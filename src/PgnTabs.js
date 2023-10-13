@@ -373,7 +373,7 @@ const AdditionalOpenings = ({ fen }) => {
 
     const sites = useContext(SelectedSitesContext).selectedSites;
 
-    const { error, loading, data } = useQuery(GET_OPENING_ADDITIONAL, {
+    const { loading, data } = useQuery(GET_OPENING_ADDITIONAL, {
         variables: { fen, sites },
         skip: fen === "start",
     });

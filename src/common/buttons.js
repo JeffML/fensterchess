@@ -1,7 +1,7 @@
 import '../stylesheets/buttons.css'
 
 const BaseButton = ({bgcolor, text, onClick, style, disabled}) => 
-    <button className="button-3" role='button' 
+    <button className="button-3" 
         style={{backgroundColor:bgcolor, ...style}} onClick={onClick} disabled={disabled}>
             {text}
         </button>

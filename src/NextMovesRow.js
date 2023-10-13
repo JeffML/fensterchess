@@ -37,6 +37,8 @@ const NextMovesGrid = ({ moves, handleMovePlayed, next, sortBy }) => {
         case sortEnum.NAME:
             toSort.sort((a, b) => a.name.localeCompare(b.name));
             break;
+        default:
+            throw Error(`unknkown case ${sortBy}`)
     }
 
     const ListItem = ({ name, moves: nextMoves, score }, index) => {
@@ -149,6 +151,8 @@ const Transitions = ({ data }) => {
                     <div className="white">{moves}</div>
                 </Fragment>
             );
+        } else {
+            return null;
         }
     });
 

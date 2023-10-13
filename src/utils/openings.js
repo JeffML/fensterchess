@@ -25,7 +25,7 @@ const movesStringToPliesAry = (moves) => {
         const matches = move.match(/(?:\d{1,3}\.)?(.*)/);
         return matches[1];
       });
-    return plies.filter(p => p != "");
+    return plies.filter(p => p !== "");
 }
 
 // see FIND_OPENINGS query
