@@ -1,0 +1,31 @@
+const APP_NAME = "Fenster"
+
+const INCR = 5; //list increment
+
+const COMPARE = 1
+
+const sortEnum = {
+    EVALUATION: 1,
+    NAME: 2,
+    // RESULTS: 3,
+};
+
+const modes = {
+    main: 1,
+    admin: 2,
+    search: 3,
+    pgnAnalyze: 4,
+
+}
+
+const SUBTITLES = []
+SUBTITLES[modes.search] = "Search Openings"
+SUBTITLES[modes.admin] = "Test and Administration"
+SUBTITLES[modes.pgnAnalyze] = "Import and Analyze PGN"
+
+const sites = ["FICS", "lichess", "shredder"]
+const siteUrls = {FICS:"https://www.freechess.org/", lichess: "https://lichess.org/", shredder: "https://www.shredderchess.com/"}
+
+const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/gim
+
+export {APP_NAME, SUBTITLES, INCR, COMPARE, sortEnum, modes, sites, siteUrls, FENEX}

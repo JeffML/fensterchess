@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch ecoAugEval",
+            "program": "${workspaceFolder}/eco2jsonTools/ecoAugEval.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "netlify lambda debug",
+            "type": "node",
+            "runtimeVersion": "default",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**",
+            ],
+            "program": "/home/jlowery2663/.yarn/bin/netlify",
+            "runtimeArgs": ["run-script", "debug"],
+            "runtimeExecutable": "npm"
+        }
+    ]
+}

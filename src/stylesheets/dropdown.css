@@ -1,0 +1,51 @@
+.menu
+{
+  border-radius: 6px;
+}
+
+.menu ul
+{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.menu ul li
+{
+  list-style: none;
+  padding: 4px;
+  position: relative;
+  transition: 0.5s;
+  display: block;
+}
+
+.menu ul li a
+{
+  color: #fff;
+  text-decoration: none;
+  padding: 5px 10px;
+}
+
+.menu ul li a:hover
+{
+  
+  background: #2ecc71;
+  border-radius: 6px;
+}
+
+.menu ul li ul
+{
+  display: none;
+}
+
+.menu ul li:hover ul
+{
+  display: block;
+  position: absolute;
+  margin-top: 5px;
+  background: #27ae60;
+  border-radius: 6px;
+  width: 100%;
+  padding: 10px 2px;
+  box-shadow: 0px 20px 100px 0px rgba(0, 0, 0, 0.5);
+}

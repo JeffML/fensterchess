@@ -1,0 +1,3 @@
+div[name=lefty]>span {
+    text-align: left;
+}
