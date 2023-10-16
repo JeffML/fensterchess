@@ -5,8 +5,8 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch ecoAugEval",
-            "program": "${workspaceFolder}/eco2jsonTools/ecoAugEval.js",
+            "name": "Launch debug",
+            "program": "${workspaceFolder}/../eco2jsonTools/interpolation/checkInterpolated.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
