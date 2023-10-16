@@ -10,6 +10,16 @@ const gridStyle = {
     padding: "3px",
 };
 
+const gridStyle2 = {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    paddingTop: "2em",
+    paddingBottom: "2em",
+    margin: "auto",
+    textAlign: "start",
+    width: "20%",
+};
+
 // pulls pgn links off of the page at $url
 const GET_PGN_LINKS = gql`
     query GetPgnLinks($url: String) {
@@ -73,12 +83,7 @@ function PgnMetaRow({ link, setLink }) {
     }
 }
 
-const PgnLinkGrid = ({
-    links,
-    end,
-    setEnd,
-    setLink,
-}) => {
+const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
     const doMore = () => {
         setEnd((p) => p + INCR);
     };
@@ -124,20 +129,45 @@ const PgnLinkGrid = ({
     );
 };
 
-/**
- * Fetch PGN urls from a site; then process each pgn file.
- *
- * TODO: mark files already fetched unless last-modfied newer than previous
- */
-const AnalyzePGN = () => {
+const PgnChooser = ({ link, setLink }) => {
     const { loading, error, data } = useQuery(GET_PGN_LINKS);
     const [end, setEnd] = useState(INCR);
-    const [link, setLink] = useState(null); // currently selected link
+    const [pgnMode, setPgnMode] = useState("twic");
 
-    // show either the list of links (along with meta data), or a "deep dive" into the pgn data itself
+    const handlePgnMode = (e) => {
+        setPgnMode(e.target.value);
+    };
+
     return (
         <>
-            <div className="row">
+            <div style={{ ...gridStyle2 }} className="white">
+                <input
+                    type="radio"
+                    name="pgnMode"
+                    value="twic"
+                    checked={pgnMode === "twic"}
+                    onChange={handlePgnMode}
+                ></input>
+                <label>
+                    <a
+                        style={{ color: "limegreen" }}
+                        target="_blank"
+                        rel="noreferrer"
+                        href="https://theweekinchess.com/a-year-of-pgn-game-files"
+                    >
+                        TWIC games
+                    </a>
+                </label>
+                <input
+                    type="radio"
+                    name="pgnMode"
+                    value="local"
+                    checked={pgnMode === "local"}
+                    onChange={handlePgnMode}
+                ></input>
+                <label>Upload PGN</label>
+            </div>
+            {pgnMode === "twic" && <div className="row">
                 {error && <p>ERROR! {error.toString()}</p>}
                 {loading && <p style={{ minWidth: "40%" }}>Loading ...</p>}
                 {data && (
@@ -151,7 +181,22 @@ const AnalyzePGN = () => {
                         }}
                     />
                 )}
-            </div>
+            </div>}
+            {pgnMode === "local" && <div className="row white">HI!!!!!</div>}
+        </>
+    )
+};
+
+/**
+ * Fetch PGN urls from a site; then process each pgn file.
+ */
+const AnalyzePGN = () => {
+    const [link, setLink] = useState(null); // currently selected link
+
+    // show either the list of links (along with meta data), or a "deep dive" into the pgn data itself
+    return (
+        <>
+            <PgnChooser {...{ link, setLink }} />
             <div className="row">
                 <div className="column">
                     <PgnTabs {...{ link }} />
