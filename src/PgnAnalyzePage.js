@@ -51,7 +51,7 @@ function PgnMetaRow({ link, setLink }) {
     if (loading) return <span>...</span>;
 
     const clickHandler = () => {
-        setLink(link);
+        setLink({url: link});
     };
 
     if (data) {
@@ -129,12 +129,36 @@ const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
     );
 };
 
+const PgnFileUploader = ({setLink}) => {
+    const handler = (e)  => {
+        const listener = (e) => {
+            setLink({pgn: reader.result})
+        }
+        const reader = new FileReader()
+        reader.addEventListener('load', listener)
+        reader.readAsText(e.target.files[0])
+    }
+
+    return (
+        <div className="row white centered">
+            <div className="row centered">
+                <label htmlFor="pgn">Choose a PGN file:</label>
+                <br />
+            </div>{" "}
+            <div className="row centered">
+                <input type="file" id="pgn" name="pgnFile" accept=".pgn" onChange={handler}/>
+            </div>
+        </div>
+    );
+};
+
 const PgnChooser = ({ link, setLink }) => {
     const { loading, error, data } = useQuery(GET_PGN_LINKS);
     const [end, setEnd] = useState(INCR);
     const [pgnMode, setPgnMode] = useState("twic");
 
     const handlePgnMode = (e) => {
+        setLink({})
         setPgnMode(e.target.value);
     };
 
@@ -167,31 +191,33 @@ const PgnChooser = ({ link, setLink }) => {
                 ></input>
                 <label>Upload PGN</label>
             </div>
-            {pgnMode === "twic" && <div className="row">
-                {error && <p>ERROR! {error.toString()}</p>}
-                {loading && <p style={{ minWidth: "40%" }}>Loading ...</p>}
-                {data && (
-                    <PgnLinkGrid
-                        {...{
-                            links: data.getPgnLinks,
-                            end,
-                            setEnd,
-                            link,
-                            setLink,
-                        }}
-                    />
-                )}
-            </div>}
-            {pgnMode === "local" && <div className="row white">HI!!!!!</div>}
+            {pgnMode === "twic" && (
+                <div className="row">
+                    {error && <p>ERROR! {error.toString()}</p>}
+                    {loading && <p style={{ minWidth: "40%" }}>Loading ...</p>}
+                    {data && (
+                        <PgnLinkGrid
+                            {...{
+                                links: data.getPgnLinks,
+                                end,
+                                setEnd,
+                                link,
+                                setLink,
+                            }}
+                        />
+                    )}
+                </div>
+            )}
+            {pgnMode === "local" && <PgnFileUploader {...{ setLink }} />}
         </>
-    )
+    );
 };
 
 /**
  * Fetch PGN urls from a site; then process each pgn file.
  */
 const AnalyzePGN = () => {
-    const [link, setLink] = useState(null); // currently selected link
+    const [link, setLink] = useState({}); // currently selected link
 
     // show either the list of links (along with meta data), or a "deep dive" into the pgn data itself
     return (
@@ -199,7 +225,7 @@ const AnalyzePGN = () => {
             <PgnChooser {...{ link, setLink }} />
             <div className="row">
                 <div className="column">
-                    <PgnTabs {...{ link }} />
+                    <PgnTabs {...link} />
                 </div>
             </div>
         </>

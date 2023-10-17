@@ -325,35 +325,46 @@ const OpeningBookComparison = ({ game }) => {
     }
 };
 
-const PgnTabs = ({ link }) => {
-    const dummyMetaPgnInput = { link, lastModified: "" };
+// Note: if called w/o a url, this does nothing (see skip)
+const PgnQueryGames = (url = null) => {
+    const dummyMetaPgnInput = { link:url, lastModified: "" };
     const { error, data, loading } = useQuery(GET_PGN_FILES, {
         variables: { pgnLinks: [dummyMetaPgnInput] },
-        skip: link === null,
+        skip: url === null,
     });
 
     if (error) console.error(error.toLocaleString());
     if (loading) return <span className="white">Loading...</span>;
     if (data) {
-        const pgnSumm = getPgnSummary(data.getPgnFiles[0].pgn);
-
-        return (
-            <Tabs>
-                <TabList className="left" style={{ marginBottom: "0px" }}>
-                    <Tab style={tabStyle}>Summary</Tab>
-                    <Tab style={tabStyle}>Games</Tab>
-                </TabList>
-                <div style={{ border: "thick solid white" }}>
-                    <TabPanel>
-                        <PgnSummary {...{ pgnSumm }} />
-                    </TabPanel>
-                    <TabPanel>
-                        <Games {...{ db: pgnSumm.db }} />
-                    </TabPanel>
-                </div>
-            </Tabs>
-        );
+        return PgnDirectGames(data.getPgnFiles[0].pgn)
     }
+}
+
+const PgnDirectGames = (pgn) => {
+    const pgnSumm = getPgnSummary(pgn);
+
+    return (
+        <Tabs>
+            <TabList className="left" style={{ marginBottom: "0px" }}>
+                <Tab style={tabStyle}>Summary</Tab>
+                <Tab style={tabStyle}>Games</Tab>
+            </TabList>
+            <div style={{ border: "thick solid white" }}>
+                <TabPanel>
+                    <PgnSummary {...{ pgnSumm }} />
+                </TabPanel>
+                <TabPanel>
+                    <Games {...{ db: pgnSumm.db }} />
+                </TabPanel>
+            </div>
+        </Tabs>
+    );
+}
+
+const PgnTabs = ({ url, pgn }) => {
+    let foo =  PgnQueryGames(url)           // this *has* to be called because it has hook in it: https://github.com/facebook/react/issues/24391
+    if (pgn) foo = PgnDirectGames(pgn)
+    return foo
 };
 
 const AdditionalOpenings = ({ fen }) => {
