@@ -327,7 +327,7 @@ const OpeningBookComparison = ({ game }) => {
 
 // Note: if called w/o a url, this does nothing (see skip)
 const PgnQueryGames = (url = null) => {
-    const dummyMetaPgnInput = { link:url, lastModified: "" };
+    const dummyMetaPgnInput = { link: url, lastModified: "" };
     const { error, data, loading } = useQuery(GET_PGN_FILES, {
         variables: { pgnLinks: [dummyMetaPgnInput] },
         skip: url === null,
@@ -336,9 +336,9 @@ const PgnQueryGames = (url = null) => {
     if (error) console.error(error.toLocaleString());
     if (loading) return <span className="white">Loading...</span>;
     if (data) {
-        return PgnDirectGames(data.getPgnFiles[0].pgn)
+        return PgnDirectGames(data.getPgnFiles[0].pgn);
     }
-}
+};
 
 const PgnDirectGames = (pgn) => {
     const pgnSumm = getPgnSummary(pgn);
@@ -359,12 +359,12 @@ const PgnDirectGames = (pgn) => {
             </div>
         </Tabs>
     );
-}
+};
 
 const PgnTabs = ({ url, pgn }) => {
-    let foo =  PgnQueryGames(url)           // this *has* to be called because it has hook in it: https://github.com/facebook/react/issues/24391
-    if (pgn) foo = PgnDirectGames(pgn)
-    return foo
+    let foo = PgnQueryGames(url); // this *has* to be called because it has hook in it: https://github.com/facebook/react/issues/24391
+    if (pgn) foo = PgnDirectGames(pgn);
+    return foo;
 };
 
 const AdditionalOpenings = ({ fen }) => {
@@ -392,7 +392,9 @@ const AdditionalOpenings = ({ fen }) => {
     if (loading)
         return (
             <>
-                <strong style={{ marginRight: "1em", color:"#FFCE44" }}>Loading...</strong>{" "}
+                <strong style={{ marginRight: "1em", color: "#FFCE44" }}>
+                    Loading...
+                </strong>{" "}
                 <span></span>
                 <strong style={{ marginLeft: "1em" }}></strong> <span></span>
             </>

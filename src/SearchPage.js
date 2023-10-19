@@ -88,7 +88,6 @@ const FENorPGN = ({ setFen, placeholder, chess }) => {
 
         // PGN?
         try {
-            console.log("loading", input)
             chess.current.loadPgn(input)
             setFen(chess.current.fen())
         } catch (ex) {

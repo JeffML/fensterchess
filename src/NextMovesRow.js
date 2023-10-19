@@ -32,7 +32,7 @@ const NextMovesGrid = ({ moves, handleMovePlayed, next, sortBy }) => {
 
     switch (sortBy) {
         case sortEnum.EVALUATION:
-            toSort.sort((a, b) => b.score - a.score);
+            toSort.sort((a, b) => Math.abs(a.score) - Math.abs(b.score));
             break;
         case sortEnum.NAME:
             toSort.sort((a, b) => a.name.localeCompare(b.name));
