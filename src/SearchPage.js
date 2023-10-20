@@ -80,19 +80,19 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
 const FENorPGN = ({ setFen, placeholder, chess }) => {
     const handleInput = (e) => {
         const input = e.clipboardData.getData("text");
-        
+
         // FEN?
         if (FENEX.test(input.split(" ")[0])) {
             setFen(input);
-        } 
+        }
 
         // PGN?
         try {
-            chess.current.loadPgn(input)
-            setFen(chess.current.fen())
+            chess.current.loadPgn(input);
+            setFen(chess.current.fen());
         } catch (ex) {
-            e.preventDefault()
-            alert(ex.toString())
+            e.preventDefault();
+            alert(ex.toString());
         }
     };
 
@@ -149,33 +149,39 @@ const SearchPage = ({ chess, fen, setFen }) => {
 
                     <div className="row">
                         <FENorPGN
-                            {...{ setFen, placeholder, setPlaceholder, chess}}
+                            {...{ setFen, placeholder, setPlaceholder, chess }}
                         />
                     </div>
                 </div>
 
                 <div className="double-column left">
-                    {loading && (
-                        <span style={{ color: "lightgreen" }}>
-                            Searching...
-                        </span>
-                    )}
+                    <div className="row" style={{ marginTop: "0px" }}>
+                        {loading && (
+                            <span style={{ color: "lightgreen" }}>
+                                Searching...
+                            </span>
+                        )}
 
-                    {error && (
-                        <span style={{ color: "red" }}>{error.toString()}</span>
-                    )}
+                        {error && (
+                            <span style={{ color: "red" }}>
+                                {error.toString()}
+                            </span>
+                        )}
 
-                    {data && <Opening {...{ fen, handleMovePlayed, data }} />}
+                        {data && (
+                            <Opening {...{ fen, handleMovePlayed, data }} />
+                        )}
+                    </div>
+                    <div className="row">
+                        {data &&
+                            data.getOpeningForFenFull?.from?.length > 1 && (
+                                <div className="row">
+                                    <Transitions {...{ data }} style={{marginLeft: "1em"}} />
+                                </div>
+                            )}
+                    </div>
                 </div>
             </div>
-            {data && data.getOpeningForFenFull?.from?.length > 1 && (
-                <div className="row">
-                    <div className="double-column">
-                        <Transitions {...{ data }} />
-                    </div>
-                    <div className="column"></div>
-                </div>
-            )}
         </>
     );
 };
