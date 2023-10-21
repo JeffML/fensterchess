@@ -131,6 +131,7 @@ td {
 .menuitem {
   color: #8D918D;
   border: 2px solid;
+  height: 3em;
 }
 
 .menuitem>span,

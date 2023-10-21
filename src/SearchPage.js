@@ -97,7 +97,7 @@ const FENorPGN = ({ setFen, placeholder, chess }) => {
     };
 
     return (
-        <textarea
+        <textarea id="fenpgn"
             spellCheck="false"
             placeholder={placeholder}
             style={{ width: "100%", height: "200%" }}
@@ -176,7 +176,10 @@ const SearchPage = ({ chess, fen, setFen }) => {
                         {data &&
                             data.getOpeningForFenFull?.from?.length > 1 && (
                                 <div className="row">
-                                    <Transitions {...{ data }} style={{marginLeft: "1em"}} />
+                                    <Transitions
+                                        {...{ data }}
+                                        style={{ marginLeft: "1em" }}
+                                    />
                                 </div>
                             )}
                     </div>
@@ -186,11 +189,11 @@ const SearchPage = ({ chess, fen, setFen }) => {
     );
 };
 
-const ThePage = (setMode) => {
+const ThePage = () => {
     const [fen, setFen] = useState("start"); //TODO: use position history context (TBD)
     const chess = useRef(new Chess());
 
-    return <SearchPage {...{ setMode, chess, fen, setFen }} />;
+    return <SearchPage {...{ chess, fen, setFen }} />;
 };
 
 export default ThePage;

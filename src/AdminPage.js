@@ -1,7 +1,7 @@
 import "./App.css";
 import { useQuery, gql } from "@apollo/client";
 import { useState } from "react";
-import modes from "./utils/modes.js";
+import {modes} from "./common/consts.js";
 import { ExitButton } from "./common/buttons.js";
 // import TestComponent, {TestComponent2} from "./TestComponent.js";
 import Constellation from "./Constellation.js";

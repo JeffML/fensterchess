@@ -24,9 +24,22 @@ const MenuBar = ({ mode, setMode }) => {
                     PGN Import
                 </span>
             </div>
-            <div className="column menuitem">
-                <label htmlFor="sites">Include Info From:</label>
-                <Sites id="sites" />
+            <div
+                className={
+                    "column menuitem " +
+                    (mode === modes.pgnAnalyze ? "selected" : "")
+                }
+            >
+                <span onClick={() => setMode(modes.about)}>About</span>
+            </div>
+            <div
+                className="double-column menuitem"
+                style={{ marginTop: "1.25em" }}
+            >
+                <label>
+                    Include Info From:
+                    <Sites />
+                </label>
             </div>
         </div>
     );

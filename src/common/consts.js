@@ -15,6 +15,7 @@ const modes = {
     admin: 2,
     search: 3,
     pgnAnalyze: 4,
+    about: 5,
 
 }
 
@@ -22,6 +23,7 @@ const SUBTITLES = []
 SUBTITLES[modes.search] = "Search Openings"
 SUBTITLES[modes.admin] = "Test and Administration"
 SUBTITLES[modes.pgnAnalyze] = "Import and Analyze PGN"
+SUBTITLES[modes.about] = "About Fenster"
 
 const sites = ["FICS", "lichess", "shredder"]
 const siteUrls = {FICS:"https://www.freechess.org/", lichess: "https://lichess.org/", shredder: "https://www.shredderchess.com/"}
