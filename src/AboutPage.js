@@ -6,8 +6,8 @@ const About = () => (
         <p>
             Fenster is a comprehensive chess opening reference site, the basis
             of which is <a href="">eco.json</a>. It is not a repository of chess
-            games, though Fenster is capable of pulling in associated opening
-            information from FICS, lichess, and Shredder databases if requested.
+            games, though Fenster is capable of pulling in associated game
+            information from FICS, lichess, and Shredder sites if requested.
         </p>
         <h2>The Search Page</h2>
         The Search Page is the default page. You can locate and opening by
@@ -31,6 +31,15 @@ const About = () => (
             be found on each side, and what the white win, black win, and draw
             statistics are.
         </p>
+        <h3> What is the "(i)"? </h3>
+        Some entries in the opening "book" are <i>interpolated</i>. This means
+        that there were no specific entries in eco.json, so variations that had
+        no name were filled in. For instance, variations A and B are related,
+        but there is a gap between them where the move sequences are not all
+        named (have entries) in the opening book. In this case, the gap is
+        filled in like: A=&lt;A'=&lt;A''=&lt;...B. For interpolated openings,
+        the name of A is used (+ "(i)"). If you think you know a more
+        appropriate name, contact the site administrator.
         <h2>The PGN Import Page</h2>
         This page shows downloads available from The Week in Chess website. (You
         have also the option to upload a PGN file from your computer.) By
@@ -46,6 +55,24 @@ const About = () => (
             right are selected the opening name as known to each site is
             displayed, as well as aggregate statistics for that opening.
         </p>
+        <h2>Developer Notes</h2>
+        It is intended to make the Fenster client code open source, but as of
+        now only trusted collaborators will be accepted. The tech stack for
+        Fenster client is:
+        <ul>
+            <li>JavaScript (not TypeScript)</li>
+            <li>Node.js</li>
+            <li>React</li>
+            <li>Apollo Client GraphQL</li>
+            <li>kokopu and chess.js</li>
+        </ul>
+        Netlify is the hosting service. There are no tests, but I'm open to
+        authors of integration tests using Cypress, or unit tests using Jest.
+        The Fenster server code is closed, but that could change. Since the
+        database is derived solely from eco.json (+ Stockfish evaluations), it
+        is perfectly possible to generate a database of your own that will
+        support the GraphQL schema (to be published soon), though it is a
+        substantial amount of work.
     </div>
 );
 

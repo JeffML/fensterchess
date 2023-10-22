@@ -77,41 +77,50 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
     } else return <div className="double-column">&nbsp;</div>;
 };
 
-const FENorPGN = ({ setFen, placeholder, chess }) => {
+const FENorPGN = ({ setFen, text, setText, chess }) => {
     const handleInput = (e) => {
         const input = e.clipboardData.getData("text");
+        const stubFen = input.split(" ")[0]
+
+        console.log(`"${stubFen}"`);
 
         // FEN?
-        if (FENEX.test(input.split(" ")[0])) {
+        if (FENEX.test(stubFen)) {
             setFen(input);
-        }
-
-        // PGN?
-        try {
-            chess.current.loadPgn(input);
-            setFen(chess.current.fen());
-        } catch (ex) {
-            e.preventDefault();
-            alert(ex.toString());
+            setText(input);
+        } else {
+            // PGN?
+            try {
+                chess.current.loadPgn(input);
+                setText(input);
+                setFen(chess.current.fen());
+            } catch (ex) {
+                e.preventDefault();
+                alert(ex.toString());
+            }
         }
     };
 
     return (
-        <textarea id="fenpgn"
+        <textarea
+            id="fenpgn"
             spellCheck="false"
-            placeholder={placeholder}
+            placeholder={"or paste in FEN/PGN here"}
             style={{ width: "100%", height: "200%" }}
+            onChange={() => {}}
             onPaste={(e) => handleInput(e)}
+            value={text}
         ></textarea>
     );
 };
 
 const SearchPage = ({ chess, fen, setFen }) => {
-    const [placeholder, setPlaceholder] = useState("or paste in FEN/PGN here");
+    const [text, setText] = useState("");
 
     const reset = () => {
         setFen("start");
         chess.current.reset();
+        setText("");
     };
 
     const handleMovePlayed = (move) => {
@@ -148,9 +157,7 @@ const SearchPage = ({ chess, fen, setFen }) => {
                     </div>
 
                     <div className="row">
-                        <FENorPGN
-                            {...{ setFen, placeholder, setPlaceholder, chess }}
-                        />
+                        <FENorPGN {...{ setFen, text, setText, chess }} />
                     </div>
                 </div>
 

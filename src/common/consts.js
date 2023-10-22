@@ -28,6 +28,6 @@ SUBTITLES[modes.about] = "About Fenster"
 const sites = ["FICS", "lichess", "shredder"]
 const siteUrls = {FICS:"https://www.freechess.org/", lichess: "https://lichess.org/", shredder: "https://www.shredderchess.com/"}
 
-const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/gim
+const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im
 
 export {APP_NAME, SUBTITLES, INCR, COMPARE, sortEnum, modes, sites, siteUrls, FENEX}
