@@ -13,8 +13,12 @@ h3 {
     text-indent: 1.5em;
 }
 
-p {
+p{
     margin: 2em;
+}
+
+pre {
+    margin-left: 3em;
 }
 
 a {
