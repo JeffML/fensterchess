@@ -1,4 +1,22 @@
 div.about {
     text-align: left;
-    color: white
+    color: white;
+    margin: 1em;
+    padding-bottom: 2.5em;
+}
+
+h2 {
+    font-family: 'Cinzel', serif;
+}
+
+h3 {
+    text-indent: 1.5em;
+}
+
+p {
+    margin: 2em;
+}
+
+a {
+    color: limegreen;
 }
