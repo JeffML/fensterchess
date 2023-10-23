@@ -4,8 +4,8 @@ import "./stylesheets/about.css";
 const About = () => (
     <div className="about">
         <p>
-            Fenster is a comprehensive chess opening reference, wholly derived
-            from data found at{" "}
+            Fenster is a comprehensive chess opening reference with over 14,000
+            variations. The raw opening data is public and can be found at{" "}
             <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>. It
             is not a repository of chess games, though Fenster is capable of
             pulling in associated opening and game information from{" "}
