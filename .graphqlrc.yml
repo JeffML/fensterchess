@@ -1,1 +1,1 @@
-schema: '/netlify/functions/pgnfen/schema.js'
+schema: '/netlify/functions/server/schema.js'
