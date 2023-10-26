@@ -1,0 +1,117 @@
+input[type="file"],
+input[type="file"]:visited,
+input[type="file"]:hover,
+input[type="file"]:focus,
+input[type="file"]:active {
+    margin: 0;
+    padding: 0em 0em;
+    /* fallback: older browsers like IE 1-8 need "em" */
+    padding: 0rem 0rem;
+    /* older browsers dont know what "rem" is */
+    overflow: hidden;
+    /* long file names overflow so just hide the end */
+    background: #fff;
+    border-radius: .2em;
+    border-radius: .2rem;
+    outline: none;
+    border: 2px solid #bbb;
+    cursor: pointer;
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+input[type="file"]:hover {
+    background: #f9f9ff;
+    /* Optional rollover color: I am using a light blue to indicate an interaction */
+    border: 2px solid #999;
+}
+
+input[type="file"]:visited,
+input[type="file"]:focus,
+input[type="file"]:active {
+    background: #fff;
+    /* Default back to white when focused. */
+    border: 2px solid #999;
+}
+
+/* Note: These "disabled" selectors blow up in IE so have to be separated from the same styles above. */
+input[type="file"]:disabled {
+    margin: 0;
+    padding: 0em 0em;
+    padding: 0rem 0rem;
+    overflow: hidden;
+    /* long file names overflow so just hide the end */
+    background: #ddd;
+    border-radius: .2em;
+    border-radius: .2rem;
+    outline: none;
+    border: 2px solid #bbb;
+    cursor: pointer;
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+input[type="file"]:disabled:hover {
+    background: #ddd;
+    /* disabled-readonly buttons should be grey */
+    border: 2px solid #999;
+}
+
+input[type="file"]:disabled:visited,
+input[type="file"]:disabled:focus,
+input[type="file"]:disabled:active {
+    background: #ddd;
+    /* disabled-readonly buttons should be grey */
+    border: 2px solid #999;
+}
+
+/* IE UPLOAD BUTTON STYLE: This attempts to alter the file upload button style in IE.  Keep in mind IE gives you limited design control but at least you can customize its upload button.*/
+::-ms-browse {
+    /* IE */
+    display: inline-block;
+    margin: 0;
+    padding: .2em .5em;
+    padding: .2rem .5rem;
+    text-align: center;
+    outline: none;
+    border: none;
+    background: #fff;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* FIREFOX UPLOAD BUTTON STYLE */
+::file-selector-button {
+    /* firefox */
+    display: inline-block;
+    margin: 0rem 1rem 0rem 0rem;
+    padding: .18em .5em;
+    padding: .18rem .5rem;
+    -webkit-appearance: button;
+    text-align: center;
+    border-radius: .1rem 0rem 0rem .1rem;
+    outline: none;
+    border: none;
+    border-right: 2px solid #bbb;
+    background: #eee;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* CHROME AND EDGE UPLOAD BUTTON STYLE */
+::-webkit-file-upload-button {
+    /* chrome and edge */
+    display: inline-block;
+    margin: 0rem 1rem 0rem 0rem;
+    padding: .19em .5em;
+    padding: .19rem .5rem;
+    -webkit-appearance: button;
+    text-align: center;
+    border-radius: .1rem 0rem 0rem .1rem;
+    outline: none;
+    border: none;
+    border-right: 2px solid #bbb;
+    background: #eee;
+    white-space: nowrap;
+    cursor: pointer;
+}

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ActionButton } from "./common/buttons.js";
 import { INCR } from "./common/consts.js";
 import PgnTabs from "./PgnTabs.js";
+import "./stylesheets/fileSelector.css"
 
 const gridStyle = {
     display: "grid",
