@@ -17,6 +17,7 @@ const Sites2 = () => {
                         id={s}
                         type="checkbox"
                         value={s}
+                        defaultChecked = {selectedSites.get().includes(s)}
                         onClick={({ target }) => {
                             if (target.checked) selectedSites.add(target.value);
                             else selectedSites.remove(target.value);

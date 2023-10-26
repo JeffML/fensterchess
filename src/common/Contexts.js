@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 
-let selectedSites = [];
+let selectedSites = localStorage.sites? JSON.parse(localStorage.sites) : [];
 
 const SelectedSitesContext = createContext({
     selectedSites,
@@ -10,21 +10,26 @@ const SelectedSitesContext = createContext({
 const SelectedSitesContextProvider = ({ children }) => {
     const add = (site) => {
         selectedSites = [...selectedSites, site];
+        localStorage.sites = JSON.stringify(selectedSites)
         setState({ ...state, selectedSites });
     };
 
     const remove = (site) => {
         selectedSites = selectedSites.filter((s) => s !== site);
+        localStorage.sites = JSON.stringify(selectedSites)
         setState({
             ...state,
             selectedSites,
         });
     };
 
+    const get = () => selectedSites
+
     const initState = {
         selectedSites,
         add,
         remove,
+        get
     };
 
     const [state, setState] = useState(initState);
