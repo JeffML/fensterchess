@@ -1,8 +1,9 @@
 import { gql, useQuery } from "@apollo/client";
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import { ActionButton } from "./common/buttons.js";
 import { INCR } from "./common/consts.js";
 import PgnTabs from "./PgnTabs.js";
+import getFeedAsJson from "./utils/getFeedAsJson.js";
 import "./stylesheets/fileSelector.css";
 
 const gridStyle = {
@@ -20,7 +21,10 @@ const radioStyle = {
     marginLeft: "2em",
     gap: "1em",
 };
-
+const gridStyle2 = {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+};
 const gridStyle3 = {
     display: "grid",
     gridTemplateColumns: "repeat(1, 1fr)",
@@ -160,6 +164,24 @@ const PgnFileUploader = ({ setLink }) => {
     );
 };
 
+const RssFeed = () => {
+    const [json, setJson] = useState({})
+
+    const rss ='https://corsproxy.io/?' + encodeURIComponent('https://theweekinchess.com/twic-rss-feed');
+
+    useEffect(()=>{
+        async function getJSON() {
+            const j = await getFeedAsJson(rss)
+            setJson(j)
+        }
+
+        getJSON()
+    }, [rss])
+    
+    return (<p>{JSON.stringify(json)}</p>)
+}
+
+
 const PgnChooser = ({ link, setLink }) => {
     const { loading, error, data } = useQuery(GET_PGN_LINKS);
     const [end, setEnd] = useState(INCR);
@@ -170,10 +192,12 @@ const PgnChooser = ({ link, setLink }) => {
         setPgnMode(e.target.value);
     };
 
+
+
     return (
         <>
             <div style={radioStyle} className="white">
-                <input 
+                <input
                     type="radio"
                     name="pgnMode"
                     value="twic"
@@ -195,7 +219,7 @@ const PgnChooser = ({ link, setLink }) => {
                     value="local"
                     checked={pgnMode === "local"}
                     onChange={handlePgnMode}
-                    style={{marginLeft: "1em"}}
+                    style={{ marginLeft: "1em" }}
                 ></input>
                 <label>Upload PGN</label>
             </div>
@@ -205,15 +229,18 @@ const PgnChooser = ({ link, setLink }) => {
                     {error && <p>ERROR! {error.toString()}</p>}
                     {loading && <p style={{ minWidth: "40%" }}>Loading ...</p>}
                     {data && (
-                        <PgnLinkGrid
-                            {...{
-                                links: data.getPgnLinks,
-                                end,
-                                setEnd,
-                                link,
-                                setLink,
-                            }}
-                        />
+                        <div style={gridStyle2}>
+                            <PgnLinkGrid
+                                {...{
+                                    links: data.getPgnLinks,
+                                    end,
+                                    setEnd,
+                                    link,
+                                    setLink,
+                                }}
+                            />
+                            <RssFeed/>
+                        </div>
                     )}
                 </div>
             )}
