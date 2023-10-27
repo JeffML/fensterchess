@@ -114,7 +114,7 @@ const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
 
     return (
         <div
-            style={{ ...gridStyle, textAlign: "start", color: "white" }}
+            style={{ ...gridStyle, maxHeight: 0, textAlign: "start", color: "white" }}
             className="font-cinzel"
         >
             <Headers />
