@@ -3,22 +3,27 @@ import { useState } from "react";
 import { ActionButton } from "./common/buttons.js";
 import { INCR } from "./common/consts.js";
 import PgnTabs from "./PgnTabs.js";
-import "./stylesheets/fileSelector.css"
+import "./stylesheets/fileSelector.css";
 
 const gridStyle = {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
     padding: "3px",
+    gridColumnGap: "2em",
+    marginLeft: "2em",
 };
 
-const gridStyle2 = {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
+const radioStyle = {
+    display: "flex",
     paddingTop: "2em",
     paddingBottom: "2em",
-    margin: "auto",
-    textAlign: "start",
-    width: "20%",
+    marginLeft: "2em",
+    gap: "1em",
+};
+
+const gridStyle3 = {
+    display: "grid",
+    gridTemplateColumns: "repeat(1, 1fr)",
 };
 
 // pulls pgn links off of the page at $url
@@ -52,7 +57,7 @@ function PgnMetaRow({ link, setLink }) {
     if (loading) return <span>...</span>;
 
     const clickHandler = () => {
-        setLink({url: link});
+        setLink({ url: link });
     };
 
     if (data) {
@@ -104,41 +109,37 @@ const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
     };
 
     return (
-        <>
-            <div className="double-column white centered">
-                <div
-                    style={{ ...gridStyle, textAlign: "start" }}
-                    className="font-cinzel"
-                >
-                    <Headers />
-                    <PgnMetaRows />
+        <div
+            style={{ ...gridStyle, textAlign: "start", color: "white" }}
+            className="font-cinzel"
+        >
+            <Headers />
+            <PgnMetaRows />
 
-                    {end < links.length ? (
-                        <span colSpan="4">
-                            <ActionButton
-                                {...{
-                                    style: { width: "8em" },
-                                    onClick: () => doMore(),
-                                    text: "More...",
-                                }}
-                            />{" "}
-                        </span>
-                    ) : null}
-                </div>
-            </div>
-        </>
+            {end < links.length ? (
+                <span colSpan="4">
+                    <ActionButton
+                        {...{
+                            style: { width: "8em" },
+                            onClick: () => doMore(),
+                            text: "More...",
+                        }}
+                    />{" "}
+                </span>
+            ) : null}
+        </div>
     );
 };
 
-const PgnFileUploader = ({setLink}) => {
-    const handler = (e)  => {
+const PgnFileUploader = ({ setLink }) => {
+    const handler = (e) => {
         const listener = (e) => {
-            setLink({pgn: reader.result})
-        }
-        const reader = new FileReader()
-        reader.addEventListener('load', listener)
-        reader.readAsText(e.target.files[0])
-    }
+            setLink({ pgn: reader.result });
+        };
+        const reader = new FileReader();
+        reader.addEventListener("load", listener);
+        reader.readAsText(e.target.files[0]);
+    };
 
     return (
         <div className="row white centered">
@@ -147,7 +148,13 @@ const PgnFileUploader = ({setLink}) => {
                 <br />
             </div>{" "}
             <div className="row centered">
-                <input type="file" id="pgn" name="pgnFile" accept=".pgn" onChange={handler}/>
+                <input
+                    type="file"
+                    id="pgn"
+                    name="pgnFile"
+                    accept=".pgn"
+                    onChange={handler}
+                />
             </div>
         </div>
     );
@@ -159,14 +166,14 @@ const PgnChooser = ({ link, setLink }) => {
     const [pgnMode, setPgnMode] = useState("twic");
 
     const handlePgnMode = (e) => {
-        setLink({})
+        setLink({});
         setPgnMode(e.target.value);
     };
 
     return (
         <>
-            <div style={{ ...gridStyle2 }} className="white">
-                <input
+            <div style={radioStyle} className="white">
+                <input 
                     type="radio"
                     name="pgnMode"
                     value="twic"
@@ -175,7 +182,6 @@ const PgnChooser = ({ link, setLink }) => {
                 ></input>
                 <label>
                     <a
-                        style={{ color: "limegreen" }}
                         target="_blank"
                         rel="noreferrer"
                         href="https://theweekinchess.com/a-year-of-pgn-game-files"
@@ -189,9 +195,11 @@ const PgnChooser = ({ link, setLink }) => {
                     value="local"
                     checked={pgnMode === "local"}
                     onChange={handlePgnMode}
+                    style={{marginLeft: "1em"}}
                 ></input>
                 <label>Upload PGN</label>
             </div>
+
             {pgnMode === "twic" && (
                 <div className="row">
                     {error && <p>ERROR! {error.toString()}</p>}
@@ -222,14 +230,14 @@ const AnalyzePGN = () => {
 
     // show either the list of links (along with meta data), or a "deep dive" into the pgn data itself
     return (
-        <>
-            <PgnChooser {...{ link, setLink }} />
-            <div className="row">
-                <div className="column">
-                    <PgnTabs {...link} />
-                </div>
+        <div style={gridStyle3}>
+            <div>
+                <PgnChooser {...{ link, setLink }} />
             </div>
-        </>
+            <div>
+                <PgnTabs {...link} />
+            </div>
+        </div>
     );
 };
 
