@@ -177,8 +177,17 @@ const RssFeed = () => {
 
         getJSON()
     }, [rss])
-    
-    return (<p>{JSON.stringify(json)}</p>)
+
+    return (
+        <div className="white" style={{textAlign:"left"}}>
+            <h3 style={{marginLeft:"-1.5em"}}>News from <a href={json?.link}>{json?.title}</a></h3>
+            <h4>{json?.description}</h4>
+            {json.items?.map(item => <>
+                <b><a href={item.link}>{item.title}</a></b><br/>
+                <div className="fadeout">{item.description}</div>
+            </>)}
+        </div>
+    )
 }
 
 

@@ -8,7 +8,14 @@ const getFeedAsJson = async (url) => {
 
     const json = new XMLParser().parse(xml);
 
-    return json;
+    const {rss:{channel:{title, link, description, item}}} = json;
+
+    const items = item.map(item => {
+        const {title, link, description} = item
+        return {title, link, description}
+    }).slice(0, 4)
+
+    return {title, link, description, items};
 };
 
 export default getFeedAsJson;
