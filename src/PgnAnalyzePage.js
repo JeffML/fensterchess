@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { useState , useEffect} from "react";
+import { useState, useEffect } from "react";
 import { ActionButton } from "./common/buttons.js";
 import { INCR } from "./common/consts.js";
 import PgnTabs from "./PgnTabs.js";
@@ -21,13 +21,17 @@ const radioStyle = {
     marginLeft: "2em",
     gap: "1em",
 };
+
 const gridStyle2 = {
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
 };
-const gridStyle3 = {
-    display: "grid",
-    gridTemplateColumns: "repeat(1, 1fr)",
+
+// const webkitMaskImage = 'linearGradient(180deg, #000 20%, transparent)'
+
+const newsStyle = {
+    fontSize: "smaller",
+    WebkitMaskImage: 'linear-gradient(180deg, #000 20%, transparent)',
 };
 
 // pulls pgn links off of the page at $url
@@ -114,7 +118,12 @@ const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
 
     return (
         <div
-            style={{ ...gridStyle, maxHeight: 0, textAlign: "start", color: "white" }}
+            style={{
+                ...gridStyle,
+                maxHeight: 0,
+                textAlign: "start",
+                color: "white",
+            }}
             className="font-cinzel"
         >
             <Headers />
@@ -165,31 +174,44 @@ const PgnFileUploader = ({ setLink }) => {
 };
 
 const RssFeed = () => {
-    const [json, setJson] = useState({})
+    const [json, setJson] = useState({});
 
-    const rss ='https://corsproxy.io/?' + encodeURIComponent('https://theweekinchess.com/twic-rss-feed');
+    const rss =
+        "https://corsproxy.io/?" +
+        encodeURIComponent("https://theweekinchess.com/twic-rss-feed");
 
-    useEffect(()=>{
+    useEffect(() => {
         async function getJSON() {
-            const j = await getFeedAsJson(rss)
-            setJson(j)
+            const j = await getFeedAsJson(rss);
+            setJson(j);
         }
 
-        getJSON()
-    }, [rss])
+        getJSON();
+    }, [rss]);
 
     return (
-        <div className="white" style={{textAlign:"left"}}>
-            <h3 style={{marginLeft:"-1.5em"}}>News from <a href={json?.link}>{json?.title}</a></h3>
-            <h4>{json?.description}</h4>
-            {json.items?.map(item => <>
-                <b><a href={item.link}>{item.title}</a></b><br/>
-                <div className="fadeout">{item.description}</div>
-            </>)}
+        <div className="white" style={{ textAlign: "left" }}>
+            <h3 style={{ marginLeft: "-1.5em" }}>
+                News from{" "}
+                <a target="_blank" rel="noreferrer" href={json?.link}>
+                    {json?.title}
+                </a>
+            </h3>
+            {/* <h4>{json?.description}</h4> */}
+            {json.items?.map((item) => (
+                <>
+                    <b>
+                        <a target="_blank" rel="noreferrer" href={item.link}>
+                            {item.title}
+                        </a>
+                    </b>
+                    <br />
+                    <div style={newsStyle}>{item.description}</div>
+                </>
+            ))}
         </div>
-    )
-}
-
+    );
+};
 
 const PgnChooser = ({ link, setLink }) => {
     const { loading, error, data } = useQuery(GET_PGN_LINKS);
@@ -201,10 +223,8 @@ const PgnChooser = ({ link, setLink }) => {
         setPgnMode(e.target.value);
     };
 
-
-
     return (
-        <>
+        <div>
             <div style={radioStyle} className="white">
                 <input
                     type="radio"
@@ -234,27 +254,24 @@ const PgnChooser = ({ link, setLink }) => {
             </div>
 
             {pgnMode === "twic" && (
-                <div className="row">
+                <div>
                     {error && <p>ERROR! {error.toString()}</p>}
                     {loading && <p style={{ minWidth: "40%" }}>Loading ...</p>}
                     {data && (
-                        <div style={gridStyle2}>
-                            <PgnLinkGrid
-                                {...{
-                                    links: data.getPgnLinks,
-                                    end,
-                                    setEnd,
-                                    link,
-                                    setLink,
-                                }}
-                            />
-                            <RssFeed/>
-                        </div>
+                        <PgnLinkGrid
+                            {...{
+                                links: data.getPgnLinks,
+                                end,
+                                setEnd,
+                                link,
+                                setLink,
+                            }}
+                        />
                     )}
                 </div>
             )}
             {pgnMode === "local" && <PgnFileUploader {...{ setLink }} />}
-        </>
+        </div>
     );
 };
 
@@ -266,14 +283,15 @@ const AnalyzePGN = () => {
 
     // show either the list of links (along with meta data), or a "deep dive" into the pgn data itself
     return (
-        <div style={gridStyle3}>
-            <div>
+        <>
+            <div style={gridStyle2}>
                 <PgnChooser {...{ link, setLink }} />
+                <RssFeed />
             </div>
             <div>
                 <PgnTabs {...link} />
             </div>
-        </div>
+        </>
     );
 };
 
