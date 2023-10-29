@@ -91,6 +91,7 @@ const Openings = ({ openings }) => {
 
     return (
         <div style={gridStyle} className="scrollableY white">
+            <span>Openings (from PGN)</span>
             {Array.from(openings)
                 .sort((a, b) => a.localeCompare(b))
                 .map((o, i) => (
@@ -250,7 +251,7 @@ const Games = ({ db }) => {
                 <span>Date</span>
                 <span>White</span>
                 <span>Black</span>
-                <span>Opening</span>
+                <span>Opening <span style={{fontSize:"smaller"}}>(from PGN)</span></span>
                 <span>Result</span>
             </div>
             <hr />
