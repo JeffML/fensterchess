@@ -27,7 +27,7 @@ const MenuBar = ({ mode, setMode }) => {
             <div
                 className={
                     "column menuitem " +
-                    (mode === modes.pgnAnalyze ? "selected" : "")
+                    (mode === modes.about ? "selected" : "")
                 }
             >
                 <span onClick={() => setMode(modes.about)}>About</span>
