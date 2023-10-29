@@ -1,6 +1,6 @@
 {
-  "name": "pgnfen3",
-  "version": "0.1.0",
+  "name": "Fenster",
+  "version": "1.0.0-beta",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -31,7 +31,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "debug": "netlify dev --debug",
-    "analyze": "source-map-explorer 'build/static/js/*.js'"
+    "analyze": "source-map-explorer 'build/static/js/*.js' --only-mapped --html ./temp/sme.html"
   },
   "eslintConfig": {
     "extends": [

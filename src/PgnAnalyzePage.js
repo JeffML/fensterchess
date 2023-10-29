@@ -1,18 +1,10 @@
 import { gql, useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
-import { ActionButton } from "./common/buttons.js";
 import { INCR } from "./common/consts.js";
 import PgnTabs from "./PgnTabs.js";
+import PgnLinkGrid from "./PgnLInkGrid.js";
 import getFeedAsJson from "./utils/getFeedAsJson.js";
 import "./stylesheets/fileSelector.css";
-
-const gridStyle = {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    padding: "3px",
-    gridColumnGap: "2em",
-    marginLeft: "2em",
-};
 
 const radioStyle = {
     display: "flex",
@@ -27,11 +19,11 @@ const gridStyle2 = {
     gridTemplateColumns: "repeat(2, 1fr)",
 };
 
-// const webkitMaskImage = 'linearGradient(180deg, #000 20%, transparent)'
-
 const newsStyle = {
     fontSize: "smaller",
-    WebkitMaskImage: 'linear-gradient(180deg, #000 20%, transparent)',
+    WebkitMaskImage: "linear-gradient(180deg, #000 20%, transparent)",
+    paddingRight: "3em",
+    marginBottom: "1em"
 };
 
 // pulls pgn links off of the page at $url
@@ -40,109 +32,6 @@ const GET_PGN_LINKS = gql`
         getPgnLinks(url: $url)
     }
 `;
-
-// HEAD requests for each link
-const GET_PGN_LINK_META = gql`
-    query getPgnLinkMeta($url: String!) {
-        getPgnLinkMeta(url: $url) {
-            link
-            contentLength
-            lastModified
-        }
-    }
-`;
-
-function PgnMetaRow({ link, setLink }) {
-    const { error, loading, data } = useQuery(GET_PGN_LINK_META, {
-        variables: { url: link },
-    });
-
-    if (error) {
-        console.error(error.toLocaleString());
-        return <span>ERROR!</span>;
-    }
-
-    if (loading) return <span>...</span>;
-
-    const clickHandler = () => {
-        setLink({ url: link });
-    };
-
-    if (data) {
-        const { lastModified, contentLength } = data.getPgnLinkMeta;
-
-        const millis = Date.parse(lastModified);
-        const localeTime = new Date(millis).toLocaleString("en-US", {
-            hour12: false,
-            dateStyle: "short",
-            timeStyle: "short",
-        });
-
-        return (
-            <>
-                <span
-                    className="fakeLink"
-                    style={{ color: "cyan" }}
-                    onClick={clickHandler}
-                >
-                    {link.substring(link.lastIndexOf("/") + 1)}
-                </span>
-                <span>{localeTime}</span>
-                <span>
-                    {Math.round(contentLength / 1000)}
-                    <span style={{ fontSize: "smaller" }}>K</span>
-                </span>
-            </>
-        );
-    }
-}
-
-const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
-    const doMore = () => {
-        setEnd((p) => p + INCR);
-    };
-
-    const Headers = () => (
-        <>
-            <span>File Name </span>
-            <span>Date</span>
-            <span>Size</span>
-        </>
-    );
-
-    const PgnMetaRows = () => {
-        return links
-            .slice(0, end)
-            .map((link) => <PgnMetaRow key={link} {...{ link, setLink }} />);
-    };
-
-    return (
-        <div
-            style={{
-                ...gridStyle,
-                maxHeight: 0,
-                textAlign: "start",
-                color: "white",
-            }}
-            className="font-cinzel"
-        >
-            <Headers />
-            <PgnMetaRows />
-
-            {end < links.length ? (
-                <span colSpan="4">
-                    <ActionButton
-                        {...{
-                            style: { width: "8em" },
-                            onClick: () => doMore(),
-                            text: "More...",
-                        }}
-                    />{" "}
-                </span>
-            ) : null}
-        </div>
-    );
-};
 
 const PgnFileUploader = ({ setLink }) => {
     const handler = (e) => {
@@ -206,7 +95,7 @@ const RssFeed = () => {
                         </a>
                     </b>
                     <br />
-                    <div style={newsStyle}>{item.description}</div>
+                    <div style={newsStyle}>{item.description.slice(0, 250)}</div>
                 </>
             ))}
         </div>
