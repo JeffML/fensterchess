@@ -2,7 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { INCR } from "./common/consts.js";
 import PgnTabs from "./PgnTabs.js";
-import PgnLinkGrid from "./PgnLInkGrid.js";
+import PgnLinkGrid from "./PgnLinkGrid.js";
 import getFeedAsJson from "./utils/getFeedAsJson.js";
 import "./stylesheets/fileSelector.css";
 
