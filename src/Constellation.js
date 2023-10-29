@@ -1,5 +1,12 @@
-import { ReactP5Wrapper } from "@p5-wrapper/react";
+/*
+    (10/29/23 -- JML) 
+    "@p5-wrapper/react" injects a huge dependency (~1MB).
+     Instead, explore using technique #2, here: https://www.shivanshbakshi.dev/blog/p5-react/integrate-p5-with-react/
+*/
+
 import { useQuery, gql } from "@apollo/client";
+// import { ReactP5Wrapper } from "@p5-wrapper/react";
+const ReactP5Wrapper = {}
 
 const GET_OPENING_PATHS = gql`
     query getPaths($type: String!, $fen: String!) {
