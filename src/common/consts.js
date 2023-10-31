@@ -1,4 +1,5 @@
 const APP_NAME = "Fenster"
+const VERSION = "1.0.0-beta"
 
 const INCR = 5; //list increment
 
@@ -30,4 +31,4 @@ const siteUrls = {FICS:"https://www.freechess.org/", lichess: "https://lichess.o
 
 const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im
 
-export {APP_NAME, SUBTITLES, INCR, COMPARE, sortEnum, modes, sites, siteUrls, FENEX}
+export {APP_NAME, SUBTITLES, INCR, COMPARE, sortEnum, modes, sites, siteUrls, FENEX, VERSION}
