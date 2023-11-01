@@ -7,7 +7,7 @@ import { Fragment, useContext, useState } from "react";
 import { getFensForMoves } from "./utils/openings.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 
-const blueBoldStyle = { divfontWeight: "bold", color: "LightSkyBlue" };
+const blueBoldStyle = { color: "LightSkyBlue" };
 
 const tabStyle = {
     border: "1px solid #FFFFFF ",
@@ -82,7 +82,7 @@ const getPgnSummary = (pgn) => {
 const Openings = ({ openings }) => {
     const gridStyle = {
         display: "grid",
-        gridTemplate: "1fr",
+        gridTemplate: "1fr 2fr",
         maxHeight: "250px",
         minWidth: "fit-content",
         marginTop: "1em",
@@ -91,13 +91,16 @@ const Openings = ({ openings }) => {
 
     return (
         <div style={gridStyle} className="scrollableY white">
-            <span>Openings (from PGN)</span>
+            <span className="font-cinzel left" style={{...blueBoldStyle, gridColumn:"span 2"}}>Openings<span style={{fontSize:"smaller", paddingTop:"2px"}}>&nbsp;(from PGN)</span></span>
             {Array.from(openings)
                 .sort((a, b) => a.localeCompare(b))
                 .map((o, i) => (
+                    <>
+                    <input type="checkbox"></input>
                     <span key={o + i} className="left">
-                        {o}
+                        {o??"(no name)"}
                     </span>
+                    </>
                 ))}
         </div>
     );
@@ -290,9 +293,6 @@ const Games = ({ db }) => {
 };
 
 const OpeningBookComparison = ({ game }) => {
-    // The following doesn't work because each FEN always ends in "0 1" (https://github.com/yo35/kokopu/issues/43)
-    // const fens = game.nodes().slice(0,50).map(n=>n.position().fen())
-
     const columnStyle = { gridColumnStart: "span 6" };
     const gridStyle = {
         display: "inline-grid",
@@ -302,10 +302,7 @@ const OpeningBookComparison = ({ game }) => {
         color: "#BDEDFF",
     };
 
-    const plies = game.pojo().mainVariation.slice(0, 50); //returns plies
-    const [fens] = getFensForMoves(plies);
-
-    // console.log({fens})
+    const fens = game.nodes().slice(0,50).map(n=>n.fen())
     const { data } = useQuery(FIND_OPENINGS, { variables: { fens } });
 
     if (data) {
@@ -326,7 +323,7 @@ const OpeningBookComparison = ({ game }) => {
     }
 };
 
-// Note: if called w/o a url, this does nothing (see skip)
+// Note: if called w/o a url, this does nothing (note the skip)
 const PgnQueryGames = (url = null) => {
     const dummyMetaPgnInput = { link: url, lastModified: "" };
     const { error, data, loading } = useQuery(GET_PGN_FILES, {
@@ -360,12 +357,6 @@ const PgnDirectGames = (pgn) => {
             </div>
         </Tabs>
     );
-};
-
-const PgnTabs = ({ url, pgn }) => {
-    let foo = PgnQueryGames(url); // this *has* to be called because it has hook in it: https://github.com/facebook/react/issues/24391
-    if (pgn) foo = PgnDirectGames(pgn);
-    return foo;
 };
 
 const AdditionalOpenings = ({ fen }) => {
@@ -425,5 +416,17 @@ const AdditionalOpenings = ({ fen }) => {
         return siteData;
     }
 };
+
+/*
+Arguments are url OR pgn.
+
+If given a url, query TWIC for games; else load the pgn file directly.
+*/
+const PgnTabs = ({ url, pgn }) => {
+    let foo = PgnQueryGames(url); // this *has* to be called because it has hook in it: https://github.com/facebook/react/issues/24391
+    if (pgn) foo = PgnDirectGames(pgn);
+    return foo;
+};
+
 
 export default PgnTabs;
