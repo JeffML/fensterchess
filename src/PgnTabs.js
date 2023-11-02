@@ -4,7 +4,6 @@ import "react-tabs/style/react-tabs.css";
 import "./stylesheets/grid.css";
 import { pgnRead } from "kokopu";
 import { Fragment, useContext, useState } from "react";
-import { getFensForMoves } from "./utils/openings.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
@@ -13,6 +12,17 @@ const tabStyle = {
     border: "1px solid #FFFFFF ",
     borderRadius: "10px 10px 0 0",
 };
+
+const tabFlashStyle = {
+    ...tabStyle,
+    transition: "all 0.5s ease-in",
+    color: "orange",
+    // padding: "20px",
+};
+
+const tabFlashStyle2 = {
+    color:"green"
+}
 
 // file requests for (a) link
 const GET_PGN_FILES = gql`
@@ -79,7 +89,7 @@ const getPgnSummary = (pgn) => {
     return { db, players, high, low, avg, count: gmCt, openings };
 };
 
-const Openings = ({ openings }) => {
+const Openings = ({ openings, setFlash }) => {
     const gridStyle = {
         display: "grid",
         gridTemplate: "1fr 2fr",
@@ -89,24 +99,43 @@ const Openings = ({ openings }) => {
         overflowX: "visible",
     };
 
+    const handler = (e) => {
+        setFlash(true);
+        setTimeout(() => {
+            setFlash(false);
+        }, 2000);
+    };
+
     return (
         <div style={gridStyle} className="scrollableY white">
-            <span className="font-cinzel left" style={{...blueBoldStyle, gridColumn:"span 2"}}>Openings<span style={{fontSize:"smaller", paddingTop:"2px"}}>&nbsp;(from PGN)</span></span>
+            <span
+                className="font-cinzel left"
+                style={{ ...blueBoldStyle, gridColumn: "span 2" }}
+            >
+                Openings
+                <span style={{ fontSize: "smaller", paddingTop: "2px" }}>
+                    &nbsp;(from PGN)
+                </span>
+            </span>
             {Array.from(openings)
                 .sort((a, b) => a.localeCompare(b))
                 .map((o, i) => (
-                    <>
-                    <input type="checkbox"></input>
-                    <span key={o + i} className="left">
-                        {o??"(no name)"}
-                    </span>
-                    </>
+                    <Fragment key={o + i}>
+                        <input
+                            type="checkbox"
+                            value={o}
+                            onClick={handler}
+                        ></input>
+                        <span key={o + i} className="left">
+                            {o ?? "(no name)"}
+                        </span>
+                    </Fragment>
                 ))}
         </div>
     );
 };
 
-const PgnSummary = ({ pgnSumm }) => {
+const PgnSummary = ({ pgnSumm, setFlash }) => {
     const { count, high, low, openings } = pgnSumm;
 
     return (
@@ -124,7 +153,7 @@ const PgnSummary = ({ pgnSumm }) => {
                         {low}
                     </div>
                     <div className="row">
-                        <Openings {...{ openings }} />
+                        <Openings {...{ openings, setFlash }} />
                     </div>
                 </div>
                 <div className="column left">
@@ -254,7 +283,10 @@ const Games = ({ db }) => {
                 <span>Date</span>
                 <span>White</span>
                 <span>Black</span>
-                <span>Opening <span style={{fontSize:"smaller"}}>(from PGN)</span></span>
+                <span>
+                    Opening{" "}
+                    <span style={{ fontSize: "smaller" }}>(from PGN)</span>
+                </span>
                 <span>Result</span>
             </div>
             <hr />
@@ -302,7 +334,10 @@ const OpeningBookComparison = ({ game }) => {
         color: "#BDEDFF",
     };
 
-    const fens = game.nodes().slice(0,50).map(n=>n.fen())
+    const fens = game
+        .nodes()
+        .slice(0, 50)
+        .map((n) => n.fen());
     const { data } = useQuery(FIND_OPENINGS, { variables: { fens } });
 
     if (data) {
@@ -324,7 +359,7 @@ const OpeningBookComparison = ({ game }) => {
 };
 
 // Note: if called w/o a url, this does nothing (note the skip)
-const PgnQueryGames = (url = null) => {
+const PgnQueryGames = (url = null, flash, setFlash) => {
     const dummyMetaPgnInput = { link: url, lastModified: "" };
     const { error, data, loading } = useQuery(GET_PGN_FILES, {
         variables: { pgnLinks: [dummyMetaPgnInput] },
@@ -334,25 +369,25 @@ const PgnQueryGames = (url = null) => {
     if (error) console.error(error.toLocaleString());
     if (loading) return <span className="white">Loading...</span>;
     if (data) {
-        return PgnDirectGames(data.getPgnFiles[0].pgn);
+        return PgnDirectGames(data.getPgnFiles[0].pgn, flash, setFlash);
     }
 };
 
-const PgnDirectGames = (pgn) => {
+const PgnDirectGames = (pgn, flash, setFlash) => {
     const pgnSumm = getPgnSummary(pgn);
 
     return (
         <Tabs>
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab style={tabStyle}>Summary</Tab>
-                <Tab style={tabStyle}>Games</Tab>
+                <Tab style={{...tabFlashStyle, ...(flash?tabFlashStyle2:null)}}>Games</Tab>
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
-                    <PgnSummary {...{ pgnSumm }} />
+                    <PgnSummary {...{ pgnSumm, setFlash }} />
                 </TabPanel>
                 <TabPanel>
-                    <Games {...{ db: pgnSumm.db }} />
+                    <Games {...{ db: pgnSumm.db, setFlash }} />
                 </TabPanel>
             </div>
         </Tabs>
@@ -423,10 +458,10 @@ Arguments are url OR pgn.
 If given a url, query TWIC for games; else load the pgn file directly.
 */
 const PgnTabs = ({ url, pgn }) => {
-    let foo = PgnQueryGames(url); // this *has* to be called because it has hook in it: https://github.com/facebook/react/issues/24391
-    if (pgn) foo = PgnDirectGames(pgn);
+    const [flash, setFlash] = useState(false);
+    let foo = PgnQueryGames(url, flash, setFlash); // this *has* to be called because it has hook in it: https://github.com/facebook/react/issues/24391
+    if (pgn) foo = PgnDirectGames(pgn, flash, setFlash);
     return foo;
 };
-
 
 export default PgnTabs;

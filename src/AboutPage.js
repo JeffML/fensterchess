@@ -1,11 +1,11 @@
 import "./App.css";
 import "./stylesheets/about.css";
-import {APP_NAME, VERSION} from './common/consts.js'
+import {VERSION} from './common/consts.js'
 
 
 const About = () => (
     <>
-        <div className="font-cinzel white" style={{fontSize:"20pt", marginTop:"1em" }}>{APP_NAME} {VERSION}</div>
+        <div className="font-cinzel white left" style={{fontSize:"12pt", marginLeft: "1em", marginTop:"1em" }}>version {VERSION}</div>
         <div className="about">
             <p>
                 Fenster is a comprehensive chess opening reference with over

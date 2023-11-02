@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { INCR } from "./common/consts.js";
 import PgnTabs from "./PgnTabs.js";
 import PgnLinkGrid from "./PgnLinkGrid.js";
@@ -88,7 +88,7 @@ const RssFeed = () => {
             </h3>
             {/* <h4>{json?.description}</h4> */}
             {json.items?.map((item) => (
-                <>
+                <Fragment key={item.title}>
                     <b>
                         <a target="_blank" rel="noreferrer" href={item.link}>
                             {item.title}
@@ -96,7 +96,7 @@ const RssFeed = () => {
                     </b>
                     <br />
                     <div style={newsStyle}>{item.description.slice(0, 250)}</div>
-                </>
+                </Fragment>
             ))}
         </div>
     );
