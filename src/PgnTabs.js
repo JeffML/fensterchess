@@ -4,6 +4,7 @@ import "react-tabs/style/react-tabs.css";
 import "./stylesheets/grid.css";
 import { pgnRead } from "kokopu";
 import { Fragment, useContext, useState } from "react";
+import sleep from './utils/sleep.js'
 import { SelectedSitesContext } from "./common/Contexts.js";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
@@ -15,13 +16,13 @@ const tabStyle = {
 
 const tabFlashStyle = {
     ...tabStyle,
-    transition: "all 0.5s ease-in",
-    color: "orange",
+    transition: "all 0.1s ease-in",
+    // color: "orange",
     // padding: "20px",
 };
 
 const tabFlashStyle2 = {
-    color:"green"
+    backgroundColor:"orange"
 }
 
 // file requests for (a) link
@@ -89,7 +90,7 @@ const getPgnSummary = (pgn) => {
     return { db, players, high, low, avg, count: gmCt, openings };
 };
 
-const Openings = ({ openings, setFlash }) => {
+const Openings = ({ openings, flash, setFlash }) => {
     const gridStyle = {
         display: "grid",
         gridTemplate: "1fr 2fr",
@@ -99,11 +100,18 @@ const Openings = ({ openings, setFlash }) => {
         overflowX: "visible",
     };
 
-    const handler = (e) => {
-        setFlash(true);
-        setTimeout(() => {
-            setFlash(false);
-        }, 2000);
+    const handler = async (e) => {
+        setFlash(true)
+        await sleep(200)
+        setFlash(false)
+        await sleep(200)
+        setFlash(true)
+        await sleep(200)
+        setFlash(false)
+        await sleep(200)
+        setFlash(true)
+        await sleep(200)
+        setFlash(false)
     };
 
     return (
@@ -135,7 +143,7 @@ const Openings = ({ openings, setFlash }) => {
     );
 };
 
-const PgnSummary = ({ pgnSumm, setFlash }) => {
+const PgnSummary = ({ pgnSumm, flash, setFlash }) => {
     const { count, high, low, openings } = pgnSumm;
 
     return (
@@ -153,7 +161,7 @@ const PgnSummary = ({ pgnSumm, setFlash }) => {
                         {low}
                     </div>
                     <div className="row">
-                        <Openings {...{ openings, setFlash }} />
+                        <Openings {...{ openings, flash, setFlash }} />
                     </div>
                 </div>
                 <div className="column left">
@@ -384,10 +392,10 @@ const PgnDirectGames = (pgn, flash, setFlash) => {
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
-                    <PgnSummary {...{ pgnSumm, setFlash }} />
+                    <PgnSummary {...{ pgnSumm, flash, setFlash }} />
                 </TabPanel>
                 <TabPanel>
-                    <Games {...{ db: pgnSumm.db, setFlash }} />
+                    <Games {...{ db: pgnSumm.db, flash, setFlash }} />
                 </TabPanel>
             </div>
         </Tabs>
