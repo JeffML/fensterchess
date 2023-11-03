@@ -80,14 +80,21 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
 const FENorPGN = ({ setFen, text, setText, chess }) => {
     const handleInput = (e) => {
         const input = e.clipboardData.getData("text");
-        const stubFen = input.split(" ")[0]
+        const stubFen = input.split(" ")[0];
 
         console.log(`"${stubFen}"`);
 
         // FEN?
         if (FENEX.test(stubFen)) {
-            setFen(input);
-            setText(input);
+            try {
+                const fen = input;
+                chess.current.load(fen);
+                setFen(fen);
+                setText(fen);
+            } catch (ex) {
+                e.preventDefault();
+                alert(ex.toString());
+            }
         } else {
             // PGN?
             try {
