@@ -3,7 +3,7 @@ import { useQuery, gql } from "@apollo/client";
 import "react-tabs/style/react-tabs.css";
 import "./stylesheets/grid.css";
 import { pgnRead } from "kokopu";
-import { Fragment, useContext, useState, memo} from "react";
+import { Fragment, useContext, useState } from "react";
 import sleep from "./utils/sleep.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 
@@ -100,7 +100,7 @@ const Openings = ({ openings, setFlash, filter, setFilter }) => {
         overflowX: "visible",
     };
 
-    const handler = async ({target}) => {
+    const handler = async ({ target }) => {
         setFlash(true);
         await sleep(200);
         setFlash(false);
@@ -113,8 +113,12 @@ const Openings = ({ openings, setFlash, filter, setFilter }) => {
         await sleep(200);
         setFlash(false);
 
-        if (target.checked) setFilter(prev => {prev.push(target.value); return prev})
-        else setFilter(prev => prev.filter(f => f !== target.value))
+        if (target.checked)
+            setFilter((prev) => {
+                prev.push(target.value);
+                return prev;
+            });
+        else setFilter((prev) => prev.filter((f) => f !== target.value));
     };
 
     return (
@@ -147,7 +151,7 @@ const Openings = ({ openings, setFlash, filter, setFilter }) => {
     );
 };
 
-const PgnSummary = ({ pgnSumm, setFlash, filter, setFilter}) => {
+const PgnSummary = ({ pgnSumm, setFlash, filter, setFilter }) => {
     const { count, high, low, openings } = pgnSumm;
 
     return (
@@ -165,7 +169,9 @@ const PgnSummary = ({ pgnSumm, setFlash, filter, setFilter}) => {
                         {low}
                     </div>
                     <div className="row">
-                        <Openings {...{ openings, setFlash, filter, setFilter }} />
+                        <Openings
+                            {...{ openings, setFlash, filter, setFilter }}
+                        />
                     </div>
                 </div>
                 <div className="column left">
@@ -288,7 +294,8 @@ const Games = ({ db, filter }) => {
 
     const clickHandler = (i) => setIndex(i);
 
-    const filterFunc = (game) => !filter.length || filter.includes(game.opening()) 
+    const filterFunc = (game) =>
+        !filter.length || filter.includes(game.opening());
 
     return (
         <>
@@ -383,7 +390,13 @@ const PgnQueryGames = (url = null, flash, setFlash, filter, setFilter) => {
     if (error) console.error(error.toLocaleString());
     if (loading) return <span className="white">Loading...</span>;
     if (data) {
-        return PgnDirectGames(data.getPgnFiles[0].pgn, flash, setFlash, filter, setFilter);
+        return PgnDirectGames(
+            data.getPgnFiles[0].pgn,
+            flash,
+            setFlash,
+            filter,
+            setFilter
+        );
     }
 };
 
@@ -407,7 +420,8 @@ const PgnDirectGames = (pgn, flash, setFlash, filter, setFilter) => {
                     <PgnSummary {...{ pgnSumm, setFlash, filter, setFilter }} />
                 </TabPanel>
                 <TabPanel>
-                    memo(<Games {...{ db: pgnSumm.db, filter }} />)
+                    memo(
+                    <Games {...{ db: pgnSumm.db, filter }} />)
                 </TabPanel>
             </div>
         </Tabs>
