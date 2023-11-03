@@ -3,8 +3,8 @@ import { useQuery, gql } from "@apollo/client";
 import "react-tabs/style/react-tabs.css";
 import "./stylesheets/grid.css";
 import { pgnRead } from "kokopu";
-import { Fragment, useContext, useState } from "react";
-import sleep from './utils/sleep.js'
+import { Fragment, useContext, useState, memo} from "react";
+import sleep from "./utils/sleep.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
@@ -22,8 +22,8 @@ const tabFlashStyle = {
 };
 
 const tabFlashStyle2 = {
-    backgroundColor:"orange"
-}
+    backgroundColor: "orange",
+};
 
 // file requests for (a) link
 const GET_PGN_FILES = gql`
@@ -90,7 +90,7 @@ const getPgnSummary = (pgn) => {
     return { db, players, high, low, avg, count: gmCt, openings };
 };
 
-const Openings = ({ openings, flash, setFlash }) => {
+const Openings = ({ openings, setFlash, filter, setFilter }) => {
     const gridStyle = {
         display: "grid",
         gridTemplate: "1fr 2fr",
@@ -100,18 +100,21 @@ const Openings = ({ openings, flash, setFlash }) => {
         overflowX: "visible",
     };
 
-    const handler = async (e) => {
-        setFlash(true)
-        await sleep(200)
-        setFlash(false)
-        await sleep(200)
-        setFlash(true)
-        await sleep(200)
-        setFlash(false)
-        await sleep(200)
-        setFlash(true)
-        await sleep(200)
-        setFlash(false)
+    const handler = async ({target}) => {
+        setFlash(true);
+        await sleep(200);
+        setFlash(false);
+        await sleep(200);
+        setFlash(true);
+        await sleep(200);
+        setFlash(false);
+        await sleep(200);
+        setFlash(true);
+        await sleep(200);
+        setFlash(false);
+
+        if (target.checked) setFilter(prev => {prev.push(target.value); return prev})
+        else setFilter(prev => prev.filter(f => f !== target.value))
     };
 
     return (
@@ -133,6 +136,7 @@ const Openings = ({ openings, flash, setFlash }) => {
                             type="checkbox"
                             value={o}
                             onClick={handler}
+                            defaultChecked={filter.includes(o)}
                         ></input>
                         <span key={o + i} className="left">
                             {o ?? "(no name)"}
@@ -143,7 +147,7 @@ const Openings = ({ openings, flash, setFlash }) => {
     );
 };
 
-const PgnSummary = ({ pgnSumm, flash, setFlash }) => {
+const PgnSummary = ({ pgnSumm, setFlash, filter, setFilter}) => {
     const { count, high, low, openings } = pgnSumm;
 
     return (
@@ -161,7 +165,7 @@ const PgnSummary = ({ pgnSumm, flash, setFlash }) => {
                         {low}
                     </div>
                     <div className="row">
-                        <Openings {...{ openings, flash, setFlash }} />
+                        <Openings {...{ openings, setFlash, filter, setFilter }} />
                     </div>
                 </div>
                 <div className="column left">
@@ -271,7 +275,7 @@ const Players = ({ pgnSumm }) => {
     );
 };
 
-const Games = ({ db }) => {
+const Games = ({ db, filter }) => {
     const gridStyle = {
         display: "grid",
         gridTemplateColumns: "1fr 2fr 3fr 3fr 4fr 1fr",
@@ -283,6 +287,8 @@ const Games = ({ db }) => {
     const [index, setIndex] = useState(-1);
 
     const clickHandler = (i) => setIndex(i);
+
+    const filterFunc = (game) => !filter.length || filter.includes(game.opening()) 
 
     return (
         <>
@@ -299,7 +305,7 @@ const Games = ({ db }) => {
             </div>
             <hr />
             <div name="lefty" style={gridStyle} className="scrollableY white">
-                {games.map((g, i) => {
+                {games.filter(filterFunc).map((g, i) => {
                     const opening = g.opening();
                     return (
                         <Fragment key={i}>
@@ -367,7 +373,7 @@ const OpeningBookComparison = ({ game }) => {
 };
 
 // Note: if called w/o a url, this does nothing (note the skip)
-const PgnQueryGames = (url = null, flash, setFlash) => {
+const PgnQueryGames = (url = null, flash, setFlash, filter, setFilter) => {
     const dummyMetaPgnInput = { link: url, lastModified: "" };
     const { error, data, loading } = useQuery(GET_PGN_FILES, {
         variables: { pgnLinks: [dummyMetaPgnInput] },
@@ -377,25 +383,31 @@ const PgnQueryGames = (url = null, flash, setFlash) => {
     if (error) console.error(error.toLocaleString());
     if (loading) return <span className="white">Loading...</span>;
     if (data) {
-        return PgnDirectGames(data.getPgnFiles[0].pgn, flash, setFlash);
+        return PgnDirectGames(data.getPgnFiles[0].pgn, flash, setFlash, filter, setFilter);
     }
 };
 
-const PgnDirectGames = (pgn, flash, setFlash) => {
+const PgnDirectGames = (pgn, flash, setFlash, filter, setFilter) => {
     const pgnSumm = getPgnSummary(pgn);
-
     return (
         <Tabs>
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab style={tabStyle}>Summary</Tab>
-                <Tab style={{...tabFlashStyle, ...(flash?tabFlashStyle2:null)}}>Games</Tab>
+                <Tab
+                    style={{
+                        ...tabFlashStyle,
+                        ...(flash ? tabFlashStyle2 : null),
+                    }}
+                >
+                    Games
+                </Tab>
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
-                    <PgnSummary {...{ pgnSumm, flash, setFlash }} />
+                    <PgnSummary {...{ pgnSumm, setFlash, filter, setFilter }} />
                 </TabPanel>
                 <TabPanel>
-                    <Games {...{ db: pgnSumm.db, flash, setFlash }} />
+                    memo(<Games {...{ db: pgnSumm.db, filter }} />)
                 </TabPanel>
             </div>
         </Tabs>
@@ -466,9 +478,12 @@ Arguments are url OR pgn.
 If given a url, query TWIC for games; else load the pgn file directly.
 */
 const PgnTabs = ({ url, pgn }) => {
+    // The following have to be at this level because of the hooks issue mentioned below:
     const [flash, setFlash] = useState(false);
-    let foo = PgnQueryGames(url, flash, setFlash); // this *has* to be called because it has hook in it: https://github.com/facebook/react/issues/24391
-    if (pgn) foo = PgnDirectGames(pgn, flash, setFlash);
+    const [filter, setFilter] = useState([]);
+
+    let foo = PgnQueryGames(url, flash, setFlash, filter, setFilter); // this *has* to be called because it has hook in it: https://github.com/facebook/react/issues/24391
+    if (pgn) foo = PgnDirectGames(pgn, flash, setFlash, filter, setFilter);
     return foo;
 };
 
