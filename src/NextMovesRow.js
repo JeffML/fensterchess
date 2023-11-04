@@ -1,34 +1,22 @@
 import { sortEnum } from "./common/consts.js";
 import { Fragment, useState } from "react";
+import {Chess} from 'chess.js'
 
-const movesDiff = (moves, nextMoves) => {
-    const denumberateAndSplit = (moves) => {
-        const regex = /\d{1,3}\.\s/g;
-        return moves.replace(regex, "").split(" ");
-    };
-    const plies = [denumberateAndSplit(moves), denumberateAndSplit(nextMoves)];
-    let nm;
+const chess = new Chess()
 
-    /*  iterate backwards by 2 until a ply difference is found
-        This won't be perfect, (for instance Ne2 vs Nfe2), but that can be dealt with later
-        
-        ex:
-        plies[0]: ["g3", "c5"]
-        plies[1]: ["e4", "c5", "g3"]
+const legalMove = (moves, variation) => {
+    const nextMove = variation.split(' ').at(-1);
 
-    */
+    // the last ply might be illegal due to transposition of moves; filter these out
+    chess.loadPgn(moves)
+    const legalMoves = chess.moves()  
 
-    for (let i = plies[1].length - 1; i >= 0; i -= 2) {
-        nm = plies[1][i];
-        if (!plies[0].includes(nm)) {
-            break;
-        }
-    }
-    return nm;
-};
+    return legalMoves.includes(nextMove)? nextMove : null;
+}
 
-const NextMovesGrid = ({ moves, handleMovePlayed, next, sortBy }) => {
-    const toSort = [...next];
+const NextMovesGrid = ({ currentMoves, handleMovePlayed, nextMoves, sortBy }) => {
+
+    const toSort = [...nextMoves];
 
     switch (sortBy) {
         case sortEnum.EVALUATION:
@@ -38,11 +26,13 @@ const NextMovesGrid = ({ moves, handleMovePlayed, next, sortBy }) => {
             toSort.sort((a, b) => a.name.localeCompare(b.name));
             break;
         default:
-            throw Error(`unknkown case ${sortBy}`)
+            throw Error(`unknown case ${sortBy}`)
     }
 
-    const ListItem = ({ name, moves: nextMoves, score }, index) => {
-        const nextMove = movesDiff(moves, nextMoves);
+    const ListItem = ({ name, moves: variation, score }, index) => {
+        const nextMove = legalMove(currentMoves, variation);
+        if (!nextMove) return null
+
         const backgroundColor = index % 2 ? "darkslategrey" : "slategrey";
         return (
             <div
@@ -92,12 +82,12 @@ const SortBy = ({ setSortBy }) => {
     );
 };
 
-const NextMovesRow = ({ next, moves, handleMovePlayed }) => {
+const NextMovesRow = ({ nextMoves, currentMoves, handleMovePlayed }) => {
     const [sortBy, setSortBy] = useState(sortEnum.EVALUATION);
 
     return (
         <div className="row">
-            {next && next.length !== 0 && (
+            {nextMoves && nextMoves.length !== 0 && (
                 <>
                         <div
                             className="column"
@@ -117,8 +107,8 @@ const NextMovesRow = ({ next, moves, handleMovePlayed }) => {
                             <div className="column">
                                 <NextMovesGrid
                                     {...{
-                                        moves,
-                                        next,
+                                        currentMoves,
+                                        nextMoves,
                                         handleMovePlayed,
                                         sortBy,
                                     }}

@@ -43,7 +43,7 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
             );
         }
         let {
-            getOpeningForFenFull: { eco, name, moves, next },
+            getOpeningForFenFull: { eco, name, moves: currentMoves, next: nextMoves },
         } = data;
 
         return (
@@ -71,7 +71,7 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
                         />
                     )}
                 </div>
-                <NextMovesRow {...{ next, moves, handleMovePlayed }} />
+                <NextMovesRow {...{ nextMoves, currentMoves, handleMovePlayed }} />
             </div>
         );
     } else return <div className="double-column">&nbsp;</div>;
@@ -81,8 +81,6 @@ const FENorPGN = ({ setFen, text, setText, chess }) => {
     const handleInput = (e) => {
         const input = e.clipboardData.getData("text");
         const stubFen = input.split(" ")[0];
-
-        console.log(`"${stubFen}"`);
 
         // FEN?
         if (FENEX.test(stubFen)) {
