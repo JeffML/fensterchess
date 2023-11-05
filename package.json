@@ -1,6 +1,6 @@
 {
   "name": "Fenster",
-  "version": "1.0.0-beta",
+  "version": "1.0.2",
   "private": true,
   "type": "module",
   "dependencies": {

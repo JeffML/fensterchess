@@ -130,12 +130,16 @@ const SearchPage = ({ chess, fen, setFen }) => {
 
     const handleMovePlayed = (move) => {
         chess.current.move(move);
-        setFen(chess.current.fen());
+        const newFen = chess.current.fen()
+        setFen(newFen);
+        setText(`FEN:\n${newFen}\n\nmoves: ${chess.current.pgn()}`)
     };
 
     const back = () => {
         chess.current.undo();
-        setFen(chess.current.fen());
+        const newFen = chess.current.fen()
+        setFen(newFen);
+        setText(`FEN:\n${newFen}\n\nmoves: ${chess.current.pgn()}`)
     };
 
     const { error, data, loading } = useQuery(GET_OPENING, {
