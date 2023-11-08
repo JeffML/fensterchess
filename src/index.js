@@ -6,8 +6,9 @@ import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink} from '@apo
 import { setContext } from '@apollo/link-context';
 
 const httpLink = createHttpLink({
-  // uri: '/.netlify/functions/pgnfen',
-  uri: 'https://fenster-s.netlify.app/.netlify/functions/server'
+  // uri: 'http://localhost:8881/.netlify/functions/server',    //not working
+  uri: 'https://fenster-s.netlify.app/.netlify/functions/server'  //production
+  // uri: 'https://flum--fenster-s.netlify.app/.netlify/functions/server' // this alias only works if branch deploy env vars are set
 });
 
 const authLink = setContext((_, { headers }) => {
