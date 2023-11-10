@@ -33,6 +33,8 @@ const NextMovesGrid = ({ currentMoves, handleMovePlayed, nextMoves, sortBy }) =>
         const nextMove = legalMove(currentMoves, variation);
         if (!nextMove) return null
 
+        name = name.replace(/(\s\(i\))+/, '*')
+
         const backgroundColor = index % 2 ? "darkslategrey" : "slategrey";
         return (
             <div

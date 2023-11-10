@@ -150,7 +150,7 @@ const SearchPage = ({ chess, fen, setFen }) => {
     return (
         <>
             <div className="row" style={{ color: "white" }}>
-                <div className="column" style={{ alignItems: "end" }}>
+                <div className="column" style={{ alignItems: "center" }}>
                     <Chessboard
                         interactionMode="playMoves"
                         position={fen}

@@ -155,9 +155,11 @@ td {
   border: none;
   color: rgb(204, 242, 225);
   cursor: pointer;
-  /* justify-content: space-evenly; */
-  text-decoration: underline;
   display: flex;
+}
+
+.fakeLink:hover {
+  text-decoration: underline;
 }
 
 .scrollableList {

@@ -1,11 +1,15 @@
 import "./App.css";
 import "./stylesheets/about.css";
-import {VERSION} from './common/consts.js'
-
+import { VERSION } from "./common/consts.js";
 
 const About = () => (
     <>
-        <div className="font-cinzel white left" style={{fontSize:"12pt", marginLeft: "1em", marginTop:"1em" }}>version {VERSION}</div>
+        <div
+            className="font-cinzel white left"
+            style={{ fontSize: "12pt", marginLeft: "1em", marginTop: "1em" }}
+        >
+            version {VERSION}
+        </div>
         <div className="about">
             <p>
                 Fenster is a comprehensive chess opening reference with over
@@ -45,7 +49,7 @@ const About = () => (
                 current position can be found on each side, and what the white
                 win, black win, and draw statistics are.
             </p>
-            <h3> What is the "(i)"? </h3>
+            <h3> What does the '*' mean? </h3>
             <p>
                 Some entries in the opening "book" are <i>interpolated</i>. This
                 means that there were no specific entries in{" "}
@@ -57,9 +61,10 @@ const About = () => (
             </p>
             <pre>A =&gt; A' =&gt; A'' =&gt; ... =&gt; B</pre>{" "}
             <p>
-                For interpolated openings, the name of variation A is used (+
-                "(i)"). These names should be considered temporary placeholders
-                for real variation names, should they come along later.
+                For interpolated openings, the name of variation A is used with
+                the addition of an "*". These names should be considered
+                placeholders for real variation names, should they come along
+                later.
             </p>
             <h2>The PGN Import Page</h2>
             <p>
@@ -94,10 +99,10 @@ const About = () => (
                     The tech stack for Fenster client is:
                 </p>
                 <ul>
-                    <li>JavaScript (not TypeScript)</li>
+                    <li>JavaScript</li>
                     <li>Node.js</li>
                     <li>React</li>
-                    <li>Apollo Client GraphQL</li>
+                    <li>Apollo GraphQL (client)</li>
                     <li>kokopu and chess.js</li>
                 </ul>
                 <p>
