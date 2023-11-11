@@ -1,3 +1,37 @@
 div[name=lefty]>span {
     text-align: left;
 }
+
+#games-chart {
+    border: 2px solid white;
+    border-radius: 10px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: repeat(100, 1fr);
+    min-width: 20em;
+}
+
+#games-chart div {
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#white {
+    color: black;
+    background: white;
+}
+
+#black {
+    color:white;
+    background: black;
+}
+
+#draw {
+    color: lightgrey;
+    background: grey;
+}

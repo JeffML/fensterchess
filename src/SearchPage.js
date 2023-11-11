@@ -66,7 +66,7 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
 
                 <div className="row" style={inlineStyle}>
                     {sites.selectedSites.length > 0 && (
-                        <OpeningAdditionalWithBarChart
+                        <OpeningAdditionalWithBarChart id="OpeningAdditionalWithBarChart"
                             {...{ fen, name, sites: sites.selectedSites }}
                         />
                     )}

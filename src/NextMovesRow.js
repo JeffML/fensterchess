@@ -95,12 +95,11 @@ const NextMovesRow = ({ nextMoves, currentMoves, handleMovePlayed }) => {
                             className="column"
                             style={{ alignItems: "start", marginBottom: "0px" }}
                         >
-                            <label
-                                htmlFor="sortBy"
+                            <span
                                 style={{ fontWeight: "bold" }}
                             >
                                 Next Moves
-                            </label>
+                            </span>
                         </div>
                         <div className="column" style={{ marginBottom: "0px" }}>
                             <SortBy {...{ sortBy, setSortBy }} />
