@@ -42,9 +42,7 @@ const wins2pctgs = ({ w, b, d }) => {
     } else return { w: 0, b: 0, d: 0 };
 };
 
-const OpeningAdditionalWithBarChart = ({ fen }) => {
-    const inlineStyle = { fontFamily: "initial", marginLeft: "10px" };
-
+const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
     const { selectedSites: sites } = useContext(SelectedSitesContext);
 
     const { error, loading, data } = useQuery(GET_OPENING_ADDITIONAL, {
@@ -57,29 +55,26 @@ const OpeningAdditionalWithBarChart = ({ fen }) => {
     if (data) {
         const json = toJson(data, sites);
         return (
-            <>
+            <div style={{marginTop:"1em"}}>
                 {Object.entries(json).map(([site, data]) => {
                     const { aka, wins } = data;
                     const games = wins.w + wins.d + wins.b;
                     return (
-                        <div
-                            className="row"
-                            key={site}
-                    
-                        >
-                            <div className="column">
+                        <div id="opening-additional">
+                            <div className="site left" key={site}>
                                 <span
                                     className="font-cinzel"
                                     style={{ alignSelf: "start" }}
                                 >
                                     {site}
-                                    <span style={inlineStyle}>{aka}</span>
-                                    <span style={inlineStyle}>
-                                        (games: {games})
-                                    </span>
                                 </span>
                             </div>
-                            <div className="column">
+                            <div className="left">
+                                <span>
+                                    {aka && aka.length? aka : "no name"}, {games} games
+                                </span>
+                            </div>
+                            <div>
                                 {games ? (
                                     <StackedBarChart
                                         {...{ pctgs: wins2pctgs(wins) }}
@@ -89,9 +84,9 @@ const OpeningAdditionalWithBarChart = ({ fen }) => {
                         </div>
                     );
                 })}
-            </>
+            </div>
         );
     }
 };
 
-export { OpeningAdditionalWithBarChart };
+export { OpeningAdditionalWithBarChartGrid };

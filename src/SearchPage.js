@@ -1,5 +1,5 @@
 import { useState, useRef, useContext } from "react";
-import { OpeningAdditionalWithBarChart } from "./OpeningAdditional.js";
+import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional.js";
 import { ActionButton } from "./common/buttons.js";
 import { Chessboard } from "kokopu-react";
 import { Chess } from "chess.js";
@@ -60,13 +60,13 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
                         style={{ fontWeight: "bolder", display: "inline" }}
                         onClick={() => {}}
                     >
-                        {eco}&nbsp;{name}
+                        {eco}&nbsp;{name.replace(/(\s\(i\))+/, '*')}
                     </span>
                 </span>
 
                 <div className="row" style={inlineStyle}>
                     {sites.selectedSites.length > 0 && (
-                        <OpeningAdditionalWithBarChart id="OpeningAdditionalWithBarChart"
+                        <OpeningAdditionalWithBarChartGrid id="OpeningAdditionalWithBarChartGrid"
                             {...{ fen, name, sites: sites.selectedSites }}
                         />
                     )}
