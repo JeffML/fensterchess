@@ -7,6 +7,7 @@ import { useQuery, gql } from "@apollo/client";
 import NextMovesRow, { Transitions } from "./NextMovesRow.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import { FENEX } from "./common/consts.js";
+import "./stylesheets/textarea.css";
 
 const GET_OPENING = gql`
     query getOpening($fen: String!) {
@@ -56,9 +57,7 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
                 >
                     Opening:&nbsp;&nbsp;
                     <span
-                        className="fakeLink"
-                        style={{ fontWeight: "bolder", display: "inline" }}
-                        onClick={() => {}}
+                        style={{ fontWeight: "bolder", display: "inline", color:"aquamarine", fontFamily: "sans"}}
                     >
                         {eco}&nbsp;{name.replace(/(\s\(i\))+/, '*')}
                     </span>
@@ -79,6 +78,7 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
 
 const FENorPGN = ({ setFen, text, setText, chess }) => {
     const handleInput = (e) => {
+        e.preventDefault()
         const input = e.clipboardData.getData("text");
         const stubFen = input.split(" ")[0];
 
@@ -90,7 +90,6 @@ const FENorPGN = ({ setFen, text, setText, chess }) => {
                 setFen(fen);
                 setText(fen);
             } catch (ex) {
-                e.preventDefault();
                 alert(ex.toString());
             }
         } else {
@@ -100,7 +99,6 @@ const FENorPGN = ({ setFen, text, setText, chess }) => {
                 setText(input);
                 setFen(chess.current.fen());
             } catch (ex) {
-                e.preventDefault();
                 alert(ex.toString());
             }
         }
@@ -110,8 +108,7 @@ const FENorPGN = ({ setFen, text, setText, chess }) => {
         <textarea
             id="fenpgn"
             spellCheck="false"
-            placeholder={"or paste in FEN/PGN here"}
-            style={{ width: "100%", height: "200%" }}
+            placeholder={"Move, or paste in FEN/PGN here"}
             onChange={() => {}}
             onPaste={(e) => handleInput(e)}
             value={text}
