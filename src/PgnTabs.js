@@ -60,6 +60,7 @@ const GET_OPENING_ADDITIONAL = gql`
 `;
 
 const getPgnSummary = (pgn) => {
+    const ETC = ", etc."
     const db = pgnRead(pgn);
     const gmCt = db.gameCount();
 
@@ -69,9 +70,14 @@ const getPgnSummary = (pgn) => {
         avg = 0,
         players = {};
     const openings = new Set();
+    let mainEvent = null;
 
     for (let game of db.games()) {
-        const { white, black, opening } = game.pojo();
+        const { white, black, opening, event } = game.pojo();
+
+        mainEvent ??= event
+        if (event !== mainEvent && !mainEvent.endsWith(ETC)) mainEvent += ETC
+
         players[white.name] = white;
         players[black.name] = black;
 
@@ -87,7 +93,7 @@ const getPgnSummary = (pgn) => {
 
     avg = avg / gmCt / 2;
 
-    return { db, players, high, low, avg, count: gmCt, openings };
+    return { db, players, high, low, avg, count: gmCt, openings, event:mainEvent };
 };
 
 const Openings = ({ openings, setFlash, filter, setFilter }) => {
@@ -152,12 +158,13 @@ const Openings = ({ openings, setFlash, filter, setFilter }) => {
 };
 
 const PgnSummary = ({ pgnSumm, setFlash, filter, setFilter }) => {
-    const { count, high, low, openings } = pgnSumm;
+    const { count, high, low, openings, event } = pgnSumm;
 
     return (
         <>
             <div className="row">
                 <div name="details" className="column left white">
+                    <div><span style={blueBoldStyle}>Event:</span> {event}</div>
                     <div>
                         <span style={blueBoldStyle}>Games:</span> {count}
                     </div>
