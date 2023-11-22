@@ -41,15 +41,6 @@ const GET_SIMILAR = gql`
     }
 `;
 
-const GET_OPENINGS = gql`
-    query getOpenings($fens: [String]!) {
-        getOpeningsForFens2(fens: $fens) {
-            name
-            moves
-        }
-    }
-`;
-
 const SimilarOpenings = ({ fen, setFen }) => {
     const moveAt = fen.split(" ").at(-1);
 
@@ -93,7 +84,7 @@ const OpeningTabs = ({
     };
 
     return (
-        <Tabs>
+        <Tabs style={{minWidth: "-webkit-fill-available", marginRight:"2em"}}>
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab style={tabStyle}>Next Moves</Tab>
                 <Tab style={tabStyle}>Similar Openings</Tab>

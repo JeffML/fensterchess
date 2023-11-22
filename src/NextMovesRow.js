@@ -91,32 +91,36 @@ const SortBy = ({ setSortBy }) => {
 const NextMovesRow = ({ nextMoves, currentMoves, handleMovePlayed }) => {
     const [sortBy, setSortBy] = useState(sortEnum.EVALUATION);
 
-    return (
-        <div className="row">
-            {nextMoves && nextMoves.length !== 0 && (
-                <>
-                    <div
-                        className="column left"
-                        style={{ marginBottom: "0px" }}
-                    >
-                        <SortBy {...{ sortBy, setSortBy }} />
-                    </div>
-                    <div className="row">
-                        <div className="column">
-                            <NextMovesGrid
-                                {...{
-                                    currentMoves,
-                                    nextMoves,
-                                    handleMovePlayed,
-                                    sortBy,
-                                }}
-                            />
+    if (nextMoves && nextMoves.length !== 0) {
+        return (
+            <div className="row">
+                {nextMoves && nextMoves.length !== 0 && (
+                    <>
+                        <div
+                            className="column left"
+                            style={{ marginBottom: "0px" }}
+                        >
+                            <SortBy {...{ sortBy, setSortBy }} />
                         </div>
-                    </div>
-                </>
-            )}
-        </div>
-    );
+                        <div className="row">
+                            <div className="column">
+                                <NextMovesGrid
+                                    {...{
+                                        currentMoves,
+                                        nextMoves,
+                                        handleMovePlayed,
+                                        sortBy,
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+    } else {
+        return <span>No continuations found</span>;
+    }
 };
 
 const Transitions = ({ data }) => {
