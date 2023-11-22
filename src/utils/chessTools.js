@@ -6,4 +6,6 @@ const movesToFen = (moves) => {
     return chess.fen()
 }
 
-export {movesToFen}
+const newName = (name) => name.replace(/(\s\(i\))+/, "*");
+
+export {movesToFen, newName}

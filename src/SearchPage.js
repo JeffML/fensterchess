@@ -9,6 +9,7 @@ import NextMovesRow, { Transitions } from "./NextMovesRow.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import { FENEX } from "./common/consts.js";
 import "./stylesheets/textarea.css";
+import { newName } from "./utils/chessTools.js";
 
 const GET_OPENING = gql`
     query getOpening($fen: String!) {
@@ -60,13 +61,29 @@ const SimilarOpenings = ({ fen, setFen }) => {
         if (data) {
             const sims = data.getSimilarOpenings.map((sim) => {
                 return (
-                    <div key={sim.fen} className="left">
-                        <span>{sim.name}</span>
+                    <div key={sim.fen} style={{ display: "grid", justifyItems:"flex-start", paddingLeft: "2em", paddingTop:"0.7em"}}>
+                        <span
+                            style={{ paddingBottom: "3px" }}
+                            className="fakeLink"
+                            onClick={()=>setFen(sim.fen)}
+                        >
+                            {newName(sim.name)}
+                        </span>
+                        <Chessboard position={sim.fen} squareSize={20} />
                     </div>
                 );
             });
 
-            return <>{sims}</>;
+            return (
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                    }}
+                >
+                    {sims}
+                </div>
+            );
         }
     }
 };
@@ -84,7 +101,9 @@ const OpeningTabs = ({
     };
 
     return (
-        <Tabs style={{minWidth: "-webkit-fill-available", marginRight:"2em"}}>
+        <Tabs
+            style={{ minWidth: "-webkit-fill-available", marginRight: "2em" }}
+        >
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab style={tabStyle}>Next Moves</Tab>
                 <Tab style={tabStyle}>Similar Openings</Tab>
@@ -142,7 +161,7 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
                             fontFamily: "sans",
                         }}
                     >
-                        {eco}&nbsp;{name.replace(/(\s\(i\))+/, "*")}
+                        {eco}&nbsp;{newName(name)}
                     </span>
                 </span>
 

@@ -1,6 +1,7 @@
 import { sortEnum } from "./common/consts.js";
 import { Fragment, useState } from "react";
 import { Chess } from "chess.js";
+import { newName } from "./utils/chessTools.js";
 
 const chess = new Chess();
 
@@ -37,7 +38,7 @@ const NextMovesGrid = ({
         const nextMove = legalMove(currentMoves, variation);
         if (!nextMove) return null;
 
-        name = name.replace(/(\s\(i\))+/, "*");
+        name = newName(name)
 
         const backgroundColor = index % 2 ? "darkslategrey" : "slategrey";
         return (
