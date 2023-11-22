@@ -1,4 +1,5 @@
 import { useState, useRef, useContext } from "react";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional.js";
 import { ActionButton } from "./common/buttons.js";
 import { Chessboard } from "kokopu-react";
@@ -30,7 +31,88 @@ const GET_OPENING = gql`
     }
 `;
 
-const Opening = ({ fen, handleMovePlayed, data }) => {
+const GET_SIMILAR = gql`
+    query getSimilar($fen: String!) {
+        getSimilarOpenings(fen: $fen) {
+            fen
+            simScore
+            name
+        }
+    }
+`;
+
+const GET_OPENINGS = gql`
+    query getOpenings($fens: [String]!) {
+        getOpeningsForFens2(fens: $fens) {
+            name
+            moves
+        }
+    }
+`;
+
+const SimilarOpenings = ({ fen, setFen }) => {
+    const moveAt = fen.split(" ").at(-1);
+
+    const { error, data, loading } = useQuery(GET_SIMILAR, {
+        variables: { fen },
+        skip: moveAt < 6,
+    });
+
+    if (moveAt < 6) return <span>Play at least 5 moves</span>;
+    else {
+        if (loading) {
+            return <span>Loading...</span>;
+        }
+        if (error) {
+            return <span> ERROR: {error.toString()}</span>;
+        }
+        if (data) {
+            const sims = data.getSimilarOpenings.map((sim) => {
+                return (
+                    <div key={sim.fen} className="left">
+                        <span>{sim.name}</span>
+                    </div>
+                );
+            });
+
+            return <>{sims}</>;
+        }
+    }
+};
+
+const OpeningTabs = ({
+    fen,
+    setFen,
+    nextMoves,
+    currentMoves,
+    handleMovePlayed,
+}) => {
+    const tabStyle = {
+        border: "1px solid #FFFFFF ",
+        borderRadius: "10px 10px 0 0",
+    };
+
+    return (
+        <Tabs>
+            <TabList className="left" style={{ marginBottom: "0px" }}>
+                <Tab style={tabStyle}>Next Moves</Tab>
+                <Tab style={tabStyle}>Similar Openings</Tab>
+            </TabList>
+            <div style={{ border: "thick solid white" }}>
+                <TabPanel>
+                    <NextMovesRow
+                        {...{ nextMoves, currentMoves, handleMovePlayed }}
+                    />
+                </TabPanel>
+                <TabPanel>
+                    <SimilarOpenings {...{ fen, setFen }} />
+                </TabPanel>
+            </div>
+        </Tabs>
+    );
+};
+
+const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
     const inlineStyle = { marginBottom: "1em" };
 
     const sites = useContext(SelectedSitesContext);
@@ -44,7 +126,12 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
             );
         }
         let {
-            getOpeningForFenFull: { eco, name, moves: currentMoves, next: nextMoves },
+            getOpeningForFenFull: {
+                eco,
+                name,
+                moves: currentMoves,
+                next: nextMoves,
+            },
         } = data;
 
         return (
@@ -57,20 +144,34 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
                 >
                     Opening:&nbsp;&nbsp;
                     <span
-                        style={{ fontWeight: "bolder", display: "inline", color:"aquamarine", fontFamily: "sans"}}
+                        style={{
+                            fontWeight: "bolder",
+                            display: "inline",
+                            color: "aquamarine",
+                            fontFamily: "sans",
+                        }}
                     >
-                        {eco}&nbsp;{name.replace(/(\s\(i\))+/, '*')}
+                        {eco}&nbsp;{name.replace(/(\s\(i\))+/, "*")}
                     </span>
                 </span>
 
                 <div className="row" style={inlineStyle}>
                     {sites.selectedSites.length > 0 && (
-                        <OpeningAdditionalWithBarChartGrid id="OpeningAdditionalWithBarChartGrid"
+                        <OpeningAdditionalWithBarChartGrid
+                            id="OpeningAdditionalWithBarChartGrid"
                             {...{ fen, name, sites: sites.selectedSites }}
                         />
                     )}
                 </div>
-                <NextMovesRow {...{ nextMoves, currentMoves, handleMovePlayed }} />
+                <OpeningTabs
+                    {...{
+                        fen,
+                        setFen,
+                        nextMoves,
+                        currentMoves,
+                        handleMovePlayed,
+                    }}
+                />
             </div>
         );
     } else return <div className="double-column">&nbsp;</div>;
@@ -78,7 +179,7 @@ const Opening = ({ fen, handleMovePlayed, data }) => {
 
 const FENorPGN = ({ setFen, text, setText, chess }) => {
     const handleInput = (e) => {
-        e.preventDefault()
+        e.preventDefault();
         const input = e.clipboardData.getData("text");
         const stubFen = input.split(" ")[0];
 
@@ -127,16 +228,16 @@ const SearchPage = ({ chess, fen, setFen }) => {
 
     const handleMovePlayed = (move) => {
         chess.current.move(move);
-        const newFen = chess.current.fen()
+        const newFen = chess.current.fen();
         setFen(newFen);
-        setText(`FEN:\n${newFen}\n\nmoves: ${chess.current.pgn()}`)
+        setText(`FEN:\n${newFen}\n\nmoves: ${chess.current.pgn()}`);
     };
 
     const back = () => {
         chess.current.undo();
-        const newFen = chess.current.fen()
+        const newFen = chess.current.fen();
         setFen(newFen);
-        setText(`FEN:\n${newFen}\n\nmoves: ${chess.current.pgn()}`)
+        setText(`FEN:\n${newFen}\n\nmoves: ${chess.current.pgn()}`);
     };
 
     const { error, data, loading } = useQuery(GET_OPENING, {
@@ -182,7 +283,9 @@ const SearchPage = ({ chess, fen, setFen }) => {
                         )}
 
                         {data && (
-                            <Opening {...{ fen, handleMovePlayed, data }} />
+                            <Opening
+                                {...{ fen, setFen, handleMovePlayed, data }}
+                            />
                         )}
                     </div>
                     <div className="row">

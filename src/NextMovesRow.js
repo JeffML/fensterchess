@@ -1,21 +1,25 @@
 import { sortEnum } from "./common/consts.js";
 import { Fragment, useState } from "react";
-import {Chess} from 'chess.js'
+import { Chess } from "chess.js";
 
-const chess = new Chess()
+const chess = new Chess();
 
 const legalMove = (moves, variation) => {
-    const nextMove = variation.split(' ').at(-1);
+    const nextMove = variation.split(" ").at(-1);
 
     // the last ply might be illegal due to transposition of moves; filter these out
-    chess.loadPgn(moves)
-    const legalMoves = chess.moves()  
+    chess.loadPgn(moves);
+    const legalMoves = chess.moves();
 
-    return legalMoves.includes(nextMove)? nextMove : null;
-}
+    return legalMoves.includes(nextMove) ? nextMove : null;
+};
 
-const NextMovesGrid = ({ currentMoves, handleMovePlayed, nextMoves, sortBy }) => {
-
+const NextMovesGrid = ({
+    currentMoves,
+    handleMovePlayed,
+    nextMoves,
+    sortBy,
+}) => {
     const toSort = [...nextMoves];
 
     switch (sortBy) {
@@ -26,14 +30,14 @@ const NextMovesGrid = ({ currentMoves, handleMovePlayed, nextMoves, sortBy }) =>
             toSort.sort((a, b) => a.name.localeCompare(b.name));
             break;
         default:
-            throw Error(`unknown case ${sortBy}`)
+            throw Error(`unknown case ${sortBy}`);
     }
 
     const ListItem = ({ name, moves: variation, score }, index) => {
         const nextMove = legalMove(currentMoves, variation);
-        if (!nextMove) return null
+        if (!nextMove) return null;
 
-        name = name.replace(/(\s\(i\))+/, '*')
+        name = name.replace(/(\s\(i\))+/, "*");
 
         const backgroundColor = index % 2 ? "darkslategrey" : "slategrey";
         return (
@@ -91,30 +95,23 @@ const NextMovesRow = ({ nextMoves, currentMoves, handleMovePlayed }) => {
         <div className="row">
             {nextMoves && nextMoves.length !== 0 && (
                 <>
-                        <div
-                            className="column"
-                            style={{ alignItems: "start", marginBottom: "0px" }}
-                        >
-                            <span
-                                style={{ fontWeight: "bold" }}
-                            >
-                                Next Moves
-                            </span>
+                    <div
+                        className="column left"
+                        style={{ marginBottom: "0px" }}
+                    >
+                        <SortBy {...{ sortBy, setSortBy }} />
+                    </div>
+                    <div className="row">
+                        <div className="column">
+                            <NextMovesGrid
+                                {...{
+                                    currentMoves,
+                                    nextMoves,
+                                    handleMovePlayed,
+                                    sortBy,
+                                }}
+                            />
                         </div>
-                        <div className="column" style={{ marginBottom: "0px" }}>
-                            <SortBy {...{ sortBy, setSortBy }} />
-                        </div>
-                        <div className="row">
-                            <div className="column">
-                                <NextMovesGrid
-                                    {...{
-                                        currentMoves,
-                                        nextMoves,
-                                        handleMovePlayed,
-                                        sortBy,
-                                    }}
-                                />
-                            </div>
                     </div>
                 </>
             )}
@@ -138,7 +135,9 @@ const Transitions = ({ data }) => {
         if (moves !== tmoves) {
             return (
                 <Fragment key={name}>
-                    <div className="white" style={{textAlign:"left"}}>{name}</div>
+                    <div className="white" style={{ textAlign: "left" }}>
+                        {name}
+                    </div>
                     <div className="white">{moves}</div>
                 </Fragment>
             );
@@ -155,7 +154,10 @@ const Transitions = ({ data }) => {
                 padding: "3px",
             }}
         >
-            <span className="font-cinzel white left underline">Opening Transitions</span><span></span>
+            <span className="font-cinzel white left underline">
+                Opening Transitions
+            </span>
+            <span></span>
             {transitions}
         </div>
     );
