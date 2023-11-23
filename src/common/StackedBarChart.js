@@ -1,14 +1,14 @@
 const gsbc = ({ pctgs: { w, b, d } }) => (
     <div id="games-chart">
-        <div id="white" style={{ gridColumn: `span ${w}` }}>
+        {w !== 0 && <div id="white" style={{ gridColumn: `span ${w}` }}>
             {w}%
-        </div>
-        <div id="draw" style={{ gridColumn: `span ${d}` }}>
+        </div>}
+        {d !== 0 && <div id="draw" style={{ gridColumn: `span ${d}` }}>
             {d}%
-        </div>
-        <div id="black" style={{ gridColumn: `span ${100 - w - d}` }}>
+        </div>}
+        {b !== 0 && <div id="black" style={{ gridColumn: `span ${100 - w - d}` }}>
             {b}%
-        </div>
+        </div>}
     </div>
 );
 
