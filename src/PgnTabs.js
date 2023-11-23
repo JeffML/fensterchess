@@ -427,8 +427,7 @@ const PgnDirectGames = (pgn, flash, setFlash, filter, setFilter) => {
                     <PgnSummary {...{ pgnSumm, setFlash, filter, setFilter }} />
                 </TabPanel>
                 <TabPanel>
-                    memo(
-                    <Games {...{ db: pgnSumm.db, filter }} />)
+                    <Games {...{ db: pgnSumm.db, filter }} />
                 </TabPanel>
             </div>
         </Tabs>
