@@ -1,5 +1,5 @@
 const APP_NAME = "Fenster"
-const VERSION = "1.1.0"
+const VERSION = "1.1.1"
 
 const INCR = 5; //list increment
 
