@@ -356,7 +356,7 @@ const OpeningBookComparison = ({ game }) => {
     const columnStyle = { gridColumnStart: "span 6" };
     const gridStyle = {
         display: "inline-grid",
-        gridTemplateColumns: "auto auto",
+        gridTemplateColumns: "auto auto auto auto",
         gap: "3px",
         marginLeft: "3em",
         color: "#BDEDFF",
@@ -377,8 +377,10 @@ const OpeningBookComparison = ({ game }) => {
                 <div style={gridStyle}>
                     <strong style={{ marginRight: "1em" }}>Fenster:</strong>{" "}
                     <span>{name}</span>
-                    <strong style={{ marginLeft: "1em" }}>Moves:</strong>{" "}
-                    <span> {moves}</span>
+                    {/* <strong style={{ marginLeft: "1em" }}>Moves:</strong>{" "}
+                    <span> {moves}</span> */}
+                    <span></span>
+                    <span></span>
                     <AdditionalOpenings {...{ fen }} />
                 </div>
             </span>
