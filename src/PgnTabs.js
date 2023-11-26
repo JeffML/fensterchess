@@ -6,7 +6,7 @@ import { pgnRead } from "kokopu";
 import { Fragment, useContext, useState } from "react";
 import sleep from "./utils/sleep.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
-import StackedBarChart from "./common/StackedBarChart.js"
+import StackedBarChart from "./common/StackedBarChart.js";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
 
@@ -61,7 +61,7 @@ const GET_OPENING_ADDITIONAL = gql`
 `;
 
 const getPgnSummary = (pgn) => {
-    const ETC = ", etc."
+    const ETC = ", etc.";
     const db = pgnRead(pgn);
     const gmCt = db.gameCount();
 
@@ -76,8 +76,8 @@ const getPgnSummary = (pgn) => {
     for (let game of db.games()) {
         const { white, black, opening, event } = game.pojo();
 
-        mainEvent ??= event
-        if (event !== mainEvent && !mainEvent.endsWith(ETC)) mainEvent += ETC
+        mainEvent ??= event;
+        if (event !== mainEvent && !mainEvent.endsWith(ETC)) mainEvent += ETC;
 
         players[white.name] = white;
         players[black.name] = black;
@@ -94,7 +94,16 @@ const getPgnSummary = (pgn) => {
 
     avg = avg / gmCt / 2;
 
-    return { db, players, high, low, avg, count: gmCt, openings, event:mainEvent };
+    return {
+        db,
+        players,
+        high,
+        low,
+        avg,
+        count: gmCt,
+        openings,
+        event: mainEvent,
+    };
 };
 
 const Openings = ({ openings, setFlash, filter, setFilter }) => {
@@ -165,7 +174,9 @@ const PgnSummary = ({ pgnSumm, setFlash, filter, setFilter }) => {
         <>
             <div className="row">
                 <div name="details" className="column left white">
-                    <div><span style={blueBoldStyle}>Event:</span> {event}</div>
+                    <div>
+                        <span style={blueBoldStyle}>Event:</span> {event}
+                    </div>
                     <div>
                         <span style={blueBoldStyle}>Games:</span> {count}
                     </div>
@@ -353,42 +364,6 @@ const Games = ({ db, filter }) => {
     );
 };
 
-const OpeningBookComparison = ({ game }) => {
-    const columnStyle = { gridColumnStart: "span 6" };
-    const gridStyle = {
-        display: "inline-grid",
-        gridTemplateColumns: "auto auto auto auto",
-        gap: "3px",
-        marginLeft: "3em",
-        color: "#BDEDFF",
-    };
-
-    const fens = game
-        .nodes()
-        .slice(0, 50)
-        .map((n) => n.fen());
-    const { data } = useQuery(FIND_OPENINGS, { variables: { fens } });
-
-    if (data) {
-        const openings = data.getOpeningsForFens2;
-        const { name, moves, fen } = openings.at(-1);
-
-        return (
-            <span style={columnStyle}>
-                <div style={gridStyle}>
-                    <strong style={{ marginRight: "1em" }}>Fenster:</strong>{" "}
-                    <span>{name}</span>
-                    {/* <strong style={{ marginLeft: "1em" }}>Moves:</strong>{" "}
-                    <span> {moves}</span> */}
-                    <span></span>
-                    <span></span>
-                    <AdditionalOpenings {...{ fen }} />
-                </div>
-            </span>
-        );
-    }
-};
-
 // Note: if called w/o a url, this does nothing (note the skip)
 const PgnQueryGames = (url = null, flash, setFlash, filter, setFilter) => {
     const dummyMetaPgnInput = { link: url, lastModified: "" };
@@ -437,6 +412,52 @@ const PgnDirectGames = (pgn, flash, setFlash, filter, setFilter) => {
     );
 };
 
+const OpeningBookComparison = ({ game }) => {
+    const columnStyle = { gridColumnStart: "span 6" };
+    const gridStyle = {
+        display: "inline-grid",
+        gridTemplateColumns: "auto auto auto auto",
+        gap: "5px",
+        marginLeft: "3em",
+        color: "#BDEDFF",
+    };
+
+    const fens = game
+        .nodes()
+        .slice(0, 50)
+        .map((n) => n.fen());
+    const { data } = useQuery(FIND_OPENINGS, { variables: { fens } });
+
+    if (data) {
+        const openings = data.getOpeningsForFens2;
+        const { name, moves, fen } = openings.at(-1);
+
+        return (
+            <span style={{ ...columnStyle, marginBottom: "1em" }}>
+                <div style={gridStyle}>
+                    <strong style={{ margin: ".5em 1em .5em 0em" }}>
+                        Fenster:
+                    </strong>{" "}
+                    <span
+                        className="fakeLink"
+                        style={{
+                            outline: "solid 1px",
+                            outlineOffset: "2px",
+                            borderRadius: "10px",
+                            margin: ".5em .5em",
+                        }}
+                    >
+                        {name}
+                    </span>
+                    <span></span>
+                    <span></span>
+                    <AdditionalOpenings {...{ fen }} />
+                </div>
+            </span>
+        );
+    }
+};
+
 const AdditionalOpenings = ({ fen }) => {
     const wins2pctgs = ({ w, b, d }) => {
         let games = w + b + d;
@@ -480,11 +501,24 @@ const AdditionalOpenings = ({ fen }) => {
                 <Fragment key={site}>
                     <strong style={{ marginRight: "1em" }}>{site}:</strong>{" "}
                     <span>{alsoKnownAs[i]}</span>
-                    <div style={{marginRight: "3em"}}>
-                    <strong style={{ marginLeft: "1em", marginRight: "1em"}}>
-                        total games:</strong> {games}
+                    <div style={{ marginRight: "3em" }}>
+                        <strong
+                            style={{ marginLeft: "1em", marginRight: "1em" }}
+                        >
+                            total games:
+                        </strong>{" "}
+                        {games}
                     </div>
-                    <span > w/d/l: &nbsp;&nbsp;<StackedBarChart {...{pctgs: {w, b, d}, style: {display:"inline-grid"}}}/> </span>
+                    <span>
+                        {" "}
+                        w/d/l: &nbsp;&nbsp;
+                        <StackedBarChart
+                            {...{
+                                pctgs: { w, b, d },
+                                style: { display: "inline-grid" },
+                            }}
+                        />{" "}
+                    </span>
                 </Fragment>
             );
         });
