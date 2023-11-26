@@ -6,6 +6,7 @@ import { pgnRead } from "kokopu";
 import { Fragment, useContext, useState } from "react";
 import sleep from "./utils/sleep.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
+import StackedBarChart from "./common/StackedBarChart.js"
 
 const blueBoldStyle = { color: "LightSkyBlue" };
 
@@ -479,13 +480,11 @@ const AdditionalOpenings = ({ fen }) => {
                 <Fragment key={site}>
                     <strong style={{ marginRight: "1em" }}>{site}:</strong>{" "}
                     <span>{alsoKnownAs[i]}</span>
-                    <strong style={{ marginLeft: "1em" }}>
-                        games (w/b/d %):
-                    </strong>{" "}
-                    <span>
-                        {" "}
-                        {games} {w}/{b}/{d}
-                    </span>
+                    <div style={{marginRight: "3em"}}>
+                    <strong style={{ marginLeft: "1em", marginRight: "1em"}}>
+                        total games:</strong> {games}
+                    </div>
+                    <span > w/d/l: &nbsp;&nbsp;<StackedBarChart {...{pctgs: {w, b, d}, style: {display:"inline-grid"}}}/> </span>
                 </Fragment>
             );
         });

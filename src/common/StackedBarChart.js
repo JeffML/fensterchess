@@ -1,5 +1,5 @@
-const gsbc = ({ pctgs: { w, b, d } }) => (
-    <div id="games-chart">
+const gsbc = ({ pctgs: { w, b, d }, style}) => (
+    <div id="games-chart" style={style}>
         {w !== 0 && <div id="white" style={{ gridColumn: `span ${w}` }}>
             {w}%
         </div>}
