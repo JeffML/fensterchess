@@ -364,27 +364,6 @@ const Games = ({ db, filter }) => {
     );
 };
 
-// Note: if called w/o a url, this does nothing (note the skip)
-const PgnQueryGames = (url = null, flash, setFlash, filter, setFilter) => {
-    const dummyMetaPgnInput = { link: url, lastModified: "" };
-    const { error, data, loading } = useQuery(GET_PGN_FILES, {
-        variables: { pgnLinks: [dummyMetaPgnInput] },
-        skip: url === null,
-    });
-
-    if (error) console.error(error.toLocaleString());
-    if (loading) return <span className="white">Loading...</span>;
-    if (data) {
-        return PgnDirectGames(
-            data.getPgnFiles[0].pgn,
-            flash,
-            setFlash,
-            filter,
-            setFilter
-        );
-    }
-};
-
 const PgnDirectGames = (pgn, flash, setFlash, filter, setFilter) => {
     const pgnSumm = getPgnSummary(pgn);
     return (
@@ -430,7 +409,7 @@ const OpeningBookComparison = ({ game }) => {
 
     if (data) {
         const openings = data.getOpeningsForFens2;
-        const { name, moves, fen } = openings.at(-1);
+        const { name, fen } = openings.at(-1);
 
         return (
             <span style={{ ...columnStyle, marginBottom: "1em" }}>
@@ -532,14 +511,27 @@ Arguments are url OR pgn.
 
 If given a url, query TWIC for games; else load the pgn file directly.
 */
-const PgnTabs = ({ url, pgn }) => {
-    // The following have to be at this level because of the hooks issue mentioned below:
+const PgnTabs = ({ url=null, pgn }) => {
     const [flash, setFlash] = useState(false);
     const [filter, setFilter] = useState([]);
 
-    let foo = PgnQueryGames(url, flash, setFlash, filter, setFilter); // this *has* to be called because it has hook in it: https://github.com/facebook/react/issues/24391
-    if (pgn) foo = PgnDirectGames(pgn, flash, setFlash, filter, setFilter);
-    return foo;
+    const dummyMetaPgnInput = { link: url, lastModified: "" };
+    const { error, data, loading } = useQuery(GET_PGN_FILES, {
+        variables: { pgnLinks: [dummyMetaPgnInput] },
+        skip: url === null,
+    });
+
+    if (error) console.error(error.toLocaleString());
+    if (loading) return <span className="white">Loading...</span>;
+    if (data || pgn) {
+        return PgnDirectGames(
+            data?.getPgnFiles[0].pgn || pgn,
+            flash,
+            setFlash,
+            filter,
+            setFilter
+        );
+    }
 };
 
 export default PgnTabs;
