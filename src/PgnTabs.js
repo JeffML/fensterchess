@@ -450,7 +450,7 @@ const OpeningBookComparison = ({ game, setOpening, setFlash2 }) => {
             setFlash2(false);
         }
 
-        doFlash();;
+        doFlash();
     }, [opening]);
 
     const fens = game
@@ -462,7 +462,7 @@ const OpeningBookComparison = ({ game, setOpening, setFlash2 }) => {
     if (data) {
         const openings = data.getOpeningsForFens2;
         opening = openings.at(-1);
-        setOpening(opening)
+        setOpening(opening);
         const { name, fen } = opening;
 
         return (
@@ -472,11 +472,7 @@ const OpeningBookComparison = ({ game, setOpening, setFlash2 }) => {
                         Fenster:
                     </strong>{" "}
                     <span
-                        // className="fakeLink"
                         style={{
-                        //     outline: "solid 1px",
-                        //     outlineOffset: "2px",
-                        //     borderRadius: "10px",
                             margin: ".5em .5em",
                         }}
                     >
@@ -510,7 +506,7 @@ const AdditionalOpenings = ({ fen }) => {
 
     const { loading, data } = useQuery(GET_OPENING_ADDITIONAL, {
         variables: { fen, sites },
-        skip: fen === "start",
+        skip: fen === "start" || sites.length === 0,
     });
 
     if (loading)
