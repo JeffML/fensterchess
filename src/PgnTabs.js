@@ -374,7 +374,7 @@ const Opening = ({ opening }) => {
         const {eco, name, moves, fen} = opening;
         return <div style={{
             display: "grid",
-            gridTemplateColumns: "1fr 2fr"co
+            gridTemplateColumns: "1fr 2fr"
         }}>
             <Chessboard position={fen} squareSize={30}/>
             <div>
