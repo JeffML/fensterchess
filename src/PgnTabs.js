@@ -3,7 +3,7 @@ import { useQuery, gql } from "@apollo/client";
 import "react-tabs/style/react-tabs.css";
 import "./stylesheets/grid.css";
 import { pgnRead } from "kokopu";
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import sleep from "./utils/sleep.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import StackedBarChart from "./common/StackedBarChart.js";
@@ -313,7 +313,9 @@ const Games = ({ db, filter, setOpening, setFlash2 }) => {
     const games = Array.from(db.games());
     const [index, setIndex] = useState(-1);
 
-    const clickHandler = (i) => setIndex(i);
+    const clickHandler = (i) => {
+        setIndex(i);
+    };
 
     const filterFunc = (game) =>
         !filter.length || filter.includes(game.opening());
@@ -379,7 +381,7 @@ const Opening = ({ opening }) => {
 const PgnGames = ({ pgn }) => {
     const [opening, setOpening] = useState(null);
     const [flash, setFlash] = useState(false);
-    const [flash2, setFlash2] = useState(false)
+    const [flash2, setFlash2] = useState(false);
     const [filter, setFilter] = useState([]);
 
     const pgnSumm = getPgnSummary(pgn);
@@ -395,17 +397,23 @@ const PgnGames = ({ pgn }) => {
                 >
                     Games
                 </Tab>
-                <Tab  style={{
+                <Tab
+                    style={{
                         ...tabFlashStyle,
-                        ...(flash2? tabFlashStyle2 : null),
-                    }}>Opening</Tab>
+                        ...(flash2 ? tabFlashStyle2 : null),
+                    }}
+                >
+                    Opening
+                </Tab>
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
                     <PgnSummary {...{ pgnSumm, setFlash, filter, setFilter }} />
                 </TabPanel>
                 <TabPanel>
-                    <Games {...{ db: pgnSumm.db, filter, setOpening, setFlash2 }} />
+                    <Games
+                        {...{ db: pgnSumm.db, filter, setOpening, setFlash2 }}
+                    />
                 </TabPanel>
                 <TabPanel>
                     <Opening {...{ opening }} />
@@ -425,6 +433,26 @@ const OpeningBookComparison = ({ game, setOpening, setFlash2 }) => {
         color: "#BDEDFF",
     };
 
+    let opening = null;
+
+    useEffect(() => {
+        async function doFlash() {
+            setFlash2(true);
+            await sleep(200);
+            setFlash2(false);
+            await sleep(200);
+            setFlash2(true);
+            await sleep(200);
+            setFlash2(false);
+            await sleep(200);
+            setFlash2(true);
+            await sleep(200);
+            setFlash2(false);
+        }
+
+        doFlash();;
+    }, [opening]);
+
     const fens = game
         .nodes()
         .slice(0, 50)
@@ -433,25 +461,9 @@ const OpeningBookComparison = ({ game, setOpening, setFlash2 }) => {
 
     if (data) {
         const openings = data.getOpeningsForFens2;
-        const opening = openings.at(-1);
+        opening = openings.at(-1);
+        setOpening(opening)
         const { name, fen } = opening;
-
-        const handler = async() => {
-        if (opening) {
-            setFlash2(true);
-            await sleep(200);
-            setFlash2(false);
-            await sleep(200);
-            setFlash2(true);
-            await sleep(200);
-            setFlash2(false);
-            await sleep(200);
-            setFlash2(true);
-            await sleep(200);
-            setFlash2(false);
-            setOpening(opening);
-        }
-        }
 
         return (
             <span style={{ ...columnStyle, marginBottom: "1em" }}>
@@ -460,12 +472,11 @@ const OpeningBookComparison = ({ game, setOpening, setFlash2 }) => {
                         Fenster:
                     </strong>{" "}
                     <span
-                        className="fakeLink"
-                        onClick = {handler}
+                        // className="fakeLink"
                         style={{
-                            outline: "solid 1px",
-                            outlineOffset: "2px",
-                            borderRadius: "10px",
+                        //     outline: "solid 1px",
+                        //     outlineOffset: "2px",
+                        //     borderRadius: "10px",
                             margin: ".5em .5em",
                         }}
                     >
