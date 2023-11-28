@@ -13,12 +13,14 @@ const blueBoldStyle = { color: "LightSkyBlue" };
 const tabStyle = {
     border: "1px solid #FFFFFF ",
     borderRadius: "10px 10px 0 0",
+    color: "lightgreen",
+    textShadow: "2px 2px 2px black",
 };
 
 const tabFlashStyle = {
     ...tabStyle,
     transition: "all 0.1s ease-in",
-    // color: "orange",
+
     // padding: "20px",
 };
 
@@ -300,7 +302,7 @@ const Players = ({ pgnSumm }) => {
     );
 };
 
-const Games = ({ db, filter }) => {
+const Games = ({ db, filter, setOpening, setFlash2 }) => {
     const gridStyle = {
         display: "grid",
         gridTemplateColumns: "1fr 2fr 3fr 3fr 4fr 1fr",
@@ -332,19 +334,19 @@ const Games = ({ db, filter }) => {
             <hr />
             <div name="lefty" style={gridStyle} className="scrollableY white">
                 {games.filter(filterFunc).map((g, i) => {
-                    const opening = g.opening();
+                    const pgnOpening = g.opening();
                     return (
                         <Fragment key={i}>
                             <span>{g.fullRound()}</span>
                             <span>{g.dateAsString()}</span>
                             <span>{g.playerName("w")}</span>
                             <span>{g.playerName("b")}</span>
-                            {opening ? (
+                            {pgnOpening ? (
                                 <span
                                     className="fakeLink"
                                     onClick={() => clickHandler(i)}
                                 >
-                                    {opening}
+                                    {pgnOpening}
                                 </span>
                             ) : (
                                 <span>N/A</span>
@@ -353,7 +355,7 @@ const Games = ({ db, filter }) => {
                             {index === i && (
                                 <OpeningBookComparison
                                     key={i}
-                                    {...{ game: g, id: i, index }}
+                                    {...{ game: g, setOpening, setFlash2 }}
                                 />
                             )}
                         </Fragment>
@@ -364,7 +366,22 @@ const Games = ({ db, filter }) => {
     );
 };
 
-const PgnDirectGames = (pgn, flash, setFlash, filter, setFilter) => {
+const Opening = ({ opening }) => {
+    if (opening) {
+        return <pre>{JSON.stringify(opening, null, 2)}</pre>;
+    } else {
+        return (
+            <div className="white">Select an opening from the Games tab.</div>
+        );
+    }
+};
+
+const PgnGames = ({ pgn }) => {
+    const [opening, setOpening] = useState(null);
+    const [flash, setFlash] = useState(false);
+    const [flash2, setFlash2] = useState(false)
+    const [filter, setFilter] = useState([]);
+
     const pgnSumm = getPgnSummary(pgn);
     return (
         <Tabs>
@@ -378,20 +395,27 @@ const PgnDirectGames = (pgn, flash, setFlash, filter, setFilter) => {
                 >
                     Games
                 </Tab>
+                <Tab  style={{
+                        ...tabFlashStyle,
+                        ...(flash2? tabFlashStyle2 : null),
+                    }}>Opening</Tab>
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
                     <PgnSummary {...{ pgnSumm, setFlash, filter, setFilter }} />
                 </TabPanel>
                 <TabPanel>
-                    <Games {...{ db: pgnSumm.db, filter }} />
+                    <Games {...{ db: pgnSumm.db, filter, setOpening, setFlash2 }} />
+                </TabPanel>
+                <TabPanel>
+                    <Opening {...{ opening }} />
                 </TabPanel>
             </div>
         </Tabs>
     );
 };
 
-const OpeningBookComparison = ({ game }) => {
+const OpeningBookComparison = ({ game, setOpening, setFlash2 }) => {
     const columnStyle = { gridColumnStart: "span 6" };
     const gridStyle = {
         display: "inline-grid",
@@ -409,7 +433,25 @@ const OpeningBookComparison = ({ game }) => {
 
     if (data) {
         const openings = data.getOpeningsForFens2;
-        const { name, fen } = openings.at(-1);
+        const opening = openings.at(-1);
+        const { name, fen } = opening;
+
+        const handler = async() => {
+        if (opening) {
+            setFlash2(true);
+            await sleep(200);
+            setFlash2(false);
+            await sleep(200);
+            setFlash2(true);
+            await sleep(200);
+            setFlash2(false);
+            await sleep(200);
+            setFlash2(true);
+            await sleep(200);
+            setFlash2(false);
+            setOpening(opening);
+        }
+        }
 
         return (
             <span style={{ ...columnStyle, marginBottom: "1em" }}>
@@ -419,6 +461,7 @@ const OpeningBookComparison = ({ game }) => {
                     </strong>{" "}
                     <span
                         className="fakeLink"
+                        onClick = {handler}
                         style={{
                             outline: "solid 1px",
                             outlineOffset: "2px",
@@ -511,10 +554,7 @@ Arguments are url OR pgn.
 
 If given a url, query TWIC for games; else load the pgn file directly.
 */
-const PgnTabs = ({ url=null, pgn }) => {
-    const [flash, setFlash] = useState(false);
-    const [filter, setFilter] = useState([]);
-
+const PgnTabs = ({ url = null, pgn }) => {
     const dummyMetaPgnInput = { link: url, lastModified: "" };
     const { error, data, loading } = useQuery(GET_PGN_FILES, {
         variables: { pgnLinks: [dummyMetaPgnInput] },
@@ -524,12 +564,12 @@ const PgnTabs = ({ url=null, pgn }) => {
     if (error) console.error(error.toLocaleString());
     if (loading) return <span className="white">Loading...</span>;
     if (data || pgn) {
-        return PgnDirectGames(
-            data?.getPgnFiles[0].pgn || pgn,
-            flash,
-            setFlash,
-            filter,
-            setFilter
+        return (
+            <PgnGames
+                {...{
+                    pgn: data?.getPgnFiles[0].pgn || pgn,
+                }}
+            />
         );
     }
 };
