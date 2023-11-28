@@ -7,6 +7,7 @@ import { Fragment, useContext, useEffect, useState } from "react";
 import sleep from "./utils/sleep.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import StackedBarChart from "./common/StackedBarChart.js";
+import { Chessboard } from "kokopu-react";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
 
@@ -370,7 +371,21 @@ const Games = ({ db, filter, setOpening, setFlash2 }) => {
 
 const Opening = ({ opening }) => {
     if (opening) {
-        return <pre>{JSON.stringify(opening, null, 2)}</pre>;
+        const {eco, name, moves, fen} = opening;
+        return <div style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 2fr"co
+        }}>
+            <Chessboard position={fen} squareSize={30}/>
+            <div>
+                <ul style={{textAlign:"left", color:"white"}}>
+                    <li>{name}</li>
+                    <li>ECO: {eco}</li>
+                    <li>Moves: {moves}</li>
+                    <li>FEN: {fen}</li>
+                </ul>
+            </div>
+        </div>;
     } else {
         return (
             <div className="white">Select an opening from the Games tab.</div>
