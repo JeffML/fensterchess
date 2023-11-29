@@ -303,201 +303,47 @@ const Players = ({ pgnSumm }) => {
     );
 };
 
-const Games = ({ db, filter, setOpening, setFlash2 }) => {
-    const gridStyle = {
-        display: "grid",
-        gridTemplateColumns: "1fr 2fr 3fr 3fr 4fr 1fr",
-        maxHeight: "250px",
-        gap: "3px",
-    };
-
-    const games = Array.from(db.games());
-    const [index, setIndex] = useState(-1);
-
-    const clickHandler = (i) => {
-        setIndex(i);
-    };
-
-    const filterFunc = (game) =>
-        !filter.length || filter.includes(game.opening());
-
-    return (
-        <>
-            <div name="lefty" style={gridStyle} className="white font-cinzel">
-                <span>Round</span>
-                <span>Date</span>
-                <span>White</span>
-                <span>Black</span>
-                <span>
-                    Opening{" "}
-                    <span style={{ fontSize: "smaller" }}>(from PGN)</span>
-                </span>
-                <span>Result</span>
-            </div>
-            <hr />
-            <div name="lefty" style={gridStyle} className="scrollableY white">
-                {games.filter(filterFunc).map((g, i) => {
-                    const pgnOpening = g.opening();
-                    return (
-                        <Fragment key={i}>
-                            <span>{g.fullRound()}</span>
-                            <span>{g.dateAsString()}</span>
-                            <span>{g.playerName("w")}</span>
-                            <span>{g.playerName("b")}</span>
-                            {pgnOpening ? (
-                                <span
-                                    className="fakeLink"
-                                    onClick={() => clickHandler(i)}
-                                >
-                                    {pgnOpening}
-                                </span>
-                            ) : (
-                                <span>N/A</span>
-                            )}
-                            <span>{g.result()}</span>
-                            {index === i && (
-                                <OpeningBookComparison
-                                    key={i}
-                                    {...{ game: g, setOpening, setFlash2 }}
-                                />
-                            )}
-                        </Fragment>
-                    );
-                })}
-            </div>
-        </>
-    );
-};
-
-const Opening = ({ opening }) => {
-    if (opening) {
-        const {eco, name, moves, fen} = opening;
-        return <div style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 2fr"
-        }}>
-            <Chessboard position={fen} squareSize={30}/>
-            <div>
-                <ul style={{textAlign:"left", color:"white"}}>
-                    <li>{name}</li>
-                    <li>ECO: {eco}</li>
-                    <li>Moves: {moves}</li>
-                    <li>FEN: {fen}</li>
-                </ul>
-            </div>
-        </div>;
-    } else {
-        return (
-            <div className="white">Select an opening from the Games tab.</div>
-        );
-    }
-};
-
-const PgnGames = ({ pgn }) => {
-    const [opening, setOpening] = useState(null);
-    const [flash, setFlash] = useState(false);
-    const [flash2, setFlash2] = useState(false);
-    const [filter, setFilter] = useState([]);
-
-    const pgnSumm = getPgnSummary(pgn);
-    return (
-        <Tabs>
-            <TabList className="left" style={{ marginBottom: "0px" }}>
-                <Tab style={tabStyle}>Summary</Tab>
-                <Tab
-                    style={{
-                        ...tabFlashStyle,
-                        ...(flash ? tabFlashStyle2 : null),
-                    }}
-                >
-                    Games
-                </Tab>
-                <Tab
-                    style={{
-                        ...tabFlashStyle,
-                        ...(flash2 ? tabFlashStyle2 : null),
-                    }}
-                >
-                    Opening
-                </Tab>
-            </TabList>
-            <div style={{ border: "thick solid white" }}>
-                <TabPanel>
-                    <PgnSummary {...{ pgnSumm, setFlash, filter, setFilter }} />
-                </TabPanel>
-                <TabPanel>
-                    <Games
-                        {...{ db: pgnSumm.db, filter, setOpening, setFlash2 }}
-                    />
-                </TabPanel>
-                <TabPanel>
-                    <Opening {...{ opening }} />
-                </TabPanel>
-            </div>
-        </Tabs>
-    );
-};
-
-const OpeningBookComparison = ({ game, setOpening, setFlash2 }) => {
-    const columnStyle = { gridColumnStart: "span 6" };
-    const gridStyle = {
-        display: "inline-grid",
-        gridTemplateColumns: "auto auto auto auto",
-        gap: "5px",
-        marginLeft: "3em",
-        color: "#BDEDFF",
-    };
-
-    let opening = null;
-
-    useEffect(() => {
-        async function doFlash() {
-            setFlash2(true);
-            await sleep(200);
-            setFlash2(false);
-            await sleep(200);
-            setFlash2(true);
-            await sleep(200);
-            setFlash2(false);
-            await sleep(200);
-            setFlash2(true);
-            await sleep(200);
-            setFlash2(false);
-        }
-
-        doFlash();
-    }, [opening]);
-
+const Opening = ({ game }) => {
     const fens = game
         .nodes()
         .slice(0, 50)
         .map((n) => n.fen());
-    const { data } = useQuery(FIND_OPENINGS, { variables: { fens } });
+
+    const { data, loading } = useQuery(FIND_OPENINGS, {
+        variables: { fens },
+        skip: game === null,
+    });
+
+    if (loading) return <span className="white">Loading...</span>;
+    if (!game)
+        return (
+            <span className="white">Select an opening from the Games tab.</span>
+        );
 
     if (data) {
         const openings = data.getOpeningsForFens2;
-        opening = openings.at(-1);
-        setOpening(opening);
-        const { name, fen } = opening;
+        const opening = openings.at(-1);
+
+        const { eco, name, moves, fen } = opening;
 
         return (
-            <span style={{ ...columnStyle, marginBottom: "1em" }}>
-                <div style={gridStyle}>
-                    <strong style={{ margin: ".5em 1em .5em 0em" }}>
-                        Fenster:
-                    </strong>{" "}
-                    <span
-                        style={{
-                            margin: ".5em .5em",
-                        }}
-                    >
-                        {name}
-                    </span>
-                    <span></span>
-                    <span></span>
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 2fr",
+                }}
+            >
+                <Chessboard position={fen} squareSize={30} />
+                <div>
+                    <ul style={{ textAlign: "left", color: "white" }}>
+                        <li>{name}</li>
+                        <li>ECO: {eco}</li>
+                        <li>Moves: {moves}</li>
+                        <li>FEN: {fen}</li>
+                    </ul>
                     <AdditionalOpenings {...{ fen }} />
                 </div>
-            </span>
+            </div>
         );
     }
 };
@@ -569,6 +415,108 @@ const AdditionalOpenings = ({ fen }) => {
 
         return siteData;
     }
+};
+
+const Games = ({ db, filter, setGame, setTabIndex }) => {
+    const gridStyle = {
+        display: "grid",
+        gridTemplateColumns: "1fr 2fr 3fr 3fr 4fr 1fr",
+        maxHeight: "250px",
+        gap: "3px",
+    };
+
+    const games = Array.from(db.games());
+
+    const clickHandler = (g) => {
+        setTabIndex(2);
+        setGame(g);
+    };
+
+    const filterFunc = (game) =>
+        !filter.length || filter.includes(game.opening());
+
+    return (
+        <>
+            <div name="lefty" style={gridStyle} className="white font-cinzel">
+                <span>Round</span>
+                <span>Date</span>
+                <span>White</span>
+                <span>Black</span>
+                <span>
+                    Opening{" "}
+                    <span style={{ fontSize: "smaller" }}>(from PGN)</span>
+                </span>
+                <span>Result</span>
+            </div>
+            <hr />
+            <div name="lefty" style={gridStyle} className="scrollableY white">
+                {games.filter(filterFunc).map((g, i) => {
+                    const pgnOpening = g.opening();
+                    return (
+                        <Fragment key={i}>
+                            <span>{g.fullRound()}</span>
+                            <span>{g.dateAsString()}</span>
+                            <span>{g.playerName("w")}</span>
+                            <span>{g.playerName("b")}</span>
+                            {pgnOpening ? (
+                                <span
+                                    className="fakeLink"
+                                    onClick={() => clickHandler(g)}
+                                >
+                                    {pgnOpening}
+                                </span>
+                            ) : (
+                                <span>N/A</span>
+                            )}
+                            <span>{g.result()}</span>
+                        </Fragment>
+                    );
+                })}
+            </div>
+        </>
+    );
+};
+
+const PgnGames = ({ pgn }) => {
+    const [game, setGame] = useState(null);
+    const [flash, setFlash] = useState(false);
+    // const [flash2, setFlash2] = useState(false);
+    const [filter, setFilter] = useState([]);
+
+    const pgnSumm = getPgnSummary(pgn);
+
+    // controlled mode; see https://www.npmjs.com/package/react-tabs#controlled-vs-uncontrolled-mode
+    const [tabIndex, setTabIndex] = useState(0);
+
+    return (
+        <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
+            <TabList className="left" style={{ marginBottom: "0px" }}>
+                <Tab style={tabStyle}>Summary</Tab>
+                <Tab
+                    style={{
+                        ...tabFlashStyle,
+                        ...(flash ? tabFlashStyle2 : null),
+                    }}
+                >
+                    Games
+                </Tab>
+                <Tab style={tabStyle}>Opening</Tab>
+            </TabList>
+            <div style={{ border: "thick solid white" }}>
+                <TabPanel>
+                    <PgnSummary {...{ pgnSumm, setFlash, filter, setFilter }} />
+                </TabPanel>
+                <TabPanel>
+                    <Games
+                        {...{ db: pgnSumm.db, filter, setGame, setTabIndex }}
+                    />
+                </TabPanel>
+                <TabPanel>
+                    <Opening {...{ game }} />
+                </TabPanel>
+            </div>
+        </Tabs>
+    );
 };
 
 /*
