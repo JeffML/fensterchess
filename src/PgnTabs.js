@@ -330,17 +330,22 @@ const Opening = ({ game }) => {
             <div
                 style={{
                     display: "grid",
-                    gridTemplateColumns: "1fr 2fr",
+                    gridTemplateColumns: "1fr 3fr",
+                    marginTop: "1em"
                 }}
             >
                 <Chessboard position={fen} squareSize={30} />
-                <div>
-                    <ul style={{ textAlign: "left", color: "white" }}>
-                        <li>{name}</li>
-                        <li>ECO: {eco}</li>
-                        <li>Moves: {moves}</li>
-                        <li>FEN: {fen}</li>
-                    </ul>
+                <div
+                    style={{ display: "grid", gridTemplateColumns: "1fr 3fr", textAlign:"left", gridAutoRows:"min-content", gridAutoColumns:"minContent", color:"white"}}
+                >
+                    <span>Fenster Opening Name:</span>
+                    <span>{name}</span>
+                    <span>ECO:</span>
+                    <span> {eco}</span>
+                    <span>Moves:</span> <span>{moves}</span>
+                    <span>FEN:</span>
+                    <span>{fen}</span>
+
                     <AdditionalOpenings {...{ fen }} />
                 </div>
             </div>
@@ -372,13 +377,10 @@ const AdditionalOpenings = ({ fen }) => {
 
     if (loading)
         return (
-            <>
+            <div style={{display:"grid", gridTemplateColumns: "auto", gridColumnStart: "2", gridColumnEnd: "auto"}}>
                 <strong style={{ marginRight: "1em", color: "#FFCE44" }}>
-                    Loading...
-                </strong>{" "}
-                <span></span>
-                <strong style={{ marginLeft: "1em" }}></strong> <span></span>
-            </>
+                    Loading...</strong>
+            </div>
         );
 
     if (data) {
@@ -388,15 +390,17 @@ const AdditionalOpenings = ({ fen }) => {
             const { games, w, b, d } = wins2pctgs(wins[i]);
 
             return (
-                <Fragment key={site}>
+                <div key={site} style={{display: "contents", gridColumnStart:"1", textAlign: "left", color:"white",}}>
+                    <span>&nbsp;</span>
+                    <span>&nbsp;</span>
                     <strong style={{ marginRight: "1em" }}>{site}:</strong>{" "}
                     <span>{alsoKnownAs[i]}</span>
                     <div style={{ marginRight: "3em" }}>
-                        <strong
+                        <span
                             style={{ marginLeft: "1em", marginRight: "1em" }}
                         >
                             total games:
-                        </strong>{" "}
+                        </span>{" "}
                         {games}
                     </div>
                     <span>
@@ -409,7 +413,7 @@ const AdditionalOpenings = ({ fen }) => {
                             }}
                         />{" "}
                     </span>
-                </Fragment>
+                </div>
             );
         });
 
