@@ -49,6 +49,13 @@ const About = () => (
                 current position can be found on each side, and what the white
                 win, black win, and draw statistics are.
             </p>
+            <h3>Similar openings</h3>
+            <p>
+                After five complete moves, the __Similar Openings__ tab _may_
+                list openings that are similar to the current one. The algorithm
+                for determine what makes an opening similar will likely be
+                refined in the future.
+            </p>
             <h3> What does the '*' mean? </h3>
             <p>
                 Some entries in the opening "book" are <i>interpolated</i>. This
@@ -77,14 +84,16 @@ const About = () => (
                 by name, rating (ELO) or title.
             </p>
             <p>
-                In addition to the Summary tab, the is the Games tab. This will
-                display information about each game in the PGN file. If you
-                click on the Opening name, it will display what Fenster know the
-                opening name (which may be different from what is called in the
-                PGN file), as well as the move sequence. If one or more of the
-                sites in the upper right are selected the opening name as known
-                to each site is displayed, as well as aggregate statistics for
-                that opening.
+                In addition to the Summary tab, the are the Games and Openings
+                tabs. These will display information about each game in the PGN
+                file. If you click on the Opening name in the games listed, it
+                will take you to the Openings tab with more information about
+                the game opening, including the Fenster opening name (which may
+                be different from what is called in the PGN file), as well as
+                the move sequence and FEN. If one or more of the sites in the
+                upper right menu are selected, the opening name as known to each
+                site is displayed, as well as aggregate statistics for that
+                opening.
             </p>
             <h2>Questions? Bugs?</h2>
             If you have any questions, spot a bug, or have suggestions for a
