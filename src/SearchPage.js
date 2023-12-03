@@ -61,11 +61,19 @@ const SimilarOpenings = ({ fen, setFen }) => {
         if (data) {
             const sims = data.getSimilarOpenings.map((sim) => {
                 return (
-                    <div key={sim.fen} style={{ display: "grid", justifyItems:"flex-start", paddingLeft: "2em", paddingTop:"0.7em"}}>
+                    <div
+                        key={sim.fen}
+                        style={{
+                            display: "grid",
+                            justifyItems: "flex-start",
+                            paddingLeft: "2em",
+                            paddingTop: "0.7em",
+                        }}
+                    >
                         <span
                             style={{ paddingBottom: "3px" }}
                             className="fakeLink"
-                            onClick={()=>setFen(sim.fen)}
+                            onClick={() => setFen(sim.fen)}
                         >
                             {newName(sim.name)}
                         </span>
@@ -236,11 +244,21 @@ const SearchPage = ({ chess, fen, setFen }) => {
         setText("");
     };
 
+    /*
+    If we came in through a FEN input, we will get the following format when a move is put to the the chess object:
+    "[SetUp \"1\"]\n[FEN \"r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 1 5\"]\n\n5. O-O"
+    The following code handles this case.
+    */
     const handleMovePlayed = (move) => {
         chess.current.move(move);
         const newFen = chess.current.fen();
         setFen(newFen);
-        setText(`FEN:\n${newFen}\n\nmoves: ${chess.current.pgn()}`);
+        let pgn = chess.current.pgn();
+        const movesPosition = pgn.lastIndexOf("]"); // end of SetUp FEN
+        if (movesPosition > -1) {
+            pgn = pgn.substring(movesPosition + 3, pgn.length); // +3 for the newlines between SetUp FEN and move list
+        }
+        setText(`FEN:\n${newFen}\n\nmoves: ${pgn}`);
     };
 
     const back = () => {
