@@ -8,4 +8,11 @@ const movesToFen = (moves) => {
 
 const newName = (name) => name.replace(/(\s\(i\))+/, "*");
 
-export {movesToFen, newName}
+const toPlay = (fen) => {
+    const splitFen = fen.split(" ")
+    const color = splitFen.at(-5)
+    const move = splitFen.at(-1)
+    return {move, color}
+} 
+
+export {movesToFen, newName, toPlay}

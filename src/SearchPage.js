@@ -10,6 +10,7 @@ import { SelectedSitesContext } from "./common/Contexts.js";
 import { FENEX } from "./common/consts.js";
 import "./stylesheets/textarea.css";
 import { newName } from "./utils/chessTools.js";
+import { toPlay } from "./utils/chessTools.js";
 
 const GET_OPENING = gql`
     query getOpening($fen: String!) {
@@ -43,14 +44,16 @@ const GET_SIMILAR = gql`
 `;
 
 const SimilarOpenings = ({ fen, setFen }) => {
-    const moveAt = fen.split(" ").at(-1);
+    const {move, color} = toPlay(fen)
+
+    const searchable = move > 5 || (move === '5' && color === 'b')
 
     const { error, data, loading } = useQuery(GET_SIMILAR, {
         variables: { fen },
-        skip: moveAt < 6,
+        skip: !searchable,
     });
 
-    if (moveAt < 6) return <span>Play at least 5 moves</span>;
+    if (!searchable) return <span>Play at least 5 moves as white</span>;
     else {
         if (loading) {
             return <span>Loading...</span>;
