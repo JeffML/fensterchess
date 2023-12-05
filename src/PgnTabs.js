@@ -325,19 +325,38 @@ const Opening = ({ game }) => {
         const opening = openings.at(-1);
 
         const { eco, name, moves, fen } = opening;
+        const event = game.event();
+        const white =
+            (game.playerTitle("w") ?? "  ") + "   " + game.playerName("w");
+        const black =
+            (game.playerTitle("b") ?? "  ") + "   " + game.playerName("b");
 
         return (
             <div
                 style={{
                     display: "grid",
                     gridTemplateColumns: "1fr 3fr",
-                    marginTop: "1em"
+                    marginTop: "1em",
                 }}
             >
                 <Chessboard position={fen} squareSize={30} />
                 <div
-                    style={{ display: "grid", gridTemplateColumns: "1fr 3fr", textAlign:"left", gridAutoRows:"min-content", gridAutoColumns:"minContent", color:"white"}}
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 3fr",
+                        textAlign: "left",
+                        gridAutoRows: "min-content",
+                        gridAutoColumns: "minContent",
+                        color: "white",
+                        marginLeft: ".6em",
+                    }}
                 >
+                    <span>Event:</span>
+                    <span>{event}</span>
+                    <span>White:</span>
+                    <span>{white}</span>
+                    <span>Black:</span>
+                    <span>{black}</span>
                     <span>Fenster Opening Name:</span>
                     <span>{name}</span>
                     <span>ECO:</span>
@@ -345,7 +364,6 @@ const Opening = ({ game }) => {
                     <span>Moves:</span> <span>{moves}</span>
                     <span>FEN:</span>
                     <span>{fen}</span>
-
                     <AdditionalOpenings {...{ fen }} />
                 </div>
             </div>
@@ -377,9 +395,17 @@ const AdditionalOpenings = ({ fen }) => {
 
     if (loading)
         return (
-            <div style={{display:"grid", gridTemplateColumns: "auto", gridColumnStart: "2", gridColumnEnd: "auto"}}>
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "auto",
+                    gridColumnStart: "2",
+                    gridColumnEnd: "auto",
+                }}
+            >
                 <strong style={{ marginRight: "1em", color: "#FFCE44" }}>
-                    Loading...</strong>
+                    Loading...
+                </strong>
             </div>
         );
 
@@ -390,16 +416,22 @@ const AdditionalOpenings = ({ fen }) => {
             const { games, w, b, d } = wins2pctgs(wins[i]);
 
             return (
-                <div key={site} style={{display: "contents", gridColumnStart:"1", textAlign: "left", color:"white",}}>
+                <div
+                    key={site}
+                    style={{
+                        display: "contents",
+                        gridColumnStart: "1",
+                        textAlign: "left",
+                        color: "white",
+                    }}
+                >
                     <span>&nbsp;</span>
                     <span>&nbsp;</span>
                     <strong style={{ marginRight: "1em" }}>{site}:</strong>{" "}
                     <span>{alsoKnownAs[i]}</span>
                     <div style={{ marginRight: "3em" }}>
-                        <span
-                            style={{ marginLeft: "1em", marginRight: "1em" }}
-                        >
-                            total games:
+                        <span style={{ marginLeft: "1em", marginRight: "1em" }}>
+                            games:
                         </span>{" "}
                         {games}
                     </div>
@@ -462,16 +494,14 @@ const Games = ({ db, filter, setGame, setTabIndex }) => {
                             <span>{g.dateAsString()}</span>
                             <span>{g.playerName("w")}</span>
                             <span>{g.playerName("b")}</span>
-                            {pgnOpening ? (
-                                <span
-                                    className="fakeLink"
-                                    onClick={() => clickHandler(g)}
-                                >
-                                    {pgnOpening}
-                                </span>
-                            ) : (
-                                <span>N/A</span>
-                            )}
+
+                            <span
+                                className="fakeLink"
+                                onClick={() => clickHandler(g)}
+                            >
+                                {pgnOpening ?? "N/A"}
+                            </span>
+
                             <span>{g.result()}</span>
                         </Fragment>
                     );
