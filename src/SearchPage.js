@@ -337,7 +337,17 @@ const SearchPage = ({ chess, fen, setFen }) => {
 };
 
 const ThePage = () => {
-    const [fen, setFen] = useState("start"); //TODO: use position history context (TBD)
+    let qfen = new URLSearchParams(window.location.search).get("fen")
+
+    if (qfen) {
+        if (!FENEX.test(qfen.split(' ')[0])) {
+            qfen = "start"
+        }
+    } else {
+        qfen = "start"
+    }
+
+    const [fen, setFen] = useState(qfen);
     const chess = useRef(new Chess());
 
     return <SearchPage {...{ chess, fen, setFen }} />;
