@@ -9,28 +9,27 @@ const MenuBar = ({ mode, setMode }) => {
                     "column menuitem " +
                     (mode === modes.search ? "selected" : "")
                 }
+                onClick={() => setMode(modes.search)}
             >
-                <span onClick={() => setMode(modes.search)}>
-                    Search Openings
-                </span>
+                <span>Search Openings</span>
             </div>
             <div
                 className={
                     "column menuitem " +
                     (mode === modes.pgnAnalyze ? "selected" : "")
                 }
+                onClick={() => setMode(modes.pgnAnalyze)}
             >
-                <span onClick={() => setMode(modes.pgnAnalyze)}>
-                    PGN Import
-                </span>
+                <span>PGN Import</span>
             </div>
             <div
                 className={
                     "column menuitem " +
                     (mode === modes.about ? "selected" : "")
                 }
+                onClick={() => setMode(modes.about)}
             >
-                <span onClick={() => setMode(modes.about)}>About</span>
+                <span>About</span>
             </div>
             <div
                 className="double-column menuitem"

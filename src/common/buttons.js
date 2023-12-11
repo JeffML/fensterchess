@@ -8,6 +8,6 @@ const BaseButton = ({bgcolor, text, onClick, style, disabled}) =>
 
 const ExitButton = ({text='Return', onClick, style}) => BaseButton({bgcolor:'red', text, onClick, style})
 
-const ActionButton = (props) => BaseButton({bgcolor:'seagreen', ...props})
+const ActionButton = (props) => BaseButton({bgcolor:"#3d8050", ...props})
 
 export {BaseButton as default, ExitButton, ActionButton}
