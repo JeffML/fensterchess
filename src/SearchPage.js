@@ -99,7 +99,7 @@ const SimilarOpenings = ({ fen, setFen }) => {
     }
 };
 
-const OpeningTabs = ({
+const OpeningTabs = ({ eco,
     fen,
     setFen,
     nextMoves,
@@ -110,7 +110,7 @@ const OpeningTabs = ({
         border: "1px solid #FFFFFF ",
         borderRadius: "10px 10px 0 0",
     };
-
+console.log({eco})
     return (
         <Tabs
             style={{ minWidth: "-webkit-fill-available", marginRight: "2em" }}
@@ -122,7 +122,7 @@ const OpeningTabs = ({
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
                     <NextMovesRow
-                        {...{ nextMoves, currentMoves, handleMovePlayed }}
+                        {...{ eco, nextMoves, currentMoves, handleMovePlayed }}
                     />
                 </TabPanel>
                 <TabPanel>
@@ -180,12 +180,13 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
                     {sites.selectedSites.length > 0 && (
                         <OpeningAdditionalWithBarChartGrid
                             id="OpeningAdditionalWithBarChartGrid"
-                            {...{ fen, name, sites: sites.selectedSites }}
+                            {...{ eco, fen, name, sites: sites.selectedSites }}
                         />
                     )}
                 </div>
                 <OpeningTabs
                     {...{
+                        eco,
                         fen,
                         setFen,
                         nextMoves,
