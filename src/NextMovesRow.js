@@ -6,22 +6,25 @@ import { newName } from "./utils/chessTools.js";
 const chess = new Chess();
 
 const legalMove = (moves, variation) => {
-    const tokens = variation.split(" ")
-    const wholeMoves = Math.trunc(tokens.length/3)
-    const partialMoves = tokens.length%3    
+    const tokens = variation.split(" ");
+    const wholeMoves = Math.trunc(tokens.length / 3);
+    const partialMoves = tokens.length % 3;
     const nextPly = tokens.at(-1);
 
-    const theMove = wholeMoves + (partialMoves? 1 : 0) + (partialMoves? '. ': '... ') + nextPly
+    const theMove =
+        wholeMoves +
+        (partialMoves ? 1 : 0) +
+        (partialMoves ? ". " : "... ") +
+        nextPly;
 
     // the last ply might be illegal due to transposition of moves; filter these out
     chess.loadPgn(moves);
     const legalMoves = chess.moves();
 
-    return legalMoves.includes(nextPly) ? {theMove, nextPly} : null;
+    return legalMoves.includes(nextPly) ? { theMove, nextPly } : null;
 };
 
 const NextMovesGrid = ({
-    eco,
     currentMoves,
     handleMovePlayed,
     nextMoves,
@@ -36,17 +39,20 @@ const NextMovesGrid = ({
         case sortEnum.NAME:
             toSort.sort((a, b) => a.name.localeCompare(b.name));
             break;
+        case sortEnum.ECO:
+            toSort.sort((a, b) => a.eco.localeCompare(b.eco));
+            break;
         default:
             throw Error(`unknown case ${sortBy}`);
     }
 
-    const ListItem = ({ name, moves: variation, score }, index) => {
+    const ListItem = ({ name, moves: variation, score, eco }, index) => {
         const nextMove = legalMove(currentMoves, variation);
         if (!nextMove) return null;
 
-        const {theMove, nextPly} = nextMove
+        const { theMove, nextPly } = nextMove;
 
-        name = newName(name)
+        name = newName(name);
 
         const backgroundColor = index % 2 ? "darkslategrey" : "slategrey";
         return (
@@ -62,9 +68,7 @@ const NextMovesGrid = ({
                 <div style={{ textAlign: "left", paddingLeft: "1em" }}>
                     {theMove}
                 </div>
-                <div style={{paddingLeft: "1em" }}>
-                    {eco}
-                </div>
+                <div style={{ paddingLeft: "1em" }}>{eco}</div>
                 <div className="fakeLink">
                     <span
                         style={{ textAlign: "left" }}
@@ -100,7 +104,7 @@ const SortBy = ({ setSortBy }) => {
     );
 };
 
-const NextMovesRow = ({eco, nextMoves, currentMoves, handleMovePlayed }) => {
+const NextMovesRow = ({ eco, nextMoves, currentMoves, handleMovePlayed }) => {
     const [sortBy, setSortBy] = useState(sortEnum.EVALUATION);
 
     if (nextMoves && nextMoves.length !== 0) {

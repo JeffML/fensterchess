@@ -9,7 +9,7 @@ const sortEnum = {
     EVALUATION: 1,
     NAME: 2,
     // RESULTS: 3,
-    // ECO: 4
+    ECO: 4
 };
 
 const modes = {

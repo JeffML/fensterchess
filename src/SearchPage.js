@@ -22,6 +22,7 @@ const GET_OPENING = gql`
                 name
                 moves
                 score
+                eco
             }
             from {
                 name
@@ -44,9 +45,9 @@ const GET_SIMILAR = gql`
 `;
 
 const SimilarOpenings = ({ fen, setFen }) => {
-    const {move, color} = toPlay(fen)
+    const { move, color } = toPlay(fen);
 
-    const searchable = move > 5 || (move === '5' && color === 'b')
+    const searchable = move > 5 || (move === "5" && color === "b");
 
     const { error, data, loading } = useQuery(GET_SIMILAR, {
         variables: { fen },
@@ -99,7 +100,7 @@ const SimilarOpenings = ({ fen, setFen }) => {
     }
 };
 
-const OpeningTabs = ({ eco,
+const OpeningTabs = ({
     fen,
     setFen,
     nextMoves,
@@ -110,7 +111,6 @@ const OpeningTabs = ({ eco,
         border: "1px solid #FFFFFF ",
         borderRadius: "10px 10px 0 0",
     };
-console.log({eco})
     return (
         <Tabs
             style={{ minWidth: "-webkit-fill-available", marginRight: "2em" }}
@@ -122,7 +122,7 @@ console.log({eco})
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
                     <NextMovesRow
-                        {...{ eco, nextMoves, currentMoves, handleMovePlayed }}
+                        {...{ nextMoves, currentMoves, handleMovePlayed }}
                     />
                 </TabPanel>
                 <TabPanel>
@@ -186,7 +186,6 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
                 </div>
                 <OpeningTabs
                     {...{
-                        eco,
                         fen,
                         setFen,
                         nextMoves,
@@ -338,14 +337,14 @@ const SearchPage = ({ chess, fen, setFen }) => {
 };
 
 const ThePage = () => {
-    let qfen = new URLSearchParams(window.location.search).get("fen")
+    let qfen = new URLSearchParams(window.location.search).get("fen");
 
     if (qfen) {
-        if (!FENEX.test(qfen.split(' ')[0])) {
-            qfen = "start"
+        if (!FENEX.test(qfen.split(" ")[0])) {
+            qfen = "start";
         }
     } else {
-        qfen = "start"
+        qfen = "start";
     }
 
     const [fen, setFen] = useState(qfen);
