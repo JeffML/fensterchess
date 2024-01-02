@@ -2,6 +2,7 @@ import { sortEnum } from "./common/consts.js";
 import { Fragment, useState } from "react";
 import { Chess } from "chess.js";
 import { newName } from "./utils/chessTools.js";
+import "./stylesheets/NextMovesRow.css";
 
 const chess = new Chess();
 
@@ -58,11 +59,9 @@ const NextMovesGrid = ({
         return (
             <div
                 key={nextPly}
+                id="listItem"
                 style={{
                     backgroundColor,
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 3fr 1fr",
-                    padding: "3px",
                 }}
             >
                 <div style={{ textAlign: "left", paddingLeft: "1em" }}>
@@ -142,11 +141,6 @@ const NextMovesRow = ({ eco, nextMoves, currentMoves, handleMovePlayed }) => {
 
 const Transitions = ({ data }) => {
     const { moves: omoves, from } = data.getOpeningForFenFull;
-    //TODO: from is an object of variations (name/moves) with FEN keys;
-    // 0. check of moves = from[key].moves; if so, do nothing
-    // 1. use a grid like the one for next moves for each from variation that differs from main
-    // 2. highlight the move diffs (see OpeningCompare.js)
-    // 3. show variation name and moves in grid
 
     if (from.length === 0) return null;
 
@@ -168,13 +162,7 @@ const Transitions = ({ data }) => {
     });
 
     return (
-        <div
-            style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                padding: "3px",
-            }}
-        >
+        <div id="transitionsGrid">
             <span className="font-cinzel white left underline">
                 Opening Transitions
             </span>
