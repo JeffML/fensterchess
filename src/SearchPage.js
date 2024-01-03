@@ -45,58 +45,50 @@ const GET_SIMILAR = gql`
 `;
 
 const SimilarOpenings = ({ fen, setFen }) => {
-    const { move, color } = toPlay(fen);
-
-    const searchable = move > 5 || (move === "5" && color === "b");
-
     const { error, data, loading } = useQuery(GET_SIMILAR, {
         variables: { fen },
-        skip: !searchable,
     });
 
-    if (!searchable) return <span>Play at least 5 moves as white</span>;
-    else {
-        if (loading) {
-            return <span>Loading...</span>;
-        }
-        if (error) {
-            return <span> ERROR: {error.toString()}</span>;
-        }
-        if (data) {
-            const sims = data.getSimilarOpenings.map((sim) => {
-                return (
-                    <div
-                        key={sim.fen}
-                        style={{
-                            display: "grid",
-                            justifyItems: "flex-start",
-                            paddingLeft: "2em",
-                            paddingTop: "0.7em",
-                        }}
-                    >
-                        <span
-                            style={{ paddingBottom: "3px" }}
-                            className="fakeLink"
-                            onClick={() => setFen(sim.fen)}
-                        >
-                            {newName(sim.name)}
-                        </span>
-                        <Chessboard position={sim.fen} squareSize={20} />
-                    </div>
-                );
-            });
-
+    if (loading) {
+        return <span>Loading...</span>;
+    }
+    if (error) {
+        return <span> ERROR: {error.toString()}</span>;
+    }
+    if (data) {
+        const sims = data.getSimilarOpenings.map((sim) => {
             return (
                 <div
+                    key={sim.fen}
                     style={{
                         display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
+                        justifyItems: "flex-start",
+                        paddingLeft: "2em",
+                        paddingTop: "0.7em",
                     }}
                 >
-                    {sims}
+                    <span
+                        style={{ paddingBottom: "3px" }}
+                        className="fakeLink"
+                        onClick={() => setFen(sim.fen)}
+                    >
+                        {newName(sim.name)}
+                    </span>
+                    <Chessboard position={sim.fen} squareSize={20} />
                 </div>
             );
-        }
+        });
+
+        return (
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                }}
+            >
+                {sims}
+            </div>
+        );
     }
 };
 
@@ -111,13 +103,17 @@ const OpeningTabs = ({
         border: "1px solid #FFFFFF ",
         borderRadius: "10px 10px 0 0",
     };
+    const { move, color } = toPlay(fen);
+
+    const searchable = move > 5 || (move === "5" && color === "b");
+
     return (
         <Tabs
             style={{ minWidth: "-webkit-fill-available", marginRight: "2em" }}
         >
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab style={tabStyle}>Next Moves</Tab>
-                <Tab style={tabStyle}>Similar Openings</Tab>
+                {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
@@ -125,9 +121,11 @@ const OpeningTabs = ({
                         {...{ nextMoves, currentMoves, handleMovePlayed }}
                     />
                 </TabPanel>
-                <TabPanel>
-                    <SimilarOpenings {...{ fen, setFen }} />
-                </TabPanel>
+                {searchable && (
+                    <TabPanel>
+                        <SimilarOpenings {...{ fen, setFen }} />
+                    </TabPanel>
+                )}
             </div>
         </Tabs>
     );
