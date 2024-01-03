@@ -60,18 +60,18 @@ const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
                     const { aka, wins } = data;
                     const games = wins.w + wins.d + wins.b;
                     return (
-                        <div id="opening-additional" key={site}>
+                        <div id="opening-additional" key={site} style={{marginBottom: "1em"}}>
                             <div className="site left">
                                 <span
                                     className="font-cinzel"
-                                    style={{ alignSelf: "start" }}
+                                    style={{fontWeight:"bold"}}
                                 >
                                     {site}
                                 </span>
                             </div>
                             <div className="left">
                                 <span>
-                                    {aka && aka.length? aka : "no name"}, {games} games
+                                    {aka && aka.length? aka : "(no name)"}, {games} games
                                 </span>
                             </div>
                             <div>

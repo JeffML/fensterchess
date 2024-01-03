@@ -98,6 +98,9 @@ const OpeningTabs = ({
     nextMoves,
     currentMoves,
     handleMovePlayed,
+    sites,
+    eco,
+    name,
 }) => {
     const tabStyle = {
         border: "1px solid #FFFFFF ",
@@ -113,6 +116,7 @@ const OpeningTabs = ({
         >
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab style={tabStyle}>Next Moves</Tab>
+                {sites && <Tab style={tabStyle}>External Info</Tab>}
                 {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
             </TabList>
             <div style={{ border: "thick solid white" }}>
@@ -121,6 +125,26 @@ const OpeningTabs = ({
                         {...{ nextMoves, currentMoves, handleMovePlayed }}
                     />
                 </TabPanel>
+                {sites && (
+                    <TabPanel>
+                        <div
+                            className="row"
+                            style={{ marginLeft: "1em", marginBottom: "1em" }}
+                        >
+                            {sites.selectedSites.length > 0 && (
+                                <OpeningAdditionalWithBarChartGrid
+                                    id="OpeningAdditionalWithBarChartGrid"
+                                    {...{
+                                        eco,
+                                        fen,
+                                        name,
+                                        sites: sites.selectedSites,
+                                    }}
+                                />
+                            )}
+                        </div>
+                    </TabPanel>
+                )}
                 {searchable && (
                     <TabPanel>
                         <SimilarOpenings {...{ fen, setFen }} />
@@ -132,8 +156,6 @@ const OpeningTabs = ({
 };
 
 const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
-    const inlineStyle = { marginBottom: "1em" };
-
     const sites = useContext(SelectedSitesContext);
 
     if (data) {
@@ -174,14 +196,6 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
                     </span>
                 </span>
 
-                <div className="row" style={inlineStyle}>
-                    {sites.selectedSites.length > 0 && (
-                        <OpeningAdditionalWithBarChartGrid
-                            id="OpeningAdditionalWithBarChartGrid"
-                            {...{ eco, fen, name, sites: sites.selectedSites }}
-                        />
-                    )}
-                </div>
                 <OpeningTabs
                     {...{
                         fen,
@@ -189,6 +203,9 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
                         nextMoves,
                         currentMoves,
                         handleMovePlayed,
+                        sites,
+                        eco,
+                        name,
                     }}
                 />
             </div>
