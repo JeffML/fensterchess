@@ -129,8 +129,6 @@ td {
 }
 
 .menuitem {
-  /* color: #8D918D; */
-  /* border: 2px solid; */
   border-radius: 3em / 1em;
   height: 3em;
   background: radial-gradient(#3d8050, #585C5C);

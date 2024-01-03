@@ -21,8 +21,6 @@ const tabStyle = {
 const tabFlashStyle = {
     ...tabStyle,
     transition: "all 0.1s ease-in",
-
-    // padding: "20px",
 };
 
 const tabFlashStyle2 = {
@@ -304,18 +302,24 @@ const Players = ({ pgnSumm }) => {
 };
 
 const Opening = ({ game }) => {
-
-    const fens = game? game
-        .nodes()
-        .slice(0, 50)
-        .map((n) => n.fen()) : null;
+    const fens = game
+        ? game
+              .nodes()
+              .slice(0, 50)
+              .map((n) => n.fen())
+        : null;
 
     const { data, loading } = useQuery(FIND_OPENINGS, {
         variables: { fens },
         skip: game === null,
     });
 
-    if (!game) return (<span className="white" style={{fontSize:"larger"}}>Please select an opening from the Games tab</span>)
+    if (!game)
+        return (
+            <span className="white" style={{ fontSize: "larger" }}>
+                Please select an opening from the Games tab
+            </span>
+        );
 
     if (loading) return <span className="white">Loading...</span>;
     if (!game)
