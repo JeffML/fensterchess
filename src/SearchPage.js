@@ -109,6 +109,7 @@ const OpeningTabs = ({
     const { move, color } = toPlay(fen);
 
     const searchable = move > 5 || (move === "5" && color === "b");
+    const showExternal = sites.selectedSites.length > 0 
 
     return (
         <Tabs
@@ -116,7 +117,7 @@ const OpeningTabs = ({
         >
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab style={tabStyle}>Next Moves</Tab>
-                {sites && <Tab style={tabStyle}>External Info</Tab>}
+                {showExternal && <Tab style={tabStyle}>External Info</Tab>}
                 {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
             </TabList>
             <div style={{ border: "thick solid white" }}>
@@ -125,13 +126,13 @@ const OpeningTabs = ({
                         {...{ nextMoves, currentMoves, handleMovePlayed }}
                     />
                 </TabPanel>
-                {sites && (
+                {showExternal && (
                     <TabPanel>
                         <div
                             className="row"
                             style={{ marginLeft: "1em", marginBottom: "1em" }}
                         >
-                            {sites.selectedSites.length > 0 && (
+
                                 <OpeningAdditionalWithBarChartGrid
                                     id="OpeningAdditionalWithBarChartGrid"
                                     {...{
@@ -141,7 +142,7 @@ const OpeningTabs = ({
                                         sites: sites.selectedSites,
                                     }}
                                 />
-                            )}
+                            
                         </div>
                     </TabPanel>
                 )}
