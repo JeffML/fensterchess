@@ -101,6 +101,7 @@ const OpeningTabs = ({
     sites,
     eco,
     name,
+    from,
 }) => {
     const tabStyle = {
         border: "1px solid #FFFFFF ",
@@ -109,7 +110,8 @@ const OpeningTabs = ({
     const { move, color } = toPlay(fen);
 
     const searchable = move > 5 || (move === "5" && color === "b");
-    const showExternal = sites.selectedSites.length > 0 
+    const showExternal = sites.selectedSites.length > 0;
+    const showTransitions = from && from.length > 1;
 
     return (
         <Tabs
@@ -119,6 +121,7 @@ const OpeningTabs = ({
                 <Tab style={tabStyle}>Next Moves</Tab>
                 {showExternal && <Tab style={tabStyle}>External Info</Tab>}
                 {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
+                {showTransitions && <Tab style={tabStyle}>Transitions</Tab>}
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
@@ -132,23 +135,31 @@ const OpeningTabs = ({
                             className="row"
                             style={{ marginLeft: "1em", marginBottom: "1em" }}
                         >
-
-                                <OpeningAdditionalWithBarChartGrid
-                                    id="OpeningAdditionalWithBarChartGrid"
-                                    {...{
-                                        eco,
-                                        fen,
-                                        name,
-                                        sites: sites.selectedSites,
-                                    }}
-                                />
-                            
+                            <OpeningAdditionalWithBarChartGrid
+                                id="OpeningAdditionalWithBarChartGrid"
+                                {...{
+                                    eco,
+                                    fen,
+                                    name,
+                                    sites: sites.selectedSites,
+                                }}
+                            />
                         </div>
                     </TabPanel>
                 )}
                 {searchable && (
                     <TabPanel>
                         <SimilarOpenings {...{ fen, setFen }} />
+                    </TabPanel>
+                )}
+                {showTransitions && (
+                    <TabPanel>
+                        <div className="row">
+                            <Transitions
+                                {...{ moves: currentMoves, from }}
+                                style={{ marginLeft: "1em" }}
+                            />
+                        </div>
                     </TabPanel>
                 )}
             </div>
@@ -173,6 +184,7 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
                 name,
                 moves: currentMoves,
                 next: nextMoves,
+                from,
             },
         } = data;
 
@@ -207,6 +219,7 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
                         sites,
                         eco,
                         name,
+                        from,
                     }}
                 />
             </div>
@@ -293,62 +306,45 @@ const SearchPage = ({ chess, fen, setFen }) => {
     });
 
     return (
-        <>
-            <div className="row" style={{ color: "white" }}>
-                <div className="column" style={{ alignItems: "center" }}>
-                    <Chessboard
-                        interactionMode="playMoves"
-                        position={fen}
-                        onMovePlayed={(move) => handleMovePlayed(move)}
+        <div className="row" style={{ color: "white" }}>
+            <div className="column" style={{ alignItems: "center" }}>
+                <Chessboard
+                    interactionMode="playMoves"
+                    position={fen}
+                    onMovePlayed={(move) => handleMovePlayed(move)}
+                />
+                <div className="row centered">
+                    <ActionButton
+                        {...{ onClick: () => back(), text: "<< Back" }}
                     />
-                    <div className="row centered">
-                        <ActionButton
-                            {...{ onClick: () => back(), text: "<< Back" }}
-                        />
-                        <ActionButton
-                            {...{ onClick: () => reset(), text: "Reset" }}
-                        />
-                    </div>
-
-                    <div className="row">
-                        <FENorPGN {...{ setFen, text, setText, chess }} />
-                    </div>
+                    <ActionButton
+                        {...{ onClick: () => reset(), text: "Reset" }}
+                    />
                 </div>
 
-                <div className="double-column left">
-                    <div className="row" style={{ marginTop: "0px" }}>
-                        {loading && (
-                            <span style={{ color: "lightgreen" }}>
-                                Searching...
-                            </span>
-                        )}
-
-                        {error && (
-                            <span style={{ color: "red" }}>
-                                {error.toString()}
-                            </span>
-                        )}
-
-                        {data && (
-                            <Opening
-                                {...{ fen, setFen, handleMovePlayed, data }}
-                            />
-                        )}
-                    </div>
-                    <div className="row">
-                        {data &&
-                            data.getOpeningForFenFull?.from?.length > 1 && (
-                                <div className="row">
-                                    <Transitions
-                                        {...{ data }}
-                                        style={{ marginLeft: "1em" }}
-                                    />
-                                </div>
-                            )}
-                    </div>
+                <div className="row">
+                    <FENorPGN {...{ setFen, text, setText, chess }} />
                 </div>
             </div>
-        </>
+
+            <div className="double-column left">
+                <div className="row" style={{ marginTop: "0px" }}>
+                    {loading && (
+                        <span style={{ color: "lightgreen" }}>
+                            Searching...
+                        </span>
+                    )}
+
+                    {error && (
+                        <span style={{ color: "red" }}>{error.toString()}</span>
+                    )}
+
+                    {data && (
+                        <Opening {...{ fen, setFen, handleMovePlayed, data }} />
+                    )}
+                </div>
+            </div>
+        </div>
     );
 };
 

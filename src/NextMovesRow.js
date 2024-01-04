@@ -139,9 +139,7 @@ const NextMovesRow = ({ eco, nextMoves, currentMoves, handleMovePlayed }) => {
     }
 };
 
-const Transitions = ({ data }) => {
-    const { moves: omoves, from } = data.getOpeningForFenFull;
-
+const Transitions = ({ moves: omoves, from }) => {
     if (from.length === 0) return null;
 
     const tmoves = omoves.slice(0, omoves.lastIndexOf(" "));
