@@ -162,7 +162,7 @@ const Theory = ({currentMoves}) => {
         theoryRequest(currentMoves, setHtml)
     }, [currentMoves])
 
-    return html;
+    return <div dangerouslySetInnerHTML={{__html:html}}/>;
 }
 
 
