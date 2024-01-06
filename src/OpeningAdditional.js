@@ -1,11 +1,11 @@
 import { gql, useQuery } from "@apollo/client";
 import { Chessboard } from "kokopu-react";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import NextMovesRow, { Transitions } from "./NextMovesRow.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import StackedBarChart from "./common/StackedBarChart.js";
-import { newName, toPlay } from "./utils/chessTools.js";
+import { newName, toPlay, theoryRequest } from "./utils/chessTools.js";
 
 const GET_OPENING_ADDITIONAL = gql`
     query getOpeningAdditional($fen: String!, $sites: [String]!) {
@@ -155,6 +155,16 @@ const SimilarOpenings = ({ fen, setFen }) => {
         );
     }
 };
+const Theory = ({currentMoves}) => {
+    const [html, setHtml] = useState(null)
+
+    useEffect(() => {
+        theoryRequest(currentMoves, setHtml)
+    }, [currentMoves])
+
+    return html;
+}
+
 
 const OpeningTabs = ({
     fen,
@@ -183,6 +193,7 @@ const OpeningTabs = ({
         >
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab style={tabStyle}>Next Moves</Tab>
+                <Tab style={tabStyle}>Theory</Tab>
                 {showExternal && <Tab style={tabStyle}>External Info</Tab>}
                 {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
                 {showTransitions && <Tab style={tabStyle}>Transitions</Tab>}
@@ -192,6 +203,9 @@ const OpeningTabs = ({
                     <NextMovesRow
                         {...{ nextMoves, currentMoves, handleMovePlayed }}
                     />
+                </TabPanel>
+                <TabPanel>
+                    <Theory {...{currentMoves}}/>
                 </TabPanel>
                 {showExternal && (
                     <TabPanel>
