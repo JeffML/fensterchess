@@ -1,41 +1,43 @@
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App.js';
-import reportWebVitals from './reportWebVitals.js';
-import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink} from '@apollo/client';
-import { setContext } from '@apollo/link-context';
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App.js";
+import reportWebVitals from "./reportWebVitals.js";
+import {
+    ApolloClient,
+    InMemoryCache,
+    ApolloProvider,
+    createHttpLink,
+} from "@apollo/client";
+import { setContext } from "@apollo/link-context";
 
 const httpLink = createHttpLink({
-  // uri: 'http://localhost:8881/.netlify/functions/server',    //not working
-  uri: 'https://fenster-s.netlify.app/.netlify/functions/server'  //production
-  // uri: 'https://flum--fenster-s.netlify.app/.netlify/functions/server' // only works if branch deploy env vars are set on netlify
+    uri: "https://fenster-s.netlify.app/.netlify/functions/server", //production
 });
 
 const authLink = setContext((_, { headers }) => {
-  // get the authentication token from local storage if it exists
-  const token = process.env.REACT_APP_QUOTE
-  // return the headers to the context so httpLink can read them
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : "",
-    }
-  }
+    // get the authentication token from local storage if it exists
+    const token = process.env.REACT_APP_QUOTE;
+    // return the headers to the context so httpLink can read them
+    return {
+        headers: {
+            ...headers,
+            authorization: token ? `Bearer ${token}` : "",
+        },
+    };
 });
 
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  // uri: '/.netlify/functions/pgnfen',
-  cache: new InMemoryCache(),
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache(),
 });
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  // <React.StrictMode>
+    // <React.StrictMode>
     <ApolloProvider {...{ client }}>
-      <App />
+        <App />
     </ApolloProvider>
-  // </React.StrictMode>
+    // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
