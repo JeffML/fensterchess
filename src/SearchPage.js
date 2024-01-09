@@ -9,6 +9,8 @@ import { ActionButton } from "./common/buttons.js";
 import { FENEX } from "./common/consts.js";
 import "./stylesheets/textarea.css";
 import { newName } from "./utils/chessTools.js";
+import {client} from "./common/localFields.js"
+
 
 const GET_OPENING = gql`
     query getOpening($fen: String!) {
@@ -28,12 +30,15 @@ const GET_OPENING = gql`
             }
             aliases
             score
+            isInCart ${client}
         }
     }
 `;
 
 const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
     const sites = useContext(SelectedSitesContext);
+
+    console.log({isInCart: data.getOpeningForFenFull.isInCart})
 
     if (data) {
         if (data.getOpeningForFenFull === null) {

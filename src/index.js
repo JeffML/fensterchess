@@ -9,6 +9,7 @@ import {
     createHttpLink,
 } from "@apollo/client";
 import { setContext } from "@apollo/link-context";
+import policyMap from "./common/localFields.js"
 
 const httpLink = createHttpLink({
     uri: "https://fenster-s.netlify.app/.netlify/functions/server", //production
@@ -28,7 +29,11 @@ const authLink = setContext((_, { headers }) => {
 
 const client = new ApolloClient({
     link: authLink.concat(httpLink),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache(
+      {
+        typePolicies: policyMap
+      }
+    ),
 });
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
