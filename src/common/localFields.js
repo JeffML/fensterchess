@@ -27,19 +27,12 @@ const Opening2 = (field) => {
     };
 };
 
-// const name = {
-//     // Field policy for the isInCart field
-//     read(_, { variables }) {
-//         // The read function for the isInCart field
-//         return localStorage.getItem("name");
-//         // .includes(variables.fen);
-//     },
-// };
 
 const policyMap = {
     Opening2: {
         fields: {
             name: Opening2("name"),
+            next: Opening2("next")
         },
     },
 };
@@ -49,6 +42,5 @@ const token = process.env.REACT_APP_QUOTE;
 const isNonAuthClient = window.location.href.includes("localhost"); // && !token;
 const client = isNonAuthClient ? "@client" : "";
 
-// localStorage.setItem("name", "Jeff Opening");
 
 export { policyMap as default, token, client };

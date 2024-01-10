@@ -18,7 +18,7 @@ const GET_OPENING = gql`
             eco 
             name ${client}
             moves
-            next {
+            next ${client}{
                 name
                 moves
                 score
