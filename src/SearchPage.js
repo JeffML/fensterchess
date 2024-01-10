@@ -15,8 +15,8 @@ import {client} from "./common/localFields.js"
 const GET_OPENING = gql`
     query getOpening($fen: String!) {
         getOpeningForFenFull(fen: $fen) {
-            eco
-            name
+            eco 
+            name ${client}
             moves
             next {
                 name
@@ -30,7 +30,6 @@ const GET_OPENING = gql`
             }
             aliases
             score
-            isInCart ${client}
         }
     }
 `;
