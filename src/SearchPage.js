@@ -17,27 +17,25 @@ const GET_OPENING = gql`
         getOpeningForFenFull(fen: $fen) {
             eco 
             name ${client}
-            moves
-            next ${client}{
+            moves ${client}
+            next  ${client} {
                 name
                 moves
                 score
                 eco
             }
-            from {
+            from ${client} {
                 name
                 moves
             }
-            aliases
-            score
+            aliases ${client}
+            score ${client}
         }
     }
 `;
 
 const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
     const sites = useContext(SelectedSitesContext);
-
-    console.log({isInCart: data.getOpeningForFenFull.isInCart})
 
     if (data) {
         if (data.getOpeningForFenFull === null) {
