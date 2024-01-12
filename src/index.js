@@ -9,7 +9,7 @@ import {
     createHttpLink,
 } from "@apollo/client";
 import { setContext } from "@apollo/link-context";
-import policyMap, {token} from "./common/localFields.js"
+import policyMap, {token} from "./common/policyMap.js"
 
 const httpLink = createHttpLink({
     uri: "https://fenster-s.netlify.app/.netlify/functions/server", //production
