@@ -9,27 +9,25 @@ import { ActionButton } from "./common/buttons.js";
 import { FENEX } from "./common/consts.js";
 import "./stylesheets/textarea.css";
 import { newName } from "./utils/chessTools.js";
-import {client} from "./common/policyMap.js"
-
 
 const GET_OPENING = gql`
     query getOpening($fen: String!) {
         getOpeningForFenFull(fen: $fen) {
-            eco  ${client}
-            name ${client}
-            moves ${client}
-            next  ${client} {
+            eco
+            name
+            moves
+            next {
                 name
                 moves
                 score
                 eco
             }
-            from ${client} {
+            from {
                 name
                 moves
             }
-            aliases ${client}
-            score ${client}
+            aliases
+            score
         }
     }
 `;
