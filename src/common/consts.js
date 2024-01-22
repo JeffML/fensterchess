@@ -34,6 +34,11 @@ const siteUrls = {
 };
 
 const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
+const DEFAULT_SERVER = "fenster-s.netlify.app"
+
+    // get the authentication token from local storage if it exists
+    const token = process.env.REACT_APP_QUOTE;
+    const serverUri = `https://${process.env.REACT_APP_SERVER??DEFAULT_SERVER}/.netlify/functions/server`;
 
 export {
     APP_NAME,
@@ -46,4 +51,6 @@ export {
     siteUrls,
     FENEX,
     VERSION,
+    token,
+    serverUri
 };
