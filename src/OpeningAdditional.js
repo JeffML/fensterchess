@@ -1,11 +1,7 @@
-import { gql, useQuery } from "@apollo/client";
-import { Chessboard } from "kokopu-react";
-import { useContext, useEffect, useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import NextMovesRow, { Transitions } from "./NextMovesRow.js";
-import { SelectedSitesContext } from "./common/Contexts.js";
+import { useQuery, gql } from "@apollo/client";
 import StackedBarChart from "./common/StackedBarChart.js";
-import { newName, toPlay, theoryRequest } from "./utils/chessTools.js";
+import { SelectedSitesContext } from "./common/Contexts.js";
+import { useContext } from "react";
 
 const GET_OPENING_ADDITIONAL = gql`
     query getOpeningAdditional($fen: String!, $sites: [String]!) {
@@ -16,16 +12,6 @@ const GET_OPENING_ADDITIONAL = gql`
                 b
                 d
             }
-        }
-    }
-`;
-
-const GET_SIMILAR = gql`
-    query getSimilar($fen: String!) {
-        getSimilarOpenings(fen: $fen) {
-            fen
-            simScore
-            name
         }
     }
 `;
@@ -69,28 +55,23 @@ const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
     if (data) {
         const json = toJson(data, sites);
         return (
-            <div style={{ marginTop: "1em" }}>
+            <div style={{marginTop:"1em"}}>
                 {Object.entries(json).map(([site, data]) => {
                     const { aka, wins } = data;
                     const games = wins.w + wins.d + wins.b;
                     return (
-                        <div
-                            id="opening-additional"
-                            key={site}
-                            style={{ marginBottom: "1em" }}
-                        >
+                        <div id="opening-additional" key={site} style={{marginBottom: "1em"}}>
                             <div className="site left">
                                 <span
                                     className="font-cinzel"
-                                    style={{ fontWeight: "bold" }}
+                                    style={{fontWeight:"bold"}}
                                 >
                                     {site}
                                 </span>
                             </div>
                             <div className="left">
                                 <span>
-                                    {aka && aka.length ? aka : "(no name)"},{" "}
-                                    {games} games
+                                    {aka && aka.length? aka : "(no name)"}, {games} games
                                 </span>
                             </div>
                             <div>
@@ -108,141 +89,4 @@ const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
     }
 };
 
-const SimilarOpenings = ({ fen, setFen }) => {
-    const { error, data, loading } = useQuery(GET_SIMILAR, {
-        variables: { fen },
-    });
-
-    if (loading) {
-        return <span>Loading...</span>;
-    }
-    if (error) {
-        return <span> ERROR: {error.toString()}</span>;
-    }
-    if (data) {
-        const sims = data.getSimilarOpenings.map((sim) => {
-            return (
-                <div
-                    key={sim.fen}
-                    style={{
-                        display: "grid",
-                        justifyItems: "flex-start",
-                        paddingLeft: "2em",
-                        paddingTop: "0.7em",
-                    }}
-                >
-                    <span
-                        style={{ paddingBottom: "3px" }}
-                        className="fakeLink"
-                        onClick={() => setFen(sim.fen)}
-                    >
-                        {newName(sim.name)}
-                    </span>
-                    <Chessboard position={sim.fen} squareSize={20} />
-                </div>
-            );
-        });
-
-        return (
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                }}
-            >
-                {sims}
-            </div>
-        );
-    }
-};
-const Theory = ({currentMoves}) => {
-    const [html, setHtml] = useState(null)
-
-    useEffect(() => {
-        theoryRequest(currentMoves, setHtml)
-    }, [currentMoves])
-
-    return <div style={{textAlign:"left", marginLeft:"1em"}} dangerouslySetInnerHTML={{__html:html}}/>;
-}
-
-
-const OpeningTabs = ({
-    fen,
-    setFen,
-    nextMoves,
-    currentMoves,
-    handleMovePlayed,
-    sites,
-    eco,
-    name,
-    from,
-}) => {
-    const tabStyle = {
-        border: "1px solid #FFFFFF ",
-        borderRadius: "10px 10px 0 0",
-    };
-    const { move, color } = toPlay(fen);
-
-    const searchable = move > 5 || (move === "5" && color === "b");
-    const showExternal = sites.selectedSites.length > 0;
-    const showTransitions = from && from.length > 1;
-
-    return (
-        <Tabs
-            style={{ minWidth: "-webkit-fill-available", marginRight: "2em" }}
-        >
-            <TabList className="left" style={{ marginBottom: "0px" }}>
-                <Tab style={tabStyle}>Next Moves</Tab>
-                <Tab style={tabStyle}>Theory</Tab>
-                {showExternal && <Tab style={tabStyle}>External Info</Tab>}
-                {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
-                {showTransitions && <Tab style={tabStyle}>Transitions</Tab>}
-            </TabList>
-            <div style={{ border: "thick solid white" }}>
-                <TabPanel>
-                    <NextMovesRow
-                        {...{ nextMoves, currentMoves, handleMovePlayed }}
-                    />
-                </TabPanel>
-                <TabPanel>
-                    <Theory {...{currentMoves}}/>
-                </TabPanel>
-                {showExternal && (
-                    <TabPanel>
-                        <div
-                            className="row"
-                            style={{ marginLeft: "1em", marginBottom: "1em" }}
-                        >
-                            <OpeningAdditionalWithBarChartGrid
-                                id="OpeningAdditionalWithBarChartGrid"
-                                {...{
-                                    eco,
-                                    fen,
-                                    name,
-                                    sites: sites.selectedSites,
-                                }}
-                            />
-                        </div>
-                    </TabPanel>
-                )}
-                {searchable && (
-                    <TabPanel>
-                        <SimilarOpenings {...{ fen, setFen }} />
-                    </TabPanel>
-                )}
-                {showTransitions && (
-                    <TabPanel>
-                        <div className="row">
-                            <Transitions
-                                {...{ moves: currentMoves, from }}
-                                style={{ marginLeft: "1em" }}
-                            />
-                        </div>
-                    </TabPanel>
-                )}
-            </div>
-        </Tabs>
-    );
-};
-
-export { OpeningAdditionalWithBarChartGrid, OpeningTabs };
+export { OpeningAdditionalWithBarChartGrid };

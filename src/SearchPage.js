@@ -1,14 +1,16 @@
-import { useContext, useRef, useState } from "react";
-
-import { gql, useQuery } from "@apollo/client";
-import { Chess } from "chess.js";
-import { Chessboard } from "kokopu-react";
-import { OpeningTabs } from "./OpeningAdditional.js";
-import { SelectedSitesContext } from "./common/Contexts.js";
+import { useState, useRef, useContext } from "react";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional.js";
 import { ActionButton } from "./common/buttons.js";
+import { Chessboard } from "kokopu-react";
+import { Chess } from "chess.js";
+import { useQuery, gql } from "@apollo/client";
+import NextMovesRow, { Transitions } from "./NextMovesRow.js";
+import { SelectedSitesContext } from "./common/Contexts.js";
 import { FENEX } from "./common/consts.js";
 import "./stylesheets/textarea.css";
 import { newName } from "./utils/chessTools.js";
+import { toPlay } from "./utils/chessTools.js";
 
 const GET_OPENING = gql`
     query getOpening($fen: String!) {
@@ -31,6 +33,139 @@ const GET_OPENING = gql`
         }
     }
 `;
+
+const GET_SIMILAR = gql`
+    query getSimilar($fen: String!) {
+        getSimilarOpenings(fen: $fen) {
+            fen
+            simScore
+            name
+        }
+    }
+`;
+
+const SimilarOpenings = ({ fen, setFen }) => {
+    const { error, data, loading } = useQuery(GET_SIMILAR, {
+        variables: { fen },
+    });
+
+    if (loading) {
+        return <span>Loading...</span>;
+    }
+    if (error) {
+        return <span> ERROR: {error.toString()}</span>;
+    }
+    if (data) {
+        const sims = data.getSimilarOpenings.map((sim) => {
+            return (
+                <div
+                    key={sim.fen}
+                    style={{
+                        display: "grid",
+                        justifyItems: "flex-start",
+                        paddingLeft: "2em",
+                        paddingTop: "0.7em",
+                    }}
+                >
+                    <span
+                        style={{ paddingBottom: "3px" }}
+                        className="fakeLink"
+                        onClick={() => setFen(sim.fen)}
+                    >
+                        {newName(sim.name)}
+                    </span>
+                    <Chessboard position={sim.fen} squareSize={20} />
+                </div>
+            );
+        });
+
+        return (
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                }}
+            >
+                {sims}
+            </div>
+        );
+    }
+};
+
+const OpeningTabs = ({
+    fen,
+    setFen,
+    nextMoves,
+    currentMoves,
+    handleMovePlayed,
+    sites,
+    eco,
+    name,
+    from,
+}) => {
+    const tabStyle = {
+        border: "1px solid #FFFFFF ",
+        borderRadius: "10px 10px 0 0",
+    };
+    const { move, color } = toPlay(fen);
+
+    const searchable = move > 5 || (move === "5" && color === "b");
+    const showExternal = sites.selectedSites.length > 0;
+    const showTransitions = from && from.length > 1;
+
+    return (
+        <Tabs
+            style={{ minWidth: "-webkit-fill-available", marginRight: "2em" }}
+        >
+            <TabList className="left" style={{ marginBottom: "0px" }}>
+                <Tab style={tabStyle}>Next Moves</Tab>
+                {showExternal && <Tab style={tabStyle}>External Info</Tab>}
+                {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
+                {showTransitions && <Tab style={tabStyle}>Transitions</Tab>}
+            </TabList>
+            <div style={{ border: "thick solid white" }}>
+                <TabPanel>
+                    <NextMovesRow
+                        {...{ nextMoves, currentMoves, handleMovePlayed }}
+                    />
+                </TabPanel>
+                {showExternal && (
+                    <TabPanel>
+                        <div
+                            className="row"
+                            style={{ marginLeft: "1em", marginBottom: "1em" }}
+                        >
+                            <OpeningAdditionalWithBarChartGrid
+                                id="OpeningAdditionalWithBarChartGrid"
+                                {...{
+                                    eco,
+                                    fen,
+                                    name,
+                                    sites: sites.selectedSites,
+                                }}
+                            />
+                        </div>
+                    </TabPanel>
+                )}
+                {searchable && (
+                    <TabPanel>
+                        <SimilarOpenings {...{ fen, setFen }} />
+                    </TabPanel>
+                )}
+                {showTransitions && (
+                    <TabPanel>
+                        <div className="row">
+                            <Transitions
+                                {...{ moves: currentMoves, from }}
+                                style={{ marginLeft: "1em" }}
+                            />
+                        </div>
+                    </TabPanel>
+                )}
+            </div>
+        </Tabs>
+    );
+};
 
 const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
     const sites = useContext(SelectedSitesContext);
