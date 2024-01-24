@@ -9,14 +9,14 @@ import {
     createHttpLink,
 } from "@apollo/client";
 import { setContext } from "@apollo/link-context";
+import {token, serverUri} from "./common/consts.js"
 
 const httpLink = createHttpLink({
-    uri: "https://fenster-s.netlify.app/.netlify/functions/server", //production
-});
+    uri:  serverUri
+})
 
 const authLink = setContext((_, { headers }) => {
-    // get the authentication token from local storage if it exists
-    const token = process.env.REACT_APP_QUOTE;
+
     // return the headers to the context so httpLink can read them
     return {
         headers: {
