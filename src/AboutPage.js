@@ -29,15 +29,16 @@ const About = () => (
             <p>
                 The Search Page can be used to search openings by entering moves
                 on the board, or by pasting FEN or PGN text in the box below the
-                board. If an opening is found in the database, information will 
-                be displayed on the right. 
-                
-                
-                This includes the opening
-                name, its ECO code and what variations, if any, branch off from
-                the opening position. Sometimes, an opening position can be
-                arrived at by difference move sequences; these will be displayed
-                below the variations at right.
+                board. If an opening is found in the database, information will
+                be displayed on the right.{" "}
+            </p>
+            <img src="resources/Screenshot 2024-01-24 12.42.41 PM.png" style={{maxWidth:"80%", border:"5px solid darkkhaki", marginLeft:"10%"}} alt="Search Page"/>
+            <p>
+                At the top of the right column is the opening name, along with its <a href="https://en.wikipedia.org/wiki/Encyclopaedia_of_Chess_Openings#Main_ECO_codes">ECO code</a>. Directly below that is
+                variations, if any, branch off from the opening position.
+                Sometimes, an opening position can be arrived at by difference
+                move sequences; these will be displayed below the variations at
+                right.
             </p>
             <p>
                 In most cases there is an evaluation given for each variation
