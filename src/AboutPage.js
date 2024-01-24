@@ -13,10 +13,12 @@ const About = () => (
         <div className="about">
             <p>
                 Fenster is a comprehensive chess opening reference with over
-                15,000 variations. The raw opening data is public and can be
+                15,000 variations. The base opening data is public and can be
                 found at{" "}
                 <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>.
-                It is not a repository of chess games, though Fenster is capable
+            </p>
+            <p>
+                Fenster is not a repository of chess games, though it is capable
                 of pulling in associated opening and game information from{" "}
                 <a href="https://www.ficsgames.org/">FICS</a>,{" "}
                 <a href="https://lichess.org/">lichess</a>, and{" "}
@@ -26,13 +28,16 @@ const About = () => (
             <h2>The Search Page</h2>
             <p>
                 The Search Page can be used to search openings by entering moves
-                in the board at page left, or entering a FEN or PGN in the text
-                box below the board. When (and if) an opening is located,
-                information about it is displayed on the right side. This
-                includes the opening name, its ECO code and what variations, if
-                any, branch off from the opening position. Sometimes, an opening
-                position can be arrived at by difference move sequences; these
-                will be displayed below the variations at right.
+                on the board, or by pasting FEN or PGN text in the box below the
+                board. If an opening is found in the database, information will 
+                be displayed on the right. 
+                
+                
+                This includes the opening
+                name, its ECO code and what variations, if any, branch off from
+                the opening position. Sometimes, an opening position can be
+                arrived at by difference move sequences; these will be displayed
+                below the variations at right.
             </p>
             <p>
                 In most cases there is an evaluation given for each variation
