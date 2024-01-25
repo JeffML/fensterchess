@@ -24,3 +24,9 @@ pre {
 a {
     color: limegreen;
 }
+
+.image {
+    max-width: 80%;
+    border: 5px solid darkkhaki;
+    margin-left: 10%;
+}
