@@ -107,12 +107,13 @@ const About = () => (
             <p>
                 After five moves by white, the Similar Openings tab <i>may</i>{" "}
                 appear. If it does, clicking on the tab will show a list of
-                positions that are (somewhat) like the current position.</p>
-                <img
-                    src="resources/Screenshot 2024-01-25 9.12.30 AM.png"
-                    alt="similar openings shown"
-                    className="image"
-                />
+                positions that are (somewhat) like the current position.
+            </p>
+            <img
+                src="resources/Screenshot 2024-01-25 9.12.30 AM.png"
+                alt="similar openings shown"
+                className="image"
+            />
             <h3> What does the '*' mean? </h3>
             <p>
                 Some entries in Fenster's opening "book" are <i>interpolated</i>
@@ -126,30 +127,37 @@ const About = () => (
                 will be "A*".
             </p>
             <h2>The PGN Import Page</h2>
+            <img
+                src="resources/Screenshot 2024-01-25 10.23.53 AM.png"
+                alt="the PGN import page"
+                className="image"
+            />
             <p>
-                This page shows downloads available from{" "}
+                This page has links to games at
                 <a href="https://theweekinchess.com/">The Week in Chess</a>{" "}
-                website. (You also have the option to upload a PGN file from
-                your computer.) By clicking on one of the TWIC links, infomation
-                about openings in the PGN file is displayed, as well at the
-                players and rating information. You can sort the list of players
-                by name, rating (ELO) or title.
-            </p>
-            <p>
-                In addition to the Summary tab, the are the Games and Openings
-                tabs. These will display information about each game in the PGN
-                file. If you click on the Opening name in the games listed, it
-                will take you to the Openings tab with more information about
-                the game opening, including the Fenster opening name (which may
-                be different from what is called in the PGN file), as well as
-                the move sequence and FEN. If one or more of the sites in the
-                upper right menu are selected, the opening name as known to each
-                site is displayed, as well as aggregate statistics for that
-                opening.
-            </p>
+                website. Clicking on the a link will show information from the PGN file in the Summary tab. 
+                Selecting one or more of the check boxes under Openings (at left) will filter the games shown in the Games tab. </p>
+                
+                <img
+                src="resources/Screenshot 2024-01-25 12.07.23 PM.png"
+                alt="the PGN import page"
+                className="image" style={{maxWidth:"50%"}}
+            />
+            <p>Now the Games tab will show only those games with the selected opening(s).</p>
+<img
+                src="resources/Screenshot 2024-01-25 12.08.06 PM.png"
+                alt="the PGN import page"
+                className="image"
+            />
+            <p>By clicking on the opening name of one of the games listed, the Opening tab will show what Fenster knows about the opening.</p>
+<img
+                src="resources/Screenshot 2024-01-25 12.08.38 PM.png"
+                alt="the PGN import page"
+                className="image"
+            />
             <h2>Questions?</h2>
-            Email us at <a href="mailto:fensterchess@gmail.com">Fenster</a> and
-            we will get back to you soon.
+            <p>Email us at <a href="mailto:fensterchess@gmail.com">Fenster</a> and
+            we will get back to you soon.</p>
         </div>
     </>
 );
