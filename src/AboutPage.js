@@ -30,10 +30,10 @@ const About = () => (
                 The Search Page can be used to search openings by entering moves
                 on the board, or by pasting FEN or PGN text in the box below the
                 board. If an opening is found in the database, information will
-                be displayed on the right.{" "}
+                be displayed on the right.
             </p>
             <img
-                src="resources/Screenshot 2024-01-24 1.29.02 PM.png"
+                src="resources/Screenshot 2024-01-25 9.09.53 AM.png"
                 className="image"
                 alt="Search Page"
             />
@@ -55,6 +55,19 @@ const About = () => (
                 evaluation (absolute value, ascending), variation name, or ECO
                 code.
             </p>
+            <h3>Theory</h3>
+            <p>
+                This is a short explanation of the ideas behind the opening from{" "}
+                <a href="https://en.wikibooks.org/wiki/Chess_Opening_Theory">
+                    Wikibooks
+                </a>
+            </p>
+            <img
+                src="resources/Screenshot 2024-01-25 9.10.34 AM.png"
+                className="image"
+                alt="Chess Opening Theory tab"
+            />
+            <h3>External Info</h3>
             <p>
                 At the upper right, available on all pages, is a selector to
                 include information from FICS, lichess, or Shredder. If one of
@@ -62,7 +75,7 @@ const About = () => (
                 displayed. On this tab is game data from the external site(s)
                 selected.
                 <img
-                    src="resources/Screenshot 2024-01-24 1.44.48 PM.png"
+                    src="resources/Screenshot 2024-01-25 9.47.13 AM.png"
                     className="image"
                     alt="external site data"
                 />
@@ -73,17 +86,33 @@ const About = () => (
                 same variation name as Fenster has, but this won't always be the
                 case as variation names are not standardized.
             </p>
+            <h3>Transitions</h3>
+            <p>
+                An opening position might be arrived at through different move
+                sequences, transitioning from one variation to another.
+            </p>
+            <img
+                src="resources/Screenshot 2024-01-25 9.15.32 AM.png"
+                className="image"
+                alt="Opening Transitions tab"
+            />
+            <p>
+                In the position shown above, the variation in Fenster's opening
+                book is named <b>DO6 Queen's Gambit</b>. This position can be
+                arrived at via the{" "}
+                <b>English Opening: Anglo-Scandinavian Defense</b> or from the{" "}
+                <b>Queen's Pawn Game</b> move order.
+            </p>
             <h3>Similar openings</h3>
             <p>
                 After five moves by white, the Similar Openings tab <i>may</i>{" "}
                 appear. If it does, clicking on the tab will show a list of
-                positions that are (somewhat) like the current position.
+                positions that are (somewhat) like the current position.</p>
                 <img
-                    src="resources/Screenshot 2024-01-24 2.02.33 PM.png"
+                    src="resources/Screenshot 2024-01-25 9.12.30 AM.png"
                     alt="similar openings shown"
                     className="image"
                 />
-            </p>
             <h3> What does the '*' mean? </h3>
             <p>
                 Some entries in Fenster's opening "book" are <i>interpolated</i>
@@ -118,36 +147,9 @@ const About = () => (
                 site is displayed, as well as aggregate statistics for that
                 opening.
             </p>
-            <h2>Questions? Bugs?</h2>
-            If you have any questions, spot a bug, or have suggestions for a
-            feature you would like to see, contact us at{" "}
-            <a href="mailto:fensterchess@gmail.com">Fenster</a> and we will get
-            back to you soon.
-            <div style={{ display: "none" }}>
-                <h2>Developer Notes</h2>
-                <p>
-                    It is intended to make the Fenster client code open source,
-                    but as of now only trusted collaborators will be accepted.
-                    The tech stack for Fenster client is:
-                </p>
-                <ul>
-                    <li>JavaScript</li>
-                    <li>Node.js</li>
-                    <li>React</li>
-                    <li>Apollo GraphQL (client)</li>
-                    <li>kokopu and chess.js</li>
-                </ul>
-                <p>
-                    Netlify is the hosting service. There are no tests, but I'm
-                    open to authors of integration tests using Cypress, or unit
-                    tests using Jest. The Fenster server code is closed, but
-                    that could change. Since the database is derived solely from
-                    eco.json (+ Stockfish evaluations), it is perfectly possible
-                    to generate a database of your own that will support the
-                    GraphQL schema (to be published soon), though it is a
-                    substantial amount of work.
-                </p>
-            </div>
+            <h2>Questions?</h2>
+            Email us at <a href="mailto:fensterchess@gmail.com">Fenster</a> and
+            we will get back to you soon.
         </div>
     </>
 );
