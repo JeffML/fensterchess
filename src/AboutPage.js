@@ -135,29 +135,42 @@ const About = () => (
             <p>
                 This page has links to games at
                 <a href="https://theweekinchess.com/">The Week in Chess</a>{" "}
-                website. Clicking on the a link will show information from the PGN file in the Summary tab. 
-                Selecting one or more of the check boxes under Openings (at left) will filter the games shown in the Games tab. </p>
-                
-                <img
+                website. Clicking on the a link will show information from the
+                PGN file in the Summary tab. Selecting one or more of the check
+                boxes under Openings (at left) will filter the games shown in
+                the Games tab.{" "}
+            </p>
+            <img
                 src="resources/Screenshot 2024-01-25 12.07.23 PM.png"
                 alt="the PGN import page"
-                className="image" style={{maxWidth:"50%"}}
+                className="image"
+                style={{ maxWidth: "50%" }}
             />
-            <p>Now the Games tab will show only those games with the selected opening(s).</p>
-<img
+            <p>
+                Now the Games tab will show only those games with the selected
+                opening(s).
+            </p>
+            <img
                 src="resources/Screenshot 2024-01-25 12.08.06 PM.png"
                 alt="the PGN import page"
                 className="image"
             />
-            <p>By clicking on the opening name of one of the games listed, the Opening tab will show what Fenster knows about the opening.</p>
-<img
+            <p>
+                By clicking on the opening name of one of the games listed, the
+                Opening tab will show what Fenster knows about the opening.
+            </p>
+            <img
                 src="resources/Screenshot 2024-01-25 12.08.38 PM.png"
                 alt="the PGN import page"
                 className="image"
             />
-            <h2>Questions?</h2>
-            <p>Email us at <a href="mailto:fensterchess@gmail.com">Fenster</a> and
-            we will get back to you soon.</p>
+            <h2>Questions? Bugs? Feature requests?</h2>
+            The Fenster client is an open source project maintained on github.
+            There you can open a{" "}
+            <a href="https://github.com/JeffML/fensterchess/discussions/1">
+                discussion
+            </a>
+            , <a href="https://github.com/JeffML/fensterchess/issues">log a bug, or request a feature</a>.
         </div>
     </>
 );
