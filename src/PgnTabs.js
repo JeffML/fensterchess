@@ -3,11 +3,12 @@ import { useQuery, gql } from "@apollo/client";
 import "react-tabs/style/react-tabs.css";
 import "./stylesheets/grid.css";
 import { pgnRead } from "kokopu";
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useState, useEffect } from "react";
 import sleep from "./utils/sleep.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import StackedBarChart from "./common/StackedBarChart.js";
 import { Chessboard } from "kokopu-react";
+import {Chess} from 'chess.js'
 
 const blueBoldStyle = { color: "LightSkyBlue" };
 
@@ -301,7 +302,66 @@ const Players = ({ pgnSumm }) => {
     );
 };
 
+const ChessboardWithControls = ({ fen, setFen }) => {
+    return (
+        <div>
+            <Chessboard position={fen} squareSize={30} />
+            <span onClick={()=>setFen("start")}>Press me!</span>
+        </div>
+    );
+};
+
+const OpeningDetails = ({ game, opening, fen, setFen }) => {
+    const { eco, name, moves, fen: fenn } = opening;
+    if (!fen) setFen(fenn);
+    const event = game.event();
+    const white =
+        (game.playerTitle("w") ?? "  ") + "   " + game.playerName("w");
+    const black =
+        (game.playerTitle("b") ?? "  ") + "   " + game.playerName("b");
+
+    return (
+        <div
+            style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 3fr",
+                marginTop: "1em",
+            }}
+        >
+            <ChessboardWithControls {...{ fen, setFen }} />
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 3fr",
+                    textAlign: "left",
+                    gridAutoRows: "min-content",
+                    gridAutoColumns: "minContent",
+                    color: "white",
+                    marginLeft: ".6em",
+                }}
+            >
+                <span>Event:</span>
+                <span>{event}</span>
+                <span>White:</span>
+                <span>{white}</span>
+                <span>Black:</span>
+                <span>{black}</span>
+                <span>Fenster Opening Name:</span>
+                <span>{name}</span>
+                <span>ECO:</span>
+                <span> {eco}</span>
+                <span>Moves:</span> <span>{moves}</span>
+                <span>FEN:</span>
+                <span>{fen}</span>
+                <AdditionalOpenings {...{ fen }} />
+            </div>
+        </div>
+    );
+};
+
 const Opening = ({ game }) => {
+    const [fen, setFen] = useState();
+
     const fens = game
         ? game
               .nodes()
@@ -322,59 +382,11 @@ const Opening = ({ game }) => {
         );
 
     if (loading) return <span className="white">Loading...</span>;
-    if (!game)
-        return (
-            <span className="white">Select an opening from the Games tab.</span>
-        );
 
     if (data) {
         const openings = data.getOpeningsForFens2;
         const opening = openings.at(-1);
-
-        const { eco, name, moves, fen } = opening;
-        const event = game.event();
-        const white =
-            (game.playerTitle("w") ?? "  ") + "   " + game.playerName("w");
-        const black =
-            (game.playerTitle("b") ?? "  ") + "   " + game.playerName("b");
-
-        return (
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 3fr",
-                    marginTop: "1em",
-                }}
-            >
-                <Chessboard position={fen} squareSize={30} />
-                <div
-                    style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 3fr",
-                        textAlign: "left",
-                        gridAutoRows: "min-content",
-                        gridAutoColumns: "minContent",
-                        color: "white",
-                        marginLeft: ".6em",
-                    }}
-                >
-                    <span>Event:</span>
-                    <span>{event}</span>
-                    <span>White:</span>
-                    <span>{white}</span>
-                    <span>Black:</span>
-                    <span>{black}</span>
-                    <span>Fenster Opening Name:</span>
-                    <span>{name}</span>
-                    <span>ECO:</span>
-                    <span> {eco}</span>
-                    <span>Moves:</span> <span>{moves}</span>
-                    <span>FEN:</span>
-                    <span>{fen}</span>
-                    <AdditionalOpenings {...{ fen }} />
-                </div>
-            </div>
-        );
+        return <OpeningDetails {...{ opening, game, fen, setFen }} />;
     }
 };
 

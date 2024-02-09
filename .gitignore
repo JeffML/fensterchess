@@ -3,6 +3,9 @@ temp
 *scidTest.eco
 TestComponent.js
 
+# Backups
+*.gz
+
 # Logs
 logs
 *.log
