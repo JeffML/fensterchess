@@ -1,14 +1,15 @@
-import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import { useQuery, gql } from "@apollo/client";
-import "react-tabs/style/react-tabs.css";
-import "./stylesheets/grid.css";
+import { gql, useQuery } from "@apollo/client";
+import { Chess } from "chess.js";
 import { pgnRead } from "kokopu";
-import { Fragment, useContext, useState, useEffect } from "react";
-import sleep from "./utils/sleep.js";
+import { Chessboard } from "kokopu-react";
+import { Fragment, useContext, useRef, useState } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import StackedBarChart from "./common/StackedBarChart.js";
-import { Chessboard } from "kokopu-react";
-import {Chess} from 'chess.js'
+import "./stylesheets/grid.css";
+import sleep from "./utils/sleep.js";
+import {pliesAryToMovesString} from './utils/openings.js'
 
 const blueBoldStyle = { color: "LightSkyBlue" };
 
@@ -169,7 +170,7 @@ const Openings = ({ openings, setFlash, filter, setFilter }) => {
     );
 };
 
-const PgnSummary = ({ pgnSumm, setFlash, filter, setFilter }) => {
+const PgnSummaryTab = ({ pgnSumm, setFlash, filter, setFilter }) => {
     const { count, high, low, openings, event } = pgnSumm;
 
     return (
@@ -302,23 +303,32 @@ const Players = ({ pgnSumm }) => {
     );
 };
 
-const ChessboardWithControls = ({ fen, setFen }) => {
+const ChessboardWithControls = ({ fen, setFen, chess }) => {
+    const onClick = () => {
+        chess.current.undo()
+        const newFen = chess.current.fen()
+        setFen(newFen)
+    }
     return (
         <div>
             <Chessboard position={fen} squareSize={30} />
-            <span onClick={()=>setFen("start")}>Press me!</span>
+            <span onClick={onClick}>Press me!</span>
         </div>
     );
 };
 
-const OpeningDetails = ({ game, opening, fen, setFen }) => {
-    const { eco, name, moves, fen: fenn } = opening;
-    if (!fen) setFen(fenn);
+const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
+
+    const { eco, name, moves, fen: openingFen } = opening;
+
     const event = game.event();
     const white =
         (game.playerTitle("w") ?? "  ") + "   " + game.playerName("w");
     const black =
         (game.playerTitle("b") ?? "  ") + "   " + game.playerName("b");
+
+    if (!fen) setFen(openingFen);
+
 
     return (
         <div
@@ -328,7 +338,7 @@ const OpeningDetails = ({ game, opening, fen, setFen }) => {
                 marginTop: "1em",
             }}
         >
-            <ChessboardWithControls {...{ fen, setFen }} />
+            <ChessboardWithControls {...{ fen, setFen, chess }} />
             <div
                 style={{
                     display: "grid",
@@ -359,8 +369,12 @@ const OpeningDetails = ({ game, opening, fen, setFen }) => {
     );
 };
 
-const Opening = ({ game }) => {
+const OpeningTab = ({ game }) => {
     const [fen, setFen] = useState();
+    const chess = useRef(new Chess());
+    const moveString = pliesAryToMovesString(game.pojo().mainVariation)
+
+    chess.current.loadPgn(moveString)
 
     const fens = game
         ? game
@@ -386,7 +400,7 @@ const Opening = ({ game }) => {
     if (data) {
         const openings = data.getOpeningsForFens2;
         const opening = openings.at(-1);
-        return <OpeningDetails {...{ opening, game, fen, setFen }} />;
+        return <OpeningDetails {...{ opening, game, fen, setFen, chess }} />;
     }
 };
 
@@ -472,7 +486,7 @@ const AdditionalOpenings = ({ fen }) => {
     }
 };
 
-const Games = ({ db, filter, setGame, setTabIndex }) => {
+const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
     const gridStyle = {
         display: "grid",
         gridTemplateColumns: "1fr 2fr 3fr 3fr 4fr 1fr",
@@ -557,15 +571,17 @@ const PgnGames = ({ pgn }) => {
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
-                    <PgnSummary {...{ pgnSumm, setFlash, filter, setFilter }} />
+                    <PgnSummaryTab
+                        {...{ pgnSumm, setFlash, filter, setFilter }}
+                    />
                 </TabPanel>
                 <TabPanel>
-                    <Games
+                    <GamesTab
                         {...{ db: pgnSumm.db, filter, setGame, setTabIndex }}
                     />
                 </TabPanel>
                 <TabPanel>
-                    <Opening {...{ game }} />
+                    <OpeningTab {...{ game }} />
                 </TabPanel>
             </div>
         </Tabs>
