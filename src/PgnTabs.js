@@ -304,25 +304,33 @@ const Players = ({ pgnSumm }) => {
 };
 
 const ChessboardWithControls = ({ fen, setFen, chess, plies, plyIndex, setPlyIndex}) => {
-    const onClick = () => {
-        setPlyIndex(plyIndex - 1)
+    const doRest = () => {
         const currMoves = pliesAryToMovesString(plies.current.slice(0, plyIndex))
         chess.current.loadPgn(currMoves)
         const currFen = chess.current.fen()
         setFen(currFen)
+    }
+    const back = () => {
+        setPlyIndex(Math.max(--plyIndex, 0))
+        doRest()
     };
+
+    const forward = () => {
+        setPlyIndex(Math.min(++plyIndex, plies.current.length))
+        doRest()
+    }
     return (
         <div>
-            <Chessboard position={fen} squareSize={30} />
-            <span onClick={onClick}>Press me!</span>
+            <Chessboard position={fen} squareSize={30} animated={true} />
+            <span onClick={back}>{"<<"}</span>{"    "}<span onClick={forward}>{">>"}</span>
         </div>
     );
 };
 
 const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
     const { eco, name, moves, fen: openingFen } = opening;
-    const plies = useRef(movesStringToPliesAry(moves))
-    const [plyIndex, setPlyIndex] = useState(plies.current.length)
+    const plies = useRef(game.pojo().mainVariation)
+    const [plyIndex, setPlyIndex] = useState(movesStringToPliesAry(moves).length)
 
     const event = game.event();
     const white =
