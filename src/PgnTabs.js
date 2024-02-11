@@ -9,7 +9,7 @@ import { SelectedSitesContext } from "./common/Contexts.js";
 import StackedBarChart from "./common/StackedBarChart.js";
 import "./stylesheets/grid.css";
 import sleep from "./utils/sleep.js";
-import {pliesAryToMovesString} from './utils/openings.js'
+import { movesStringToPliesAry, pliesAryToMovesString } from "./utils/openings.js";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
 
@@ -303,12 +303,14 @@ const Players = ({ pgnSumm }) => {
     );
 };
 
-const ChessboardWithControls = ({ fen, setFen, chess }) => {
+const ChessboardWithControls = ({ fen, setFen, chess, plies, plyIndex, setPlyIndex}) => {
     const onClick = () => {
-        chess.current.undo()
-        const newFen = chess.current.fen()
-        setFen(newFen)
-    }
+        setPlyIndex(plyIndex - 1)
+        const currMoves = pliesAryToMovesString(plies.current.slice(0, plyIndex))
+        chess.current.loadPgn(currMoves)
+        const currFen = chess.current.fen()
+        setFen(currFen)
+    };
     return (
         <div>
             <Chessboard position={fen} squareSize={30} />
@@ -318,8 +320,9 @@ const ChessboardWithControls = ({ fen, setFen, chess }) => {
 };
 
 const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
-
     const { eco, name, moves, fen: openingFen } = opening;
+    const plies = useRef(movesStringToPliesAry(moves))
+    const [plyIndex, setPlyIndex] = useState(plies.current.length)
 
     const event = game.event();
     const white =
@@ -338,7 +341,7 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
                 marginTop: "1em",
             }}
         >
-            <ChessboardWithControls {...{ fen, setFen, chess }} />
+            <ChessboardWithControls {...{ fen, setFen, chess, plies, plyIndex, setPlyIndex }} />
             <div
                 style={{
                     display: "grid",
@@ -372,9 +375,6 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
 const OpeningTab = ({ game }) => {
     const [fen, setFen] = useState();
     const chess = useRef(new Chess());
-    const moveString = pliesAryToMovesString(game.pojo().mainVariation)
-
-    chess.current.loadPgn(moveString)
 
     const fens = game
         ? game
