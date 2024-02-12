@@ -9,7 +9,11 @@ import { SelectedSitesContext } from "./common/Contexts.js";
 import StackedBarChart from "./common/StackedBarChart.js";
 import "./stylesheets/grid.css";
 import sleep from "./utils/sleep.js";
-import { movesStringToPliesAry, pliesAryToMovesString } from "./utils/openings.js";
+import {
+    movesStringToPliesAry,
+    pliesAryToMovesString,
+} from "./utils/openings.js";
+import { ActionButton } from "./common/buttons.js";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
 
@@ -303,35 +307,56 @@ const Players = ({ pgnSumm }) => {
     );
 };
 
-const ChessboardWithControls = ({ fen, setFen, chess, plies, plyIndex, setPlyIndex}) => {
+const ChessboardWithControls = ({
+    fen,
+    setFen,
+    chess,
+    plies,
+    plyIndex,
+    setPlyIndex,
+}) => {
     const doRest = () => {
-        const currMoves = pliesAryToMovesString(plies.current.slice(0, plyIndex))
-        chess.current.loadPgn(currMoves)
-        const currFen = chess.current.fen()
-        setFen(currFen)
-    }
+        const currMoves = pliesAryToMovesString(
+            plies.current.slice(0, plyIndex)
+        );
+        chess.current.loadPgn(currMoves);
+        const currFen = chess.current.fen();
+        setFen(currFen);
+    };
     const back = () => {
-        setPlyIndex(Math.max(--plyIndex, 0))
-        doRest()
+        setPlyIndex(Math.max(--plyIndex, 0));
+        doRest();
     };
 
     const forward = () => {
-        setPlyIndex(Math.min(++plyIndex, plies.current.length))
-        doRest()
-    }
+        setPlyIndex(Math.min(++plyIndex, plies.current.length));
+        doRest();
+    };
     return (
         <div>
-            <Chessboard position={fen} squareSize={30} animated={true} />
-            <span onClick={back}>{"<<"}</span>{"    "}<span onClick={forward}>{">>"}</span>
+            <Chessboard position={fen} squareSize={30} animated={true} coordinateVisible={false} />
+            <div style={{ marginLeft: "-10%", marginTop: "-3%" }}>
+                <ActionButton
+                    onClick={back}
+                    text="<<"
+                    style={{ fontSize: "small" }}
+                ></ActionButton>
+                <ActionButton
+                    onClick={forward}
+                    text=">>"
+                    style={{ fontSize: "small" }}
+                ></ActionButton>
+            </div>
         </div>
     );
 };
 
-
 const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
-    const { eco, name, moves, fen: openingFen } = opening??{};
-    const plies = useRef(game.pojo().mainVariation)
-    const [plyIndex, setPlyIndex] = useState(movesStringToPliesAry(moves??"").length)
+    const { eco, name, moves, fen: openingFen } = opening ?? {};
+    const plies = useRef(game.pojo().mainVariation);
+    const [plyIndex, setPlyIndex] = useState(
+        movesStringToPliesAry(moves ?? "").length
+    );
 
     const event = game.event();
     const white =
@@ -341,7 +366,6 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
 
     if (!fen) setFen(openingFen);
 
-
     return (
         <div
             style={{
@@ -350,7 +374,9 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
                 marginTop: "1em",
             }}
         >
-            <ChessboardWithControls {...{ fen, setFen, chess, plies, plyIndex, setPlyIndex }} />
+            <ChessboardWithControls
+                {...{ fen, setFen, chess, plies, plyIndex, setPlyIndex }}
+            />
             <div
                 style={{
                     display: "grid",
@@ -530,19 +556,22 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
             <div name="lefty" style={gridStyle} className="scrollableY white">
                 {games.filter(filterFunc).map((g, i) => {
                     const pgnOpening = g.opening();
+                    let variant = g.variant()
+                    if (variant && variant === "regular") variant = null
+
                     return (
                         <Fragment key={i}>
                             <span>{g.fullRound()}</span>
                             <span>{g.dateAsString()}</span>
                             <span>{g.playerName("w")}</span>
                             <span>{g.playerName("b")}</span>
-
-                            <span
+                            {variant && <span>{variant} variant not supported</span>}
+                            {!variant && pgnOpening && <span
                                 className="fakeLink"
                                 onClick={() => clickHandler(g)}
                             >
                                 {pgnOpening ?? "N/A"}
-                            </span>
+                            </span>}
 
                             <span>{g.result()}</span>
                         </Fragment>
