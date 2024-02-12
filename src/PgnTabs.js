@@ -327,10 +327,11 @@ const ChessboardWithControls = ({ fen, setFen, chess, plies, plyIndex, setPlyInd
     );
 };
 
+
 const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
-    const { eco, name, moves, fen: openingFen } = opening;
+    const { eco, name, moves, fen: openingFen } = opening??{};
     const plies = useRef(game.pojo().mainVariation)
-    const [plyIndex, setPlyIndex] = useState(movesStringToPliesAry(moves).length)
+    const [plyIndex, setPlyIndex] = useState(movesStringToPliesAry(moves??"").length)
 
     const event = game.event();
     const white =
