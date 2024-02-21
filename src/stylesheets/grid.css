@@ -36,5 +36,11 @@ div[name=lefty]>span {
     background: grey;
 }
 
+div#game-details span:nth-child(odd){
+    color: lightgreen    
+}
 
+div#game-details span:nth-child(even){
+    color: white    
+}
 

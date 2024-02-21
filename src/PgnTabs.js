@@ -377,14 +377,13 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
             <ChessboardWithControls
                 {...{ fen, setFen, chess, plies, plyIndex, setPlyIndex }}
             />
-            <div
+            <div id="game-details"
                 style={{
                     display: "grid",
                     gridTemplateColumns: "1fr 3fr",
                     textAlign: "left",
-                    gridAutoRows: "min-content",
+                    gridAutoRows: "minContent",
                     gridAutoColumns: "minContent",
-                    color: "white",
                     marginLeft: ".6em",
                 }}
             >
