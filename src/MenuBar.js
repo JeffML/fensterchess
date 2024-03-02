@@ -25,6 +25,15 @@ const MenuBar = ({ mode, setMode }) => {
             <div
                 className={
                     "column menuitem " +
+                    (mode === modes.visualization ? "selected" : "")
+                }
+                onClick={() => setMode(modes.visualization)}
+            >
+                <span>Visualizations</span>
+            </div>
+            <div
+                className={
+                    "column menuitem " +
                     (mode === modes.about ? "selected" : "")
                 }
                 onClick={() => setMode(modes.about)}

@@ -18,12 +18,14 @@ const modes = {
     search: 3,
     pgnAnalyze: 4,
     about: 5,
+    visualization: 6,
 };
 
 const SUBTITLES = [];
 SUBTITLES[modes.search] = "Search Openings";
 SUBTITLES[modes.admin] = "Test and Administration";
 SUBTITLES[modes.pgnAnalyze] = "Import and Analyze PGN";
+SUBTITLES[modes.visualization] = "Visualization";
 SUBTITLES[modes.about] = "About Fenster";
 
 const sites = ["FICS", "lichess", "shredder"];

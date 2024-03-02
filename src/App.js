@@ -7,6 +7,7 @@ import AboutPage from "./AboutPage.js"
 import PageHeader from "./PageHeader.js";
 import SearchPage from "./SearchPage.js";
 import PgnAnalysis from "./PgnAnalyzePage.js";
+import Visualizations from "./Visualizations.js";
 import { SelectedSitesContextProvider } from "./common/Contexts.js";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
                 )}
                 {mode === modes.search && <SearchPage />}
                 {mode === modes.pgnAnalyze && <PgnAnalysis {...{ setMode }} />}
+                {mode === modes.visualization && <Visualizations />}
                 {mode === modes.about && <AboutPage/>}
             </SelectedSitesContextProvider>
         </div>
