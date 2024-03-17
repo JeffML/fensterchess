@@ -11,6 +11,7 @@ import {
 import { setContext } from "@apollo/link-context";
 import {token, serverUri} from "./common/consts.js"
 
+// Note: serverUri can be changed by env var REACT_APP_SERVER (see consts.js)
 const httpLink = createHttpLink({
     uri:  serverUri
 })

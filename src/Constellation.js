@@ -1,12 +1,6 @@
-/*
-    (10/29/23 -- JML) 
-    "@p5-wrapper/react" injects a huge dependency (~1MB).
-     Instead, explore using technique #2, here: https://www.shivanshbakshi.dev/blog/p5-react/integrate-p5-with-react/
-*/
-
 import { useQuery, gql } from "@apollo/client";
-// import { ReactP5Wrapper } from "@p5-wrapper/react";
-const ReactP5Wrapper = {}
+import { useRef, useEffect } from "react";
+import p5 from "p5";
 
 const GET_OPENING_PATHS = gql`
     query getPaths($type: String!, $fen: String!) {
@@ -28,6 +22,15 @@ const GET_OPENING_PATHS = gql`
         }
     }
 `;
+
+const GET_DEST_FREQ = gql`
+    query getDestFreq($cat: String!, $code: String) {
+        getDestinationSquareByFrequency(cat: $cat, code: $code) {
+            key
+            value
+        }
+    }
+`
 
 const RF_DEGREES = 22.5; // 180/8
 
@@ -60,50 +63,18 @@ const calcPaths = ({ from, at, to, radius }) => {
 };
 
 const Constellation = ({ fen, type }) => {
-    const sketch = (p5, paths) => {
-        let scale = 5.0;
+    const renderRef = useRef();
+    const p55 = useRef();
 
-        p5.setup = () => {
-            p5.createCanvas(600, 400, p5.WEBGL);
-        };
+    const scale = 5.0;
 
-        p5.draw = () => {
-            p5.background(220);
-            p5.scale(scale);
-            p5.point(0, 0, 0);
-
-            p5.push();
-
-
-            p5.rotateZ(p5.frameCount * 0.01);
-            p5.rotateX(p5.frameCount * 0.01);
-            p5.rotateY(p5.frameCount * 0.01);
-
-
-            for (let pathSet of paths) {
-                let lastv = p5.createVector(...pathSet[0]);
-
-                for (let p of pathSet.slice(1)) {
-                    let v2 = p5.constructor.Vector.add(lastv, p);
-                    p5.line(lastv.x, lastv.y, lastv.z, v2.x, v2.y, v2.z);
-                    lastv = v2;
-                }
-            }
-
-            p5.pop();
-        };
-    };
-
-    // FIXME: HARDWIRED
-    fen = "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2";
-    type = "pathBySquare";
+    let paths = [];
 
     const { error, data, loading } = useQuery(GET_OPENING_PATHS, {
         variables: { type, fen },
         skip: fen === "start",
     });
 
-    if (loading) console.log("loading");
     if (error) console.error(error.toString());
     if (data) {
         const {
@@ -115,10 +86,101 @@ const Constellation = ({ fen, type }) => {
         } = data;
         const from = from_paths.map((p) => p.coords);
         const to = to_paths.map((p) => p.coords);
-        const paths = calcPaths({ at, from, to, radius: 10 });
-
-        return <ReactP5Wrapper {...{ sketch: (p5) => sketch(p5, paths) }} />;
+        paths = calcPaths({ at, from, to, radius: 10 });
     }
+
+    useEffect(() => {
+        let remove;
+        new p5((p) => {
+            remove = p.remove;
+            p55.current = p;
+            p.setup = () => {
+                p.createCanvas(600, 400, p.WEBGL).parent(renderRef.current);
+            };
+            p.draw = () => {
+                p.background(220);
+                p.scale(scale);
+                p.push();
+
+                p.rotateZ(p.frameCount * 0.01);
+                p.rotateX(p.frameCount * 0.01);
+                p.rotateY(p.frameCount * 0.01);
+
+                p.point(0, 0, 0);
+
+                if (paths.length) {
+                    for (let pathSet of paths) {
+                        let lastv = p.createVector(...pathSet[0]);
+
+                        for (let path of pathSet.slice(1)) {
+                            let v2 = p5.Vector.add(lastv, path);
+                            p.line(lastv.x, lastv.y, lastv.z, v2.x, v2.y, v2.z);
+                            lastv = v2;
+                        }
+                    }
+                }
+                p.pop();
+            };
+        });
+        return remove;
+    }, [paths]);
+
+    return <div ref={renderRef} className="double-column left"></div>;
 };
 
-export default Constellation;
+const HeatMap3D = () => {
+    function f(x, y) {
+        return x * x + y * y * y;
+    }
+
+    const renderRef = useRef();
+
+    useEffect(() => {
+        let N = 10;
+        let h = 1 / N;
+        let sum = 0;
+        let i = -1;
+        let j = -1;
+
+        new p5((p) => {
+            p.setup = () => {
+                p.createCanvas(600, 400, p.WEBGL).parent(renderRef.current);
+            };
+            p.draw = () => {
+                i = i + 1;
+                if (i === N) {
+                    i = 0;
+                    j = j + 1;
+                }
+                if (j < N) {
+                    sum = sum + f(i / N, j / N) * h * h;
+                    p.translate(20 * i - 100, 20 * j - 100);
+                    p.rotateX(-1);
+                    p.rotateZ(0.1);
+                    p.box(20, 50 * f(i / N, j / N), 20);
+                    p.rotateX(1);
+                    p.rotateZ(-0.1);
+                    p.translate(-20 * i + 100, -20 * j + 100);
+                }
+            };
+        });
+    }, []);
+
+    return <div ref={renderRef} className="double-column left"></div>;
+};
+
+const DestinationFrequenciesByEco = () => {
+    const cat = "D"
+    const code = "04"
+    const {  error, data } = useQuery(GET_DEST_FREQ, {
+        variables: { cat, code },
+        skip: !cat,
+    });
+
+    if (error) console.error(error.toString());
+    if (data) console.dir(data)
+    return null;
+}
+
+
+export {Constellation as default, HeatMap3D, DestinationFrequenciesByEco};

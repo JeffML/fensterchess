@@ -1,4 +1,5 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState} from "react";
+import Constellation, {HeatMap3D, DestinationFrequenciesByEco} from "./Constellation.js";
 
 const gridStyle = {
     display: "grid",
@@ -11,13 +12,22 @@ const gridStyle = {
 };
 
 const visualizations = {
-    tree: { name: "bar" },
-    heatmap: { name: "flum" },
-    "ball of mud": {}
+    "heatmap 3D": {},
+    "ball of mud": {},
+    "destination frequencies": {},
 };
 
+
+
+// FIXME: HARDWIRED
+const fen = "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2";
+const type = "pathBySquare";
+
 const Display = ({ viz }) => {
-    return <div className="double-column left" id={viz}>The Viz</div>;
+    if (viz === "heatmap 3D") return <HeatMap3D></HeatMap3D>;
+    if (viz === "ball of mud") return <Constellation {...{ fen, type }} />;
+    if (viz === "destination frequencies") return <DestinationFrequenciesByEco />;
+    return null;
 };
 
 const Visualization = () => {

@@ -9,7 +9,7 @@ const sortEnum = {
     EVALUATION: 1,
     NAME: 2,
     // RESULTS: 3,
-    ECO: 4
+    ECO: 4,
 };
 
 const modes = {
@@ -36,11 +36,15 @@ const siteUrls = {
 };
 
 const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
-const DEFAULT_SERVER = "fenster-s.netlify.app"
+const DEFAULT_SERVER = "fenster-s.netlify.app";
 
-    // get the authentication token from local storage if it exists
-    const token = process.env.REACT_APP_QUOTE;
-    const serverUri = `https://${process.env.REACT_APP_SERVER??DEFAULT_SERVER}/.netlify/functions/server`;
+// get the authentication token from local storage if it exists
+const token = process.env.REACT_APP_QUOTE;
+const alias = process.env.REACT_APP_SERVER; // this can be set as follows: "REACT_APP_SERVER=flum netlify dev"
+
+// prettier-ignore
+const serverUri = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}/.netlify/functions/server`;
+console.log(`alias was ${alias}, serverUri is ${serverUri}`)
 
 export {
     APP_NAME,
@@ -54,5 +58,5 @@ export {
     FENEX,
     VERSION,
     token,
-    serverUri
+    serverUri,
 };

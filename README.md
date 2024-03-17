@@ -5,7 +5,7 @@ which can requested. All opening data is derived from the github procject <a hre
 ## Tech Stack
 Major techs/dependencies are as follows:
 * Create React App 
-    * Which is apprently [deprecated](https://dev.to/ag2byte/create-react-app-is-officially-dead-h7o#:~:text=React%20developer%20team%20recently%20removed,react%2Dapp%20is%20finally%20gone.). Looking into [Vite](https://vitejs.dev/).
+    * Which is apparently [deprecated](https://dev.to/ag2byte/create-react-app-is-officially-dead-h7o#:~:text=React%20developer%20team%20recently%20removed,react%2Dapp%20is%20finally%20gone.). Looking into [Vite](https://vitejs.dev/).
 * Netlify (web hosting serice)
 * Node
 * React
@@ -23,4 +23,4 @@ Major techs/dependencies are as follows:
     * A master games server with an open API has yet to be found
 
 ## Local development
-A local client can be spun up using `netlify dev`. Code changes are automatically reflected in the browser. There is rate limiting in the database for all non-credentialed client origins (aggregate). If the server is no longer responsive to your local test client, it may be because of this. Send an email to <a href="mailto:fensterchess@gmail.com">Fenster</a>, describing what you are trying to do and you can recieve your own private credential.
+A local client can be spun up using `netlify dev` (once `netlify_cli` [is installed](https://docs.netlify.com/cli/get-started/)). Code changes are automatically reflected in the browser. There is rate limiting in the database for all non-credentialed client origins (aggregate). If the server is no longer responsive to your local test client, it may be because of this. Send an email to <a href="mailto:fensterchess@gmail.com">Fenster</a>, describing what you are trying to do and you can recieve your own private credential.
