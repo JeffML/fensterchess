@@ -30,7 +30,7 @@ const GET_DEST_FREQ = gql`
             value
         }
     }
-`
+`;
 
 const RF_DEGREES = 22.5; // 180/8
 
@@ -170,17 +170,31 @@ const HeatMap3D = () => {
 };
 
 const DestinationFrequenciesByEco = () => {
-    const cat = "D"
-    const code = "04"
-    const {  error, data } = useQuery(GET_DEST_FREQ, {
+    const cat = "D";
+    const code = "04";
+    const { error, data } = useQuery(GET_DEST_FREQ, {
         variables: { cat, code },
         skip: !cat,
     });
 
     if (error) console.error(error.toString());
-    if (data) console.dir(data)
+    if (data) {
+        console.dir(data);
+        // scrub the data
+        const dests = data.getDestinationSquareByFrequency.reduce((acc, d) => {
+            const dest = d.key[2].substr(-2);
+            // FIXME: we don't know who is castling (NEI), so skip
+            if (dest !== "-0") {
+                if (acc[dest]) acc[dest] += d.value
+                else acc[dest] = d.value;
+            }
+            return acc;
+        }, {});
+
+        console.log (Object.keys(dests).sort())
+        return <div>{JSON.stringify(dests, null, 2)}</div>;
+    }
     return null;
-}
+};
 
-
-export {Constellation as default, HeatMap3D, DestinationFrequenciesByEco};
+export { Constellation as default, HeatMap3D, DestinationFrequenciesByEco };
