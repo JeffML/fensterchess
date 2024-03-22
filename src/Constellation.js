@@ -128,50 +128,61 @@ const Constellation = ({ fen, type }) => {
     return <div ref={renderRef} className="double-column left"></div>;
 };
 
-const HeatMap3D = () => {
-    function f(x, y) {
-        return x * x + y * y * y;
-    }
+// see https://editor.p5js.org/claesjohnson/sketches/Z9cIPNZ0z
+const HeatMap3D = ({dests}) => {
+
+   const root = 'a'.charCodeAt(0)
+    const freqs = []  // sparse array
+    
+    Object.keys(dests).forEach(d => {
+        const coord = ((d.charCodeAt(0) - root) * 10) + (Number.parseInt(d[1]) - 1)
+        freqs[coord] = dests[d]
+    })
+
 
     const renderRef = useRef();
 
     useEffect(() => {
-        let N = 10;
-        let h = 1 / N;
-        let sum = 0;
-        let i = -1;
-        let j = -1;
+        let N = 8;             // dimensions (8x8)
+        let file = 0;
+        let rank = 0;
+        
+        function calcHeight(file, rank) {
+            const h = freqs[file*10 + rank]?? 0
+            return h + 1;
+        }
 
         new p5((p) => {
             p.setup = () => {
                 p.createCanvas(600, 400, p.WEBGL).parent(renderRef.current);
             };
             p.draw = () => {
-                i = i + 1;
-                if (i === N) {
-                    i = 0;
-                    j = j + 1;
+                if (file === N) {
+                    file = 0;
+                    rank++;
                 }
-                if (j < N) {
-                    sum = sum + f(i / N, j / N) * h * h;
-                    p.translate(20 * i - 100, 20 * j - 100);
+                if (rank < N) {
+                    p.translate(20 * file - 100, 20 * rank - 100);
                     p.rotateX(-1);
                     p.rotateZ(0.1);
-                    p.box(20, 50 * f(i / N, j / N), 20);
+                    p.box(20, calcHeight(file, rank)*10, 20);
                     p.rotateX(1);
                     p.rotateZ(-0.1);
-                    p.translate(-20 * i + 100, -20 * j + 100);
+                    p.translate(-20 * file + 100, -20 * rank + 100);
                 }
+
+                file++;
             };
         });
-    }, []);
+    }, [freqs]);
 
     return <div ref={renderRef} className="double-column left"></div>;
 };
 
+
 const DestinationFrequenciesByEco = () => {
     const cat = "D";
-    const code = "04";
+    const code = "14";
     const { error, data } = useQuery(GET_DEST_FREQ, {
         variables: { cat, code },
         skip: !cat,
@@ -183,16 +194,12 @@ const DestinationFrequenciesByEco = () => {
         // scrub the data
         const dests = data.getDestinationSquareByFrequency.reduce((acc, d) => {
             const dest = d.key[2].substr(-2);
-            // FIXME: we don't know who is castling (NEI), so skip
-            if (dest !== "-0") {
-                if (acc[dest]) acc[dest] += d.value
-                else acc[dest] = d.value;
-            }
+            acc[dest] = d.value;
             return acc;
         }, {});
 
-        console.log (Object.keys(dests).sort())
-        return <div>{JSON.stringify(dests, null, 2)}</div>;
+        // dests: { "a6": 1, "b4": 1, "b5": 1, "d3": 6, "d6": 6, "f4": 6, ..., "b3": 1, "c1": 2, "f1": 2, "f8": 2, "c8": 1 }
+        return <HeatMap3D {...{dests}}/>
     }
     return null;
 };
