@@ -1,5 +1,5 @@
 import { useQuery, gql } from "@apollo/client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import p5 from "p5";
 
 const GET_OPENING_PATHS = gql`
@@ -68,9 +68,9 @@ const Constellation = ({ fen, type }) => {
 
     const scale = 5.0;
 
-    let paths = [];
+    let paths = useMemo(() => [], []);
 
-    const { error, data, loading } = useQuery(GET_OPENING_PATHS, {
+    const { error, data } = useQuery(GET_OPENING_PATHS, {
         variables: { type, fen },
         skip: fen === "start",
     });
@@ -129,26 +129,27 @@ const Constellation = ({ fen, type }) => {
 };
 
 // see https://editor.p5js.org/claesjohnson/sketches/Z9cIPNZ0z
-const HeatMap3D = ({dests}) => {
+const HeatMap3Dx = ({ dests }) => {
+    const root = "a".charCodeAt(0);
 
-   const root = 'a'.charCodeAt(0)
-    const freqs = []  // sparse array
-    
-    Object.keys(dests).forEach(d => {
-        const coord = ((d.charCodeAt(0) - root) * 10) + (Number.parseInt(d[1]) - 1)
-        freqs[coord] = dests[d]
-    })
+    const freqs = useMemo(() => [], []);
+    // const freqs = []  // sparse array
 
+    Object.keys(dests).forEach((d) => {
+        const coord =
+            (d.charCodeAt(0) - root) * 10 + (Number.parseInt(d[1]) - 1);
+        freqs[coord] = dests[d];
+    });
 
     const renderRef = useRef();
 
     useEffect(() => {
-        let N = 8;             // dimensions (8x8)
+        let N = 8; // dimensions (8x8)
         let file = 0;
         let rank = 0;
-        
+
         function calcHeight(file, rank) {
-            const h = freqs[file*10 + rank]?? 0
+            const h = freqs[file * 10 + rank] ?? 0;
             return h + 1;
         }
 
@@ -163,11 +164,11 @@ const HeatMap3D = ({dests}) => {
                 }
                 if (rank < N) {
                     p.translate(20 * file - 100, 20 * rank - 100);
-                    p.rotateX(-1);
-                    p.rotateZ(0.1);
-                    p.box(20, calcHeight(file, rank)*10, 20);
-                    p.rotateX(1);
-                    p.rotateZ(-0.1);
+                    // p.rotateX(-1);
+                    // p.rotateZ(0.1);
+                    p.box(20, calcHeight(file, rank) * 10, 20);
+                    // p.rotateX(1);
+                    // p.rotateZ(-0.1);
                     p.translate(-20 * file + 100, -20 * rank + 100);
                 }
 
@@ -179,6 +180,117 @@ const HeatMap3D = ({dests}) => {
     return <div ref={renderRef} className="double-column left"></div>;
 };
 
+// see https://editor.p5js.org/claesjohnson/sketches/Z9cIPNZ0z
+const HeatMap3D = ({ dests }) => {
+    const root = "a".charCodeAt(0);
+
+    const freqs = useMemo(() => [], []);
+
+    Object.keys(dests).forEach((d) => {
+        const coord =
+            (d.charCodeAt(0) - root) * 10 + (Number.parseInt(d[1]) - 1);
+        freqs[coord] = dests[d];
+    });
+
+    const renderRef = useRef();
+
+    useEffect(() => {
+        let N = 8; // dimensions (8x8)
+        let file = 0;
+        let rank = 0;
+
+        function calcHeight(file, rank) {
+            const h = freqs[file * 10 + rank] ?? 0;
+            return h + 1;
+        }
+
+        new p5((p) => {
+            let rotX = 45;
+            let rotY = 0;
+            let sliderZ;
+            const width = 600
+            const height = 400
+
+            p.setup = () => {
+                p.createCanvas(width, height, p.WEBGL).parent(renderRef.current);
+                // p.ambientLight(100, 100, 100)
+                // p.ambientMaterial(70, 130, 30);
+                p.noStroke();
+                p.ortho(-width, width, -height, height, -width * 4, width * 4);
+                sliderZ = p.createSlider(-90, 90, 45);
+                p.angleMode(p.DEGREES);
+            };
+
+            p.draw = () => {
+                p.background(255);
+
+                let locX = height;
+                let locY = width / 4;
+              
+                p.ambientLight(60, 60, 60);
+                p.pointLight(255, 255, 255, locX, locY, 100);
+                p.fill(200, 100, 200)
+
+                let rotZ = sliderZ.value();
+                // p.print(rotX, rotY, rotZ);
+
+                p.rotateX(rotX);
+                p.rotateY(rotY);
+                p.rotateZ(rotZ);
+                p.scale(1.5);
+
+                for (
+                    let y = -height / 2 + height / 10;
+                    y < height / 2 - height / 10;
+                    y += height / 10
+                ) {
+                    for (
+                        let x = -height / 2 + height / 10;
+                        x < height / 2 - height / 10;
+                        x += height / 10
+                    ) {
+                        p.push();
+                        let minSize = height / 100;
+                        let maxSize = height / 10;
+                        let minH = height / 100;
+                        let maxH = height;
+                        let sizeX = p.map(
+                            p.noise(x, y, p.frameCount * 0.0),
+                            0,
+                            1,
+                            minSize,
+                            maxSize
+                        );
+                        let sizeY = p.map(
+                            p.noise(x + 100, y + 100, p.frameCount * 0.0 + 100),
+                            0,
+                            1,
+                            minSize,
+                            maxSize
+                        );
+                        let sizeZ = p.map(
+                            p.noise(x * 0.1, y * 0.1, p.frameCount * 0.0),
+                            0,
+                            1,
+                            minH,
+                            maxH
+                        );
+                        p.translate(x, y, sizeZ / 2 - height / 3);
+                        p.box(sizeX, sizeY, sizeZ);
+                        p.pop();
+                    }
+                }
+            };
+            p.mouseDragged = () => {
+                rotY += p.movedX;
+                rotX += -p.movedY;
+              }
+              
+        });
+    }, [freqs]);
+
+    return <div ref={renderRef} className="double-column left"></div>;
+};
 
 const DestinationFrequenciesByEco = () => {
     const cat = "D";
@@ -199,7 +311,7 @@ const DestinationFrequenciesByEco = () => {
         }, {});
 
         // dests: { "a6": 1, "b4": 1, "b5": 1, "d3": 6, "d6": 6, "f4": 6, ..., "b3": 1, "c1": 2, "f1": 2, "f8": 2, "c8": 1 }
-        return <HeatMap3D {...{dests}}/>
+        return <HeatMap3D {...{ dests }} />;
     }
     return null;
 };
