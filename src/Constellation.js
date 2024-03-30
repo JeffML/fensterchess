@@ -180,7 +180,7 @@ const HeatMap3Dx = ({ dests }) => {
     return <div ref={renderRef} className="double-column left"></div>;
 };
 
-// see https://editor.p5js.org/claesjohnson/sketches/Z9cIPNZ0z
+// see "3d grid" @ https://editor.p5js.org/otsohavanto/sketches/OHPamV3P2
 const HeatMap3D = ({ dests }) => {
     const root = "a".charCodeAt(0);
 
@@ -196,87 +196,65 @@ const HeatMap3D = ({ dests }) => {
 
     useEffect(() => {
         let N = 8; // dimensions (8x8)
-        let file = 0;
-        let rank = 0;
+        let remove;
 
         function calcHeight(file, rank) {
             const h = freqs[file * 10 + rank] ?? 0;
-            return h + 1;
+            return h * 10;
         }
 
         new p5((p) => {
+            remove = p.remove;
             let rotX = 45;
             let rotY = 0;
             let sliderZ;
-            const width = 600
-            const height = 400
+            const width = 600;
+            const height = 400;
 
             p.setup = () => {
-                p.createCanvas(width, height, p.WEBGL).parent(renderRef.current);
-                // p.ambientLight(100, 100, 100)
-                // p.ambientMaterial(70, 130, 30);
+                p.createCanvas(width, height, p.WEBGL).parent(
+                    renderRef.current
+                );
                 p.noStroke();
                 p.ortho(-width, width, -height, height, -width * 4, width * 4);
-                sliderZ = p.createSlider(-90, 90, 45);
+                sliderZ = p.createSlider(-20, -10, 45);
                 p.angleMode(p.DEGREES);
             };
 
             p.draw = () => {
                 p.background(255);
 
-                let locX = height;
+                /*light and shading*/
+                let locX = height / 2;
                 let locY = width / 4;
-              
+
                 p.ambientLight(60, 60, 60);
                 p.pointLight(255, 255, 255, locX, locY, 100);
-                p.fill(200, 100, 200)
+                p.fill(170, 170, 170);
+                /**/
 
                 let rotZ = sliderZ.value();
-                // p.print(rotX, rotY, rotZ);
 
                 p.rotateX(rotX);
                 p.rotateY(rotY);
                 p.rotateZ(rotZ);
                 p.scale(1.5);
 
-                for (
-                    let y = -height / 2 + height / 10;
-                    y < height / 2 - height / 10;
-                    y += height / 10
-                ) {
-                    for (
-                        let x = -height / 2 + height / 10;
-                        x < height / 2 - height / 10;
-                        x += height / 10
-                    ) {
+                for (let file = 0; file < N; file++) {
+                    for (let rank = 0; rank < N; rank++) {
+                    // for (let y = -height/2 + height/10; y < height/2 - height / 10; y += height/10) {
+                    //     for (let x = -height/2 + height/10; x < height/2 - height/10; x += height/10) {
                         p.push();
-                        let minSize = height / 100;
-                        let maxSize = height / 10;
-                        let minH = height / 100;
-                        let maxH = height;
-                        let sizeX = p.map(
-                            p.noise(x, y, p.frameCount * 0.0),
-                            0,
-                            1,
-                            minSize,
-                            maxSize
-                        );
-                        let sizeY = p.map(
-                            p.noise(x + 100, y + 100, p.frameCount * 0.0 + 100),
-                            0,
-                            1,
-                            minSize,
-                            maxSize
-                        );
-                        let sizeZ = p.map(
-                            p.noise(x * 0.1, y * 0.1, p.frameCount * 0.0),
-                            0,
-                            1,
-                            minH,
-                            maxH
-                        );
-                        p.translate(x, y, sizeZ / 2 - height / 3);
-                        p.box(sizeX, sizeY, sizeZ);
+                        // x = width, y = length, z = height
+                        let x =
+                            -height / 2 + (height / 10) + file * (height / 10);
+                        let y =
+                            -height / 2 + height / 10 + rank * (height / 10);
+                        let z = calcHeight(file, rank);
+                        // let z = 100
+
+                        p.translate(x, y); //, z / 2 - height / 3);
+                        p.box(30, 30, z);
                         p.pop();
                     }
                 }
@@ -284,9 +262,10 @@ const HeatMap3D = ({ dests }) => {
             p.mouseDragged = () => {
                 rotY += p.movedX;
                 rotX += -p.movedY;
-              }
-              
+                console.log(rotX, rotY);
+            };
         });
+        return remove;
     }, [freqs]);
 
     return <div ref={renderRef} className="double-column left"></div>;
