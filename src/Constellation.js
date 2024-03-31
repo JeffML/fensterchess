@@ -186,11 +186,13 @@ const HeatMap3D = ({ dests }) => {
 
     const freqs = useMemo(() => [], []);
 
-    Object.keys(dests).forEach((d) => {
-        const coord =
-            (d.charCodeAt(0) - root) * 10 + (Number.parseInt(d[1]) - 1);
-        freqs[coord] = dests[d];
-    });
+    Object.keys(dests)
+        .reverse()
+        .forEach((d) => {
+            const coord =
+                (d.charCodeAt(0) - root) * 10 + (Number.parseInt(d[1]) - 1);
+            freqs[coord] = dests[d];
+        });
 
     const renderRef = useRef();
 
@@ -199,7 +201,7 @@ const HeatMap3D = ({ dests }) => {
         let remove;
 
         function calcHeight(file, rank) {
-            const h = freqs[file * 10 + rank] ?? 0;
+            const h = freqs[file * 10 + rank] ?? 1;
             return h * 10;
         }
 
@@ -230,7 +232,6 @@ const HeatMap3D = ({ dests }) => {
 
                 p.ambientLight(60, 60, 60);
                 p.pointLight(255, 255, 255, locX, locY, 100);
-                p.fill(170, 170, 170);
                 /**/
 
                 let rotZ = sliderZ.value();
@@ -239,21 +240,25 @@ const HeatMap3D = ({ dests }) => {
                 p.rotateY(rotY);
                 p.rotateZ(rotZ);
                 p.scale(1.5);
+                let color = (rank, file) => {
+                    if (rank%2) { // odd
+                        return file%2? "white" : "black"
+                    } 
+                    return file%2? "black":"white"
+                };
 
-                for (let file = 0; file < N; file++) {
-                    for (let rank = 0; rank < N; rank++) {
-                    // for (let y = -height/2 + height/10; y < height/2 - height / 10; y += height/10) {
-                    //     for (let x = -height/2 + height/10; x < height/2 - height/10; x += height/10) {
-                        p.push();
+                for (let rank = 0; rank < N; rank++) {
+                    for (let file = 0; file < N; file++) {
                         // x = width, y = length, z = height
                         let x =
-                            -height / 2 + (height / 10) + file * (height / 10);
+                            -height / 2 + height / 10 + file * (height / 10);
                         let y =
                             -height / 2 + height / 10 + rank * (height / 10);
                         let z = calcHeight(file, rank);
-                        // let z = 100
+                        p.fill(color(rank, file));
+                        p.push();
 
-                        p.translate(x, y); //, z / 2 - height / 3);
+                        p.translate(x, y, z / 2 - height / 3);
                         p.box(30, 30, z);
                         p.pop();
                     }
