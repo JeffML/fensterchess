@@ -212,6 +212,11 @@ const HeatMap3D = ({ dests }) => {
             let sliderZ;
             const width = 600;
             const height = 400;
+            let font;
+
+            p.preload = () => {
+               font = p.loadFont("resources/Cinzel-Medium.ttf")
+            }
 
             p.setup = () => {
                 p.createCanvas(width, height, p.WEBGL).parent(
@@ -221,10 +226,15 @@ const HeatMap3D = ({ dests }) => {
                 p.ortho(-width, width, -height, height, -width * 4, width * 4);
                 sliderZ = p.createSlider(-20, -10, 45);
                 p.angleMode(p.DEGREES);
+                p.textFont(font)
             };
 
             p.draw = () => {
-                p.background(255);
+                p.background(200);
+
+                p.textSize(20);
+                p.textAlign(p.RIGHT, p.TOP);
+                p.textStyle(p.BOLD);
 
                 /*light and shading*/
                 let locX = height / 2;
@@ -236,30 +246,41 @@ const HeatMap3D = ({ dests }) => {
 
                 let rotZ = sliderZ.value();
 
+                const boxUnit = height / 10;
+
                 p.rotateX(rotX);
                 p.rotateY(rotY);
                 p.rotateZ(rotZ);
                 p.scale(1.5);
                 let color = (rank, file) => {
-                    if (rank%2) { // odd
-                        return file%2? "white" : "black"
-                    } 
-                    return file%2? "black":"white"
+                    if (rank % 2) {
+                        // odd
+                        return file % 2 ? "white" : "black";
+                    }
+                    return file % 2 ? "black" : "white";
                 };
 
                 for (let rank = 0; rank < N; rank++) {
                     for (let file = 0; file < N; file++) {
                         // x = width, y = length, z = height
-                        let x =
-                            -height / 2 + height / 10 + file * (height / 10);
-                        let y =
-                            -height / 2 + height / 10 + rank * (height / 10);
+                        let x = -height / 2 + boxUnit + file * boxUnit;
+                        let y = -height / 2 + boxUnit + rank * boxUnit;
                         let z = calcHeight(file, rank);
                         p.fill(color(rank, file));
                         p.push();
 
                         p.translate(x, y, z / 2 - height / 3);
                         p.box(30, 30, z);
+                        if (file === 0) {
+                            p.fill("black")
+                            p.text(N - rank, -22, -22)
+                        }
+                        if (rank === N-1) {
+                            p.textAlign(p.RIGHT, p.BOTTOM);
+                            p.fill("black")
+                            p.text(String.fromCharCode(root + file), 2, 52)
+                        }
+
                         p.pop();
                     }
                 }
@@ -271,7 +292,7 @@ const HeatMap3D = ({ dests }) => {
             };
         });
         return remove;
-    }, [freqs]);
+    }, [freqs, root]);
 
     return <div ref={renderRef} className="double-column left"></div>;
 };
@@ -299,5 +320,7 @@ const DestinationFrequenciesByEco = () => {
     }
     return null;
 };
+
+
 
 export { Constellation as default, HeatMap3D, DestinationFrequenciesByEco };
