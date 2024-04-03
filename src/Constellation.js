@@ -1,5 +1,5 @@
 import { useQuery, gql } from "@apollo/client";
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import p5 from "p5";
 
 const GET_OPENING_PATHS = gql`
@@ -32,7 +32,7 @@ const GET_DEST_FREQ = gql`
     }
 `;
 
-const RF_DEGREES = 22.5; // 180/8
+const RF_DEGREES = 22.5; 
 
 const getXYZ = ([radius, rank, file]) => {
     const fDeg = file * RF_DEGREES;
@@ -128,57 +128,12 @@ const Constellation = ({ fen, type }) => {
     return <div ref={renderRef} className="double-column left"></div>;
 };
 
-// see https://editor.p5js.org/claesjohnson/sketches/Z9cIPNZ0z
-const HeatMap3Dx = ({ dests }) => {
-    const root = "a".charCodeAt(0);
-
-    const freqs = useMemo(() => [], []);
-    // const freqs = []  // sparse array
-
-    Object.keys(dests).forEach((d) => {
-        const coord =
-            (d.charCodeAt(0) - root) * 10 + (Number.parseInt(d[1]) - 1);
-        freqs[coord] = dests[d];
-    });
-
-    const renderRef = useRef();
-
-    useEffect(() => {
-        let N = 8; // dimensions (8x8)
-        let file = 0;
-        let rank = 0;
-
-        function calcHeight(file, rank) {
-            const h = freqs[file * 10 + rank] ?? 0;
-            return h + 1;
-        }
-
-        new p5((p) => {
-            p.setup = () => {
-                p.createCanvas(600, 400, p.WEBGL).parent(renderRef.current);
-            };
-            p.draw = () => {
-                if (file === N) {
-                    file = 0;
-                    rank++;
-                }
-                if (rank < N) {
-                    p.translate(20 * file - 100, 20 * rank - 100);
-                    // p.rotateX(-1);
-                    // p.rotateZ(0.1);
-                    p.box(20, calcHeight(file, rank) * 10, 20);
-                    // p.rotateX(1);
-                    // p.rotateZ(-0.1);
-                    p.translate(-20 * file + 100, -20 * rank + 100);
-                }
-
-                file++;
-            };
-        });
-    }, [freqs]);
-
-    return <div ref={renderRef} className="double-column left"></div>;
-};
+const HeatMapType = ({type, setType}) => {
+    return <div className="row">
+        <label>2D<input type="radio" name="type" defaultChecked={type==="2D"} onClick={()=>setType("2D")}/></label><br/>
+        <label>3D<input type="radio" name="type" defaultChecked={type==="3D"} onClick={()=>setType("3D")}/></label>
+    </div>
+}
 
 // see "3d grid" @ https://editor.p5js.org/otsohavanto/sketches/OHPamV3P2
 const HeatMap3D = ({ dests }) => {
@@ -223,7 +178,7 @@ const HeatMap3D = ({ dests }) => {
                     renderRef.current
                 );
                 p.noStroke();
-                p.ortho(-width, width, -height, height, -width * 4, width * 4);
+                p.ortho(-width, width, -height, height/2, -width * 4, width * 4);
                 sliderZ = p.createSlider(-20, -10, 45);
                 p.angleMode(p.DEGREES);
                 p.textFont(font)
@@ -237,8 +192,8 @@ const HeatMap3D = ({ dests }) => {
                 p.textStyle(p.BOLD);
 
                 /*light and shading*/
-                let locX = height / 2;
-                let locY = width / 4;
+                let locX = -height * 0.2;
+                let locY = -width / 1.5;
 
                 p.ambientLight(60, 60, 60);
                 p.pointLight(255, 255, 255, locX, locY, 100);
@@ -278,34 +233,46 @@ const HeatMap3D = ({ dests }) => {
                         if (rank === N-1) {
                             p.textAlign(p.RIGHT, p.BOTTOM);
                             p.fill("black")
-                            p.text(String.fromCharCode(root + file), 2, 52)
+                            p.text(String.fromCharCode(root + file), 4, 52)
                         }
 
                         p.pop();
                     }
                 }
             };
+
             p.mouseDragged = () => {
                 rotY += p.movedX;
                 rotX += -p.movedY;
                 console.log(rotX, rotY);
             };
         });
+
         return remove;
     }, [freqs, root]);
 
-    return <div ref={renderRef} className="double-column left"></div>;
+    return <div ref={renderRef} className="row"></div>;
 };
+
+const HeatMaps = ({dests}) => {
+    const [type, setType] = useState()
+
+    return <div className = "double-column left">
+        <HeatMapType {...{type, setType}}/>
+        {type === "3D" && <HeatMap3D {...{ dests }} />}
+    </div>
+}
 
 const DestinationFrequenciesByEco = () => {
     const cat = "D";
     const code = "14";
-    const { error, data } = useQuery(GET_DEST_FREQ, {
+    const { error, data, loading } = useQuery(GET_DEST_FREQ, {
         variables: { cat, code },
         skip: !cat,
     });
 
     if (error) console.error(error.toString());
+    if (loading) return <div className="double-column left">Loading...</div>
     if (data) {
         console.dir(data);
         // scrub the data
@@ -316,11 +283,11 @@ const DestinationFrequenciesByEco = () => {
         }, {});
 
         // dests: { "a6": 1, "b4": 1, "b5": 1, "d3": 6, "d6": 6, "f4": 6, ..., "b3": 1, "c1": 2, "f1": 2, "f8": 2, "c8": 1 }
-        return <HeatMap3D {...{ dests }} />;
+        return <HeatMaps {...{ dests }} />
     }
     return null;
 };
 
 
 
-export { Constellation as default, HeatMap3D, DestinationFrequenciesByEco };
+export { Constellation as default, DestinationFrequenciesByEco };

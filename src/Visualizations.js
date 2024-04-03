@@ -1,5 +1,5 @@
 import { Fragment, useState} from "react";
-import Constellation, {HeatMap3D, DestinationFrequenciesByEco} from "./Constellation.js";
+import Constellation, {DestinationFrequenciesByEco} from "./Constellation.js";
 
 const gridStyle = {
     display: "grid",
@@ -12,9 +12,8 @@ const gridStyle = {
 };
 
 const visualizations = {
-    "heatmap 3D": {},
+    "heatmaps": {},
     "ball of mud": {},
-    "destination frequencies": {},
 };
 
 
@@ -24,10 +23,9 @@ const fen = "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2";
 const type = "pathBySquare";
 
 const Display = ({ viz }) => {
-    if (viz === "heatmap 3D") return <HeatMap3D></HeatMap3D>;
+    if (viz === "heatmaps") return <DestinationFrequenciesByEco />;
     if (viz === "ball of mud") return <Constellation {...{ fen, type }} />;
-    if (viz === "destination frequencies") return <DestinationFrequenciesByEco />;
-    return null;
+    return <div className="double-column left"/>;
 };
 
 const Visualization = () => {
@@ -45,6 +43,7 @@ const Visualization = () => {
                         textAlign: "left",
                         marginLeft: "1em",
                     }}
+                    className="font-cinzel"
                 >
                     Visualizations
                 </span>
