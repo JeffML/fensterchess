@@ -1,6 +1,7 @@
 import { useQuery, gql } from "@apollo/client";
 import { useRef, useEffect, useMemo, useState } from "react";
 import p5 from "p5";
+import ecoCodes from './common/ecoCodes.js'
 
 const GET_OPENING_PATHS = gql`
     query getPaths($type: String!, $fen: String!) {
@@ -129,11 +130,15 @@ const Constellation = ({ fen, type }) => {
 };
 
 const HeatMapType = ({type, setType}) => {
-    return <div className="row">
+    return <div className="row" id="heatmaptype">
         <label>2D<input type="radio" name="type" defaultChecked={type==="2D"} onClick={()=>setType("2D")}/></label><br/>
         <label>3D<input type="radio" name="type" defaultChecked={type==="3D"} onClick={()=>setType("3D")}/></label>
     </div>
 }
+
+
+
+
 
 // see "3d grid" @ https://editor.p5js.org/otsohavanto/sketches/OHPamV3P2
 const HeatMap3D = ({ dests }) => {
@@ -254,18 +259,19 @@ const HeatMap3D = ({ dests }) => {
     return <div ref={renderRef} className="row"></div>;
 };
 
-const HeatMaps = ({dests}) => {
+const HeatMaps = ({dests, cat, setCat, code, setCode}) => {
     const [type, setType] = useState()
 
     return <div className = "double-column left">
         <HeatMapType {...{type, setType}}/>
-        {type === "3D" && <HeatMap3D {...{ dests }} />}
+        {/* <EcoCatCode {...{setCat, setCode}} /> */}
+        {type === "3D" && <HeatMap3D {...{ dests, cat, code }} />}
     </div>
 }
 
-const DestinationFrequenciesByEco = () => {
-    const cat = "D";
-    const code = "14";
+const DestinationFrequenciesByEco = ({cat}) => {
+    const [code, setCode] = useState()
+
     const { error, data, loading } = useQuery(GET_DEST_FREQ, {
         variables: { cat, code },
         skip: !cat,
@@ -274,7 +280,6 @@ const DestinationFrequenciesByEco = () => {
     if (error) console.error(error.toString());
     if (loading) return <div className="double-column left">Loading...</div>
     if (data) {
-        console.dir(data);
         // scrub the data
         const dests = data.getDestinationSquareByFrequency.reduce((acc, d) => {
             const dest = d.key[2].substr(-2);
@@ -283,7 +288,7 @@ const DestinationFrequenciesByEco = () => {
         }, {});
 
         // dests: { "a6": 1, "b4": 1, "b5": 1, "d3": 6, "d6": 6, "f4": 6, ..., "b3": 1, "c1": 2, "f1": 2, "f8": 2, "c8": 1 }
-        return <HeatMaps {...{ dests }} />
+        return <HeatMaps {...{ dests, setCode }} />
     }
     return null;
 };
