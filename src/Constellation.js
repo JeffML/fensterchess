@@ -302,6 +302,8 @@ const HeatMaps = ({ dests, cat, code }) => {
 };
 
 const DestinationFrequenciesByEco = ({ cat, code }) => {
+    if (code === "all") code = undefined
+    
     const { error, data, loading } = useQuery(GET_DEST_FREQ, {
         variables: { cat, code },
         skip: !cat,
