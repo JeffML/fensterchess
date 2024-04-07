@@ -289,11 +289,9 @@ const HeatMap3D = ({ dests }) => {
     return <div ref={renderRef} className="row"></div>;
 };
 
-const HeatMaps = ({ dests, cat, code }) => {
-    const [type, setType] = useState();
-
+const HeatMaps = ({ dests, cat, code, type, setType }) => {
     return (
-        <div className="double-column left">
+        <div className="double-column left" style={{marginTop: "1em"}}>
             <HeatMapType {...{ type, setType }} />
             <br />
             {type === "3D" && <HeatMap3D {...{ dests, cat, code }} />}
@@ -303,11 +301,13 @@ const HeatMaps = ({ dests, cat, code }) => {
 
 const DestinationFrequenciesByEco = ({ cat, code }) => {
     if (code === "all") code = undefined
-    
+
     const { error, data, loading } = useQuery(GET_DEST_FREQ, {
         variables: { cat, code },
         skip: !cat,
     });
+
+    const [type, setType] = useState();
 
     if (error) console.error(error.toString());
     if (loading) return <div className="double-column left">Loading...</div>;
@@ -321,7 +321,7 @@ const DestinationFrequenciesByEco = ({ cat, code }) => {
 
         // const fakeDests = {"b4": 5, "g6": 3}
         // return <HeatMaps {...{ dests: fakeDests, cat, code }} />;
-        return <HeatMaps {...{ dests, cat, code }} />;
+        return <HeatMaps {...{ dests, cat, code, type, setType }} />;
     }
     return null;
 };

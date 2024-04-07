@@ -84,7 +84,7 @@ const Display = ({ viz }) => {
         return (
             <div className="double-column left">
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
-                <DestinationFrequenciesByEco {...{cat, code}}/>
+                <DestinationFrequenciesByEco {...{ cat, code }} />
             </div>
         );
     if (viz === "ball of mud") return <Constellation {...{ fen, type }} />;
@@ -110,17 +110,23 @@ const Visualization = () => {
                 >
                     Visualizations
                 </span>
-                {Object.keys(visualizations).map((k) => (
-                    <Fragment key={k}>
-                        <input
-                            type="radio"
-                            name="viz"
-                            value={k}
-                            onClick={handler}
-                        ></input>
-                        <span className="left">{k}</span>
-                    </Fragment>
-                ))}
+                <div
+                    style={{ display: "grid", gridTemplateColumns: "1fr"}}
+                >
+                    {Object.keys(visualizations).map((k) => (
+                        <Fragment key={k}>
+                            <label>
+                            <input
+                                type="radio"
+                                name="viz"
+                                value={k}
+                                onClick={handler}
+                                style={{width: "1em"}}
+                            ></input>
+                            {k}</label>
+                        </Fragment>
+                    ))}
+                </div>
             </div>
             <Display {...{ viz }} />
         </div>
