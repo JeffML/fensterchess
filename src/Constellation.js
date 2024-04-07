@@ -1,7 +1,6 @@
 import { useQuery, gql } from "@apollo/client";
 import { useRef, useEffect, useMemo, useState } from "react";
 import p5 from "p5";
-import ecoCodes from './common/ecoCodes.js'
 
 const GET_OPENING_PATHS = gql`
     query getPaths($type: String!, $fen: String!) {
@@ -33,7 +32,7 @@ const GET_DEST_FREQ = gql`
     }
 `;
 
-const RF_DEGREES = 22.5; 
+const RF_DEGREES = 22.5;
 
 const getXYZ = ([radius, rank, file]) => {
     const fDeg = file * RF_DEGREES;
@@ -129,16 +128,31 @@ const Constellation = ({ fen, type }) => {
     return <div ref={renderRef} className="double-column left"></div>;
 };
 
-const HeatMapType = ({type, setType}) => {
-    return <div className="row" id="heatmaptype">
-        <label>2D<input type="radio" name="type" defaultChecked={type==="2D"} onClick={()=>setType("2D")}/></label><br/>
-        <label>3D<input type="radio" name="type" defaultChecked={type==="3D"} onClick={()=>setType("3D")}/></label>
-    </div>
-}
-
-
-
-
+const HeatMapType = ({ type, setType }) => {
+    return (
+        <div className="row" id="heatmaptype">
+            <label>
+                2D
+                <input
+                    type="radio"
+                    name="type"
+                    defaultChecked={type === "2D"}
+                    onClick={() => setType("2D")}
+                />
+            </label>
+            <br />
+            <label>
+                3D
+                <input
+                    type="radio"
+                    name="type"
+                    defaultChecked={type === "3D"}
+                    onClick={() => setType("3D")}
+                />
+            </label>
+        </div>
+    );
+};
 
 // see "3d grid" @ https://editor.p5js.org/otsohavanto/sketches/OHPamV3P2
 const HeatMap3D = ({ dests }) => {
@@ -175,18 +189,25 @@ const HeatMap3D = ({ dests }) => {
             let font;
 
             p.preload = () => {
-               font = p.loadFont("resources/Cinzel-Medium.ttf")
-            }
+                font = p.loadFont("resources/Cinzel-Medium.ttf");
+            };
 
             p.setup = () => {
                 p.createCanvas(width, height, p.WEBGL).parent(
                     renderRef.current
                 );
                 p.noStroke();
-                p.ortho(-width, width, -height, height/2, -width * 4, width * 4);
+                p.ortho(
+                    -width,
+                    width,
+                    -height,
+                    height / 2,
+                    -width * 4,
+                    width * 4
+                );
                 sliderZ = p.createSlider(-20, -10, 45);
                 p.angleMode(p.DEGREES);
-                p.textFont(font)
+                p.textFont(font);
             };
 
             p.draw = () => {
@@ -212,12 +233,13 @@ const HeatMap3D = ({ dests }) => {
                 p.rotateY(rotY);
                 p.rotateZ(rotZ);
                 p.scale(1.5);
+
                 let color = (rank, file) => {
                     if (rank % 2) {
                         // odd
-                        return file % 2 ? "white" : "black";
+                        return file % 2 ? "dimgray" : "white";
                     }
-                    return file % 2 ? "black" : "white";
+                    return file % 2 ? "white" : "dimgray";
                 };
 
                 for (let rank = 0; rank < N; rank++) {
@@ -229,19 +251,27 @@ const HeatMap3D = ({ dests }) => {
                         p.fill(color(rank, file));
                         p.push();
 
-                        p.translate(x, y, z / 2 - height / 3);
+                        p.translate(x, -y, z / 2 - height / 3);
                         p.box(30, 30, z);
-                        if (file === 0) {
-                            p.fill("black")
-                            p.text(N - rank, -22, -22)
-                        }
-                        if (rank === N-1) {
-                            p.textAlign(p.RIGHT, p.BOTTOM);
-                            p.fill("black")
-                            p.text(String.fromCharCode(root + file), 4, 52)
-                        }
-
                         p.pop();
+
+                        // p.translate(x, -y, z / 2 - height / 3);
+
+                        if (file === 0) {
+                            p.push();
+                            p.translate(x, -y, -calcHeight(0,0)*14);
+                            p.fill("black");
+                            p.text(rank + 1, -22, -22);
+                            p.pop()
+                        }
+                        if (rank === 0) {
+                            p.push();
+                            p.textAlign(p.RIGHT, p.BOTTOM);
+                            p.translate(x, -y, -calcHeight(0,0)*12);
+                            p.fill("black");
+                            p.text(String.fromCharCode(root + file), 4, 52);
+                            p.pop()
+                        }
                     }
                 }
             };
@@ -259,26 +289,26 @@ const HeatMap3D = ({ dests }) => {
     return <div ref={renderRef} className="row"></div>;
 };
 
-const HeatMaps = ({dests, cat, setCat, code, setCode}) => {
-    const [type, setType] = useState()
+const HeatMaps = ({ dests, cat, code }) => {
+    const [type, setType] = useState();
 
-    return <div className = "double-column left">
-        <HeatMapType {...{type, setType}}/>
-        {/* <EcoCatCode {...{setCat, setCode}} /> */}
-        {type === "3D" && <HeatMap3D {...{ dests, cat, code }} />}
-    </div>
-}
+    return (
+        <div className="double-column left">
+            <HeatMapType {...{ type, setType }} />
+            <br />
+            {type === "3D" && <HeatMap3D {...{ dests, cat, code }} />}
+        </div>
+    );
+};
 
-const DestinationFrequenciesByEco = ({cat}) => {
-    const [code, setCode] = useState()
-
+const DestinationFrequenciesByEco = ({ cat, code }) => {
     const { error, data, loading } = useQuery(GET_DEST_FREQ, {
         variables: { cat, code },
         skip: !cat,
     });
 
     if (error) console.error(error.toString());
-    if (loading) return <div className="double-column left">Loading...</div>
+    if (loading) return <div className="double-column left">Loading...</div>;
     if (data) {
         // scrub the data
         const dests = data.getDestinationSquareByFrequency.reduce((acc, d) => {
@@ -287,12 +317,11 @@ const DestinationFrequenciesByEco = ({cat}) => {
             return acc;
         }, {});
 
-        // dests: { "a6": 1, "b4": 1, "b5": 1, "d3": 6, "d6": 6, "f4": 6, ..., "b3": 1, "c1": 2, "f1": 2, "f8": 2, "c8": 1 }
-        return <HeatMaps {...{ dests, setCode }} />
+        // const fakeDests = {"b4": 5, "g6": 3}
+        // return <HeatMaps {...{ dests: fakeDests, cat, code }} />;
+        return <HeatMaps {...{ dests, cat, code }} />;
     }
     return null;
 };
-
-
 
 export { Constellation as default, DestinationFrequenciesByEco };

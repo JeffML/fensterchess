@@ -21,7 +21,7 @@ const visualizations = {
 const fen = "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2";
 const type = "pathBySquare";
 
-const EcoCatCode = ({ cat, setCat }) => {
+const EcoCatCode = ({ cat, setCat, setCode }) => {
     const cats = Object.keys(ecoCodes);
     const gridStyle = {
         display: "grid",
@@ -36,7 +36,7 @@ const EcoCatCode = ({ cat, setCat }) => {
             <span className="left font-cinzel">ECO Categories</span>
             <div style={{ ...gridStyle }}>
                 {cats.map((c) => (
-                    <label>
+                    <label key={c}>
                         {c}
                         <input
                             display="inline"
@@ -44,7 +44,6 @@ const EcoCatCode = ({ cat, setCat }) => {
                             name="cat"
                             defaultChecked={cat === c}
                             value={c}
-                            key={c}
                             onChange={() => setCat(c)}
                         />
                     </label>
@@ -54,9 +53,17 @@ const EcoCatCode = ({ cat, setCat }) => {
                 <>
                     <span className="left font-cinzel">ECO Codes</span>
                     <div>
-                        <select size={5}>
+                        <select
+                            size={5}
+                            onChange={({ target }) => {
+                                setCode(target.value);
+                            }}
+                        >
+                            <option value={"all"} key="x">
+                                All
+                            </option>
                             {ecoCodes[cat].map((entry) => (
-                                <option value={entry[0]}>
+                                <option value={entry[0]} key={entry[0]}>
                                     {cat}
                                     {entry[0]} {entry[1]}
                                 </option>
@@ -77,7 +84,7 @@ const Display = ({ viz }) => {
         return (
             <div className="double-column left">
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
-                <DestinationFrequenciesByEco />
+                <DestinationFrequenciesByEco {...{cat, code}}/>
             </div>
         );
     if (viz === "ball of mud") return <Constellation {...{ fen, type }} />;
