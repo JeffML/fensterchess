@@ -4,7 +4,6 @@ import { useState } from "react";
 import {modes} from "./common/consts.js";
 import { ExitButton } from "./common/buttons.js";
 // import TestComponent, {TestComponent2} from "./TestComponent.js";
-import Constellation from "./Constellation.js";
 
 const GET_DATABASES = gql`
     query GetDatabases {
@@ -105,7 +104,7 @@ const AdminPage = ({ setMode }) => {
     return (
         <>
             <div className="row centered">
-                <Constellation /> { /* {fen, type} */}
+                
             </div>
             <div className="row">
                 <div className="column centered">

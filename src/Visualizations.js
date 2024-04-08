@@ -1,5 +1,6 @@
 import { Fragment, useState } from "react";
-import Constellation, { DestinationFrequenciesByEco } from "./Constellation.js";
+import { DestinationFrequenciesByEco } from "./vizzes/Constellation.js";
+import Constellation from "./vizzes/BallOfMud.js";
 import ecoCodes from "./common/ecoCodes.js";
 
 const gridStyle = {
@@ -98,38 +99,44 @@ const Visualization = () => {
     };
 
     return (
-        <div className="row white">
-            <div style={gridStyle} className="column">
-                <span
-                    style={{
-                        gridColumn: "1 / span 2",
-                        textAlign: "left",
-                        marginLeft: "1em",
-                    }}
-                    className="font-cinzel"
-                >
-                    Visualizations
-                </span>
-                <div
-                    style={{ display: "grid", gridTemplateColumns: "1fr"}}
-                >
-                    {Object.keys(visualizations).map((k) => (
-                        <Fragment key={k}>
-                            <label>
-                            <input
-                                type="radio"
-                                name="viz"
-                                value={k}
-                                onClick={handler}
-                                style={{width: "1em"}}
-                            ></input>
-                            {k}</label>
-                        </Fragment>
-                    ))}
+        <>
+            <h2 style={{ fontFamily: "arial" }}>
+                (These are experimental. Don't overthink.)
+            </h2>
+            <div className="row white">
+                <div style={gridStyle} className="column">
+                    <span
+                        style={{
+                            gridColumn: "1 / span 2",
+                            textAlign: "left",
+                            marginLeft: "1em",
+                        }}
+                        className="font-cinzel"
+                    >
+                        Visualizations
+                    </span>
+                    <div
+                        style={{ display: "grid", gridTemplateColumns: "1fr" }}
+                    >
+                        {Object.keys(visualizations).map((k) => (
+                            <Fragment key={k}>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="viz"
+                                        value={k}
+                                        onClick={handler}
+                                        style={{ width: "1em" }}
+                                    ></input>
+                                    {k}
+                                </label>
+                            </Fragment>
+                        ))}
+                    </div>
                 </div>
+                <Display {...{ viz }} />
             </div>
-            <Display {...{ viz }} />
-        </div>
+        </>
     );
 };
 
