@@ -37,7 +37,7 @@ const HeatMap2D = ({ dests }) => {
     const heatmap = new HeatMap(ordinals, destsToRows(dests));
     const data = heatmap.getData();
 
-    const ranks = data.rows.map(({ cells }) => {
+    const ranks = data.rows.reverse().map(({ cells }) => {
         return cells.colors.map((rgb,i) => <Square {...{rgb, value:cells.values[i]}} />);
     });
 
