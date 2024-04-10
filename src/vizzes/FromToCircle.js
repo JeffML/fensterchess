@@ -1,5 +1,7 @@
 import { useRef, useEffect } from "react";
 import p5 from "p5";
+import getColorForValue from "./colorGradient.js";
+
 
 const FromToCircleImpl = () => {
 
@@ -10,6 +12,7 @@ const FromToCircleImpl = () => {
         var r; //radius
         var angle;
         var step; //distance between steps in radians
+        let stepCount = 0
 
         new p5((p) => {
             remove = p.remove;
@@ -26,6 +29,10 @@ const FromToCircleImpl = () => {
 
     p.draw = () => {
         // background(220);
+        const value = ++stepCount%64 * step;
+        let color = getColorForValue(value/10)
+        console.log(value, color)
+        p.stroke(...color.map(c => c*255))
 
         //move 0,0 to the center of the screen
         p.translate(p.width / 2, p.height / 2);
