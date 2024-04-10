@@ -2,7 +2,6 @@ import { useQuery, gql } from "@apollo/client";
 import { useState } from "react";
 import { HeatMap3D } from "./HeatMap3D.js";
 import { HeatMap2D } from "./HeatMap2D.js";
-import { BallOfMud } from "./BallOfMud.js";
 
 export const GET_OPENING_PATHS = gql`
     query getPaths($type: String!, $fen: String!) {
@@ -126,6 +125,6 @@ const DestinationFrequenciesByEco = ({ cat, code }) => {
         return <HeatMaps {...{ dests, type, setType }} />;
     }
     return null;
-};
+}
 
-export { BallOfMud as default, DestinationFrequenciesByEco };
+export {  DestinationFrequenciesByEco as MostActiveSquaresByEco };

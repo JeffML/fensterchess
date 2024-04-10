@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
-import { DestinationFrequenciesByEco } from "./vizzes/Constellation.js";
-import Constellation from "./vizzes/BallOfMud.js";
+import { MostActiveSquaresByEco } from "./vizzes/MostActive.js";
+import {FromToCircle} from "./vizzes/FromToCircle.js"
 import ecoCodes from "./common/ecoCodes.js";
 
 const gridStyle = {
@@ -14,7 +14,8 @@ const gridStyle = {
 };
 
 const visualizations = {
-    heatmaps: {},
+    "from-to circle": {},
+    "most active squares": {},
     "ball of mud": {},
 };
 
@@ -81,14 +82,15 @@ const Display = ({ viz }) => {
     const [cat, setCat] = useState();
     const [code, setCode] = useState();
 
-    if (viz === "heatmaps")
+    if (viz === "most active squares")
         return (
             <div className="double-column left">
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
-                <DestinationFrequenciesByEco {...{ cat, code }} />
+                <MostActiveSquaresByEco {...{ cat, code }} />
             </div>
         );
-    if (viz === "ball of mud") return <Constellation {...{ fen, type }} />;
+    if (viz === "ball of mud") return <MostActiveSquaresByEco {...{ fen, type }} />;
+    if (viz === "from-to circle") return <FromToCircle />
     return <div className="double-column left" />;
 };
 
@@ -100,8 +102,8 @@ const Visualization = () => {
 
     return (
         <>
-            <h2 style={{ fontFamily: "arial" }}>
-                (These are experimental. Don't overthink.)
+            <h2 style={{ fontFamily: "arial", color:"white" }}>
+                (Experimental. Don't overthink.)
             </h2>
             <div className="row white">
                 <div style={gridStyle} className="column">

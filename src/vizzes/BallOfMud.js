@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { useRef, useEffect, useMemo } from "react";
 import p5 from "p5";
-import { GET_OPENING_PATHS, calcPaths } from "./Constellation.js";
+import { GET_OPENING_PATHS, calcPaths } from "./MostActive.js";
 
 export const BallOfMud = ({ fen, type }) => {
     const renderRef = useRef();
