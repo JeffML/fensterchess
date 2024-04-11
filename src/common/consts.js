@@ -44,7 +44,10 @@ const alias = process.env.REACT_APP_SERVER; // this can be set as follows: "REAC
 
 // prettier-ignore
 const serverUri = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}/.netlify/functions/server`;
-console.log(`alias was ${alias}, serverUri is ${serverUri}`)
+// console.log(`alias was ${alias}, serverUri is ${serverUri}`)
+
+const RANKS = [1, 2, 3, 4, 5, 6, 7, 8];
+const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 export {
     APP_NAME,
@@ -59,4 +62,6 @@ export {
     VERSION,
     token,
     serverUri,
+    RANKS,
+    FILES,
 };

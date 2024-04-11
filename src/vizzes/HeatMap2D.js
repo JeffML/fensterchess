@@ -1,4 +1,5 @@
 import HeatMap from "jsheatmap";
+import {RANKS as ordinals, FILES as files} from '../common/consts.js' 
 
 const square = {
     width: "2em",
@@ -12,9 +13,6 @@ const gridStyle = {
     gridTemplateColumns: "repeat(8, 1fr)",
     gridGap: "1px",
 };
-
-const ordinals = [1, 2, 3, 4, 5, 6, 7, 8];
-const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 const rgbColor = (rgb) =>
     `rgb(${rgb.red * 100}%, ${rgb.green * 100}%, ${rgb.blue * 100}%)`;
