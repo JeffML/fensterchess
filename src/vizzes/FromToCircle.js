@@ -13,16 +13,13 @@ import { FILES, RANKS } from "../common/consts.js";
         (a1 - 8)/63 = (9-8)/65 = 1/65
         (h8 - 8)/63 = (72-8)/65 = 64/65
         */
-// const calcColor = (square) => {
-const squareColors = FILES.map((_, file) =>
+
+const squareColors = FILES.map((file, fileNo) =>
     RANKS.map((rank) => {
-        const squareInt = 8 * file + rank;
-        return getColorForValue((squareInt - 8) / 65);
+        const squareInt = 8 * fileNo + rank;
+        return {file, rank, color: getColorForValue((squareInt - 8) / 65)};
     })
 ).flat();
-
-// return squareColors.flatten()
-// }
 
 const FromToCircleImpl = () => {
     const renderRef = useRef();
@@ -41,18 +38,17 @@ const FromToCircleImpl = () => {
                 p.createCanvas(600, 600);
 
                 //initialize variables
-                r = 200;
+                r = 250;
                 angle = 0;
-                step = p.TWO_PI / 64; //in radians equivalent of 360/6 in degrees
+                step = p.TWO_PI / 64; //in radians equivalent of 360/64 in degrees
+                p.ellipseMode(p.CENTER);
+                p.textAlign(p.CENTER, p.CENTER);
+                p.textFont("Georgia");
             };
 
             p.draw = () => {
-                // background(220);
-                // const value = (++stepCount % 64) * step;
-
+                let {file, rank, color} = squareColors[stepCount++ % 64]
                 p.push();
-                let color = squareColors[stepCount++ % 64];
-                // console.log(value, color);
                 p.stroke(...color.map((c) => c * 255));
 
                 //move 0,0 to the center of the screen
@@ -61,11 +57,14 @@ const FromToCircleImpl = () => {
                 //convert polar coordinates to cartesian coordinates
                 var x = r * p.sin(angle);
                 var y = r * p.cos(angle);
+                var lx = (r-10) * p.sin(angle);
+                var ly = (r-10) * p.cos(angle);
 
                 //draw ellipse at every x,y point
-                p.ellipse(x, y, 10);
+                p.ellipse(x, y, 30);
+                p.text(`${file}${rank}`, x, y)
 
-                p.line(0, 0, x, y);
+                p.line(0, 0, lx, ly);
 
                 //increase angle by step size
                 angle = angle + step;

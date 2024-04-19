@@ -1,10 +1,4 @@
-// const defaultGradients = [
-//     [0, 0, 1, 0.0], // blue
-//     [0, 1, 1, 0.34], // cyan
-//     [0, 1, 0, 0.5], // green
-//     [1, 1, 0, 0.66], // yellow
-//     [1, 0, 0, 1.0], // red
-// ];
+
 
 const defaultGradients = [
     [0, 0, .5, 0.0],
@@ -22,21 +16,6 @@ const defaultGradients = [
     [1, .5, 0, 0.92],
     [1, .5, .5, 1.0]
 ]
-
-// const dg = () => {
-//     const grads = [[0, 0, 1, 0.0]]
-
-//     for (let i = 1; i <= 64; i++) {
-//         if (i/64 < 0.34) grads[i-1] = [0, 1, 1, i/64]
-//         else if (i/64 < 0.5) grads[i-1] = [0, 1, 0, i/64]
-//         else if (i/64 < 0.66) grads[i-1] = [1, 1, 0, i/64]
-//         else grads[i-1] = [1, 0, 0, 1.0]
-//     }
-
-//     return grads
-// }
-
-// const defaultGradients = dg();
 
 //-- Inputs a (value) between 0 and 1 and outputs the [(red), (green) and (blue)]
 //-- values representing that position in the gradient.
