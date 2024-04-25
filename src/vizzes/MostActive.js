@@ -53,7 +53,7 @@ const calcPath = ({ start, coords, radius }) => {
     return [orig, ...rest];
 };
 
-export const calcPaths = ({ from, at, to, radius }) => {
+const calcPaths = ({ from, at, to, radius }) => {
     const fromPaths = from.map((coords) =>
         calcPath({ start: [0, 0, 0], coords, radius })
     );
@@ -127,4 +127,4 @@ const DestinationFrequenciesByEco = ({ cat, code }) => {
     return null;
 }
 
-export {  DestinationFrequenciesByEco as MostActiveSquaresByEco };
+export {  DestinationFrequenciesByEco as MostActiveSquaresByEco, calcPaths };
