@@ -1,7 +1,18 @@
 import { useRef, useEffect } from "react";
+import { useQuery, gql } from "@apollo/client";
 import p5 from "p5";
 import getColorForValue from "./colorGradient.js";
 import { FILES, RANKS } from "../common/consts.js";
+
+const GET_FROM_TO = gql`
+    query getFromTo($cat: String!, $code: String) {
+        getFromTo(cat: $cat, code: $code) {
+            eco
+            fen
+            moves
+        }
+    }
+`;
 
 /*
         TODO: 
@@ -17,7 +28,7 @@ import { FILES, RANKS } from "../common/consts.js";
 const squareColors = FILES.map((file, fileNo) =>
     RANKS.map((rank) => {
         const squareInt = 8 * fileNo + rank;
-        return {file, rank, color: getColorForValue((squareInt - 8) / 65)};
+        return { file, rank, color: getColorForValue((squareInt - 8) / 65) };
     })
 ).flat();
 
@@ -47,7 +58,7 @@ const FromToCircleImpl = () => {
             };
 
             p.draw = () => {
-                let {file, rank, color} = squareColors[stepCount++ % 64]
+                let { file, rank, color } = squareColors[stepCount++ % 64];
                 p.push();
                 p.stroke(...color.map((c) => c * 255));
 
@@ -57,12 +68,12 @@ const FromToCircleImpl = () => {
                 //convert polar coordinates to cartesian coordinates
                 var x = r * p.sin(angle);
                 var y = r * p.cos(angle);
-                var lx = (r-10) * p.sin(angle);
-                var ly = (r-10) * p.cos(angle);
+                var lx = (r - 10) * p.sin(angle);
+                var ly = (r - 10) * p.cos(angle);
 
                 //draw ellipse at every x,y point
                 p.ellipse(x, y, 30);
-                p.text(`${file}${rank}`, x, y)
+                p.text(`${file}${rank}`, x, y);
 
                 p.line(0, 0, lx, ly);
 
@@ -80,14 +91,29 @@ const FromToCircleImpl = () => {
 };
 
 const FromToCircle = () => {
-    return (
-        <>
-            <div className="column"></div>
-            <div className="double-column left" style={{ marginTop: "1em" }}>
-                <FromToCircleImpl />
-            </div>
-        </>
-    );
+    const cat = "B";
+    const code = "02";
+    
+    const { error, data, loading } = useQuery(GET_FROM_TO, {
+        variables: { cat, code },
+        skip: !cat,
+    });
+
+    if (error) console.error(error);
+    if (data) {
+        console.dir(data, { depth: 3 });
+        return (
+            <>
+                <div className="column"></div>
+                <div
+                    className="double-column left"
+                    style={{ marginTop: "1em" }}
+                >
+                    <FromToCircleImpl />
+                </div>
+            </>
+        );
+    }
 };
 
 export { FromToCircle };
