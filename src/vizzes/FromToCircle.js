@@ -32,7 +32,7 @@ const squareColors = FILES.map((file, fileNo) =>
     })
 ).flat();
 
-const FromToCircleImpl = () => {
+const FromToCircleImpl = ({moves}) => {
     const renderRef = useRef();
 
     useEffect(() => {
@@ -41,6 +41,8 @@ const FromToCircleImpl = () => {
         var angle;
         var step; //distance between steps in radians
         let stepCount = 0;
+        const moveCoords = []
+    
 
         new p5((p) => {
             remove = p.remove;
@@ -55,21 +57,28 @@ const FromToCircleImpl = () => {
                 p.ellipseMode(p.CENTER);
                 p.textAlign(p.CENTER, p.CENTER);
                 p.textFont("Georgia");
+
+                for (let stepp = 0; stepp < 64; stepp++) {
+                    const newAngle = angle + step * stepp
+                    var x = r * p.sin(newAngle);
+                    var y = r * p.cos(newAngle);
+                    var lx = (r - 10) * p.sin(newAngle);
+                    var ly = (r - 10) * p.cos(newAngle);
+                    let { file, rank, color } = squareColors[stepp];
+
+                    moveCoords[stepp] = {file, rank, color, x, y, lx, ly}
+                }
             };
 
             p.draw = () => {
-                let { file, rank, color } = squareColors[stepCount++ % 64];
                 p.push();
-                p.stroke(...color.map((c) => c * 255));
 
                 //move 0,0 to the center of the screen
                 p.translate(p.width / 2, p.height / 2);
 
-                //convert polar coordinates to cartesian coordinates
-                var x = r * p.sin(angle);
-                var y = r * p.cos(angle);
-                var lx = (r - 10) * p.sin(angle);
-                var ly = (r - 10) * p.cos(angle);
+                const {x, y, lx, ly, file, rank, color} = moveCoords[stepCount]
+                
+                p.stroke(...color.map((c) => c * 255));
 
                 //draw ellipse at every x,y point
                 p.ellipse(x, y, 30);
@@ -79,6 +88,8 @@ const FromToCircleImpl = () => {
 
                 //increase angle by step size
                 angle = angle + step;
+
+                stepCount = ++stepCount % 64
 
                 p.pop();
             };
@@ -93,7 +104,7 @@ const FromToCircleImpl = () => {
 const FromToCircle = () => {
     const cat = "B";
     const code = "02";
-    
+
     const { error, data, loading } = useQuery(GET_FROM_TO, {
         variables: { cat, code },
         skip: !cat,
@@ -101,7 +112,7 @@ const FromToCircle = () => {
 
     if (error) console.error(error);
     if (data) {
-        console.dir(data, { depth: 3 });
+        // console.dir(data, { depth: 3 });
         return (
             <>
                 <div className="column"></div>
@@ -109,7 +120,7 @@ const FromToCircle = () => {
                     className="double-column left"
                     style={{ marginTop: "1em" }}
                 >
-                    <FromToCircleImpl />
+                    <FromToCircleImpl {...{moves: data.moves}}/>
                 </div>
             </>
         );
