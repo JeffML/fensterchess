@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { MostActiveSquaresByEco } from "./vizzes/MostActive.js";
 import { FromToCircle } from "./vizzes/FromToCircle.js";
+import {BallOfMud}  from "./vizzes/BallOfMud.js"
 import ecoCodes from "./common/ecoCodes.js";
 
 const gridStyle = {
@@ -14,7 +15,7 @@ const gridStyle = {
 };
 
 const visualizations = {
-    "from-to circle": {},
+    "from-to squares": {},
     "most active squares": {},
     // "ball of mud": {},               TODO (or not)
 };
@@ -81,10 +82,12 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
 const Display = ({ viz }) => {
     const [cat, setCat] = useState();
     const [code, setCode] = useState();
-    if (!viz)        
+    if (!viz)
         return (
-         <div className="double-column left"><br/>
-    <img src="resources/ekthpeeramenths.jpg"/></div>)
+            <div className="double-column left" style={{marginTop:"1em"}}>
+                <img src="resources/ekthpeeramenths.jpg" />
+            </div>
+        );
     if (viz === "most active squares")
         return (
             <div className="double-column left">
@@ -93,8 +96,8 @@ const Display = ({ viz }) => {
             </div>
         );
     if (viz === "ball of mud")
-        return <MostActiveSquaresByEco {...{ fen, type }} />;
-    if (viz === "from-to circle")
+        return <BallOfMud {...{ fen, type }} />;
+    if (viz === "from-to squares")
         return (
             <div className="double-column left">
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
@@ -112,13 +115,14 @@ const Visualization = () => {
 
     return (
         <>
-            <div className="row white">
-                <div style={gridStyle} className="column">
+            <div className="row white left">
+                <div style={gridStyle} className="column left">
                     <span
                         style={{
                             gridColumn: "1 / span 2",
                             textAlign: "left",
                             marginLeft: "1em",
+                            fontSize: "larger"
                         }}
                         className="font-cinzel"
                     >
@@ -128,22 +132,22 @@ const Visualization = () => {
                         style={{ display: "grid", gridTemplateColumns: "1fr" }}
                     >
                         {Object.keys(visualizations).map((k) => (
-                            <Fragment key={k}>
+                            <div key={k} style={{display:"flex", marginLeft:"2em"}}>
                                 <label>
                                     <input
                                         type="radio"
                                         name="viz"
                                         value={k}
                                         onClick={handler}
-                                        style={{ width: "1em" }}
+                                        style={{ width: "1em"}}
                                     ></input>
                                     {k}
                                 </label>
-                            </Fragment>
+                            </div>
                         ))}
                     </div>
                 </div>
-                <Display {...{ viz }} />
+                <Display {...{ viz }}/>
             </div>
         </>
     );

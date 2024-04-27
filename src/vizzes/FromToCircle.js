@@ -93,7 +93,6 @@ const FromToCircleImpl = ({ moves }) => {
                 p.translate(p.width / 2, p.height / 2);
                 if (moves)
                     moves.forEach((move) => {
-
                         // note the == for rank: integer vs string issue
                         const fromCoord = moveCoords.find(
                             ({ file, rank }) =>
@@ -118,11 +117,10 @@ const FromToCircleImpl = ({ moves }) => {
         return remove;
     }, [moves]);
 
-    return <div ref={renderRef} className="row"></div>;
+    return <div ref={renderRef}></div>;
 };
 
-const FromToCircle = ({cat, code}) => {
-
+const FromToCircle = ({ cat, code }) => {
     const { error, data } = useQuery(GET_FROM_TO, {
         variables: { cat, code },
         skip: !cat,
@@ -145,15 +143,9 @@ const FromToCircle = ({cat, code}) => {
         }
 
         return (
-            <>
-                <div className="column"></div>
-                <div
-                    className="double-column left"
-                    style={{ marginTop: "1em" }}
-                >
-                    <FromToCircleImpl {...{ moves: allMoves }} />
-                </div>
-            </>
+            <div style={{ marginTop: "1em" }}>
+                <FromToCircleImpl {...{ moves: allMoves }} />
+            </div>
         );
     }
 };
