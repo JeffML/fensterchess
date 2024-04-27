@@ -16,7 +16,7 @@ const gridStyle = {
 const visualizations = {
     "from-to circle": {},
     "most active squares": {},
-    "ball of mud": {},
+    // "ball of mud": {},               TODO (or not)
 };
 
 // FIXME: HARDWIRED
@@ -81,7 +81,10 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
 const Display = ({ viz }) => {
     const [cat, setCat] = useState();
     const [code, setCode] = useState();
-
+    if (!viz)        
+        return (
+         <div className="double-column left"><br/>
+    <img src="resources/ekthpeeramenths.jpg"/></div>)
     if (viz === "most active squares")
         return (
             <div className="double-column left">
@@ -109,9 +112,6 @@ const Visualization = () => {
 
     return (
         <>
-            <h2 style={{ fontFamily: "arial", color: "white" }}>
-                (Experimental. Don't overthink.)
-            </h2>
             <div className="row white">
                 <div style={gridStyle} className="column">
                     <span
@@ -122,7 +122,7 @@ const Visualization = () => {
                         }}
                         className="font-cinzel"
                     >
-                        Visualizations
+                        Experimental Visualizations
                     </span>
                     <div
                         style={{ display: "grid", gridTemplateColumns: "1fr" }}
