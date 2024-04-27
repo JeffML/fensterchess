@@ -15,17 +15,6 @@ const GET_FROM_TO = gql`
     }
 `;
 
-/*
-        TODO: 
-        The value should be a number between 0 and 1
-        There are 64 squares
-        The values for each square could be 8*file + rank
-        The input value for getColorForValue would be (squareValue - 8)/65
-        square values:  a1 = 8*1 + 1 = 9; h8 = 8*8 + 8 = 72
-        (a1 - 8)/63 = (9-8)/65 = 1/65
-        (h8 - 8)/63 = (72-8)/65 = 64/65
-        */
-
 const squareColors = FILES.map((file, fileNo) =>
     RANKS.map((rank) => {
         const squareInt = 8 * fileNo + rank;
@@ -85,7 +74,6 @@ const FromToCircleImpl = ({ moves }) => {
                     //increase angle by step size
                     angle = angle + step;
 
-                    // stepCount = ++stepCount % 64
                 } while (stepCount++ < 64);
             };
 
@@ -117,7 +105,7 @@ const FromToCircleImpl = ({ moves }) => {
         return remove;
     }, [moves]);
 
-    return <div ref={renderRef}></div>;
+    return <div ref={renderRef} className="row"></div>;
 };
 
 const FromToCircle = ({ cat, code }) => {
@@ -143,7 +131,7 @@ const FromToCircle = ({ cat, code }) => {
         }
 
         return (
-            <div style={{ marginTop: "1em" }}>
+            <div >
                 <FromToCircleImpl {...{ moves: allMoves }} />
             </div>
         );
