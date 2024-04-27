@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import { useRef, useEffect } from "react";
 import { useQuery, gql } from "@apollo/client";
 import p5 from "p5";
@@ -32,7 +33,7 @@ const squareColors = FILES.map((file, fileNo) =>
     })
 ).flat();
 
-const FromToCircleImpl = ({moves}) => {
+const FromToCircleImpl = ({ moves }) => {
     const renderRef = useRef();
 
     useEffect(() => {
@@ -41,8 +42,7 @@ const FromToCircleImpl = ({moves}) => {
         var angle;
         var step; //distance between steps in radians
         let stepCount = 0;
-        const moveCoords = []
-    
+        const moveCoords = [];
 
         new p5((p) => {
             remove = p.remove;
@@ -59,53 +59,71 @@ const FromToCircleImpl = ({moves}) => {
                 p.textFont("Georgia");
 
                 for (let stepp = 0; stepp < 64; stepp++) {
-                    const newAngle = angle + step * stepp
-                    var x = r * p.sin(newAngle);
-                    var y = r * p.cos(newAngle);
-                    var lx = (r - 10) * p.sin(newAngle);
-                    var ly = (r - 10) * p.cos(newAngle);
+                    const newAngle = angle + step * stepp;
+                    const x = r * p.sin(newAngle);
+                    const y = r * p.cos(newAngle);
+                    const lx = (r - 10) * p.sin(newAngle);
+                    const ly = (r - 10) * p.cos(newAngle);
                     let { file, rank, color } = squareColors[stepp];
 
-                    moveCoords[stepp] = {file, rank, color, x, y, lx, ly}
+                    moveCoords[stepp] = { file, rank, color, x, y, lx, ly };
                 }
-            };
-
-            p.draw = () => {
-                p.push();
 
                 //move 0,0 to the center of the screen
                 p.translate(p.width / 2, p.height / 2);
 
-                const {x, y, lx, ly, file, rank, color} = moveCoords[stepCount]
-                
-                p.stroke(...color.map((c) => c * 255));
+                do {
+                    const { x, y, file, rank, color } =
+                        moveCoords[stepCount % 64];
 
-                //draw ellipse at every x,y point
-                p.ellipse(x, y, 30);
-                p.text(`${file}${rank}`, x, y);
+                    p.stroke(...color.map((c) => c * 255));
 
-                p.line(0, 0, lx, ly);
+                    //draw ellipse at every x,y point
+                    p.ellipse(x, y, 30);
+                    p.text(`${file}${rank}`, x, y);
 
-                //increase angle by step size
-                angle = angle + step;
+                    //increase angle by step size
+                    angle = angle + step;
 
-                stepCount = ++stepCount % 64
+                    // stepCount = ++stepCount % 64
+                } while (stepCount++ < 64);
+            };
 
-                p.pop();
+            p.draw = () => {
+                p.translate(p.width / 2, p.height / 2);
+                if (moves)
+                    moves.forEach((move) => {
+
+                        // note the == for rank: integer vs string issue
+                        const fromCoord = moveCoords.find(
+                            ({ file, rank }) =>
+                                move[0][0] === file && move[0][1] == rank
+                        );
+
+                        const toCoord = moveCoords.find(
+                            ({ file, rank }) =>
+                                move[1][0] === file && move[1][1] == rank
+                        );
+                        p.stroke(...fromCoord.color.map((c) => c * 255));
+                        p.line(
+                            fromCoord.lx,
+                            fromCoord.ly,
+                            toCoord.lx,
+                            toCoord.ly
+                        );
+                    });
             };
         });
 
         return remove;
-    }, []);
+    }, [moves]);
 
     return <div ref={renderRef} className="row"></div>;
 };
 
-const FromToCircle = () => {
-    const cat = "B";
-    const code = "02";
+const FromToCircle = ({cat, code}) => {
 
-    const { error, data, loading } = useQuery(GET_FROM_TO, {
+    const { error, data } = useQuery(GET_FROM_TO, {
         variables: { cat, code },
         skip: !cat,
     });
@@ -113,6 +131,19 @@ const FromToCircle = () => {
     if (error) console.error(error);
     if (data) {
         // console.dir(data, { depth: 3 });
+
+        // TODO: this reduce can probably go into the db view
+        let allMoves = data.getFromTo.reduce((acc, { moves }) => {
+            moves.forEach((move) => acc.add(move.toString()));
+            return acc;
+        }, new Set());
+
+        allMoves = Array.from(new Set(allMoves));
+
+        for (let i = 0; i < allMoves.length; i++) {
+            allMoves[i] = allMoves[i].split(",");
+        }
+
         return (
             <>
                 <div className="column"></div>
@@ -120,7 +151,7 @@ const FromToCircle = () => {
                     className="double-column left"
                     style={{ marginTop: "1em" }}
                 >
-                    <FromToCircleImpl {...{moves: data.moves}}/>
+                    <FromToCircleImpl {...{ moves: allMoves }} />
                 </div>
             </>
         );

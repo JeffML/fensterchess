@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { MostActiveSquaresByEco } from "./vizzes/MostActive.js";
-import {FromToCircle} from "./vizzes/FromToCircle.js"
+import { FromToCircle } from "./vizzes/FromToCircle.js";
 import ecoCodes from "./common/ecoCodes.js";
 
 const gridStyle = {
@@ -89,8 +89,15 @@ const Display = ({ viz }) => {
                 <MostActiveSquaresByEco {...{ cat, code }} />
             </div>
         );
-    if (viz === "ball of mud") return <MostActiveSquaresByEco {...{ fen, type }} />;
-    if (viz === "from-to circle") return <FromToCircle />
+    if (viz === "ball of mud")
+        return <MostActiveSquaresByEco {...{ fen, type }} />;
+    if (viz === "from-to circle")
+        return (
+            <div className="double-column left">
+                <EcoCatCode {...{ cat, setCat, code, setCode }} />
+                <FromToCircle {...{ cat, code }} />
+            </div>
+        );
     return <div className="double-column left" />;
 };
 
@@ -102,7 +109,7 @@ const Visualization = () => {
 
     return (
         <>
-            <h2 style={{ fontFamily: "arial", color:"white" }}>
+            <h2 style={{ fontFamily: "arial", color: "white" }}>
                 (Experimental. Don't overthink.)
             </h2>
             <div className="row white">
