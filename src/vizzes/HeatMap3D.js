@@ -130,5 +130,5 @@ export const HeatMap3D = ({ dests }) => {
         return remove;
     }, [freqs, root]);
 
-    return <div ref={renderRef} className="row"></div>;
+    return <div id="renderRef" ref={renderRef} className="row"></div>;
 };

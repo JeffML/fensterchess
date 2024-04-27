@@ -37,7 +37,7 @@ const FromToCircleImpl = ({ moves }) => {
             remove = p.remove;
 
             p.setup = () => {
-                p.createCanvas(600, 600);
+                p.createCanvas(600, 600).parent(renderRef.current);
 
                 //initialize variables
                 r = 250;
@@ -105,7 +105,7 @@ const FromToCircleImpl = ({ moves }) => {
         return remove;
     }, [moves]);
 
-    return <div ref={renderRef} className="row"></div>;
+    return <div id="renderRef" ref={renderRef}></div>;
 };
 
 const FromToCircle = ({ cat, code }) => {
