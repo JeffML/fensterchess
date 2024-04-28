@@ -92,9 +92,14 @@ const FromToCircleImpl = ({ moves }) => {
                                 move[1][0] === file && move[1][1] == rank
                         );
                         p.stroke(...fromCoord.color.map((c) => c * 255));
-                        p.line(
+                        const cpx = 0
+                        const cpy = 0
+                        p.noFill()
+                        p.bezier(
                             fromCoord.lx,
                             fromCoord.ly,
+                            cpx, cpy,
+                            cpx, cpy,
                             toCoord.lx,
                             toCoord.ly
                         );
