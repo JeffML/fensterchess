@@ -41,9 +41,9 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
                                 setCode(target.value);
                             }}
                         >
-                            <option value={"all"} key="x">
+                            {/* <option value={"all"} key="x">
                                 All
-                            </option>
+                            </option> */}
                             {ecoCodes[cat].map((entry) => (
                                 <option value={entry[0]} key={entry[0]}>
                                     {cat}

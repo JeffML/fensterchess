@@ -28,11 +28,11 @@ SUBTITLES[modes.pgnAnalyze] = "Import and Analyze PGN";
 SUBTITLES[modes.visualization] = "Visualization";
 SUBTITLES[modes.about] = "About Fenster";
 
-const sites = ["FICS", "lichess", "shredder"];
+const sites = ["FICS", "lichess"] //, "shredder"];  //the database appears to be down; see https://www.shredderchess.com/online/opening-database.html
 const siteUrls = {
     FICS: "https://www.freechess.org/",
     lichess: "https://lichess.org/",
-    shredder: "https://www.shredderchess.com/",
+    // shredder: "https://www.shredderchess.com/",   
 };
 
 const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;

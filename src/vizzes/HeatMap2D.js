@@ -44,7 +44,7 @@ const HeatMap2D = ({ dests }) => {
 
     const ranks = data.rows.reverse().map(({ cells }) => {
         return cells.colors.map((rgb, i) => (
-            <Square {...{ rgb, value: cells.values[i] }} />
+            <Square id={i} {...{ rgb, value: cells.values[i] }} />
         ));
     });
 

@@ -196,18 +196,18 @@ const OpeningTabs = ({
             style={{ minWidth: "-webkit-fill-available", marginRight: "2em" }}
         >
             <TabList className="left" style={{ marginBottom: "0px" }}>
-                <Tab style={tabStyle}>Next Moves</Tab>
+                {nextMoves && <Tab style={tabStyle}>Next Moves</Tab>}
                 <Tab style={tabStyle}>Theory</Tab>
                 {showExternal && <Tab style={tabStyle}>External Info</Tab>}
                 {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
                 {showTransitions && <Tab style={tabStyle}>Transitions</Tab>}
             </TabList>
             <div style={{ border: "thick solid white" }}>
-                <TabPanel>
+                {nextMoves && <TabPanel>
                     <NextMovesRow
                         {...{ nextMoves, currentMoves, handleMovePlayed }}
                     />
-                </TabPanel>
+                </TabPanel>}
                 <TabPanel>
                     <Theory {...{ currentMoves }} />
                 </TabPanel>

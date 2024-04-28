@@ -88,7 +88,24 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
                 />
             </div>
         );
-    } else return <div className="double-column">&nbsp;</div>;
+    } else
+        return (
+            <div className="double-column">
+                <OpeningTabs
+                    {...{
+                        fen,
+                        setFen,
+                        // nextMoves,
+                        // currentMoves,
+                        handleMovePlayed,
+                        sites,
+                        // eco,
+                        // name,
+                        // from,
+                    }}
+                />
+            </div>
+        );
 };
 
 const FENorPGN = ({ setFen, text, setText, chess }) => {

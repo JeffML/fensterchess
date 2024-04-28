@@ -22,7 +22,7 @@ const About = () => (
                 of pulling in associated opening and game information from{" "}
                 <a href="https://www.ficsgames.org/">FICS</a>,{" "}
                 <a href="https://lichess.org/">lichess</a>, and{" "}
-                <a href="https://www.shredderchess.com/">Shredder</a> sites if
+                <a href="https://www.shredderchess.com/">Shredder (currently down as of 04/28/2024)fd</a> sites if
                 requested.
             </p>
             <h2>The Search Page</h2>
