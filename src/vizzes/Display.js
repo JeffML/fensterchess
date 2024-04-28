@@ -69,9 +69,9 @@ export const Display = ({ viz }) => {
         );
     if (viz === "most active squares")
         return (
-            <div>
+            <div className="double-column left">
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
-                <MostActiveSquaresByEco {...{ cat, code }} />
+                <MostActiveSquaresByEco {...{ cat, code }}/>
             </div>
         );
     if (viz === "ball of mud") {

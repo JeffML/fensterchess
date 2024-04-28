@@ -64,26 +64,37 @@ const calcPaths = ({ from, at, to, radius }) => {
 };
 
 const HeatMapType = ({ type, setType }) => {
+    const gridStyle = {
+        display: "grid",
+        gridTemplateColumns: "auto auto auto",
+        gridColumnGap: "3em"
+    };
+
     return (
-        <div className="row" id="heatmaptype">
+        <div className="row" style={gridStyle} id="heatmaptype">
             <label>
-                2D
                 <input
                     type="radio"
                     name="type"
                     defaultChecked={type === "2D"}
                     onClick={() => setType("2D")}
-                />
+                />{" "}
+                2D
             </label>
             <br />
             <label>
-                3D
                 <input
                     type="radio"
                     name="type"
                     defaultChecked={type === "3D"}
                     onClick={() => setType("3D")}
                 />
+                3D
+                {type === "3D" && (
+                    <span style={{ color: "lightgreen", marginLeft: "2em" }}>
+                        (mouse draggable)
+                    </span>
+                )}
             </label>
         </div>
     );
@@ -91,17 +102,17 @@ const HeatMapType = ({ type, setType }) => {
 
 const HeatMaps = ({ dests, type, setType }) => {
     return (
-        <div className="double-column left" style={{marginTop: "1em"}}>
+        <div className="double-column left" style={{ marginTop: "1em" }}>
             <HeatMapType {...{ type, setType }} />
             <br />
-            {type === "3D" && <HeatMap3D {...{ dests}} />}
-            {type === "2D" && <HeatMap2D {...{ dests}} />}
+            {type === "3D" && <HeatMap3D {...{ dests }} />}
+            {type === "2D" && <HeatMap2D {...{ dests }} />}
         </div>
     );
 };
 
 const DestinationFrequenciesByEco = ({ cat, code }) => {
-    if (code === "all") code = undefined
+    if (code === "all") code = undefined;
 
     const { error, data, loading } = useQuery(GET_DEST_FREQ, {
         variables: { cat, code },
@@ -120,11 +131,9 @@ const DestinationFrequenciesByEco = ({ cat, code }) => {
             return acc;
         }, {});
 
-        // const fakeDests = {"b4": 5, "g6": 3}
-        // return <HeatMaps {...{ dests: fakeDests, cat, code }} />;
         return <HeatMaps {...{ dests, type, setType }} />;
     }
     return null;
-}
+};
 
-export {  DestinationFrequenciesByEco as MostActiveSquaresByEco, calcPaths };
+export { DestinationFrequenciesByEco as MostActiveSquaresByEco, calcPaths };

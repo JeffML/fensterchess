@@ -29,7 +29,7 @@ export const HeatMap3D = ({ dests }) => {
             remove = p.remove;
             let rotX = 45;
             let rotY = 0;
-            let sliderZ;
+            // let sliderZ;
             const width = 600;
             const height = 400;
             let font;
@@ -51,7 +51,7 @@ export const HeatMap3D = ({ dests }) => {
                     -width * 4,
                     width * 4
                 );
-                sliderZ = p.createSlider(-20, -10, 45);
+                // sliderZ = p.createSlider(-20, -10, 45);
                 p.angleMode(p.DEGREES);
                 p.textFont(font);
             };
@@ -70,7 +70,7 @@ export const HeatMap3D = ({ dests }) => {
                 p.ambientLight(60, 60, 60);
                 p.pointLight(255, 255, 255, locX, locY, 100);
                 /**/
-                let rotZ = sliderZ.value();
+                let rotZ = -10 //sliderZ.value();
 
                 const boxUnit = height / 10;
 
@@ -130,5 +130,5 @@ export const HeatMap3D = ({ dests }) => {
         return remove;
     }, [freqs, root]);
 
-    return <div id="renderRef" ref={renderRef} className="row"></div>;
+    return <div id="renderRef" ref={renderRef} style={{marginBottom: "3em"}}></div>;
 };

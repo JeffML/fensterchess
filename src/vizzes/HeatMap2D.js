@@ -1,10 +1,10 @@
 import HeatMap from "jsheatmap";
-import {RANKS as ordinals, FILES as files} from '../common/consts.js' 
+import { RANKS as ordinals, FILES as files } from "../common/consts.js";
 
 const square = {
     width: "2em",
     height: "2em",
-    textShadow:"1px 1px #000000",
+    textShadow: "1px 1px #000000",
     lineHeight: "2rem",
 };
 
@@ -12,14 +12,21 @@ const gridStyle = {
     display: "grid",
     gridTemplateColumns: "repeat(8, 1fr)",
     gridGap: "1px",
+    marginBottom: "3em"
 };
 
 const rgbColor = (rgb) =>
     `rgb(${rgb.red * 100}%, ${rgb.green * 100}%, ${rgb.blue * 100}%)`;
 
-const Square = ({rgb, value}) => (
-    <div style={{ ...square, backgroundColor: rgbColor(rgb) }}>{value}</div>
-);
+const Square = ({ rgb, value }) => {
+    const bgColor = `hsl(196deg 36% ${value > 0 ? 95 - value * 5 : 95}%)`;
+
+    return (
+        <div style={{ ...square, backgroundColor: bgColor }}>{value}</div>
+    );
+
+    //    <div style={{ ...square, backgroundColor: rgbColor(rgb) }}>{value}</div>
+};
 
 const destsToRows = (dests) => {
     const ranks = [];
@@ -36,7 +43,9 @@ const HeatMap2D = ({ dests }) => {
     const data = heatmap.getData();
 
     const ranks = data.rows.reverse().map(({ cells }) => {
-        return cells.colors.map((rgb,i) => <Square {...{rgb, value:cells.values[i]}} />);
+        return cells.colors.map((rgb, i) => (
+            <Square {...{ rgb, value: cells.values[i] }} />
+        ));
     });
 
     return <div style={gridStyle}>{ranks}</div>;

@@ -105,7 +105,7 @@ const FromToCircleImpl = ({ moves }) => {
         return remove;
     }, [moves]);
 
-    return <div id="renderRef" ref={renderRef}></div>;
+    return <div id="renderRef" ref={renderRef} style={{marginLeft: "-120px"}}></div>;
 };
 
 const FromToCircle = ({ cat, code }) => {
@@ -130,11 +130,8 @@ const FromToCircle = ({ cat, code }) => {
             allMoves[i] = allMoves[i].split(",");
         }
 
-        return (
-            <div >
-                <FromToCircleImpl {...{ moves: allMoves }} />
-            </div>
-        );
+        return <FromToCircleImpl {...{ moves: allMoves }} />
+        
     }
 };
 
