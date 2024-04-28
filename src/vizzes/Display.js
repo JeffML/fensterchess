@@ -6,18 +6,17 @@ import ecoCodes from "../common/ecoCodes.js";
 
 const EcoCatCode = ({ cat, setCat, setCode }) => {
     const cats = Object.keys(ecoCodes);
-    const gridStyle = {
+    const radioGridStyle = {
         display: "grid",
-        gridTemplateColumns: "repeat(5, 1fr)",
+        gridTemplateColumns: "repeat(5, 4rem)",
         padding: "3px",
-        gridColumnGap: "2em",
         marginLeft: "2em",
     };
 
     return (
-        <div style={{marginLeft: "10%"}}>
+        <div style={{ marginLeft: "10%" }}>
             <span className=" left font-cinzel">ECO Categories</span>
-            <div style={{ ...gridStyle }}>
+            <div style={{ ...radioGridStyle }}>
                 {cats.map((c) => (
                     <label key={c}>
                         {c}
@@ -64,13 +63,13 @@ export const Display = ({ viz }) => {
     const [code, setCode] = useState();
     if (!viz)
         return (
-            <div className="double-column left" style={{ marginTop: "1em" }}>
+            <div>
                 <img src="resources/ekthpeeramenths.jpg" />
             </div>
         );
     if (viz === "most active squares")
         return (
-            <div className="double-column left">
+            <div>
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
                 <MostActiveSquaresByEco {...{ cat, code }} />
             </div>

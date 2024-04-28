@@ -9,7 +9,7 @@ const gridStyle = {
     marginTop: "1em",
     overflowX: "visible",
     columnGap: "1px",
-    color: "white"
+    color: "white",
 };
 
 const visualizations = {
@@ -18,7 +18,6 @@ const visualizations = {
     // "ball of mud": {},               TODO (or not)
 };
 
-
 const Visualization = () => {
     const [viz, setViz] = useState("");
     const handler = ({ target }) => {
@@ -26,39 +25,36 @@ const Visualization = () => {
     };
 
     return (
-            <div style={gridStyle} className="column left">
-                <span
-                    style={{
-                        gridColumn: "1 / span 2",
-                        textAlign: "left",
-                        marginLeft: "1em",
-                        fontSize: "larger",
-                    }}
-                    className="font-cinzel"
-                >
-                    Experimental Visualizations
-                </span>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
-                    {Object.keys(visualizations).map((k) => (
-                        <div
-                            key={k}
-                            style={{ display: "flex", marginLeft: "2em" }}
-                        >
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="viz"
-                                    value={k}
-                                    onClick={handler}
-                                    style={{ width: "1em" }}
-                                ></input>
-                                {k}
-                            </label>
-                        </div>
-                    ))}
-                </div>
-                <Display {...{ viz }} />{" "}
+        <div style={gridStyle} className="left">
+            <h2
+                style={{
+                    gridColumn: "1 / span 2",
+                    textAlign: "left",
+                    marginLeft: "1em",
+                    // fontSize: "larger",
+                }}
+                className="font-cinzel"
+            >
+                Experimental Visualizations
+            </h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
+                {Object.keys(visualizations).map((k) => (
+                    <div key={k} style={{ display: "flex", marginLeft: "2em" }}>
+                        <label>
+                            <input
+                                type="radio"
+                                name="viz"
+                                value={k}
+                                onClick={handler}
+                                style={{ width: "1em" }}
+                            ></input>
+                            {k}
+                        </label>
+                    </div>
+                ))}
             </div>
+            <Display {...{ viz }} />{" "}
+        </div>
     );
 };
 
