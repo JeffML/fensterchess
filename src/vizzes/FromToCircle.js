@@ -116,12 +116,16 @@ const FromToCircleImpl = ({ moves }) => {
 };
 
 const FromToCircle = ({ cat, code }) => {
-    const { error, data } = useQuery(GET_FROM_TO, {
+    const { error, data, loading } = useQuery(GET_FROM_TO, {
         variables: { cat, code },
-        skip: !cat,
+        skip: !code,
     });
 
-    if (error) console.error(error);
+    if (error) {
+        console.error(error);
+        return <span>error.toString()</span>
+    }
+    if (loading) return <div><span className="white">Loading...</span></div>
     if (data) {
         // console.dir(data, { depth: 3 });
 

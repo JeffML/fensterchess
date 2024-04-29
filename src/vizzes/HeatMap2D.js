@@ -15,6 +15,7 @@ const gridStyle = {
     marginBottom: "3em"
 };
 
+// eslint-disable-next-line no-unused-vars
 const rgbColor = (rgb) =>
     `rgb(${rgb.red * 100}%, ${rgb.green * 100}%, ${rgb.blue * 100}%)`;
 

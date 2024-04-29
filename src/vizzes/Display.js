@@ -64,7 +64,7 @@ export const Display = ({ viz }) => {
     if (!viz)
         return (
             <div>
-                <img src="resources/ekthpeeramenths.jpg" />
+                <img src="resources/ekthpeeramenths.jpg" alt="frankenstein movie still"/>
             </div>
         );
     if (viz === "most active squares")
