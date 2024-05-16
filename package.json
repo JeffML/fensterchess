@@ -1,7 +1,7 @@
 {
   "name": "fenster",
-  "version": "2.1.0",
-  "private": true,
+  "version": "2.1.1",
+  "private": false,
   "type": "module",
   "dependencies": {
     "@apollo/client": "^3.8.6",
