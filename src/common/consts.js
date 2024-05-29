@@ -1,5 +1,5 @@
 const APP_NAME = "Fenster";
-const VERSION = "2.1.1";
+const VERSION = "2.2.0";
 
 const INCR = 5; //list increment
 
@@ -28,11 +28,12 @@ SUBTITLES[modes.pgnAnalyze] = "Import and Analyze PGN";
 SUBTITLES[modes.visualization] = "Visualization";
 SUBTITLES[modes.about] = "About Fenster";
 
-const sites = ["FICS", "lichess"] //, "shredder"];  //the database appears to be down; see https://www.shredderchess.com/online/opening-database.html
+// Note: shredder has been down before; check https://www.shredderchess.com/online/opening-database.html or see fenster-s getOpeningAdditional resolver
+const sites = ["FICS", "lichess", "shredder"]; 
 const siteUrls = {
     FICS: "https://www.freechess.org/",
     lichess: "https://lichess.org/",
-    // shredder: "https://www.shredderchess.com/",   
+    shredder: "https://www.shredderchess.com/",   
 };
 
 const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
