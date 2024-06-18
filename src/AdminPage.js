@@ -2,7 +2,7 @@ import "./App.css";
 import { useQuery, gql } from "@apollo/client";
 import { useState } from "react";
 import {modes} from "./common/consts.js";
-import { ExitButton } from "./common/buttons.js";
+import { ExitButton } from "./common/Buttons.js";
 // import TestComponent, {TestComponent2} from "./TestComponent.js";
 
 const GET_DATABASES = gql`

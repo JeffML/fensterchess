@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { ActionButton } from "./common/buttons.js";
+import { ActionButton } from "./common/Buttons.js";
 import { INCR } from "./common/consts.js";
 
 // HEAD requests for each link

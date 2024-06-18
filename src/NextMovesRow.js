@@ -2,7 +2,7 @@ import { sortEnum } from "./common/consts.js";
 import { Fragment, useState } from "react";
 import { Chess } from "chess.js";
 import { newName } from "./utils/chessTools.js";
-import "./stylesheets/NextMovesRow.css";
+import "./stylesheets/nextMovesRow.css";
 
 const chess = new Chess();
 

@@ -5,33 +5,34 @@ import { Chessboard } from "kokopu-react";
 import { Fragment, useContext, useRef, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
+import { ActionButton } from "./common/Buttons.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import StackedBarChart from "./common/StackedBarChart.js";
 import "./stylesheets/grid.css";
-import sleep from "./utils/sleep.js";
+import "./stylesheets/tabs.css";
 import {
     movesStringToPliesAry,
     pliesAryToMovesString,
 } from "./utils/openings.js";
-import { ActionButton } from "./common/buttons.js";
+import sleep from "./utils/sleep.js";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
 
-const tabStyle = {
-    border: "1px solid #FFFFFF ",
-    borderRadius: "10px 10px 0 0",
-    color: "lightgreen",
-    textShadow: "2px 2px 2px black",
-};
+// const tabStyle = {
+//     border: "1px solid #FFFFFF ",
+//     borderRadius: "10px 10px 0 0",
+//     color: "lightgreen",
+//     textShadow: "2px 2px 2px black",
+// };
 
-const tabFlashStyle = {
-    ...tabStyle,
-    transition: "all 0.1s ease-in",
-};
+// const tabFlashStyle = {
+//     ...tabStyle,
+//     transition: "all 0.1s ease-in",
+// };
 
-const tabFlashStyle2 = {
-    backgroundColor: "orange",
-};
+// const tabFlashStyle2 = {
+//     backgroundColor: "orange",
+// };
 
 // file requests for (a) link
 const GET_PGN_FILES = gql`
@@ -123,17 +124,19 @@ const Openings = ({ openings, setFlash, filter, setFilter }) => {
         overflowX: "visible",
     };
 
+    const sleepTime = 300;
+
     const handler = async ({ target }) => {
         setFlash(true);
-        await sleep(200);
+        await sleep(sleepTime);
         setFlash(false);
-        await sleep(200);
+        await sleep(sleepTime);
         setFlash(true);
-        await sleep(200);
+        await sleep(sleepTime);
         setFlash(false);
-        await sleep(200);
+        await sleep(sleepTime);
         setFlash(true);
-        await sleep(200);
+        await sleep(sleepTime);
         setFlash(false);
 
         if (target.checked)
@@ -584,7 +587,6 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
 const PgnGames = ({ pgn }) => {
     const [game, setGame] = useState(null);
     const [flash, setFlash] = useState(false);
-    // const [flash2, setFlash2] = useState(false);
     const [filter, setFilter] = useState([]);
 
     const pgnSumm = getPgnSummary(pgn);
@@ -595,16 +597,13 @@ const PgnGames = ({ pgn }) => {
     return (
         <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
             <TabList className="left" style={{ marginBottom: "0px" }}>
-                <Tab style={tabStyle}>Summary</Tab>
-                <Tab
-                    style={{
-                        ...tabFlashStyle,
-                        ...(flash ? tabFlashStyle2 : null),
-                    }}
+                <Tab className="react-tabs__tab tab-base">Summary</Tab>
+                <Tab 
+                    className={`react-tabs__tab tab-base tab-flash1 ${flash?"tab-flash2":""}`}
                 >
                     Games
                 </Tab>
-                <Tab style={tabStyle}>Opening</Tab>
+                <Tab className="react-tabs__tab tab-base">Opening</Tab>
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>

@@ -4,7 +4,7 @@ import { Chessboard } from "kokopu-react";
 import { useContext, useRef, useState } from "react";
 import { OpeningTabs } from "./OpeningAdditional.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
-import { ActionButton } from "./common/buttons.js";
+import { ActionButton } from "./common/Buttons.js";
 import { FENEX } from "./common/consts.js";
 import "./stylesheets/textarea.css";
 import { newName } from "./utils/chessTools.js";
