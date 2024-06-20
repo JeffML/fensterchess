@@ -588,6 +588,7 @@ const PgnGames = ({ pgn }) => {
     const [game, setGame] = useState(null);
     const [flash, setFlash] = useState(false);
     const [filter, setFilter] = useState([]);
+    const [tabDisabled, setTabDisabled] = useState(true)
 
     const pgnSumm = getPgnSummary(pgn);
 
@@ -603,7 +604,7 @@ const PgnGames = ({ pgn }) => {
                 >
                     Games
                 </Tab>
-                <Tab className="react-tabs__tab tab-base">Opening</Tab>
+                <Tab {...{disabled:tabDisabled}} className="react-tabs__tab tab-base" style={{color:tabDisabled?"GrayText":null}} >Opening</Tab>
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>

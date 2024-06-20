@@ -1,0 +1,14 @@
+.tab-base {
+    border: 1px solid #FFFFFF ;
+    border-radius: 10px 10px 0px 0px;
+    color: lightgreen;
+    text-shadow: 2px 2px 2px black;
+}
+
+.tab-flash1 {
+    transition: all 0.1s ease-in;
+}
+
+.tab-flash2 {
+    background-color: orange;
+}
