@@ -18,22 +18,6 @@ import sleep from "./utils/sleep.js";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
 
-// const tabStyle = {
-//     border: "1px solid #FFFFFF ",
-//     borderRadius: "10px 10px 0 0",
-//     color: "lightgreen",
-//     textShadow: "2px 2px 2px black",
-// };
-
-// const tabFlashStyle = {
-//     ...tabStyle,
-//     transition: "all 0.1s ease-in",
-// };
-
-// const tabFlashStyle2 = {
-//     backgroundColor: "orange",
-// };
-
 // file requests for (a) link
 const GET_PGN_FILES = gql`
     query GetPgnFiles($pgnLinks: [MetaPgnInput]) {
@@ -346,13 +330,13 @@ const ChessboardWithControls = ({
             <div style={{ marginLeft: "-10%", marginTop: "-3%" }}>
                 <ActionButton
                     onClick={back}
-                    text="<<"
-                    style={{ fontSize: "small" }}
+                    text="&lArr;"
+                    style={{ fontSize: "14pt" }}
                 ></ActionButton>
                 <ActionButton
                     onClick={forward}
-                    text=">>"
-                    style={{ fontSize: "small" }}
+                    text="&rArr;"
+                    style={{ fontSize: "14pt" }}
                 ></ActionButton>
             </div>
         </div>
@@ -381,6 +365,7 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
         display: "inline-block",
         lineHeight: "0px",
         borderRadius: "3px",
+        height: "12px"
     };
 
     return (

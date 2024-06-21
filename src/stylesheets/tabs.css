@@ -15,5 +15,5 @@
 
 .hoverEffect:hover {
     background-color: deeppink;
-    cursor:grab
+    cursor:pointer
 }
