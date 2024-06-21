@@ -337,7 +337,12 @@ const ChessboardWithControls = ({
     };
     return (
         <div>
-            <Chessboard position={fen} squareSize={30} animated={true} coordinateVisible={false} />
+            <Chessboard
+                position={fen}
+                squareSize={30}
+                animated={true}
+                coordinateVisible={false}
+            />
             <div style={{ marginLeft: "-10%", marginTop: "-3%" }}>
                 <ActionButton
                     onClick={back}
@@ -369,6 +374,15 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
 
     if (!fen) setFen(openingFen);
 
+    const movesStyle = {
+        border: "solid 1px darkgray",
+        fontSize: "16pt",
+        color: "limegreen",
+        display: "inline-block",
+        lineHeight: "0px",
+        borderRadius: "3px",
+    };
+
     return (
         <div
             style={{
@@ -380,7 +394,8 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
             <ChessboardWithControls
                 {...{ fen, setFen, chess, plies, plyIndex, setPlyIndex }}
             />
-            <div id="game-details"
+            <div
+                id="game-details"
                 style={{
                     display: "grid",
                     gridTemplateColumns: "1fr 3fr",
@@ -400,7 +415,10 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
                 <span>{name}</span>
                 <span>ECO:</span>
                 <span> {eco}</span>
-                <span>Moves:</span> <span>{moves}</span>
+                <span>Moves:</span>{" "}
+                <span>
+                    {moves}&nbsp;<span style={movesStyle} className="hoverEffect">...</span>
+                </span>
                 <span>FEN:</span>
                 <span>{fen}</span>
                 <AdditionalOpenings {...{ fen }} />
@@ -558,8 +576,8 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
             <div name="lefty" style={gridStyle} className="scrollableY white">
                 {games.filter(filterFunc).map((g, i) => {
                     const pgnOpening = g.opening();
-                    let variant = g.variant()
-                    if (variant && variant === "regular") variant = null
+                    let variant = g.variant();
+                    if (variant && variant === "regular") variant = null;
 
                     return (
                         <Fragment key={i}>
@@ -567,13 +585,17 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
                             <span>{g.dateAsString()}</span>
                             <span>{g.playerName("w")}</span>
                             <span>{g.playerName("b")}</span>
-                            {variant && <span>{variant} variant not supported</span>}
-                            {!variant && pgnOpening && <span
-                                className="fakeLink"
-                                onClick={() => clickHandler(g)}
-                            >
-                                {pgnOpening ?? "N/A"}
-                            </span>}
+                            {variant && (
+                                <span>{variant} variant not supported</span>
+                            )}
+                            {!variant && pgnOpening && (
+                                <span
+                                    className="fakeLink"
+                                    onClick={() => clickHandler(g)}
+                                >
+                                    {pgnOpening ?? "N/A"}
+                                </span>
+                            )}
 
                             <span>{g.result()}</span>
                         </Fragment>
@@ -585,11 +607,12 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
 };
 
 /*
-    Opening tab
+    Opening tab panel:
 
-    1. default: disabled
-    2. enabled/displayed when opening selected from Games tab
-    3. disabled when opening tab loses focus
+    when opening found
+    1. bold opening moves 
+    2. show rest of pgn in normal case
+        1. maybe initially show '...' and expand if clicked
 
 */
 
@@ -597,7 +620,7 @@ const PgnGames = ({ pgn }) => {
     const [game, setGame] = useState(null);
     const [flash, setFlash] = useState(false);
     const [filter, setFilter] = useState([]);
-    const [tabDisabled, setTabDisabled] = useState(true)
+    const [tabDisabled, setTabDisabled] = useState(true);
 
     const pgnSumm = getPgnSummary(pgn);
 
@@ -605,22 +628,31 @@ const PgnGames = ({ pgn }) => {
     const [tabIndex, setTabIndex] = useState(0);
 
     const onTabSelect = (index) => {
-        setTabIndex(index)
-        if (index !== 2) { // Opening Tab
-            setTabDisabled(true)
-        } 
-    }
+        setTabIndex(index);
+        if (index !== 2) {
+            // Opening Tab
+            setTabDisabled(true);
+        }
+    };
 
     return (
         <Tabs selectedIndex={tabIndex} onSelect={onTabSelect}>
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab className="react-tabs__tab tab-base">Summary</Tab>
-                <Tab 
-                    className={`react-tabs__tab tab-base tab-flash1 ${flash?"tab-flash2":""}`}
+                <Tab
+                    className={`react-tabs__tab tab-base tab-flash1 ${
+                        flash ? "tab-flash2" : ""
+                    }`}
                 >
                     Games
                 </Tab>
-                <Tab {...{disabled:tabDisabled}} className="react-tabs__tab tab-base" style={{color:tabDisabled?"GrayText":null}} >Opening</Tab>
+                <Tab
+                    {...{ disabled: tabDisabled }}
+                    className="react-tabs__tab tab-base"
+                    style={{ color: tabDisabled ? "GrayText" : null }}
+                >
+                    Opening
+                </Tab>
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 <TabPanel>
