@@ -584,6 +584,15 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
     );
 };
 
+/*
+    Opening tab
+
+    1. default: disabled
+    2. enabled/displayed when opening selected from Games tab
+    3. disabled when opening tab loses focus
+
+*/
+
 const PgnGames = ({ pgn }) => {
     const [game, setGame] = useState(null);
     const [flash, setFlash] = useState(false);
@@ -595,8 +604,15 @@ const PgnGames = ({ pgn }) => {
     // controlled mode; see https://www.npmjs.com/package/react-tabs#controlled-vs-uncontrolled-mode
     const [tabIndex, setTabIndex] = useState(0);
 
+    const onTabSelect = (index) => {
+        setTabIndex(index)
+        if (index !== 2) { // Opening Tab
+            setTabDisabled(true)
+        } 
+    }
+
     return (
-        <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
+        <Tabs selectedIndex={tabIndex} onSelect={onTabSelect}>
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab className="react-tabs__tab tab-base">Summary</Tab>
                 <Tab 
