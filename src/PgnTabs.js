@@ -365,7 +365,7 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
         display: "inline-block",
         lineHeight: "0px",
         borderRadius: "3px",
-        height: "12px"
+        height: "12px",
     };
 
     return (
@@ -402,7 +402,10 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
                 <span> {eco}</span>
                 <span>Moves:</span>{" "}
                 <span>
-                    {moves}&nbsp;<span style={movesStyle} className="hoverEffect">...</span>
+                    {moves}&nbsp;
+                    <span style={movesStyle} className="hoverEffect">
+                        ...
+                    </span>
                 </span>
                 <span>FEN:</span>
                 <span>{fen}</span>
@@ -605,7 +608,7 @@ const PgnGames = ({ pgn }) => {
     const [game, setGame] = useState(null);
     const [flash, setFlash] = useState(false);
     const [filter, setFilter] = useState([]);
-    const [tabDisabled, setTabDisabled] = useState(true);
+    // const [tabDisabled, setTabDisabled] = useState(true);
 
     const pgnSumm = getPgnSummary(pgn);
 
@@ -614,10 +617,6 @@ const PgnGames = ({ pgn }) => {
 
     const onTabSelect = (index) => {
         setTabIndex(index);
-        if (index !== 2) {
-            // Opening Tab
-            setTabDisabled(true);
-        }
     };
 
     return (
@@ -632,9 +631,11 @@ const PgnGames = ({ pgn }) => {
                     Games
                 </Tab>
                 <Tab
-                    {...{ disabled: tabDisabled }}
+                    {...{ disabled: tabIndex !== 2 }}
                     className="react-tabs__tab tab-base"
-                    style={{ color: tabDisabled ? "GrayText" : null }}
+                    style={{
+                        color: tabIndex !== 2 ? "GrayText" : "lightgreen",
+                    }}
                 >
                     Opening
                 </Tab>
