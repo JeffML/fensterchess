@@ -343,8 +343,29 @@ const ChessboardWithControls = ({
     );
 };
 
+const Moves = ({ openingMoves, plies, plyIndex }) => {
+    const movesStyle = {
+        border: "solid 1px darkgray",
+        fontSize: "16pt",
+        color: "limegreen",
+        display: "inline-block",
+        lineHeight: "0px",
+        borderRadius: "3px",
+        height: "12px",
+    };
+
+    return (
+        <span>
+            {openingMoves}&nbsp;
+            <span style={movesStyle} className="hoverEffect">
+                ...
+            </span>
+        </span>
+    );
+};
+
 const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
-    const { eco, name, moves:openingMoves, fen: openingFen } = opening ?? {};
+    const { eco, name, moves: openingMoves, fen: openingFen } = opening ?? {};
     const plies = useRef(game.pojo().mainVariation);
     const [plyIndex, setPlyIndex] = useState(
         movesStringToPliesAry(openingMoves ?? "").length
@@ -357,16 +378,6 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
         (game.playerTitle("b") ?? "  ") + "   " + game.playerName("b");
 
     if (!fen) setFen(openingFen);
-
-    const movesStyle = {
-        border: "solid 1px darkgray",
-        fontSize: "16pt",
-        color: "limegreen",
-        display: "inline-block",
-        lineHeight: "0px",
-        borderRadius: "3px",
-        height: "12px",
-    };
 
     return (
         <div
@@ -402,13 +413,7 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
                 <span>{name}</span>
                 <span>ECO:</span>
                 <span> {eco}</span>
-                <span>Moves:</span>{" "}
-                <span>
-                    {openingMoves}&nbsp;
-                    <span style={movesStyle} className="hoverEffect">
-                        ...
-                    </span>
-                </span>
+                <span>Moves:</span> <Moves {...{plies, openingMoves, plyIndex}}/>
                 <span>FEN:</span>
                 <span>{fen}</span>
                 <AdditionalOpenings {...{ fen }} />
