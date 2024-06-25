@@ -344,10 +344,10 @@ const ChessboardWithControls = ({
 };
 
 const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
-    const { eco, name, moves, fen: openingFen } = opening ?? {};
+    const { eco, name, moves:openingMoves, fen: openingFen } = opening ?? {};
     const plies = useRef(game.pojo().mainVariation);
     const [plyIndex, setPlyIndex] = useState(
-        movesStringToPliesAry(moves ?? "").length
+        movesStringToPliesAry(openingMoves ?? "").length
     );
 
     const event = game.event();
@@ -396,13 +396,15 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
                 <span>{white}</span>
                 <span>Black:</span>
                 <span>{black}</span>
+                <span>Result:</span>
+                <span>{game.result()}</span>
                 <span>Fenster Opening Name:</span>
                 <span>{name}</span>
                 <span>ECO:</span>
                 <span> {eco}</span>
                 <span>Moves:</span>{" "}
                 <span>
-                    {moves}&nbsp;
+                    {openingMoves}&nbsp;
                     <span style={movesStyle} className="hoverEffect">
                         ...
                     </span>
