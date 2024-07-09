@@ -13,6 +13,7 @@ import "./stylesheets/tabs.css";
 import {
     movesStringToPliesAry,
     pliesAryToMovesString,
+    PliesAryToMovesStringSpan,
 } from "./utils/openings.js";
 import sleep from "./utils/sleep.js";
 
@@ -368,9 +369,9 @@ const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
     if (showGameMoves) {
         const opLen = openingPliesRef.current.length
         gamePlies = gamePliesRef.current.slice( opLen )
-        gameMoves = pliesAryToMovesString(gamePlies, opLen)
+        gameMoves = PliesAryToMovesStringSpan(gamePlies, {start: opLen, plyIndex})
     }
-    const openingMoves = pliesAryToMovesString(openingPliesRef.current)
+    const openingMoves = PliesAryToMovesStringSpan(openingPliesRef.current, {plyIndex})
 
     return (
         <span>
