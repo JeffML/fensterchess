@@ -12,8 +12,9 @@ const getFensForMoves = (plies) => {
     return [fens, varMoves]
 }
 
-const pliesAryToMovesString = (plies) => {
+const pliesAryToMovesString = (plies, plyIndex = 0) => {
     return plies.reduce((prev, curr, i) => {
+        i = i + plyIndex
         if (i%2 === 0) prev += `${(i/2)+1}. ${curr} `
         else prev += `${curr} `
         return prev
@@ -28,24 +29,4 @@ const movesStringToPliesAry = (moves) => {
     return plies.filter(p => p !== "");
 }
 
-// see FIND_OPENINGS query
-// note that game move order may not match Opening Book move order
-// const extractOpeningData = ({getOpeningsForFens2}, game) => {
-//     const gameMoves = pliesAryToMovesString(game.mainVariation)
-
-//     // opening book search results for game fens:
-//     const obOpenings = getOpeningsForFens2.map(({eco: ECO, name, moves: bookMoves}) => 
-//         ({ECO, name, bookMoves}))
-//     const gameOpening = {
-//         ECO: game.eco,
-//         moves: gameMoves.slice(0, obOpenings.at(-1).bookMoves.length),    // truncate game opening moves to same length as OB opening moves 
-//         name: game.opening + (game.openingVariation? ", " + game.openingVariation : "")
-//     }
-//     return {
-//         obOpenings, gameOpening,
-//         getObOpening: () => obOpenings.at(-1),
-//         game
-//     }
-// }
-
-export { getFensForMoves, /*extractOpeningData,*/ movesStringToPliesAry, pliesAryToMovesString }
+export { getFensForMoves, movesStringToPliesAry, pliesAryToMovesString }

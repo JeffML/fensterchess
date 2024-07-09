@@ -343,8 +343,11 @@ const ChessboardWithControls = ({
     );
 };
 
-const Moves = ({ openingMoves, plies, plyIndex }) => {
-    const movesStyle = {
+const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
+    const openingMovesStyle = {
+        color: "powderblue",
+    };
+    const ellipsesStyle = {
         border: "solid 1px darkgray",
         fontSize: "16pt",
         color: "limegreen",
@@ -354,22 +357,43 @@ const Moves = ({ openingMoves, plies, plyIndex }) => {
         height: "12px",
     };
 
+    const [showGameMoves, setShowGameMoves] = useState(false);
+
+    const clickHandler = () => {
+        setShowGameMoves(!showGameMoves);
+    };
+
+    let gamePlies, gameMoves;
+
+    if (showGameMoves) {
+        const opLen = openingPliesRef.current.length
+        gamePlies = gamePliesRef.current.slice( opLen )
+        gameMoves = pliesAryToMovesString(gamePlies, opLen)
+    }
+    const openingMoves = pliesAryToMovesString(openingPliesRef.current)
+
     return (
         <span>
-            {openingMoves}&nbsp;
-            <span style={movesStyle} className="hoverEffect">
-                ...
-            </span>
+            <span style={openingMovesStyle}>{openingMoves}&nbsp;</span>
+            {!showGameMoves && (
+                <span
+                    style={ellipsesStyle}
+                    className="hoverEffect"
+                    onClick={clickHandler}
+                >
+                    ...
+                </span>
+            )}
+            {showGameMoves && <span>{gameMoves}</span>}
         </span>
     );
 };
 
 const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
     const { eco, name, moves: openingMoves, fen: openingFen } = opening ?? {};
-    const plies = useRef(game.pojo().mainVariation);
-    const [plyIndex, setPlyIndex] = useState(
-        movesStringToPliesAry(openingMoves ?? "").length
-    );
+    const gamePliesRef = useRef(game.pojo().mainVariation);
+    const openingPliesRef = useRef(movesStringToPliesAry(openingMoves ?? ""));
+    const [plyIndex, setPlyIndex] = useState(openingPliesRef.current.length);
 
     const event = game.event();
     const white =
@@ -388,7 +412,14 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
             }}
         >
             <ChessboardWithControls
-                {...{ fen, setFen, chess, plies, plyIndex, setPlyIndex }}
+                {...{
+                    fen,
+                    setFen,
+                    chess,
+                    plies: gamePliesRef,
+                    plyIndex,
+                    setPlyIndex,
+                }}
             />
             <div
                 id="game-details"
@@ -413,7 +444,8 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
                 <span>{name}</span>
                 <span>ECO:</span>
                 <span> {eco}</span>
-                <span>Moves:</span> <Moves {...{plies, openingMoves, plyIndex}}/>
+                <span>Moves:</span>{" "}
+                <Moves {...{ gamePliesRef, openingPliesRef, plyIndex }} />
                 <span>FEN:</span>
                 <span>{fen}</span>
                 <AdditionalOpenings {...{ fen }} />
