@@ -1,4 +1,5 @@
 import { Chess } from "chess.js";
+import { Fragment } from "react";
 
 const getFensForMoves = (plies) => {
     const chess = new Chess();
@@ -15,31 +16,30 @@ const getFensForMoves = (plies) => {
     return [fens, varMoves];
 };
 
-const pliesAryToMovesString = (plies, { start = 0 }) => {
+const pliesAryToMovesString = (plies) => {
     return plies.reduce((prev, curr, i) => {
-        i = i + start;
         if (i % 2 === 0) prev += `${i / 2 + 1}. `;
         prev += `${curr} `;
         return prev;
     }, "");
 };
 
-const PliesAryToMovesStringSpan = (plies, { start = 0, plyIndex }) => {
+const PliesAryToMovesStringSpan = (plies, { start = 0, plyIndex, color }) => {
     const moveString = (move, i) => {
         return (i % 2 === 0 ? `${i / 2 + 1}. ` : " ") + `${move} `;
     };
 
     return (
-        <span>
+        <>
             {plies.map((ply, index) => {
                 let i = index + start;
-                if (i === plyIndex) {
-                    return <u>{moveString(ply, i)}</u>;
+                if (i === plyIndex - 1) {
+                    return <u key={i} style={{color}}><b>{moveString(ply, i)}</b></u>;
                 } else {
-                    return moveString(ply, i);
+                    return <span key={i} style={{color}}>{moveString(ply, i)}</span>
                 }
             })}
-        </span>
+        </>
     );
 };
 

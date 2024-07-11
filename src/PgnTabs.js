@@ -367,11 +367,18 @@ const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
     let gamePlies, gameMoves;
 
     if (showGameMoves) {
-        const opLen = openingPliesRef.current.length
-        gamePlies = gamePliesRef.current.slice( opLen )
-        gameMoves = PliesAryToMovesStringSpan(gamePlies, {start: opLen, plyIndex})
+        const opLen = openingPliesRef.current.length;
+        gamePlies = gamePliesRef.current.slice(opLen);
+        gameMoves = PliesAryToMovesStringSpan(gamePlies, {
+            start: opLen,
+            plyIndex,
+            color: "lightgreen",
+        });
     }
-    const openingMoves = PliesAryToMovesStringSpan(openingPliesRef.current, {plyIndex})
+    const openingMoves = PliesAryToMovesStringSpan(openingPliesRef.current, {
+        plyIndex,
+        color: "powderblue",
+    });
 
     return (
         <span>
@@ -616,7 +623,7 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
                             {variant && (
                                 <span>{variant} variant not supported</span>
                             )}
-                            {!variant && pgnOpening && (
+                            {!variant && (
                                 <span
                                     className="fakeLink"
                                     onClick={() => clickHandler(g)}
@@ -634,33 +641,15 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
     );
 };
 
-/*
-    Opening tab panel:
-
-    when opening found
-    1. bold opening moves 
-    2. show rest of pgn in normal case
-        1. maybe initially show '...' and expand if clicked
-
-*/
-
-const PgnGames = ({ pgn }) => {
+const PgnGames = ({ pgn, tabIndex, setTabIndex }) => {
     const [game, setGame] = useState(null);
     const [flash, setFlash] = useState(false);
     const [filter, setFilter] = useState([]);
-    // const [tabDisabled, setTabDisabled] = useState(true);
 
     const pgnSumm = getPgnSummary(pgn);
 
-    // controlled mode; see https://www.npmjs.com/package/react-tabs#controlled-vs-uncontrolled-mode
-    const [tabIndex, setTabIndex] = useState(0);
-
-    const onTabSelect = (index) => {
-        setTabIndex(index);
-    };
-
     return (
-        <Tabs selectedIndex={tabIndex} onSelect={onTabSelect}>
+        <Tabs selectedIndex={tabIndex} onSelect={setTabIndex}>
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 <Tab className="react-tabs__tab tab-base">Summary</Tab>
                 <Tab
@@ -705,6 +694,9 @@ Arguments are url OR pgn.
 If given a url, query TWIC for games; else load the pgn file directly.
 */
 const PgnTabs = ({ url = null, pgn }) => {
+    // controlled mode; see https://www.npmjs.com/package/react-tabs#controlled-vs-uncontrolled-mode
+    const [tabIndex, setTabIndex] = useState(0);
+
     const dummyMetaPgnInput = { link: url, lastModified: "" };
     const { error, data, loading } = useQuery(GET_PGN_FILES, {
         variables: { pgnLinks: [dummyMetaPgnInput] },
@@ -713,11 +705,14 @@ const PgnTabs = ({ url = null, pgn }) => {
 
     if (error) console.error(error.toLocaleString());
     if (loading) return <span className="white">Loading...</span>;
+
     if (data || pgn) {
         return (
             <PgnGames
                 {...{
                     pgn: data?.getPgnFiles[0].pgn || pgn,
+                    tabIndex,
+                    setTabIndex,
                 }}
             />
         );
