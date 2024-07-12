@@ -203,11 +203,13 @@ const OpeningTabs = ({
                 {showTransitions && <Tab style={tabStyle}>Transitions</Tab>}
             </TabList>
             <div style={{ border: "thick solid white" }}>
-                {nextMoves && <TabPanel>
-                    <NextMovesRow
-                        {...{ nextMoves, currentMoves, handleMovePlayed }}
-                    />
-                </TabPanel>}
+                {nextMoves && (
+                    <TabPanel>
+                        <NextMovesRow
+                            {...{ nextMoves, currentMoves, handleMovePlayed }}
+                        />
+                    </TabPanel>
+                )}
                 <TabPanel>
                     <Theory {...{ currentMoves }} />
                 </TabPanel>

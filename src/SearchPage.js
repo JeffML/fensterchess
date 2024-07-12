@@ -95,13 +95,8 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
                     {...{
                         fen,
                         setFen,
-                        // nextMoves,
-                        // currentMoves,
                         handleMovePlayed,
                         sites,
-                        // eco,
-                        // name,
-                        // from,
                     }}
                 />
             </div>
@@ -160,7 +155,7 @@ const SearchPage = ({ chess, fen, setFen }) => {
     /*
     If we came in through a FEN input, we will get the following format when a move is put to the the chess object:
     "[SetUp \"1\"]\n[FEN \"r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 1 5\"]\n\n5. O-O"
-    The following code handles this case.
+    The code below handles this case.
     */
     const handleMovePlayed = (move) => {
         chess.current.move(move);
