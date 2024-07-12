@@ -13,8 +13,8 @@ import "./stylesheets/tabs.css";
 import {
     movesStringToPliesAry,
     pliesAryToMovesString,
-    PliesAryToMovesStringSpan,
 } from "./utils/openings.js";
+import PliesAryToMovesStringSpan from "./common/PliesAryToMovesStringSpan.js";
 import sleep from "./utils/sleep.js";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
