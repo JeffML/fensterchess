@@ -170,6 +170,15 @@ const Theory = ({ currentMoves }) => {
     );
 };
 
+const Theory2 = ({ html }) => {
+    return (
+        <div
+            style={{ textAlign: "left", marginLeft: "1em" }}
+            dangerouslySetInnerHTML={{ __html: html }}
+        />
+    );
+};
+
 const OpeningTabs = ({
     fen,
     setFen,
@@ -191,13 +200,19 @@ const OpeningTabs = ({
     const showExternal = sites.selectedSites.length > 0;
     const showTransitions = from && from.length > 1;
 
+    const [html, setHtml] = useState(null);
+
+    useEffect(() => {
+        theoryRequest(currentMoves, setHtml);
+    }, [currentMoves]);
+
     return (
         <Tabs
             style={{ minWidth: "-webkit-fill-available", marginRight: "2em" }}
         >
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 {nextMoves && <Tab style={tabStyle}>Next Moves</Tab>}
-                <Tab style={tabStyle}>Theory</Tab>
+                {html && <Tab style={tabStyle}>Theory</Tab>}
                 {showExternal && <Tab style={tabStyle}>External Info</Tab>}
                 {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
                 {showTransitions && <Tab style={tabStyle}>Transitions</Tab>}
@@ -210,9 +225,11 @@ const OpeningTabs = ({
                         />
                     </TabPanel>
                 )}
-                <TabPanel>
-                    <Theory {...{ currentMoves }} />
-                </TabPanel>
+                {html && (
+                    <TabPanel>
+                        <Theory2 {...{ html }} />
+                    </TabPanel>
+                )}
                 {showExternal && (
                     <TabPanel>
                         <div
