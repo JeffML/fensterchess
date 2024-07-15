@@ -66,12 +66,13 @@ const calcPaths = ({ from, at, to, radius }) => {
 const HeatMapType = ({ type, setType }) => {
     const gridStyle = {
         display: "grid",
-        gridTemplateColumns: "auto auto auto",
+        gridTemplateColumns: "auto auto auto auto",
         gridColumnGap: "3em"
     };
 
     return (
         <div className="row" style={gridStyle} id="heatmaptype">
+            <span style={{fontWeight:"bold", color:"mediumturquoise"}}>Select a style:</span>
             <label>
                 <input
                     type="radio"
