@@ -36,6 +36,7 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
                     <span className=" left font-cinzel">ECO Codes</span>
                     <div>
                         <select
+                        id="eco-codes"
                             size={5}
                             onChange={({ target }) => {
                                 setCode(target.value);

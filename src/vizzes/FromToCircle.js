@@ -22,6 +22,29 @@ const squareColors = FILES.map((file, fileNo) =>
     })
 ).flat();
 
+const drawCircles = (p, moveCoords, stepCount, angle, step) => {
+    p.ellipseMode(p.CENTER);
+    p.textAlign(p.CENTER, p.CENTER);
+    p.textFont("Georgia");
+
+    //move 0,0 to the center of the screen
+    // p.translate(p.width / 2, p.height / 2);
+
+    do {
+        const { x, y, file, rank, color } = moveCoords[stepCount % 64];
+
+        p.stroke(...color.map((c) => c * 255));
+
+        //draw ellipse at every x,y point
+        p.ellipse(x, y, 30);
+        p.text(`${file}${rank}`, x, y);
+
+        //increase angle by step size
+        angle = angle + step;
+
+    } while (stepCount++ < 64);
+}
+
 const FromToCircleImpl = ({ moves }) => {
     const renderRef = useRef();
 
@@ -37,15 +60,9 @@ const FromToCircleImpl = ({ moves }) => {
             remove = p.remove;
 
             p.setup = () => {
-                p.createCanvas(600, 600).parent(renderRef.current);
-
-                //initialize variables
                 r = 250;
                 angle = 0;
                 step = p.TWO_PI / 64; //in radians equivalent of 360/64 in degrees
-                p.ellipseMode(p.CENTER);
-                p.textAlign(p.CENTER, p.CENTER);
-                p.textFont("Georgia");
 
                 for (let stepp = 0; stepp < 64; stepp++) {
                     const newAngle = angle + step * stepp;
@@ -58,61 +75,59 @@ const FromToCircleImpl = ({ moves }) => {
                     moveCoords[stepp] = { file, rank, color, x, y, lx, ly };
                 }
 
-                //move 0,0 to the center of the screen
-                p.translate(p.width / 2, p.height / 2);
+                p.createCanvas(600, 600).parent(renderRef.current);
 
-                do {
-                    const { x, y, file, rank, color } =
-                        moveCoords[stepCount % 64];
-
-                    p.stroke(...color.map((c) => c * 255));
-
-                    //draw ellipse at every x,y point
-                    p.ellipse(x, y, 30);
-                    p.text(`${file}${rank}`, x, y);
-
-                    //increase angle by step size
-                    angle = angle + step;
-
-                } while (stepCount++ < 64);
             };
 
             p.draw = () => {
+
+                if (!moves) return;
                 p.translate(p.width / 2, p.height / 2);
-                if (moves)
-                    moves.forEach((move) => {
-                        // note the == for rank: integer vs string issue
-                        const fromCoord = moveCoords.find(
-                            ({ file, rank }) =>
-                                move[0][0] === file && move[0][1] == rank
-                        );
+                p.push()
+                moves.forEach((move) => {
+                    // note the == for rank: integer vs string issue
+                    const fromCoord = moveCoords.find(
+                        ({ file, rank }) =>
+                            move[0][0] === file && move[0][1] == rank
+                    );
 
-                        const toCoord = moveCoords.find(
-                            ({ file, rank }) =>
-                                move[1][0] === file && move[1][1] == rank
-                        );
-                        p.stroke(...fromCoord.color.map((c) => c * 255));
-                       
-                        const cp1 = [0 + fromCoord.lx/2, 0 + fromCoord.ly/2]
-                        const cp2 = [0 + toCoord.lx/2, 0 + toCoord.ly/2]
+                    const toCoord = moveCoords.find(
+                        ({ file, rank }) =>
+                            move[1][0] === file && move[1][1] == rank
+                    );
+                    p.stroke(...fromCoord.color.map((c) => c * 255));
 
-                        p.noFill()
-                        p.bezier(
-                            fromCoord.lx,
-                            fromCoord.ly,
-                            cp1[0], cp1[1],
-                            cp2[0], cp2[1],
-                            toCoord.lx,
-                            toCoord.ly
-                        );
-                    });
+                    const cp1 = [0 + fromCoord.lx / 2, 0 + fromCoord.ly / 2];
+                    const cp2 = [0 + toCoord.lx / 2, 0 + toCoord.ly / 2];
+
+                    p.noFill();
+                    p.bezier(
+                        fromCoord.lx,
+                        fromCoord.ly,
+                        cp1[0],
+                        cp1[1],
+                        cp2[0],
+                        cp2[1],
+                        toCoord.lx,
+                        toCoord.ly
+                    );
+                });
+                p.pop()
+
+                drawCircles(p, moveCoords, stepCount, angle, step);
             };
         });
 
         return remove;
     }, [moves]);
 
-    return <div id="renderRef" ref={renderRef} style={{marginLeft: "-120px"}}></div>;
+    return (
+        <div
+            id="renderRef"
+            ref={renderRef}
+            style={{ marginLeft: "-120px" }}
+        ></div>
+    );
 };
 
 const FromToCircle = ({ cat, code }) => {
@@ -123,9 +138,14 @@ const FromToCircle = ({ cat, code }) => {
 
     if (error) {
         console.error(error);
-        return <span>error.toString()</span>
+        return <span>error.toString()</span>;
     }
-    if (loading) return <div><span className="white">Loading...</span></div>
+    if (loading)
+        return (
+            <div>
+                <span className="white">Loading...</span>
+            </div>
+        );
     if (data) {
         // console.dir(data, { depth: 3 });
 
@@ -141,9 +161,10 @@ const FromToCircle = ({ cat, code }) => {
             allMoves[i] = allMoves[i].split(",");
         }
 
-        return <FromToCircleImpl {...{ moves: allMoves }} />
-        
+        return <FromToCircleImpl {...{ moves: allMoves }} />;
     }
 };
 
 export { FromToCircle };
+
+
