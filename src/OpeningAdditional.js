@@ -155,20 +155,6 @@ const SimilarOpenings = ({ fen, setFen }) => {
         );
     }
 };
-const Theory = ({ currentMoves }) => {
-    const [html, setHtml] = useState(null);
-
-    useEffect(() => {
-        theoryRequest(currentMoves, setHtml);
-    }, [currentMoves]);
-
-    return (
-        <div
-            style={{ textAlign: "left", marginLeft: "1em" }}
-            dangerouslySetInnerHTML={{ __html: html }}
-        />
-    );
-};
 
 const Theory2 = ({ html }) => {
     return (

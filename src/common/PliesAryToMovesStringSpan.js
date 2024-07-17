@@ -17,4 +17,4 @@ const PliesAryToMovesStringSpan = (plies, { start = 0, plyIndex, color }) => {
     );
 };
 
-export default PliesAryToMovesStringSpan
+export default PliesAryToMovesStringSpan;
