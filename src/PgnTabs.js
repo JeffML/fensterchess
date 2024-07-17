@@ -540,6 +540,7 @@ const AdditionalOpenings = ({ fen }) => {
 
             return (
                 <div
+                    id="AdditionalOpenings"
                     key={site}
                     style={{
                         display: "contents",
@@ -556,17 +557,21 @@ const AdditionalOpenings = ({ fen }) => {
                         <span style={{ marginLeft: "1em", marginRight: "1em" }}>
                             games:
                         </span>{" "}
-                        {games}
+                        {games ?? 0}
                     </div>
                     <span>
-                        {" "}
-                        w/d/l: &nbsp;&nbsp;
-                        <StackedBarChart
-                            {...{
-                                pctgs: { w, b, d },
-                                style: { display: "inline-grid" },
-                            }}
-                        />{" "}
+                        {games && (
+                            <>
+                                {" "}
+                                w/d/l: &nbsp;&nbsp;
+                                <StackedBarChart
+                                    {...{
+                                        pctgs: { w, b, d },
+                                        style: { display: "inline-grid" },
+                                    }}
+                                />{" "}
+                            </>
+                        )}
                     </span>
                 </div>
             );

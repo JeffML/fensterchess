@@ -1,4 +1,4 @@
-const gsbc = ({ pctgs: { w, b, d }, style}) => (
+const StackedBarChart = ({ pctgs: { w, b, d }, style}) => (
     <div id="games-chart" style={style}>
         {w !== 0 && <div id="white" style={{ gridColumn: `span ${w}` }}>
             {w}%
@@ -12,4 +12,4 @@ const gsbc = ({ pctgs: { w, b, d }, style}) => (
     </div>
 );
 
-export default gsbc;
+export default StackedBarChart;
