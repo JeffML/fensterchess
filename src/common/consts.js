@@ -39,9 +39,10 @@ const siteUrls = {
 const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
 const DEFAULT_SERVER = "fenster-s.netlify.app";
 
-// get the authentication token from local storage if it exists
-const token = process.env.REACT_APP_QUOTE;
+const token = process.env.REACT_APP_QUOTE;  // authentication token
 const alias = process.env.REACT_APP_SERVER; // this can be set as follows: "REACT_APP_SERVER=flum netlify dev"
+
+const isTestMode = token === "flum"
 
 // prettier-ignore
 const serverUri = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}/.netlify/functions/server`;
@@ -65,4 +66,5 @@ export {
     serverUri,
     RANKS,
     FILES,
+    isTestMode,
 };
