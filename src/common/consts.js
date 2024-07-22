@@ -1,7 +1,7 @@
 const APP_NAME = "Fenster";
-const VERSION = "2.2.0";
+const VERSION = "2.3.0";   // keep in sync with package.json version!
 
-const INCR = 5; //list increment
+const INCR = 5; // list increment
 
 const COMPARE = 1;
 
