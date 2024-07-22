@@ -14,7 +14,7 @@ const sortEnum = {
 
 const modes = {
     main: 1,
-    admin: 2,
+    test: 2,
     search: 3,
     pgnAnalyze: 4,
     about: 5,
@@ -42,7 +42,7 @@ const DEFAULT_SERVER = "fenster-s.netlify.app";
 const token = process.env.REACT_APP_QUOTE;  // authentication token
 const alias = process.env.REACT_APP_SERVER; // this can be set as follows: "REACT_APP_SERVER=flum netlify dev"
 
-const isTestMode = token === "flum"
+const isTestMode = process.env.REACT_APP_TEST_MODE === "flum"   // brings up test page
 
 // prettier-ignore
 const serverUri = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}/.netlify/functions/server`;
