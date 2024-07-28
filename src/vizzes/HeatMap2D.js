@@ -1,5 +1,6 @@
 import HeatMap from "jsheatmap";
 import { RANKS as ordinals, FILES as files } from "../common/consts.js";
+import { Fragment } from "react";
 
 const square = {
     width: "2em",
@@ -43,10 +44,12 @@ const HeatMap2D = ({ dests }) => {
     const heatmap = new HeatMap(ordinals, destsToRows(dests));
     const data = heatmap.getData();
 
-    const ranks = data.rows.reverse().map(({ cells }) => {
-        return cells.colors.map((rgb, i) => (
-            <Square id={i} {...{ rgb, value: cells.values[i] }} />
-        ));
+    const ranks = data.rows.reverse().map(({ cells }, j) => {
+        return <Fragment key={j}>
+         {cells.colors.map((rgb, i) => (
+            <Square id={i} key={i} {...{ rgb, value: cells.values[i] }} />
+        ))}
+        </Fragment>;
     });
 
     return <div style={gridStyle}>{ranks}</div>;

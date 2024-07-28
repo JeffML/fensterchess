@@ -123,7 +123,7 @@ export const HeatMap3D = ({ dests }) => {
             p.mouseDragged = () => {
                 rotY += p.movedX;
                 rotX += -p.movedY;
-                console.log(rotX, rotY);
+                // console.log(rotX, rotY);
             };
         });
 

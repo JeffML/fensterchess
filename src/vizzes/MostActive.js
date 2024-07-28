@@ -3,27 +3,6 @@ import { useState } from "react";
 import { HeatMap3D } from "./HeatMap3D.js";
 import { HeatMap2D } from "./HeatMap2D.js";
 
-export const GET_OPENING_PATHS = gql`
-    query getPaths($type: String!, $fen: String!) {
-        getOpeningPaths(type: $type, fen: $fen) {
-            name
-            score
-            at_path {
-                fen
-                coords
-            }
-            from_paths {
-                fen
-                coords
-            }
-            to_paths {
-                fen
-                coords
-            }
-        }
-    }
-`;
-
 const GET_DEST_FREQ = gql`
     query getDestFreq($cat: String!, $code: String) {
         getDestinationSquareByFrequency(cat: $cat, code: $code) {
@@ -33,46 +12,18 @@ const GET_DEST_FREQ = gql`
     }
 `;
 
-const RF_DEGREES = 22.5;
-
-const getXYZ = ([radius, rank, file]) => {
-    const fDeg = file * RF_DEGREES;
-    const rDeg = rank * RF_DEGREES;
-
-    const x = radius * Math.sin(fDeg) * Math.cos(rDeg);
-    const y = radius * Math.sin(fDeg) * Math.sin(rDeg);
-    const z = radius * Math.cos(fDeg);
-
-    return [x, y, z];
-};
-
-const calcPath = ({ start, coords, radius }) => {
-    const orig = getXYZ(start);
-    const rest = coords.map((coord) => getXYZ([radius, ...coord]));
-
-    return [orig, ...rest];
-};
-
-const calcPaths = ({ from, at, to, radius }) => {
-    const fromPaths = from.map((coords) =>
-        calcPath({ start: [0, 0, 0], coords, radius })
-    );
-    const toPaths = to.map((coords) =>
-        calcPath({ start: at.at(-1), coords, radius })
-    );
-    return [...fromPaths, ...toPaths];
-};
-
 const HeatMapType = ({ type, setType }) => {
     const gridStyle = {
         display: "grid",
         gridTemplateColumns: "auto auto auto auto",
-        gridColumnGap: "3em"
+        gridColumnGap: "3em",
     };
 
     return (
         <div className="row" style={gridStyle} id="heatmaptype">
-            <span style={{fontWeight:"bold", color:"mediumturquoise"}}>Select a style:</span>
+            <span style={{ fontWeight: "bold", color: "mediumturquoise" }}>
+                Select a style:
+            </span>
             <label>
                 <input
                     type="radio"
@@ -137,4 +88,4 @@ const DestinationFrequenciesByEco = ({ cat, code }) => {
     return null;
 };
 
-export { DestinationFrequenciesByEco as MostActiveSquaresByEco, calcPaths };
+export { DestinationFrequenciesByEco as MostActiveSquaresByEco };

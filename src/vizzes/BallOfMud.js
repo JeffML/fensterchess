@@ -1,7 +1,59 @@
-import { useQuery } from "@apollo/client";
+import { useQuery , gql} from "@apollo/client";
 import { useRef, useEffect, useMemo } from "react";
 import p5 from "p5";
-import { GET_OPENING_PATHS, calcPaths } from "./MostActive.js";
+
+
+const RF_DEGREES = 22.5;
+
+export const GET_OPENING_PATHS = gql`
+    query getPaths($type: String!, $fen: String!) {
+        getOpeningPaths(type: $type, fen: $fen) {
+            name
+            score
+            at_path {
+                fen
+                coords
+            }
+            from_paths {
+                fen
+                coords
+            }
+            to_paths {
+                fen
+                coords
+            }
+        }
+    }
+`;
+
+
+const getXYZ = ([radius, rank, file]) => {
+    const fDeg = file * RF_DEGREES;
+    const rDeg = rank * RF_DEGREES;
+
+    const x = radius * Math.sin(fDeg) * Math.cos(rDeg);
+    const y = radius * Math.sin(fDeg) * Math.sin(rDeg);
+    const z = radius * Math.cos(fDeg);
+
+    return [x, y, z];
+};
+
+const calcPath = ({ start, coords, radius }) => {
+    const orig = getXYZ(start);
+    const rest = coords.map((coord) => getXYZ([radius, ...coord]));
+
+    return [orig, ...rest];
+};
+
+const calcPaths = ({ from, at, to, radius }) => {
+    const fromPaths = from.map((coords) =>
+        calcPath({ start: [0, 0, 0], coords, radius })
+    );
+    const toPaths = to.map((coords) =>
+        calcPath({ start: at.at(-1), coords, radius })
+    );
+    return [...fromPaths, ...toPaths];
+};
 
 export const BallOfMud = ({ fen, type }) => {
     const renderRef = useRef();
