@@ -1,0 +1,40 @@
+.node {
+    border: 1px solid grey;
+    padding: 1rem;
+    flex: 1 1 auto;
+}
+
+.card {
+    margin-bottom: 1rem;
+    background-color: white;
+}
+
+.card img {
+    max-width: 100%;
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 5px;
+    user-select: none;
+}
+
+.card button {
+    user-select: none;
+}
+
+.designation {
+    font-size: 0.675em;
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.5;
+    user-select: none;
+}
+
+.name {
+    user-select: none;
+}
+
+.children {
+    /* display: flex; */
+    display: flex;
+    gap: 0.5rem;
+}
