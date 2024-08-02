@@ -6,13 +6,22 @@ import React, { useState } from "react";
 
 const ellipse = {
     maxWidth: "1em",
-    backgroundColor: "white", writingMode: "vertical-rl" , textOrientation: "upright", fontSize:"16pt", 
-}
+    backgroundColor: "white",
+    //writingMode: "vertical-rl" , textOrientation: "upright",
+    fontSize: "12pt",
+    display: "block",
+    marginBottom: "5px",
+    // paddingRight: "10px"
+};
 
 const ellipseNode = {
     alignContent: "center",
-    maxWidth: "1em"
-}
+    maxWidth: "1em",
+};
+
+/*
+                227A/B is single; 226 is double
+            */
 
 const Node = ({ item, expanded, onExpandChange }) => {
     const [expandedChild, setExpandedChild] = useState();
@@ -31,9 +40,13 @@ const Node = ({ item, expanded, onExpandChange }) => {
                     )}
                 </div>
             )}
+
             {expanded && (
                 <div className="children">
-                    <div className="node" style={ellipseNode}><span style={ellipse}>{"<"}</span></div>
+                    <div className="node" style={ellipseNode}>
+                        <div style={ellipse}>{"\u227A"}</div>
+                        <div style={ellipse}>{"\u226A"}</div>
+                    </div>
                     {item.child?.slice(0, 5).map((item, idx) => (
                         <Node
                             key={idx}
@@ -46,7 +59,10 @@ const Node = ({ item, expanded, onExpandChange }) => {
                             expanded={expandedChild === idx}
                         />
                     ))}
-                    <div className="node" style={ellipseNode}><span style={ellipse}>{">"}</span></div>
+                    <div className="node" style={ellipseNode}>
+                        <div style={ellipse}>{"\u227B"}</div>
+                        <div style={ellipse}>{"\u226B"}</div>
+                    </div>
                 </div>
             )}
         </div>
@@ -83,7 +99,7 @@ const convert = (data) => {
             key: code,
             name: code,
             designation: name,
-            image:  "/resources/caro-panov.png",
+            image: "/resources/caro-panov.png",
         }));
 
         currObj.child = children;
