@@ -4,26 +4,22 @@ import "./flowchart.css";
 import data from "../common/ecoCodes.js";
 import React, { useState } from "react";
 
-const ellipse = {
+const arrow = {
     maxWidth: "1em",
     backgroundColor: "white",
-    //writingMode: "vertical-rl" , textOrientation: "upright",
+    // writingMode: "vertical-rl" , textOrientation: "upright",
     fontSize: "12pt",
     display: "block",
     marginBottom: "5px",
     // paddingRight: "10px"
 };
 
-const ellipseNode = {
+const arrowNode = {
     alignContent: "center",
     maxWidth: "1em",
 };
 
-/*
-                227A/B is single; 226 is double
-            */
-
-const Node = ({ item, expanded, onExpandChange }) => {
+const Node = ({ item, expanded, onExpandChange, arrows = true }) => {
     const [expandedChild, setExpandedChild] = useState();
 
     return (
@@ -43,10 +39,12 @@ const Node = ({ item, expanded, onExpandChange }) => {
 
             {expanded && (
                 <div className="children">
-                    <div className="node" style={ellipseNode}>
-                        <div style={ellipse}>{"\u227A"}</div>
-                        <div style={ellipse}>{"\u226A"}</div>
-                    </div>
+                    {arrows && (
+                        <div className="node" style={arrowNode}>
+                            <div style={arrow} className="hover">{"\u227A"}</div>
+                            <div style={arrow} className="hover">{"\u226A"}</div>
+                        </div>
+                    )}
                     {item.child?.slice(0, 5).map((item, idx) => (
                         <Node
                             key={idx}
@@ -59,10 +57,12 @@ const Node = ({ item, expanded, onExpandChange }) => {
                             expanded={expandedChild === idx}
                         />
                     ))}
-                    <div className="node" style={ellipseNode}>
-                        <div style={ellipse}>{"\u227B"}</div>
-                        <div style={ellipse}>{"\u226B"}</div>
-                    </div>
+                    {arrows && (
+                        <div className="node" style={arrowNode}>
+                            <div style={arrow} className="hover">{"\u227B"}</div>
+                            <div style={arrow} className="hover">{"\u226B"}</div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
@@ -114,5 +114,5 @@ const root = {
 };
 
 export default () => {
-    return <Node item={root} expanded />;
+    return <Node item={root} expanded arrows={false} />;
 };
