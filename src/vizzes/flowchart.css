@@ -39,7 +39,10 @@
     gap: 0.5rem;
 }
 
+.hover {
+    background-color: white;
+}
 .hover:hover {
-    cursor: pointer
-  }
-  
+    cursor: pointer;
+    background-color: lime;
+}

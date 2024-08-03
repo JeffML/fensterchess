@@ -6,12 +6,9 @@ import React, { useState } from "react";
 
 const arrow = {
     maxWidth: "1em",
-    backgroundColor: "white",
-    // writingMode: "vertical-rl" , textOrientation: "upright",
     fontSize: "12pt",
     display: "block",
     marginBottom: "5px",
-    // paddingRight: "10px"
 };
 
 const arrowNode = {
@@ -19,8 +16,18 @@ const arrowNode = {
     maxWidth: "1em",
 };
 
+const UP = 5,
+    DOWN = -5,
+    UPHARD = 10,
+    DOWNHARD = -10;
+
 const Node = ({ item, expanded, onExpandChange, arrows = true }) => {
     const [expandedChild, setExpandedChild] = useState();
+    const [childIdx, setChildIdx] = useState(0);
+
+    const bumpIndex = (upOrDown) => {
+        setChildIdx(Math.max(0, Math.min(99, childIdx + upOrDown)));
+    };
 
     return (
         <div className="node">
@@ -41,11 +48,23 @@ const Node = ({ item, expanded, onExpandChange, arrows = true }) => {
                 <div className="children">
                     {arrows && (
                         <div className="node" style={arrowNode}>
-                            <div style={arrow} className="hover">{"\u227A"}</div>
-                            <div style={arrow} className="hover">{"\u226A"}</div>
+                            <div
+                                style={arrow}
+                                className="hover"
+                                onClick={() => bumpIndex(DOWN)}
+                            >
+                                {"\u227A"}
+                            </div>
+                            <div
+                                style={arrow}
+                                className="hover"
+                                onClick={() => bumpIndex(DOWNHARD)}
+                            >
+                                {"\u226A"}
+                            </div>
                         </div>
                     )}
-                    {item.child?.slice(0, 5).map((item, idx) => (
+                    {item.child?.slice(childIdx, childIdx + 5).map((item, idx) => (
                         <Node
                             key={idx}
                             item={item}
@@ -59,8 +78,20 @@ const Node = ({ item, expanded, onExpandChange, arrows = true }) => {
                     ))}
                     {arrows && (
                         <div className="node" style={arrowNode}>
-                            <div style={arrow} className="hover">{"\u227B"}</div>
-                            <div style={arrow} className="hover">{"\u226B"}</div>
+                            <div
+                                style={arrow}
+                                className="hover"
+                                onClick={() => bumpIndex(UP)}
+                            >
+                                {"\u227B"}
+                            </div>
+                            <div
+                                style={arrow}
+                                className="hover"
+                                onClick={() => bumpIndex(UPHARD)}
+                            >
+                                {"\u226B"}
+                            </div>
                         </div>
                     )}
                 </div>
