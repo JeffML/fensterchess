@@ -21,18 +21,41 @@ const UP = 5,
     UPHARD = 10,
     DOWNHARD = -10;
 
-const Node = ({ item, expanded, onExpandChange, arrows = true }) => {
-    const [expandedChild, setExpandedChild] = useState();
-    const [childIdx, setChildIdx] = useState(0);
-
+const Arrows = ({ setChildIdx, childIdx, direction }) => {
     const bumpIndex = (upOrDown) => {
         setChildIdx(Math.max(0, Math.min(99, childIdx + upOrDown)));
     };
 
     return (
+        <div className="node" style={arrowNode}>
+            <div
+                style={arrow}
+                className="hover"
+                onClick={() => bumpIndex(direction === DOWN ? DOWN : UP)}
+            >
+                {direction === DOWN ? "\u227A" : "\u227B"}
+            </div>
+            <div
+                style={arrow}
+                className="hover"
+                onClick={() =>
+                    bumpIndex(direction === DOWN ? DOWNHARD : UPHARD)
+                }
+            >
+                {direction === DOWN ? "\u226A" : "\u226B"}
+            </div>
+        </div>
+    );
+};
+
+const Node = ({ item, expanded, onExpandChange, arrows = true }) => {
+    const [expandedChild, setExpandedChild] = useState();
+    const [childIdx, setChildIdx] = useState(0);
+
+    return (
         <div className="node">
             {item.name && (
-                <div className="card">
+                <div className="card" title={item.variation}>
                     <img src={item.image} />
                     <div className="name">{item.name}</div>
                     <div className="designation">{item.designation}</div>
@@ -46,54 +69,22 @@ const Node = ({ item, expanded, onExpandChange, arrows = true }) => {
 
             {expanded && (
                 <div className="children">
-                    {arrows && (
-                        <div className="node" style={arrowNode}>
-                            <div
-                                style={arrow}
-                                className="hover"
-                                onClick={() => bumpIndex(DOWN)}
-                            >
-                                {"\u227A"}
-                            </div>
-                            <div
-                                style={arrow}
-                                className="hover"
-                                onClick={() => bumpIndex(DOWNHARD)}
-                            >
-                                {"\u226A"}
-                            </div>
-                        </div>
-                    )}
-                    {item.child?.slice(childIdx, childIdx + 5).map((item, idx) => (
-                        <Node
-                            key={idx}
-                            item={item}
-                            onExpandChange={() => {
-                                setExpandedChild(
-                                    expandedChild === idx ? null : idx
-                                );
-                            }}
-                            expanded={expandedChild === idx}
-                        />
-                    ))}
-                    {arrows && (
-                        <div className="node" style={arrowNode}>
-                            <div
-                                style={arrow}
-                                className="hover"
-                                onClick={() => bumpIndex(UP)}
-                            >
-                                {"\u227B"}
-                            </div>
-                            <div
-                                style={arrow}
-                                className="hover"
-                                onClick={() => bumpIndex(UPHARD)}
-                            >
-                                {"\u226B"}
-                            </div>
-                        </div>
-                    )}
+                    {arrows && <Arrows {...{setChildIdx, childIdx, direction:DOWN}} />}
+                    {item.child
+                        ?.slice(childIdx, childIdx + 5)
+                        .map((item, idx) => (
+                            <Node
+                                key={idx}
+                                item={item}
+                                onExpandChange={() => {
+                                    setExpandedChild(
+                                        expandedChild === idx ? null : idx
+                                    );
+                                }}
+                                expanded={expandedChild === idx}
+                            />
+                        ))}
+                    {arrows && <Arrows {...{setChildIdx, childIdx, direction:UP}} />}
                 </div>
             )}
         </div>
@@ -126,10 +117,11 @@ const convert = (data) => {
             designation: "",
             image: "/resources/caro-panov.png",
         };
-        let children = data[key].map(([code, name]) => ({
+        let children = data[key].map(([code, name, variation]) => ({
             key: code,
             name: code,
             designation: name,
+            variation,
             image: "/resources/caro-panov.png",
         }));
 
