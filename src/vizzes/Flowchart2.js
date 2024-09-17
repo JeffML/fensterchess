@@ -56,7 +56,7 @@ const Node = ({ item, expanded, onExpandChange, arrows = true }) => {
         <div className="node">
             {item.name && (
                 <div className="card" title={item.variation}>
-                    <img src={item.image} />
+                    <img src={item.image} alt="" />
                     <div className="name">{item.name}</div>
                     <div className="designation">{item.designation}</div>
                     {onExpandChange && item.child?.length && (
@@ -106,11 +106,10 @@ converts raw data to format like:
     Where child is array of similar
 */
 const convert = (data) => {
-    const newData = [];
     let currObj = {};
 
     // add categories
-    Object.keys(data).map((key) => {
+    const newData = Object.keys(data).map((key) => {
         currObj = {
             key,
             name: key,
@@ -126,7 +125,7 @@ const convert = (data) => {
         }));
 
         currObj.child = children;
-        newData.push(currObj);
+       return currObj
     });
 
     return newData;
@@ -136,6 +135,8 @@ const root = {
     child: convert(data),
 };
 
-export default () => {
+const Component = () => {
     return <Node item={root} expanded arrows={false} />;
 };
+
+export default Component
