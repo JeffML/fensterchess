@@ -1,6 +1,60 @@
 import { useState } from "react";
 import { Display } from "./vizzes/Display.js";
-import eslintConfigReactApp from "eslint-config-react-app";
+
+const visualizations = [
+    { name: "from-to squares", type: "graph" },
+    // "flowchart": {type: "graph"},
+    { name: "most active squares", type: "heatmap" },
+    // "ball of mud": {type: "graph"},               TODO (or not)
+];
+
+const Graphs = ({ graphs, handler }) => {
+    return (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
+            {graphs.map((g) => (
+                <div
+                    key={g.name}
+                    style={{ display: "flex", marginLeft: "2em" }}
+                >
+                    <label>
+                        <input
+                            type="radio"
+                            name="viz"
+                            value={g.name}
+                            onClick={handler}
+                            style={{ width: "1em" }}
+                        ></input>
+                        {g.name}
+                    </label>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const Heatmaps = ({ heatmaps, handler }) => {
+    return (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
+            {heatmaps.map((g) => (
+                <div
+                    key={g.name}
+                    style={{ display: "flex", marginLeft: "2em" }}
+                >
+                    <label>
+                        <input
+                            type="radio"
+                            name="viz"
+                            value={g.name}
+                            onClick={handler}
+                            style={{ width: "1em" }}
+                        ></input>
+                        {g.name}
+                    </label>
+                </div>
+            ))}
+        </div>
+    );
+};
 
 const gridStyle = {
     display: "grid",
@@ -13,83 +67,36 @@ const gridStyle = {
     color: "white",
 };
 
-const visualizations = [
-    { "from-to squares": { type: "graph" } },
-    // "flowchart": {type: "graph"},
-    { "most active squares": { type: "heatmap" } },
-    // "ball of mud": {type: "graph"},               TODO (or not)
-];
-
-const vizTitle = (o) => Object.keys(o)[0]
-
-const Graphs = ({ graphs }) => {
-
-    return <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
-        {graphs.map(g => (
-            <div key={vizTitle(g)} style={{ display: "flex", marginLeft: "2em" }}>
-                <label>
-                    <input
-                        type="radio"
-                        name="viz"
-                        value={vizTitle(g)}
-                        onClick={handler}
-                        style={{ width: "1em" }}
-                    ></input>
-                    {vizTitle(g)}
-                </label>
-            </div>
-        ))}
-    </div>
-}
-
-const HeatMaps = ({heatmaps}) => {
-    return <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
-        {heatmaps.map(g => (
-            <div key={vizTitle(g)} style={{ display: "flex", marginLeft: "2em" }}>
-                <label>
-                    <input
-                        type="radio"
-                        name="viz"
-                        value={vizTitle(g)}
-                        onClick={handler}
-                        style={{ width: "1em" }}
-                    ></input>
-                    {vizTitle(g)}
-                </label>
-            </div>
-        ))}
-    </div>
-}
-
-const Visualization = () => {
+const Visualizations = () => {
     const [viz, setViz] = useState("");
     const handler = ({ target }) => {
         setViz(target.value);
     };
 
-    const graphs = visualizations.filter(o => o.type === "graph")
-    const heatmaps = visualizations.filter(o => o.type === "heatmap")
+    const graphs = visualizations.filter((o) => o.type === "graph");
+    const heatmaps = visualizations.filter((o) => o.type === "heatmap");
 
     return (
-        <div style={gridStyle} className="left">
-            <h2
+        <div className="white" style={gridStyle}>
+            <div
                 style={{
-                    gridColumn: "1 / span 2",
                     textAlign: "left",
                     marginLeft: "1em",
-                    // fontSize: "larger",
                 }}
-                className="font-cinzel"
             >
-                Experimental Visualizations
-            </h2>
-            <h3>Graphs</h3>
-            <Graphs {...{ graphs }}></Graphs>
-            <h3>Heatmaps</h3>
-            <Heatmaps {...{ heatmaps }}></Heatmaps>
-            <Display {...{ viz }} />{" "}
+                <h2 className="font-cinzel">Experimental Visualizations</h2>
+                <div style={{ gridColumn: "1" }}>
+                    <h3 className="left">Graphs</h3>
+                    <Graphs {...{ graphs, handler }}></Graphs>
+                </div>
+                <div style={{ gridColumn: "1" }}>
+                    <h3 className="left">Heatmaps</h3>
+                    <Heatmaps {...{ heatmaps, handler }}></Heatmaps>
+                </div>
+            </div>
+            <Display {...{ viz }} />
         </div>
     );
 };
 
-export default Visualization;
+export default Visualizations;
