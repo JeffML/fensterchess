@@ -3,8 +3,9 @@ import { Display } from "./vizzes/Display.js";
 
 const visualizations = [
     { name: "from-to squares", type: "graph" },
-    // "flowchart": {type: "graph"},
-    { name: "most active squares", type: "heatmap" },
+    // "ECO flowchart": {type: "graph"},
+    { name: "most active squares overall", type: "heatmap" },
+    { name: "most active squares by piece", type: "heatmap" },
     // "ball of mud": {type: "graph"},               TODO (or not)
 ];
 

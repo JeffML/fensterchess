@@ -68,7 +68,7 @@ export const Display = ({ viz }) => {
                 <img src="resources/ekthpeeramenths.jpg" alt="frankenstein movie still"/>
             </div>
         );
-    if (viz === "most active squares")
+    if (viz === "most active squares overall")
         return (
             <div className="double-column left">
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />

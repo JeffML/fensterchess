@@ -27,7 +27,6 @@ const Square = ({ rgb, value }) => {
         <div style={{ ...square, backgroundColor: bgColor }}>{value}</div>
     );
 
-    //    <div style={{ ...square, backgroundColor: rgbColor(rgb) }}>{value}</div>
 };
 
 const destsToRows = (dests) => {
