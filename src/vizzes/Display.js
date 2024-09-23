@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { MostActiveSquaresByEco } from "./MostActive.js";
+import { MostActiveSquaresByEco, MostActiveByPiece } from "./MostActive.js";
 import { FromToCircle } from "./FromToCircle.js";
 import { BallOfMud } from "./BallOfMud.js";
 import ecoCodes from "../common/ecoCodes.js";
+import { ColorAndPieces } from "./ColorAndPieces.js";
+import { MOST_ACTIVE, FROM_TO, PIECE_DESTINATION } from "../Visualizations.js";
 
 const EcoCatCode = ({ cat, setCat, setCode }) => {
     const cats = Object.keys(ecoCodes);
@@ -36,15 +38,12 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
                     <span className=" left font-cinzel">ECO Codes</span>
                     <div>
                         <select
-                        id="eco-codes"
+                            id="eco-codes"
                             size={5}
                             onChange={({ target }) => {
                                 setCode(target.value);
                             }}
                         >
-                            {/* <option value={"all"} key="x">
-                                All
-                            </option> */}
                             {ecoCodes[cat].map((entry) => (
                                 <option value={entry[0]} key={entry[0]}>
                                     {cat}
@@ -62,17 +61,23 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
 export const Display = ({ viz }) => {
     const [cat, setCat] = useState();
     const [code, setCode] = useState();
+    const [isWhite, setIsWhite] = useState();
+    const [pieces, setPieces] = useState([]);
+
     if (!viz)
         return (
             <div>
-                <img src="resources/ekthpeeramenths.jpg" alt="frankenstein movie still"/>
+                <img
+                    src="resources/ekthpeeramenths.jpg"
+                    alt="frankenstein movie still"
+                />
             </div>
         );
-    if (viz === "most active squares overall")
+    if (viz === MOST_ACTIVE)
         return (
             <div className="double-column left">
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
-                <MostActiveSquaresByEco {...{ cat, code }}/>
+                <MostActiveSquaresByEco {...{ cat, code }} />
             </div>
         );
     if (viz === "ball of mud") {
@@ -83,11 +88,23 @@ export const Display = ({ viz }) => {
 
         return <BallOfMud {...{ fen, type }} />;
     }
-    if (viz === "from-to squares")
+    if (viz === FROM_TO)
         return (
             <div className="double-column left">
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
                 <FromToCircle {...{ cat, code }} />
+            </div>
+        );
+    if (viz === PIECE_DESTINATION)
+        return (
+            <div className="double-column left">
+                <EcoCatCode {...{ cat, setCat, code, setCode }} />
+                {cat && code && (
+                    <ColorAndPieces
+                        {...{ isWhite, pieces, setIsWhite, setPieces }}
+                    />
+                )}
+                <MostActiveByPiece {...{ cat, code }} />
             </div>
         );
     return <div className="double-column left" />;

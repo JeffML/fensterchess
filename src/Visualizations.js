@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { Display } from "./vizzes/Display.js";
 
+const MOST_ACTIVE = "most active squares"
+const FROM_TO = "from-to squares"
+const PIECE_DESTINATION = "destination squares"
+
 const visualizations = [
-    { name: "from-to squares", type: "graph" },
+    { name: FROM_TO, type: "graph" },
     // "ECO flowchart": {type: "graph"},
-    { name: "most active squares overall", type: "heatmap" },
-    { name: "most active squares by piece", type: "heatmap" },
+    { name: MOST_ACTIVE, type: "heatmap" },
+    { name: PIECE_DESTINATION, type: "heatmap" },
     // "ball of mud": {type: "graph"},               TODO (or not)
 ];
 
@@ -100,4 +104,4 @@ const Visualizations = () => {
     );
 };
 
-export default Visualizations;
+export {Visualizations, FROM_TO, PIECE_DESTINATION, MOST_ACTIVE};
