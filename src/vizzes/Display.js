@@ -61,7 +61,7 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
 export const Display = ({ viz }) => {
     const [cat, setCat] = useState();
     const [code, setCode] = useState();
-    const [isWhite, setIsWhite] = useState();
+    const [colors, setColors] = useState([]);
     const [pieces, setPieces] = useState([]);
 
     if (!viz)
@@ -101,7 +101,7 @@ export const Display = ({ viz }) => {
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
                 {cat && code && (
                     <ColorAndPieces
-                        {...{ isWhite, pieces, setIsWhite, setPieces }}
+                        {...{ colors, pieces, setColors, setPieces }}
                     />
                 )}
                 <MostActiveByPiece {...{ cat, code }} />
