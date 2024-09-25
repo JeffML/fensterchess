@@ -62,7 +62,7 @@ export const Display = ({ viz }) => {
     const [cat, setCat] = useState();
     const [code, setCode] = useState();
     const [colors, setColors] = useState([]);
-    const [pieces, setPieces] = useState([]);
+    const [piece, setPiece] = useState();
 
     if (!viz)
         return (
@@ -101,10 +101,10 @@ export const Display = ({ viz }) => {
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
                 {cat && code && (
                     <ColorAndPieces
-                        {...{ colors, pieces, setColors, setPieces }}
+                        {...{ colors, piece, setColors, setPiece }}
                     />
                 )}
-                <MostActiveByPiece {...{ cat, code }} />
+                <MostActiveByPiece {...{ cat, code, colors, piece}} />
             </div>
         );
     return <div className="double-column left" />;

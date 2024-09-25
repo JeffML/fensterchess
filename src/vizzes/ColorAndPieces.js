@@ -1,16 +1,13 @@
-const ColorAndPieces = ({ colors, pieces, setColors, setPieces }) => {
+const ColorAndPieces = ({ colors, piece, setColors, setPiece }) => {
 
     const handler = ({ value, name, checked }) => {
         if (name === "color") {
             const newColors = checked
-                ? colors.push(value) && colors
+                ? colors.concat(value)
                 : colors.filter((c) => c !== value);
             setColors(newColors);
         } else if (name === "piece") {
-            const newPieces = checked
-                ? pieces.push(value) && pieces
-                : pieces.filter((p) => p !== value);
-            setPieces(newPieces);
+            setPiece(value);
         }
     };
 
@@ -47,7 +44,7 @@ const ColorAndPieces = ({ colors, pieces, setColors, setPieces }) => {
         );
     };
 
-    const PieceCheckBoxes = () => {
+    const PieceRadios = () => {
         const pieceChoices = ["P", "R", "N", "B", "Q", "K"];
         return (
             <div
@@ -60,16 +57,16 @@ const ColorAndPieces = ({ colors, pieces, setColors, setPieces }) => {
                 }}
                 className="white"
             >
-                {pieceChoices.map((piece) => (
-                    <label key={piece}>
+                {pieceChoices.map((p) => (
+                    <label key={p}>
                         {" "}
-                        {piece}:{" "}
+                        {p}:{" "}
                         <input
-                            type="checkbox"
+                            type="radio"
                             name="piece"
-                            value={piece}
+                            value={p}
                             defaultChecked={
-                                pieces.includes(piece)
+                                p === piece
                             }
                             onClick={(e) => handler(e.target)}
                         />
@@ -99,7 +96,7 @@ const ColorAndPieces = ({ colors, pieces, setColors, setPieces }) => {
                     color: "mediumturquoise",
                 }}
             >
-                Pieces: &nbsp;&nbsp; <PieceCheckBoxes />
+                Pieces: &nbsp;&nbsp; <PieceRadios />
             </label>
         </div>
     );

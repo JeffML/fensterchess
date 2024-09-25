@@ -4,8 +4,8 @@ import { HeatMap3D } from "./HeatMap3D.js";
 import { HeatMap2D } from "./HeatMap2D.js";
 
 const GET_DEST_FREQ = gql`
-    query getDestFreq($cat: String!, $code: String) {
-        getDestinationSquareByFrequency(cat: $cat, code: $code) {
+    query getDestFreq($cat: String!, $code: String, $groupLevel: Int) {
+        getDestinationSquareByFrequency(cat: $cat, code: $code groupLevel: $groupLevel) {
             key
             value
         }
@@ -88,27 +88,38 @@ const DestinationFrequenciesByEco = ({ cat, code }) => {
     return null;
 };
 
-const MostActiveByPiece = ({ cat, code, color, pieces }) => {
+const MostActiveByPiece = ({ cat, code, colors, piece }) => {
     const [type, setType] = useState();
 
     if (code === "all") code = undefined;
 
     const { error, data, loading } = useQuery(GET_DEST_FREQ, {
-        variables: { cat, code },
+        variables: { cat, code, groupLevel:4 },
         skip: !cat || !code,
     });
 
     if (error) console.error(error.toString());
     if (loading) return <div className="double-column left">Loading...</div>;
     if (data) {
+        // reduce according to colors and piece selected
         const dests = data.getDestinationSquareByFrequency.reduce((acc, d) => {
-            if (pieces && !pieces.includes(d.key[2][0])) return acc;
+            let dPiece = d.key[2][0]  // first letter of move
+            if ("abcdefgh".includes(dPiece)) dPiece = 'P'            
+            if (piece !== dPiece) return acc;
+
+            const isWhite = d.key[3]
 
             const dest = d.key[2].substr(-2);
             acc[dest] ??= 0;
-            if (!color) acc[dest] += d.value;
-            else if (color === "W" && d.key[3] === true) acc[dest] += d.value;
-            else if (color === "B" && d.key[3] === false) acc[dest] += d.value;
+
+            if (colors.includes("White") && isWhite === "true") {
+                acc[dest] += d.value;
+            }
+
+            if (colors.includes("Black") && isWhite === "false") {
+                acc[dest] += d.value;
+            }
+
             return acc;
         }, {});
 
