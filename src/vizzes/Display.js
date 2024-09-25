@@ -45,9 +45,9 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
                             }}
                         >
                             {ecoCodes[cat].map((entry) => (
-                                <option value={entry[0]} key={entry[0]}>
+                                <option value={entry[0]} key={entry[0]} title={entry[2]}>
                                     {cat}
-                                    {entry[0]} {entry[1]}
+                                    {entry[0]} {entry[1]}, {entry[2].substring(0, 30)}
                                 </option>
                             ))}
                         </select>
