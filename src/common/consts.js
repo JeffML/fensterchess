@@ -1,5 +1,5 @@
 const APP_NAME = "Fenster";
-const VERSION = "2.3.0";   // keep in sync with package.json version!
+const VERSION = "2.3.0"; // keep in sync with package.json version!
 
 const INCR = 5; // list increment
 
@@ -29,20 +29,20 @@ SUBTITLES[modes.visualization] = "Visualization";
 SUBTITLES[modes.about] = "About Fenster";
 
 // Note: shredder has been down before; check https://www.shredderchess.com/online/opening-database.html or see fenster-s getOpeningAdditional resolver
-const sites = ["FICS", "lichess", "shredder"]; 
+const sites = ["FICS", "lichess", "shredder"];
 const siteUrls = {
     FICS: "https://www.freechess.org/",
     lichess: "https://lichess.org/",
-    shredder: "https://www.shredderchess.com/",   
+    shredder: "https://www.shredderchess.com/",
 };
 
 const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
 const DEFAULT_SERVER = "fenster-s.netlify.app";
 
-const token = process.env.REACT_APP_QUOTE;  // authentication token
+const token = process.env.REACT_APP_QUOTE; // authentication token
 const alias = process.env.REACT_APP_SERVER; // this can be set as follows: "REACT_APP_SERVER=flum netlify dev"
 
-const isTestMode = process.env.REACT_APP_TEST_MODE === "flum"   // brings up test page
+const isTestMode = process.env.REACT_APP_TEST_MODE === "flum"; // brings up test page
 
 // prettier-ignore
 const serverUri = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}/.netlify/functions/server`;
@@ -50,6 +50,14 @@ const serverUri = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}/.netlify
 
 const RANKS = [1, 2, 3, 4, 5, 6, 7, 8];
 const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"];
+
+const ECO_CATS = [
+    ["A", "Flank Openings"],
+    ["B", "Semi-Open Games"],
+    ["C", "Open Games, and French Defense"],
+    ["D", "Closed and Semi-Closed Games"],
+    ["E", "Indian Defenses"],
+];
 
 export {
     APP_NAME,
@@ -66,5 +74,6 @@ export {
     serverUri,
     RANKS,
     FILES,
+    ECO_CATS,
     isTestMode,
 };

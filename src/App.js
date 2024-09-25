@@ -6,7 +6,7 @@ import { SelectedSitesContextProvider } from "./common/Contexts.js";
 import PageHeader from "./PageHeader.js";
 import PgnAnalysis from "./PgnAnalyzePage.js";
 import SearchPage from "./SearchPage.js";
-import TestComponent from "./TestComponent.js";
+// import TestComponent from "./TestComponent.js";
 import { Visualizations } from "./Visualizations.js";
 
 function App() {
@@ -22,7 +22,7 @@ function App() {
                 {mode === modes.pgnAnalyze && <PgnAnalysis {...{ setMode }} />}
                 {mode === modes.visualization && <Visualizations />}
                 {mode === modes.about && <AboutPage />}
-                {mode === modes.test && <TestComponent />}
+                {/* {mode === modes.test && <TestComponent />} */}
             </SelectedSitesContextProvider>
         </div>
     );

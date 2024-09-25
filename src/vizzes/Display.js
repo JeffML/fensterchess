@@ -4,9 +4,10 @@ import { FromToCircle } from "./FromToCircle.js";
 import { BallOfMud } from "./BallOfMud.js";
 import ecoCodes from "../common/ecoCodes.js";
 import { ColorAndPieces } from "./ColorAndPieces.js";
-import { MOST_ACTIVE, FROM_TO, PIECE_DESTINATION } from "../Visualizations.js";
+import { MOST_ACTIVE, FROM_TO, PIECE_DESTINATION, ECO_FLOWCHART } from "../Visualizations.js";
+import {EcoFlowchart} from './EcoFlowchart.js'
 
-const EcoCatCode = ({ cat, setCat, setCode }) => {
+function EcoCatCode({ cat, setCat, setCode }) {
     const cats = Object.keys(ecoCodes);
     const radioGridStyle = {
         display: "grid",
@@ -28,8 +29,7 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
                             name="cat"
                             defaultChecked={cat === c}
                             value={c}
-                            onChange={() => setCat(c)}
-                        />
+                            onChange={() => setCat(c)} />
                     </label>
                 ))}
             </div>
@@ -42,7 +42,7 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
                             size={5}
                             onChange={({ target }) => {
                                 setCode(target.value);
-                            }}
+                            } }
                         >
                             {ecoCodes[cat].map((entry) => (
                                 <option value={entry[0]} key={entry[0]} title={entry[2]}>
@@ -56,7 +56,7 @@ const EcoCatCode = ({ cat, setCat, setCode }) => {
             )}
         </div>
     );
-};
+}
 
 export const Display = ({ viz }) => {
     const [cat, setCat] = useState();
@@ -107,5 +107,9 @@ export const Display = ({ viz }) => {
                 <MostActiveByPiece {...{ cat, code, colors, piece}} />
             </div>
         );
+    if (viz === ECO_FLOWCHART) 
+        return (
+            <EcoFlowchart></EcoFlowchart>
+        )
     return <div className="double-column left" />;
 };
