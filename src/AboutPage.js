@@ -13,16 +13,16 @@ const About = () => (
         <div className="about">
             <p>
                 Fenster is a comprehensive chess opening reference with over
-                15,000 variations. The base opening data is public and can be
+                15,000 variations in its database. The opening database content is public and can be
                 found at{" "}
                 <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>.
             </p>
             <p>
-                Fenster is not a repository of chess games, though it is capable
-                of pulling in associated opening and game information from{" "}
-                <a href="https://www.ficsgames.org/">FICS</a>,{" "} <a href="https://www.shredderchess.com/online/opening-database.html">Shredder</a> and {" "}
-                <a href="https://lichess.org/">lichess</a> sites if
-                requested.
+                At present, there is no repository of chess games, though Fenster is capable
+                of pulling game metadata from the following sources:{" "}
+                <ul><li><a href="https://www.ficsgames.org/">FICS</a></li>
+                <li><a href="https://www.shredderchess.com/online/opening-database.html">Shredder</a></li>
+                <li><a href="https://lichess.org/">lichess</a></li></ul>
             </p>
             <h2>The Search Page</h2>
             <p>
@@ -32,7 +32,7 @@ const About = () => (
                 be displayed on the right.
             </p>
             <img
-                src="resources/Screenshot 2024-01-25 9.09.53 AM.png"
+                src="resources/SearchPage.png"
                 className="image"
                 alt="Search Page"
             />
@@ -62,7 +62,7 @@ const About = () => (
                 </a>
             </p>
             <img
-                src="resources/Screenshot 2024-01-25 9.10.34 AM.png"
+                src="resources/Theory.png"
                 className="image"
                 alt="Chess Opening Theory tab"
             />
@@ -74,7 +74,7 @@ const About = () => (
                 displayed. On this tab is game data from the external site(s)
                 selected.
                 <img
-                    src="resources/Screenshot 2024-01-25 9.47.13 AM.png"
+                    src="resources/ExternalInfo.png"
                     className="image"
                     alt="external site data"
                 />
@@ -91,7 +91,7 @@ const About = () => (
                 sequences, transitioning from one variation to another.
             </p>
             <img
-                src="resources/Screenshot 2024-01-25 9.15.32 AM.png"
+                src="resources/Transitions.png"
                 className="image"
                 alt="Opening Transitions tab"
             />
@@ -109,7 +109,7 @@ const About = () => (
                 positions that are (somewhat) like the current position.
             </p>
             <img
-                src="resources/Screenshot 2024-01-25 9.12.30 AM.png"
+                src="resources/Similar.png"
                 alt="similar openings shown"
                 className="image"
             />
@@ -127,7 +127,7 @@ const About = () => (
             </p>
             <h2>The PGN Import Page</h2>
             <img
-                src="resources/Screenshot 2024-01-25 10.23.53 AM.png"
+                src="resources/PgnImport.png"
                 alt="the PGN import page"
                 className="image"
             />
@@ -140,7 +140,7 @@ const About = () => (
                 the Games tab.{" "}
             </p>
             <img
-                src="resources/Screenshot 2024-01-25 12.07.23 PM.png"
+                src="resources/PgnGameFilter.png"
                 alt="the PGN import page"
                 className="image"
                 style={{ maxWidth: "50%" }}
@@ -150,8 +150,8 @@ const About = () => (
                 opening(s).
             </p>
             <img
-                src="resources/Screenshot 2024-01-25 12.08.06 PM.png"
-                alt="the PGN import page"
+                src="resources/PgnGameList.png"
+                alt="the PGN game list"
                 className="image"
             />
             <p>
@@ -159,10 +159,41 @@ const About = () => (
                 Opening tab will show what Fenster knows about the opening.
             </p>
             <img
-                src="resources/Screenshot 2024-01-25 12.08.38 PM.png"
+                src="resources/PgnGameDetail.png"
                 alt="the PGN import page"
                 className="image"
             />
+            <h2>Visualizations</h2>
+            <img
+                src="resources/Visualizations.png"
+                alt="the PGN import page"
+                className="image"
+            />
+            <p>
+                These are experimental and targeted toward the idly curious.
+                <h3>
+                    From-To squares
+                </h3>
+                <p>
+                    For all variations in a selected ECO code, an association graph will be drawn showing origination and destination squares of all pieces. 
+                </p>
+                <h3>ECO categories and codes</h3>
+                <p>
+                    By selecting an ECO category, a list of all ECO codes in that category will be shown.
+                </p>
+                <h3>
+                    Most active squares
+                </h3>
+                <p>
+                    This is a heatmap showing which squares are most "active", meaning the most common destination of all pieces for a given ECO code
+                </p>
+                <h3>
+                    Destination squares
+                </h3>
+                <p>
+                    Similar to above, this heatmap pertains to specific pieces and player color. Inspired by <a href="https://github.com/Ramon-Deniz/ChessData">this project</a>.
+                </p>
+            </p>
             <h2>Questions? Bugs? Feature requests?</h2>
             The Fenster client is an open source project maintained on github.
             There you can open a{" "}

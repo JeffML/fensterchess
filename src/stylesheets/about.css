@@ -13,10 +13,6 @@ h3 {
     text-indent: 1.5em;
 }
 
-p{
-    margin: 2em;
-}
-
 pre {
     margin-left: 3em;
 }
@@ -25,8 +21,19 @@ a {
     color: limegreen;
 }
 
+p {
+    font-size: 14pt;
+    font-family: 'Inter Tight', sans-serif;
+    margin: 1.5rem;
+}
+
+h3 + p {
+    margin: 2rem;
+}
+
 .image {
     max-width: 80%;
     border: 5px solid darkkhaki;
     margin-left: 10%;
+    margin-top: 1rem;
 }
