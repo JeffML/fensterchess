@@ -41,4 +41,17 @@ const theoryRequest = async (currentMoves, setHtml) => {
     }
 };
 
-export { movesToFen, newName, toPlay, theoryRequest };
+function parseMoves(moveString) {
+    const tokens = moveString.split(" ");
+    const wholeMoves = Math.trunc(tokens.length / 3);
+    const partialMoves = tokens.length % 3;
+    const nextPly = tokens.at(-1);
+
+    const theMove = wholeMoves +
+        (partialMoves ? 1 : 0) +
+        (partialMoves ? ". " : "... ") +
+        nextPly;
+    return { nextPly, theMove };
+}
+
+export { movesToFen, newName, toPlay, theoryRequest, parseMoves };
