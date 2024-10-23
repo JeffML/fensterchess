@@ -2,9 +2,9 @@ import { sortEnum } from "./common/consts.js";
 import { Fragment, useState } from "react";
 import { newName } from "./utils/chessTools.js";
 import "./stylesheets/nextMovesRow.css";
-import {Chess} from "chess.js"
+import { Chess } from "chess.js";
 
-const chess = new Chess()
+const chess = new Chess();
 
 /**
  * Shows next opening variations from current positions
@@ -69,20 +69,14 @@ const NextOpeningsGrid = ({ handleMovePlayed, legalMoves, sortBy }) => {
     );
 };
 
-const TranspositionsGrid = ({transpositions, sortBy }) => {
-    
+const TranspositionsGrid = ({ transpositions, sortBy }) => {
     // open a new tab with this transposition
     const handleMovePlayed = (moves) => {
-        chess.loadPgn(moves)
-        const fen = chess.fen()
-        const domain = window.location.origin
+        const domain = window.location.origin;
+        const newBrowserTab = domain + `?moves=${moves}`;
+        window.open(newBrowserTab, "_blank");
+    };
 
-        const newBrowserTab = domain + `?fen=${fen}`
-        window.open(newBrowserTab, '_blank')
-
-    }
-    
-    
     const toSort = [...transpositions];
 
     switch (sortBy) {
@@ -111,7 +105,13 @@ const TranspositionsGrid = ({transpositions, sortBy }) => {
                     backgroundColor,
                 }}
             >
-                <div style={{ textAlign: "left", paddingLeft: "1em", fontFamily: "mono" }}>
+                <div
+                    style={{
+                        textAlign: "left",
+                        paddingLeft: "1em",
+                        fontFamily: "mono",
+                    }}
+                >
                     {moves.replace(/(\d{1,3}\.)\s/g, "$1")}
                 </div>
                 <div style={{ paddingLeft: "1em" }}>{eco}</div>
@@ -176,7 +176,7 @@ const NextOpenings = ({ legalMoves, transpositions, handleMovePlayed }) => {
 
                 <div className="row">
                     <div className="column">
-                    <h3 className="row">Next Moves</h3>
+                        <h3 className="row">Next Moves</h3>
                         <NextOpeningsGrid
                             {...{
                                 legalMoves,
@@ -186,17 +186,19 @@ const NextOpenings = ({ legalMoves, transpositions, handleMovePlayed }) => {
                         />
                     </div>
                 </div>
-                {transpositions.length !== 0 && <div className="row">
-                    <div className="column">
-                    <h3 className="row">Transpositions</h3>
-                        <TranspositionsGrid
-                            {...{
-                                transpositions,
-                                sortBy,
-                            }}
-                        />
+                {transpositions.length !== 0 && (
+                    <div className="row">
+                        <div className="column">
+                            <h3 className="row">Transpositions</h3>
+                            <TranspositionsGrid
+                                {...{
+                                    transpositions,
+                                    sortBy,
+                                }}
+                            />
+                        </div>
                     </div>
-                </div>}
+                )}
             </div>
         );
     } else {

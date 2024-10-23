@@ -1,7 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Chess } from "chess.js";
 import { Chessboard } from "kokopu-react";
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef, useEffect, useState } from "react";
 import { OpeningTabs } from "./OpeningAdditional.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import { ActionButton } from "./common/Buttons.js";
@@ -224,19 +224,42 @@ const SearchPage = ({ chess, fen, setFen }) => {
     );
 };
 
-const ThePage = () => {
-    let qfen = new URLSearchParams(window.location.search).get("fen");
+let paramsRead = false;
 
-    if (qfen) {
-        if (!FENEX.test(qfen.split(" ")[0])) {
-            qfen = "start";
+const ThePage = () => {
+    const qfen = useRef("start");
+    const chess = useRef(new Chess());
+
+    if (!paramsRead) {
+        const url =  new URLSearchParams(window.location.search)
+        let qmoves = url.get("moves")
+        url.delete("moves") // done with param
+    
+        if (qmoves) {
+            try {
+                chess.current.loadPgn(qmoves)
+                qfen.current = chess.current.fen()
+            } catch (e) {
+                console.log(e)
+                qmoves = ""
+            }
+        } else {
+            qfen.current = new URLSearchParams(window.location.search).get("fen");
         }
-    } else {
-        qfen = "start";
+    
+        if (qfen.current) {
+            if (!FENEX.test(qfen.current.split(" ")[0])) {
+                qfen.current = "start";
+            }
+        } else {
+            qfen.current = "start";
+        }
+
+        paramsRead = true;
     }
 
-    const [fen, setFen] = useState(qfen);
-    const chess = useRef(new Chess());
+
+    const [fen, setFen] = useState(qfen.current);
 
     return <SearchPage {...{ chess, fen, setFen }} />;
 };
