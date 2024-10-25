@@ -138,3 +138,4 @@ dist
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+src/common/ecoCodes_old.js
