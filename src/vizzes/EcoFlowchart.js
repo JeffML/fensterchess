@@ -2,7 +2,10 @@ import data from "../common/ecoCodes.js";
 import { ECO_CATS } from "../common/consts.js";
 import "./EcoFlowchart.css";
 import { useState } from "react";
+import {Chessboard} from "kokopu-react"
+import {Chess} from "chess.js"
 
+const chess = new Chess()
 
 
 const EcoCats = ({ category }) => {
@@ -24,7 +27,8 @@ const EcoCats = ({ category }) => {
                 {data[cat].map(([code, desc, desc2]) => (
                     <p style={{borderBottom:'solid 1px', margin:'1em'}}>
                         <span style={{color:'lightgray', textShadow: '1px 1px 4px black'}}>{cat}
-                        {code}:{"   "}</span>{desc},{desc2}
+                        {code}:{"   "}</span>{desc},{"  "}{desc2}
+                        {/* <Chessboard position={chess.loadPgn(desc2).fen()}/> */}
                     </p>
                 ))}
             </div>
