@@ -13,16 +13,27 @@ const About = () => (
         <div className="about">
             <p>
                 Fenster is a comprehensive chess opening reference with over
-                15,000 variations in its database. The opening database content is public and can be
-                found at{" "}
+                15,000 variations in its database. The opening database content
+                is public and can be found at{" "}
                 <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>.
             </p>
             <p>
-                At present, there is no repository of chess games, though Fenster is capable
-                of pulling game metadata from the following sources:{" "}
-                <ul><li><a href="https://www.ficsgames.org/">FICS</a></li>
-                <li><a href="https://www.shredderchess.com/online/opening-database.html">Shredder</a></li>
-                <li><a href="https://lichess.org/">lichess</a></li></ul>
+                At present, there is no repository of chess games, though
+                Fenster is capable of pulling game metadata from the following
+                sources:{" "}
+                <ul>
+                    <li>
+                        <a href="https://www.ficsgames.org/">FICS</a>
+                    </li>
+                    <li>
+                        <a href="https://www.shredderchess.com/online/opening-database.html">
+                            Shredder
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://lichess.org/">lichess</a>
+                    </li>
+                </ul>
             </p>
             <h2>The Search Page</h2>
             <p>
@@ -42,10 +53,33 @@ const About = () => (
                 <a href="https://en.wikipedia.org/wiki/Encyclopaedia_of_Chess_Openings#Main_ECO_codes">
                     ECO code
                 </a>
-                . Directly below that are next move continuations. A
-                continuation may branch into a new opening variation, or may
-                continue along the current opening variation. By clicking on the
-                variation name, the next move will be made on the board.
+                . Directly below that are continuations. There are two types:
+                <ul>
+                    <li>
+                        Those that can be played from the current opening
+                        sequence, called 'Next Moves';
+                    </li>
+                    <li>
+                        Variations with a conflicting move sequence, called
+                        transpositions
+                    </li>
+                </ul>
+                The latter needs some explaination. Let's look at the move
+                sequence 1.c4 d5:
+                <img
+                    src="resources/NextVsTransposition.png"
+                    className="image"
+                    alt="Next and Transposition variations"
+                />
+                </p>
+                <p>From the current position, we can arrive at all three positons
+                arising from the variations listed in the Next Moves tab.
+                However, only one variation can be played directly (<b>2. cxd5</b>).
+                The two others are transpositions whose move sequences are in
+                conflict with the current variation. In these cases, <b>2. c4</b> can't
+                be played, because <b>1. c4</b> was played already. If you click on the
+                variation name of the transposition, it will open a new tab with that variation's
+                move sequence.
             </p>
             <p>
                 The rightmost column is a chess engine evaluation* of the
@@ -85,22 +119,18 @@ const About = () => (
                 same variation name as Fenster has, but this won't always be the
                 case as variation names are not standardized.
             </p>
-            <h3>Transitions</h3>
+            <h3>Roots</h3>
             <p>
-                An opening position might be arrived at through different move
-                sequences, transitioning from one variation to another.
+                An opening position might be arrived at through different root
+                move sequences.
             </p>
-            <img
-                src="resources/Transitions.png"
-                className="image"
-                alt="Opening Transitions tab"
-            />
+            <img src="resources/Roots.png" className="image" alt="Roots tab" />
             <p>
                 In the position shown above, the variation in Fenster's opening
                 book is named <b>DO6 Queen's Gambit</b>. This position can be
-                arrived at via the{" "}
+                arrived at via the move sequences{" "}
                 <b>English Opening: Anglo-Scandinavian Defense</b> or from the{" "}
-                <b>Queen's Pawn Game</b> move order.
+                <b>Queen's Pawn Game</b>.
             </p>
             <h3>Similar openings</h3>
             <p>
@@ -171,27 +201,31 @@ const About = () => (
             />
             <p>
                 These are experimental and targeted toward the idly curious.
-                <h3>
-                    From-To squares
-                </h3>
+                <h3>From-To squares</h3>
                 <p>
-                    For all variations in a selected ECO code, an association graph will be drawn showing origination and destination squares of all pieces. 
+                    For all variations in a selected ECO code, an association
+                    graph will be drawn showing origination and destination
+                    squares of all pieces.
                 </p>
                 <h3>ECO categories and codes</h3>
                 <p>
-                    By selecting an ECO category, a list of all ECO codes in that category will be shown.
+                    By selecting an ECO category, a list of all ECO codes in
+                    that category will be shown.
                 </p>
-                <h3>
-                    Most active squares
-                </h3>
+                <h3>Most active squares</h3>
                 <p>
-                    This is a heatmap showing which squares are most "active", meaning the most common destination of all pieces for a given ECO code
+                    This is a heatmap showing which squares are most "active",
+                    meaning the most common destination of all pieces for a
+                    given ECO code
                 </p>
-                <h3>
-                    Destination squares
-                </h3>
+                <h3>Destination squares</h3>
                 <p>
-                    Similar to above, this heatmap pertains to specific pieces and player color. Inspired by <a href="https://github.com/Ramon-Deniz/ChessData">this project</a>.
+                    Similar to above, this heatmap pertains to specific pieces
+                    and player color. Inspired by{" "}
+                    <a href="https://github.com/Ramon-Deniz/ChessData">
+                        this project
+                    </a>
+                    .
                 </p>
             </p>
             <h2>Questions? Bugs? Feature requests?</h2>
@@ -200,7 +234,11 @@ const About = () => (
             <a href="https://github.com/JeffML/fensterchess/discussions/1">
                 discussion
             </a>
-            , <a href="https://github.com/JeffML/fensterchess/issues">log a bug, or request a feature</a>.
+            ,{" "}
+            <a href="https://github.com/JeffML/fensterchess/issues">
+                log a bug, or request a feature
+            </a>
+            .
         </div>
     </>
 );
