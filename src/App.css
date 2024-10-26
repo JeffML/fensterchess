@@ -78,6 +78,12 @@ th,
   justify-content: flex-start;
 }
 
+.right {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
 .centered-sm {
   position: absolute;
   top: 75%;
