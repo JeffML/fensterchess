@@ -1,6 +1,5 @@
 # About
-[Fenster](https://fensterchess.com) is a chess opening database. The open source client (fensterchess.com) is in this repository. The data is stored on a nosql database, with restricted access. It has a GraphQL API, however, 
-which can requested. All opening data is derived from the github procject <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>.
+[Fenster](https://fensterchess.com) is a chess opening database. The client is open source and maintained in this repository. The data server code is closed source, but limited database access is available by request using a GraphQL API. All opening data is derived from the github project <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>.
 
 ## Tech Stack
 Major techs/dependencies are as follows:
