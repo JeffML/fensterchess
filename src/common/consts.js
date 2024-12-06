@@ -1,5 +1,5 @@
 const APP_NAME = "Fenster";
-const VERSION = "2.3.2"; // keep in sync with package.json version!
+const VERSION = "2.3.3"; // keep in sync with package.json version!
 
 const INCR = 5; // list increment
 
@@ -29,12 +29,14 @@ SUBTITLES[modes.visualization] = "Visualization";
 SUBTITLES[modes.about] = "About Fenster";
 
 // Note: shredder has been down before; check https://www.shredderchess.com/online/opening-database.html or see fenster-s getOpeningAdditional resolver
-const sites = ["FICS", "lichess", "shredder"];
+
 const siteUrls = {
     FICS: "https://www.freechess.org/",
     lichess: "https://lichess.org/",
-    shredder: "https://www.shredderchess.com/",
+    // shredder: "https://www.shredderchess.com/",
 };
+
+const sites = Object.keys(siteUrls);
 
 const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
 const DEFAULT_SERVER = "fenster-s.netlify.app";
