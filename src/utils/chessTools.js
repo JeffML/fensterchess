@@ -42,7 +42,7 @@ const theoryRequest = async (currentMoves, setHtml) => {
 };
 
 function parseMoves(moveString) {
-    const tokens = moveString.split(" ");
+    const tokens = moveString.trim().split(/\s+/g);
     const wholeMoves = Math.trunc(tokens.length / 3);
     const partialMoves = tokens.length % 3;
     const nextPly = tokens.at(-1);
