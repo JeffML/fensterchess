@@ -1,10 +1,6 @@
 import { sortEnum } from "./common/consts.js";
 import { Fragment, useState } from "react";
-import { newName } from "./utils/chessTools.js";
 import "./stylesheets/nextMovesRow.css";
-import { Chess } from "chess.js";
-
-const chess = new Chess();
 
 /**
  * Shows next opening variations from current positions
@@ -34,7 +30,6 @@ const NextOpeningsGrid = ({ handleMovePlayed, legalMoves, sortBy }) => {
     }
 
     const ListItem = ({ name, score, eco, theMove, nextPly }, index) => {
-        name = newName(name);
 
         const backgroundColor = index % 2 ? "darkslategrey" : "slategrey";
         return (
@@ -94,8 +89,6 @@ const TranspositionsGrid = ({ transpositions, sortBy }) => {
     }
 
     const ListItem = ({ name, score, eco, moves }, index) => {
-        name = newName(name);
-
         const backgroundColor = index % 2 ? "darkslategrey" : "slategrey";
         return (
             <div

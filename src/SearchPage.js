@@ -1,13 +1,12 @@
 import { gql, useQuery } from "@apollo/client";
 import { Chess } from "chess.js";
 import { Chessboard } from "kokopu-react";
-import { useContext, useRef, useEffect, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { OpeningTabs } from "./OpeningAdditional.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import { ActionButton } from "./common/Buttons.js";
 import { FENEX } from "./common/consts.js";
 import "./stylesheets/textarea.css";
-import { newName } from "./utils/chessTools.js";
 
 const GET_OPENING = gql`
     query getOpening($fen: String!) {
@@ -69,7 +68,7 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
                             fontFamily: "sans",
                         }}
                     >
-                        {eco}&nbsp;{newName(name)}
+                        {eco}&nbsp;{name}
                     </span>
                 </span>
 

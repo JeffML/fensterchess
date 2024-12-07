@@ -8,7 +8,7 @@ const movesToFen = (moves) => {
     return chess.fen();
 };
 
-const newName = (name) => name.replace(/(\s\(i\))+/, "*");
+// const newName = (name) => name.replace(/(\s\(i\))+/, "*");
 
 const toPlay = (fen) => {
     const splitFen = fen.split(" ");
@@ -54,4 +54,4 @@ function parseMoves(moveString) {
     return { nextPly, theMove };
 }
 
-export { movesToFen, newName, toPlay, theoryRequest, parseMoves };
+export { movesToFen, toPlay, theoryRequest, parseMoves };

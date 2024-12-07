@@ -7,7 +7,6 @@ import { NextOpenings, Roots } from "./NextOpenings.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import StackedBarChart from "./common/StackedBarChart.js";
 import {
-    newName,
     parseMoves,
     theoryRequest,
     toPlay,
@@ -144,7 +143,7 @@ const SimilarOpenings = ({ fen, setFen }) => {
                         className="fakeLink"
                         onClick={() => setFen(sim.fen)}
                     >
-                        {newName(sim.name)}
+                        {sim.name}
                     </span>
                     <Chessboard position={sim.fen} squareSize={20} />
                 </div>

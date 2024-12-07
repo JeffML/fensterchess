@@ -3,9 +3,6 @@ import { ECO_CATS } from "../common/consts.js";
 import "./EcoFlowchart.css";
 import { useState } from "react";
 import { Chessboard } from "kokopu-react";
-import { Chess } from "chess.js";
-
-const chess = new Chess();
 
 const EcoCats = ({ category }) => {
     const [cat, desc] = category;
