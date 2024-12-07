@@ -2,10 +2,10 @@ import { gql, useQuery } from "@apollo/client";
 import { Chess } from "chess.js";
 import { Chessboard } from "kokopu-react";
 import { useContext, useRef, useState } from "react";
-import { OpeningTabs } from "./OpeningAdditional.js";
+import { OpeningTabs } from "./OpeningTabs.js";
 import { SelectedSitesContext } from "./common/Contexts.js";
 import { ActionButton } from "./common/Buttons.js";
-import { FENEX } from "./common/consts.js";
+import { FENEX, NO_ENTRY_FOUND } from "./common/consts.js";
 import "./stylesheets/textarea.css";
 
 const GET_OPENING = gql`
@@ -26,6 +26,7 @@ const GET_OPENING = gql`
             }
             aliases
             score
+            src
         }
     }
 `;
@@ -35,11 +36,7 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
 
     if (data) {
         if (data.getOpeningForFenFull === null) {
-            return (
-                <div className="double-column left">
-                    No Entry Found in Opening Book
-                </div>
-            );
+            return <div className="double-column left">{NO_ENTRY_FOUND}</div>;
         }
         let {
             getOpeningForFenFull: {
@@ -210,9 +207,14 @@ const SearchPage = ({ chess, fen, setFen }) => {
                         </span>
                     )}
 
-                    {error && (
-                        <span style={{ color: "red" }}>{error.toString()}</span>
-                    )}
+                    {error &&
+                        (error.message.startsWith("not_found") ? (
+                            NO_ENTRY_FOUND
+                        ) : (
+                            <span style={{ color: "red" }}>
+                                {error.toString()}
+                            </span>
+                        ))}
 
                     {data && (
                         <Opening {...{ fen, setFen, handleMovePlayed, data }} />
@@ -230,22 +232,24 @@ const ThePage = () => {
     const chess = useRef(new Chess());
 
     if (!paramsRead) {
-        const url =  new URLSearchParams(window.location.search)
-        let qmoves = url.get("moves")
-        url.delete("moves") // done with param
-    
+        const url = new URLSearchParams(window.location.search);
+        let qmoves = url.get("moves");
+        url.delete("moves"); // done with param
+
         if (qmoves) {
             try {
-                chess.current.loadPgn(qmoves)
-                qfen.current = chess.current.fen()
+                chess.current.loadPgn(qmoves);
+                qfen.current = chess.current.fen();
             } catch (e) {
-                console.log(e)
-                qmoves = ""
+                console.log(e);
+                qmoves = "";
             }
         } else {
-            qfen.current = new URLSearchParams(window.location.search).get("fen");
+            qfen.current = new URLSearchParams(window.location.search).get(
+                "fen"
+            );
         }
-    
+
         if (qfen.current) {
             if (!FENEX.test(qfen.current.split(" ")[0])) {
                 qfen.current = "start";
@@ -256,7 +260,6 @@ const ThePage = () => {
 
         paramsRead = true;
     }
-
 
     const [fen, setFen] = useState(qfen.current);
 

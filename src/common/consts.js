@@ -61,6 +61,8 @@ const ECO_CATS = [
     ["E", "Indian Defenses"],
 ];
 
+const NO_ENTRY_FOUND = "No Entry Found in Opening Book"
+
 export {
     APP_NAME,
     SUBTITLES,
@@ -78,4 +80,5 @@ export {
     FILES,
     ECO_CATS,
     isTestMode,
+    NO_ENTRY_FOUND,
 };
