@@ -108,7 +108,7 @@ const FENorPGN = ({ setFen, text, setText, chess }) => {
         // FEN?
         if (FENEX.test(stubFen)) {
             try {
-                let fen = input.replaceAll(/[\"\n]/g, '');
+                let fen = input.replaceAll(/["\n]/g, '');
                 chess.current.load(fen);  
                 fen = chess.current.fen()   //scrubs e.p. falsities
                 setFen(fen);
