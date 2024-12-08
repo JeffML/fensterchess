@@ -102,14 +102,15 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
 const FENorPGN = ({ setFen, text, setText, chess }) => {
     const handleInput = (e) => {
         e.preventDefault();
-        const input = e.clipboardData.getData("text");
-        const stubFen = input.split(" ")[0];
+        let input = e.clipboardData.getData("text");
+        const stubFen = input.split(" ")[0].replace('"', '');
 
         // FEN?
         if (FENEX.test(stubFen)) {
             try {
-                const fen = input;
-                chess.current.load(fen);
+                let fen = input.replaceAll(/[\"\n]/g, '');
+                chess.current.load(fen);  
+                fen = chess.current.fen()   //scrubs e.p. falsities
                 setFen(fen);
                 setText(fen);
             } catch (ex) {
@@ -131,7 +132,7 @@ const FENorPGN = ({ setFen, text, setText, chess }) => {
         <textarea
             id="fenpgn"
             spellCheck="false"
-            placeholder={"Move, or paste in FEN/PGN here"}
+            placeholder={"Paste moves or FEN here"}
             onChange={() => {}}
             onPaste={(e) => handleInput(e)}
             value={text}
@@ -195,7 +196,10 @@ const SearchPage = ({ chess, fen, setFen }) => {
                 </div>
 
                 <div className="row">
-                    <FENorPGN {...{ setFen, text, setText, chess }} />
+                    <div className="column">
+                    <div className="row" style={{marginBottom: "10px"}}>Drag pieces above, or paste a move sequence or FEN below:</div>
+                    <div className="row"><FENorPGN {...{ setFen, text, setText, chess }} /> </div>
+                    </div>
                 </div>
             </div>
 

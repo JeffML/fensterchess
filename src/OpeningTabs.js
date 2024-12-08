@@ -1,16 +1,12 @@
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { NextOpenings, Roots } from "./NextOpenings.js";
-import {
-    parseMoves,
-    theoryRequest,
-    toPlay,
-} from "./utils/chessTools.js";
-import {Chess} from 'chess.js'
+import { parseMoves, theoryRequest, toPlay } from "./utils/chessTools.js";
+import { Chess } from "chess.js";
 import { useState, useEffect } from "react";
 import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional.js";
 import { SimilarOpenings } from "./SimilarOpenings.js";
 
-const chess = new Chess()
+const chess = new Chess();
 
 const Theory2 = ({ html }) => {
     return (
@@ -65,7 +61,6 @@ const legalMove = (moves, variation) => {
         : null;
 };
 
-
 const OpeningTabs = ({
     fen,
     setFen,
@@ -103,16 +98,34 @@ const OpeningTabs = ({
             style={{ minWidth: "-webkit-fill-available", marginRight: "2em" }}
         >
             <TabList className="left" style={{ marginBottom: "0px" }}>
-                {legalMoves && legalMoves.length !== 0 && <Tab style={tabStyle}>Next Moves</Tab>}
+                {legalMoves && legalMoves.length !== 0 && (
+                    <Tab style={tabStyle}>Next Moves</Tab>
+                )}
+                {showTransitions && <Tab style={tabStyle}>Roots</Tab>}
                 {html && <Tab style={tabStyle}>Theory</Tab>}
                 {showExternal && <Tab style={tabStyle}>External Info</Tab>}
                 {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
-                {showTransitions && <Tab style={tabStyle}>Roots</Tab>}
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 {legalMoves && legalMoves.length !== 0 && (
                     <TabPanel>
-                        <NextOpenings {...{ legalMoves, transpositions, handleMovePlayed }} />
+                        <NextOpenings
+                            {...{
+                                legalMoves,
+                                transpositions,
+                                handleMovePlayed,
+                            }}
+                        />
+                    </TabPanel>
+                )}
+                {showTransitions && (
+                    <TabPanel id="roots">
+                        <div className="row">
+                            <Roots
+                                {...{ moves: currentMoves, from }}
+                                style={{ marginLeft: "1em" }}
+                            />
+                        </div>
                     </TabPanel>
                 )}
                 {html && (
@@ -143,19 +156,9 @@ const OpeningTabs = ({
                         <SimilarOpenings {...{ fen, setFen }} />
                     </TabPanel>
                 )}
-                {showTransitions && (
-                    <TabPanel id="roots">
-                        <div className="row">
-                            <Roots
-                                {...{ moves: currentMoves, from }}
-                                style={{ marginLeft: "1em" }}
-                            />
-                        </div>
-                    </TabPanel>
-                )}
             </div>
         </Tabs>
     );
 };
 
-export {OpeningTabs}
+export { OpeningTabs };

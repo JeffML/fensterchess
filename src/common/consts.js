@@ -1,5 +1,7 @@
+import packageJson from '../../package.json' // okay if it's open source anyway
+
 const APP_NAME = "Fenster";
-const VERSION = "2.3.3"; // keep in sync with package.json version!
+const VERSION = packageJson.version
 
 const INCR = 5; // list increment
 
@@ -29,7 +31,7 @@ SUBTITLES[modes.visualization] = "Visualization";
 SUBTITLES[modes.about] = "About Fenster";
 
 // Note: shredder has been down before; check https://www.shredderchess.com/online/opening-database.html or see fenster-s getOpeningAdditional resolver
-
+// Update: removed by request of the Shredder guy
 const siteUrls = {
     FICS: "https://www.freechess.org/",
     lichess: "https://lichess.org/",

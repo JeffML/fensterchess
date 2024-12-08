@@ -26,11 +26,6 @@ const About = () => (
                         <a href="https://www.ficsgames.org/">FICS</a>
                     </li>
                     <li>
-                        <a href="https://www.shredderchess.com/online/opening-database.html">
-                            Shredder
-                        </a>
-                    </li>
-                    <li>
                         <a href="https://lichess.org/">lichess</a>
                     </li>
                 </ul>
@@ -74,7 +69,7 @@ const About = () => (
                 </p>
                 <p>From the current position, we can arrive at all three positons
                 arising from the variations listed in the Next Moves tab.
-                However, only one variation can be played directly (<b>2. cxd5</b>).
+                However, two continuations can be played directly (<b>2. cxd5</b> and <b>2.Nf3</b>).
                 The two others are transpositions whose move sequences are in
                 conflict with the current variation. In these cases, <b>2. c4</b> can't
                 be played, because <b>1. c4</b> was played already. If you click on the
@@ -103,8 +98,8 @@ const About = () => (
             <h3>External Info</h3>
             <p>
                 At the upper right, available on all pages, is a selector to
-                include information from FICS, lichess, or Shredder. If one of
-                These has been selected, then the External Info tab will be
+                include information from FICS or lichess. If one of
+                these has been selected, then the External Info tab will be
                 displayed. On this tab is game data from the external site(s)
                 selected.
                 <img

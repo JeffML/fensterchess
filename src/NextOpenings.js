@@ -30,7 +30,6 @@ const NextOpeningsGrid = ({ handleMovePlayed, legalMoves, sortBy }) => {
     }
 
     const ListItem = ({ name, score, eco, theMove, nextPly }, index) => {
-
         const backgroundColor = index % 2 ? "darkslategrey" : "slategrey";
         return (
             <div
@@ -210,24 +209,18 @@ const NextOpenings = ({ legalMoves, transpositions, handleMovePlayed }) => {
 const Roots = ({ moves: omoves, from }) => {
     if (from.length === 0) return null;
 
-    const tmoves = omoves.slice(0, omoves.lastIndexOf(" "));
-
     const roots = Object.entries(from).map(([, { name, moves }]) => {
-        if (moves !== tmoves) {
-            return (
-                <Fragment key={name}>
-                    <div
-                        className="white"
-                        style={{ textAlign: "left", marginLeft: "40px" }}
-                    >
-                        {name}
-                    </div>
-                    <div className="white">{moves}</div>
-                </Fragment>
-            );
-        } else {
-            return null;
-        }
+        return (
+            <Fragment key={name}>
+                <div
+                    className="white"
+                    style={{ textAlign: "left", marginLeft: "40px" }}
+                >
+                    {name}
+                </div>
+                <div className="white">{moves}</div>
+            </Fragment>
+        );
     });
 
     return (
