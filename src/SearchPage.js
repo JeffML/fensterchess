@@ -9,8 +9,8 @@ import { FENEX, NO_ENTRY_FOUND } from "./common/consts.js";
 import "./stylesheets/textarea.css";
 
 const GET_OPENING = gql`
-    query getOpening($fen: String!) {
-        getOpeningForFenFull(fen: $fen) {
+    query getOpening($fen: String!, $loose: Boolean) {
+        getOpeningForFenFull(fen: $fen, loose: $loose) {
             eco
             name
             moves
@@ -174,7 +174,7 @@ const SearchPage = ({ chess, fen, setFen }) => {
     };
 
     const { error, data, loading } = useQuery(GET_OPENING, {
-        variables: { fen },
+        variables: { fen, loose:true },
         skip: fen === "start",
     });
 
