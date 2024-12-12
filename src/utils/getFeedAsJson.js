@@ -2,20 +2,35 @@
 import { XMLParser } from "fast-xml-parser";
 
 const getFeedAsJson = async (url) => {
-    const response = await fetch(url);
+    try {
+        const response = await fetch(url);
 
-    const xml = await response.text();
+        if (response.status == 404) {
+            throw Error("404 response")
+        }
 
-    const json = new XMLParser().parse(xml);
+        const xml = await response.text();
 
-    const {rss:{channel:{title, link, description, item}}} = json;
+        const json = new XMLParser().parse(xml);
 
-    const items = item.map(item => {
-        const {title, link, description} = item
-        return {title, link, description}
-    }).slice(0, 4)
+        const {
+            rss: {
+                channel: { title, link, description, item },
+            },
+        } = json;
 
-    return {title, link, description, items};
+        const items = item
+            .map((item) => {
+                const { title, link, description } = item;
+                return { title, link, description };
+            })
+            .slice(0, 4);
+        return { title, link, description, items };
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+
 };
 
-export default getFeedAsJson;
+export {getFeedAsJson};

@@ -3,7 +3,7 @@ import { useState, useEffect, Fragment } from "react";
 import { INCR } from "./common/consts.js";
 import PgnTabs from "./PgnTabs.js";
 import PgnLinkGrid from "./PgnLinkGrid.js";
-import getFeedAsJson from "./utils/getFeedAsJson.js";
+import {getFeedAsJson} from "./utils/getFeedAsJson.js";
 import "./stylesheets/fileSelector.css";
 
 const radioStyle = {
@@ -66,8 +66,7 @@ const RssFeed = () => {
     const [json, setJson] = useState({});
 
     const rss =
-        "https://corsproxy.io/?" +
-        encodeURIComponent("https://theweekinchess.com/twic-rss-feed");
+        "https://corsproxy.io/https://theweekinchess.com/twic-rss-feed";
 
     useEffect(() => {
         async function getJSON() {
