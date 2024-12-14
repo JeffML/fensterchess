@@ -5,7 +5,7 @@ const getFeedAsJson = async (url) => {
     try {
         const response = await fetch(url);
 
-        if (response.status == 404) {
+        if (response.status === 404) {
             throw Error("404 response")
         }
 
