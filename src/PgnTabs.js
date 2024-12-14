@@ -409,6 +409,12 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
     const black =
         (game.playerTitle("b") ?? "  ") + "   " + game.playerName("b");
 
+    const onClickHandler = () => {
+        const domain = window.location.origin;
+        const newBrowserTab = domain + `?moves=${openingMoves}`
+        window.open(newBrowserTab, "_blank");
+    }
+
     if (!fen) setFen(openingFen);
 
     return (
@@ -449,7 +455,7 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
                 <span>Result:</span>
                 <span>{game.result()}</span>
                 <span>Fenster Opening Name:</span>
-                <span>{name}</span>
+                <span className="fakeLink" style={{color:"cyan"}} onClick={()=>onClickHandler()}>{name}</span>
                 <span>ECO:</span>
                 <span> {eco}</span>
                 <span>Moves:</span>{" "}
