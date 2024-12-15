@@ -3,7 +3,7 @@ import { Chess } from "chess.js";
 import { Chessboard } from "kokopu-react";
 import { useContext, useRef, useState } from "react";
 import { OpeningTabs } from "./OpeningTabs.js";
-import { SelectedSitesContext } from "./common/Contexts.js";
+import { SelectedSitesContext } from "./common/SelectedSitesContext.js";
 import { ActionButton } from "./common/Buttons.js";
 import { FENEX, NO_ENTRY_FOUND } from "./common/consts.js";
 import "./stylesheets/textarea.css";

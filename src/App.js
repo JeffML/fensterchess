@@ -2,7 +2,7 @@ import { useState } from "react";
 import AboutPage from "./AboutPage.js";
 import "./App.css";
 import { isTestMode, modes, SUBTITLES } from "./common/consts.js";
-import { SelectedSitesContextProvider } from "./common/Contexts.js";
+import { SelectedSitesContextProvider } from "./common/SelectedSitesContext.js";
 import PageHeader from "./PageHeader.js";
 import PgnAnalysis from "./PgnAnalyzePage.js";
 import SearchPage from "./SearchPage.js";
