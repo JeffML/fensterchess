@@ -1,10 +1,14 @@
 import { sortEnum } from "./common/consts.js";
+import {uniqWith, uniWith} from "./utils/uniqWith.js"
 import { Fragment, useState } from "react";
 import "./stylesheets/nextMovesRow.css";
 
 /**
  * Shows next opening variations from current positions
- *
+ * Note that with loose matching (position only), the current position may come from multiple
+ * move sequences, leading to duplicate "to" variations appearing. CloudAnt (editor?) doesn't appear 
+ * to support fat arrow functions, making it very hard to write a coherent reduce function.
+ * 
  * @param {{ currentMoves: any; handleMovePlayed: any; nextMoves: any; sortBy: any; }} param0
  * @param {*} param0.currentMoves
  * @param {*} param0.handleMovePlayed
@@ -12,7 +16,9 @@ import "./stylesheets/nextMovesRow.css";
  * @param {*} param0.sortBy
  * @returns {*}
  */
-const NextOpeningsGrid = ({ handleMovePlayed, legalMoves, sortBy }) => {
+const NextOpeningsGrid = ({ handleMovePlayed, legalMoves: dupeLegals, sortBy }) => {
+
+    const legalMoves = uniqWith(dupeLegals, (a, b) => a.moves === b.moves)
     const toSort = [...legalMoves];
 
     switch (sortBy) {
@@ -63,7 +69,8 @@ const NextOpeningsGrid = ({ handleMovePlayed, legalMoves, sortBy }) => {
     );
 };
 
-const TranspositionsGrid = ({ transpositions, sortBy }) => {
+// see comment above on dupe "to" records
+const TranspositionsGrid = ({ transpositions:dupeTrans, sortBy }) => {
     // open a new tab with this transposition
     const handleMovePlayed = (moves) => {
         const domain = window.location.origin;
@@ -71,6 +78,7 @@ const TranspositionsGrid = ({ transpositions, sortBy }) => {
         window.open(newBrowserTab, "_blank");
     };
 
+    const transpositions = uniqWith(dupeTrans, (a, b) => a.moves === b.moves)
     const toSort = [...transpositions];
 
     switch (sortBy) {

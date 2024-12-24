@@ -2,9 +2,10 @@ import { gql, useQuery } from "@apollo/client";
 import { Chess } from "chess.js";
 import { Chessboard } from "kokopu-react";
 import { useContext, useRef, useState } from "react";
+import { FenOrPgn } from "./FenOrPgn.js";
 import { OpeningTabs } from "./OpeningTabs.js";
-import { SelectedSitesContext } from "./common/SelectedSitesContext.js";
 import { ActionButton } from "./common/Buttons.js";
+import { SelectedSitesContext } from "./common/SelectedSitesContext.js";
 import { FENEX, NO_ENTRY_FOUND } from "./common/consts.js";
 import "./stylesheets/textarea.css";
 
@@ -99,46 +100,6 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
         );
 };
 
-const FENorPGN = ({ setFen, text, setText, chess }) => {
-    const handleInput = (e) => {
-        e.preventDefault();
-        let input = e.clipboardData.getData("text");
-        const stubFen = input.split(" ")[0].replace('"', '');
-
-        // FEN?
-        if (FENEX.test(stubFen)) {
-            try {
-                let fen = input.replaceAll(/["\n]/g, '');
-                chess.current.load(fen);  
-                fen = chess.current.fen()   //scrubs e.p. falsities
-                setFen(fen);
-                setText(fen);
-            } catch (ex) {
-                alert(ex.toString());
-            }
-        } else {
-            // PGN?
-            try {
-                chess.current.loadPgn(input);
-                setText(input);
-                setFen(chess.current.fen());
-            } catch (ex) {
-                alert(ex.toString());
-            }
-        }
-    };
-
-    return (
-        <textarea
-            id="fenpgn"
-            spellCheck="false"
-            placeholder={"Paste moves or FEN here"}
-            onChange={() => {}}
-            onPaste={(e) => handleInput(e)}
-            value={text}
-        ></textarea>
-    );
-};
 
 const SearchPage = ({ chess, fen, setFen }) => {
     const [text, setText] = useState("");
@@ -198,7 +159,7 @@ const SearchPage = ({ chess, fen, setFen }) => {
                 <div className="row">
                     <div className="column">
                     <div className="row" style={{marginBottom: "10px"}}>Drag pieces above, or paste a move sequence or FEN below:</div>
-                    <div className="row"><FENorPGN {...{ setFen, text, setText, chess }} /> </div>
+                    <div className="row"><FenOrPgn {...{ setFen, text, setText, chess }} /> </div>
                     </div>
                 </div>
             </div>
