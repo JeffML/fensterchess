@@ -100,14 +100,16 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
         );
 };
 
+const SearchPage = ({ chess, fen, setFen, moves }) => {
 
-const SearchPage = ({ chess, fen, setFen }) => {
-    const [text, setText] = useState("");
+    if (moves) {
+        chess.current.loadPgn(moves)
+        setFen(chess.current.fen())
+    }
 
     const reset = () => {
         setFen("start");
         chess.current.reset();
-        setText("");
     };
 
     /*
@@ -118,24 +120,23 @@ const SearchPage = ({ chess, fen, setFen }) => {
     const handleMovePlayed = (move) => {
         chess.current.move(move);
         const newFen = chess.current.fen();
+        moves = chess.current.pgn();
         setFen(newFen);
-        let pgn = chess.current.pgn();
-        const movesPosition = pgn.lastIndexOf("]"); // end of SetUp FEN
+        const movesPosition = moves.lastIndexOf("]"); // end of SetUp FEN
         if (movesPosition > -1) {
-            pgn = pgn.substring(movesPosition + 3, pgn.length); // +3 for the newlines between SetUp FEN and move list
+            moves = moves.substring(movesPosition + 3, moves.length); // +3 for the newlines between SetUp FEN and move list
         }
-        setText(`FEN:\n${newFen}\n\nmoves: ${pgn}`);
     };
 
     const back = () => {
         chess.current.undo();
         const newFen = chess.current.fen();
+        moves = chess.current.pgn();
         setFen(newFen);
-        setText(`FEN:\n${newFen}\n\nmoves: ${chess.current.pgn()}`);
     };
 
     const { error, data, loading } = useQuery(GET_OPENING, {
-        variables: { fen, loose:true },
+        variables: { fen, loose: true },
         skip: fen === "start",
     });
 
@@ -158,8 +159,13 @@ const SearchPage = ({ chess, fen, setFen }) => {
 
                 <div className="row">
                     <div className="column">
-                    <div className="row" style={{marginBottom: "10px"}}>Drag pieces above, or paste a move sequence or FEN below:</div>
-                    <div className="row"><FenOrPgn {...{ setFen, text, setText, chess }} /> </div>
+                        <div className="row" style={{ marginBottom: "10px" }}>
+                            Drag pieces above, or paste a move sequence or FEN
+                            below:
+                        </div>
+                        <div className="row">
+                            <FenOrPgn {...{ fen, setFen, moves, chess }} />{" "}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -192,43 +198,53 @@ const SearchPage = ({ chess, fen, setFen }) => {
 
 let paramsRead = false;
 
+const loadMoves = (moves, chess) => {
+    let fen = ""
+
+    try {
+        chess.current.loadPgn(moves);
+        fen = chess.current.fen();
+    } catch (e) {
+        console.error(e);
+        moves = "";
+    } finally {
+        return {moves, fen}
+    }
+}
+
 const ThePage = () => {
-    const qfen = useRef("start");
+    let qfen = "start";
+    let moves = "";
+
     const chess = useRef(new Chess());
+    const url = new URLSearchParams(window.location.search);
 
     if (!paramsRead) {
-        const url = new URLSearchParams(window.location.search);
-        let qmoves = url.get("moves");
+        moves = url.get("moves");
         url.delete("moves"); // done with param
 
-        if (qmoves) {
-            try {
-                chess.current.loadPgn(qmoves);
-                qfen.current = chess.current.fen();
-            } catch (e) {
-                console.log(e);
-                qmoves = "";
-            }
+        if (moves) {
+            ({qfen, moves} = loadMoves(moves, chess))   // nifty deconstruction, Batman!
         } else {
-            qfen.current = new URLSearchParams(window.location.search).get(
-                "fen"
-            );
+            qfen = url.get("fen");
+            url.delete("fen");
         }
 
-        if (qfen.current) {
+        if (qfen) {
             if (!FENEX.test(qfen.current.split(" ")[0])) {
-                qfen.current = "start";
+                qfen = "start";
             }
         } else {
-            qfen.current = "start";
+            qfen = "start";
         }
 
         paramsRead = true;
     }
 
-    const [fen, setFen] = useState(qfen.current);
+    // we only need this state change to render FenOrPgn component; moves go with
+    const [fen, setFen] = useState(qfen);
 
-    return <SearchPage {...{ chess, fen, setFen }} />;
+    return <SearchPage {...{ chess, fen, moves, setFen }} />;
 };
 
 export default ThePage;

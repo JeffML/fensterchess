@@ -1,6 +1,9 @@
 import { FENEX } from "./common/consts.js";
 
-const FenOrPgn = ({ setFen, text, setText, chess }) => {
+const FenOrPgn = ({ fen, setFen, moves, chess }) => {
+
+    const text = `FEN:\n${fen}\n\nmoves: ${moves}`;
+
     const handleInput = (e) => {
         e.preventDefault();
         let input = e.clipboardData.getData("text");
@@ -13,7 +16,6 @@ const FenOrPgn = ({ setFen, text, setText, chess }) => {
                 chess.current.load(fen);  
                 fen = chess.current.fen()   //scrubs e.p. falsities
                 setFen(fen);
-                setText(fen);
             } catch (ex) {
                 alert(ex.toString());
             }
@@ -21,7 +23,7 @@ const FenOrPgn = ({ setFen, text, setText, chess }) => {
             // PGN?
             try {
                 chess.current.loadPgn(input);
-                setText(input);
+                moves = chess.current.pgn()     // canonical pgn
                 setFen(chess.current.fen());
             } catch (ex) {
                 alert(ex.toString());
