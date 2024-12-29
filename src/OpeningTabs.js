@@ -62,8 +62,7 @@ const legalMove = (moves, variation) => {
 };
 
 const OpeningTabs = ({
-    fen,
-    setFen,
+    boardState, setBoardState, 
     nextMoves,
     currentMoves,
     handleMovePlayed,
@@ -76,6 +75,8 @@ const OpeningTabs = ({
         border: "1px solid #FFFFFF ",
         borderRadius: "10px 10px 0 0",
     };
+
+    const {fen} = boardState
     const { move, color } = toPlay(fen);
 
     const searchable = move > 5 || (move === "5" && color === "b");
@@ -153,7 +154,7 @@ const OpeningTabs = ({
                 )}
                 {searchable && (
                     <TabPanel>
-                        <SimilarOpenings {...{ fen, setFen }} />
+                        <SimilarOpenings {...{ setBoardState, boardState }} />
                     </TabPanel>
                 )}
             </div>

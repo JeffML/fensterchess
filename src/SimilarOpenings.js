@@ -11,7 +11,9 @@ const GET_SIMILAR = gql`
     }
 `;
 
-const SimilarOpenings = ({ fen, setFen }) => {
+const SimilarOpenings = ({ boardState, setBoardState }) => {
+    const {fen, moves} = boardState;
+
     const { error, data, loading } = useQuery(GET_SIMILAR, {
         variables: { fen },
     });
@@ -37,7 +39,7 @@ const SimilarOpenings = ({ fen, setFen }) => {
                     <span
                         style={{ paddingBottom: "3px" }}
                         className="fakeLink"
-                        onClick={() => setFen(sim.fen)}
+                        onClick={() => setBoardState({fen: sim.fen, moves})}
                     >
                         {sim.name}
                     </span>

@@ -32,7 +32,7 @@ const GET_OPENING = gql`
     }
 `;
 
-const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
+const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
     const sites = useContext(SelectedSitesContext);
 
     if (data) {
@@ -72,8 +72,8 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
 
                 <OpeningTabs
                     {...{
-                        fen,
-                        setFen,
+                        boardState,
+                        setBoardState,
                         nextMoves,
                         currentMoves,
                         handleMovePlayed,
@@ -90,8 +90,8 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
             <div className="double-column">
                 <OpeningTabs
                     {...{
-                        fen,
-                        setFen,
+                        boardState,
+                        setBoardState,
                         handleMovePlayed,
                         sites,
                     }}
@@ -100,15 +100,9 @@ const Opening = ({ fen, setFen, handleMovePlayed, data }) => {
         );
 };
 
-const SearchPage = ({ chess, fen, setFen, moves }) => {
-
-    if (moves) {
-        chess.current.loadPgn(moves)
-        setFen(chess.current.fen())
-    }
-
+const SearchPage = ({ chess, boardState, setBoardState }) => {
     const reset = () => {
-        setFen("start");
+        setBoardState({ fen: "start", moves: "" });
         chess.current.reset();
     };
 
@@ -119,26 +113,32 @@ const SearchPage = ({ chess, fen, setFen, moves }) => {
     */
     const handleMovePlayed = (move) => {
         chess.current.move(move);
-        const newFen = chess.current.fen();
-        moves = chess.current.pgn();
-        setFen(newFen);
+        const fen = chess.current.fen();
+        let moves = chess.current.pgn();
         const movesPosition = moves.lastIndexOf("]"); // end of SetUp FEN
         if (movesPosition > -1) {
             moves = moves.substring(movesPosition + 3, moves.length); // +3 for the newlines between SetUp FEN and move list
         }
+        setBoardState({ fen, moves });
     };
 
     const back = () => {
         chess.current.undo();
-        const newFen = chess.current.fen();
-        moves = chess.current.pgn();
-        setFen(newFen);
+        const fen = chess.current.fen();
+        const moves = chess.current.pgn();
+        setBoardState({ fen, moves });
     };
 
     const { error, data, loading } = useQuery(GET_OPENING, {
-        variables: { fen, loose: true },
-        skip: fen === "start",
+        variables: { fen: boardState.fen, loose: true },
+        skip: boardState.fen === "start",
     });
+
+    if (data) {
+        console.dir(data, {depth:3})
+        chess.current.loadPgn(data.getOpeningForFenFull.moves)
+    }
+    const { fen } = boardState;
 
     return (
         <div className="row" style={{ color: "white" }}>
@@ -164,7 +164,9 @@ const SearchPage = ({ chess, fen, setFen, moves }) => {
                             below:
                         </div>
                         <div className="row">
-                            <FenOrPgn {...{ fen, setFen, moves, chess }} />{" "}
+                            <FenOrPgn
+                                {...{ boardState, setBoardState, chess }}
+                            />{" "}
                         </div>
                     </div>
                 </div>
@@ -188,7 +190,14 @@ const SearchPage = ({ chess, fen, setFen, moves }) => {
                         ))}
 
                     {data && (
-                        <Opening {...{ fen, setFen, handleMovePlayed, data }} />
+                        <Opening
+                            {...{
+                                boardState,
+                                setBoardState,
+                                handleMovePlayed,
+                                data,
+                            }}
+                        />
                     )}
                 </div>
             </div>
@@ -196,10 +205,8 @@ const SearchPage = ({ chess, fen, setFen, moves }) => {
     );
 };
 
-let paramsRead = false;
-
 const loadMoves = (moves, chess) => {
-    let fen = ""
+    let fen = "";
 
     try {
         chess.current.loadPgn(moves);
@@ -208,43 +215,48 @@ const loadMoves = (moves, chess) => {
         console.error(e);
         moves = "";
     } finally {
-        return {moves, fen}
+        return { moves, fen };
     }
-}
+};
+
+let paramsRead = false;
 
 const ThePage = () => {
-    let qfen = "start";
-    let moves = "";
+    const [boardState, setBoardState] = useState({ fen: "start", moves: "" });
 
     const chess = useRef(new Chess());
     const url = new URLSearchParams(window.location.search);
 
-    if (!paramsRead) {
-        moves = url.get("moves");
+    const readParams = () => {
+        const qmoves = url.get("moves");
         url.delete("moves"); // done with param
 
-        if (moves) {
-            ({qfen, moves} = loadMoves(moves, chess))   // nifty deconstruction, Batman!
+        if (qmoves) {
+            const { moves, fen } = loadMoves(qmoves, chess);
+            return { moves, fen };
         } else {
-            qfen = url.get("fen");
+            let qfen = url.get("fen");
             url.delete("fen");
-        }
 
-        if (qfen) {
-            if (!FENEX.test(qfen.current.split(" ")[0])) {
+            if (qfen) {
+                if (!FENEX.test(qfen.current.split(" ")[0])) {
+                    qfen = "start";
+                }
+            } else {
                 qfen = "start";
             }
-        } else {
-            qfen = "start";
-        }
 
+            return { moves: "", fen: qfen??"start" };
+        }
+    };
+
+    if (!paramsRead) {
+        const { fen, moves } = readParams();
+        setBoardState({ fen, moves });
         paramsRead = true;
     }
 
-    // we only need this state change to render FenOrPgn component; moves go with
-    const [fen, setFen] = useState(qfen);
-
-    return <SearchPage {...{ chess, fen, moves, setFen }} />;
+    return <SearchPage {...{ chess, boardState, setBoardState }} />;
 };
 
 export default ThePage;

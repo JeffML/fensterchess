@@ -8,13 +8,6 @@ import "./stylesheets/nextMovesRow.css";
  * Note that with loose matching (position only), the current position may come from multiple
  * move sequences, leading to duplicate "to" variations appearing. CloudAnt (editor?) doesn't appear 
  * to support fat arrow functions, making it very hard to write a coherent reduce function.
- * 
- * @param {{ currentMoves: any; handleMovePlayed: any; nextMoves: any; sortBy: any; }} param0
- * @param {*} param0.currentMoves
- * @param {*} param0.handleMovePlayed
- * @param {*} param0.nextMoves
- * @param {*} param0.sortBy
- * @returns {*}
  */
 const NextOpeningsGrid = ({ handleMovePlayed, legalMoves: dupeLegals, sortBy }) => {
 

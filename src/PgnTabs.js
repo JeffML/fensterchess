@@ -398,7 +398,7 @@ const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
 };
 
 const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
-    const { eco, name, moves: openingMoves, fen: openingFen } = opening ?? {};
+    const { eco, name, moves: openingMoves, fen: openingFen } = opening;
     const gamePliesRef = useRef(game.pojo().mainVariation);
     const openingPliesRef = useRef(movesStringToPliesAry(openingMoves ?? ""));
     const [plyIndex, setPlyIndex] = useState(openingPliesRef.current.length);
@@ -414,8 +414,6 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
         const newBrowserTab = domain + `?moves=${openingMoves}`
         window.open(newBrowserTab, "_blank");
     }
-
-    if (!fen) setFen(openingFen);
 
     return (
         <div
@@ -495,7 +493,7 @@ const OpeningTab = ({ game }) => {
 
     if (data) {
         const openings = data.getOpeningsForFens2;
-        const opening = openings.at(-1);
+        const opening = openings.at(-1)??{};
         return <OpeningDetails {...{ opening, game, fen, setFen, chess }} />;
     }
 };
