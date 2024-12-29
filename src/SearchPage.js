@@ -135,7 +135,7 @@ const SearchPage = ({ chess, boardState, setBoardState }) => {
     });
 
     if (data) {
-        console.dir(data, {depth:3})
+        // console.dir(data, {depth:3})
         chess.current.loadPgn(data.getOpeningForFenFull.moves)
     }
     const { fen } = boardState;
