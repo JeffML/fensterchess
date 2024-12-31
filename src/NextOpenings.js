@@ -1,5 +1,5 @@
 import { sortEnum } from "./common/consts.js";
-import {uniqWith, uniWith} from "./utils/uniqWith.js"
+import {uniqWith} from "./utils/uniqWith.js"
 import { Fragment, useState } from "react";
 import "./stylesheets/nextMovesRow.css";
 

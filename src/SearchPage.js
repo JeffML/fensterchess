@@ -62,7 +62,7 @@ const SearchPage = ({ chess, boardState, setBoardState, loading, error, data }) 
         setBoardState({ fen, moves });
     };
 
-    const {fen, moves} = boardState;
+    const {fen} = boardState;
 
     return (
         <div className="row" style={{ color: "white" }}>
@@ -192,7 +192,7 @@ const ThePage = () => {
     if (data) {
         chess.current.loadPgn(data.getOpeningForFenFull.moves)
         const moves = chess.current.pgn()
-        if (fen !== boardState.fen || moves != boardState.moves) setBoardState({fen, moves})
+        if (fen !== boardState.fen || moves !== boardState.moves) setBoardState({fen, moves})
     }
 
     return <SearchPage {...{ chess, boardState, setBoardState, loading, error, data }} />;

@@ -398,7 +398,7 @@ const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
 };
 
 const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
-    const { eco, name, moves: openingMoves, fen: openingFen } = opening;
+    const { eco, name, moves: openingMoves } = opening;
     const gamePliesRef = useRef(game.pojo().mainVariation);
     const openingPliesRef = useRef(movesStringToPliesAry(openingMoves ?? ""));
     const [plyIndex, setPlyIndex] = useState(openingPliesRef.current.length);
