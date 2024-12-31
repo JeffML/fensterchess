@@ -1,4 +1,5 @@
 import { FENEX } from "./common/consts.js";
+import "./stylesheets/textarea.css";
 
 const FenOrPgn = ({ boardState, setBoardState, chess }) => {
     const {fen, moves} = boardState

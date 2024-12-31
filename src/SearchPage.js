@@ -1,13 +1,13 @@
 import { gql, useQuery } from "@apollo/client";
 import { Chess } from "chess.js";
 import { Chessboard } from "kokopu-react";
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FenOrPgn } from "./FenOrPgn.js";
-import { OpeningTabs } from "./OpeningTabs.js";
+import { Opening } from "./Opening.js";
 import { ActionButton } from "./common/Buttons.js";
-import { SelectedSitesContext } from "./common/SelectedSitesContext.js";
+
 import { FENEX, NO_ENTRY_FOUND } from "./common/consts.js";
-import "./stylesheets/textarea.css";
+
 
 const GET_OPENING = gql`
     query getOpening($fen: String!, $loose: Boolean) {
@@ -32,73 +32,6 @@ const GET_OPENING = gql`
     }
 `;
 
-const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
-    const sites = useContext(SelectedSitesContext);
-
-    if (data) {
-        if (data.getOpeningForFenFull === null) {
-            return <div className="double-column left">{NO_ENTRY_FOUND}</div>;
-        }
-        let {
-            getOpeningForFenFull: {
-                eco,
-                name,
-                moves: currentMoves,
-                next: nextMoves,
-                from,
-            },
-        } = data;
-
-        return (
-            <div className="double-column left">
-                <span
-                    className="font-cinzel"
-                    style={{
-                        fontSize: "larger",
-                    }}
-                >
-                    Opening:&nbsp;&nbsp;
-                    <span
-                        style={{
-                            fontWeight: "bolder",
-                            display: "inline",
-                            color: "aquamarine",
-                            fontFamily: "sans",
-                        }}
-                    >
-                        {eco}&nbsp;{name}
-                    </span>
-                </span>
-
-                <OpeningTabs
-                    {...{
-                        boardState,
-                        setBoardState,
-                        nextMoves,
-                        currentMoves,
-                        handleMovePlayed,
-                        sites,
-                        eco,
-                        name,
-                        from,
-                    }}
-                />
-            </div>
-        );
-    } else
-        return (
-            <div className="double-column">
-                <OpeningTabs
-                    {...{
-                        boardState,
-                        setBoardState,
-                        handleMovePlayed,
-                        sites,
-                    }}
-                />
-            </div>
-        );
-};
 
 const SearchPage = ({ chess, boardState, setBoardState }) => {
     const reset = () => {
