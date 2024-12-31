@@ -33,7 +33,7 @@ const GET_OPENING = gql`
 `;
 
 
-const SearchPage = ({ chess, boardState, setBoardState }) => {
+const SearchPage = ({ chess, boardState, setBoardState, loading, error, data }) => {
     const reset = () => {
         setBoardState({ fen: "start", moves: "" });
         chess.current.reset();
@@ -62,19 +62,7 @@ const SearchPage = ({ chess, boardState, setBoardState }) => {
         setBoardState({ fen, moves });
     };
 
-    const { error, data, loading } = useQuery(GET_OPENING, {
-        variables: { fen: boardState.fen, loose: true },
-        skip: boardState.fen === "start",
-    });
-
-
-    const { fen } = boardState;
-
-    if (data) {
-        chess.current.loadPgn(data.getOpeningForFenFull.moves)
-        const moves = chess.current.pgn()
-        if (fen !== boardState.fen || moves != boardState.moves) setBoardState({fen, moves})
-    }
+    const {fen, moves} = boardState;
 
     return (
         <div className="row" style={{ color: "white" }}>
@@ -192,7 +180,22 @@ const ThePage = () => {
         setBoardState({ fen, moves });
     }
 
-    return <SearchPage {...{ chess, boardState, setBoardState }} />;
+
+    const { error, data, loading } = useQuery(GET_OPENING, {
+        variables: { fen: boardState.fen, loose: true },
+        skip: boardState.fen === "start",
+    });
+
+
+    const { fen } = boardState;
+
+    if (data) {
+        chess.current.loadPgn(data.getOpeningForFenFull.moves)
+        const moves = chess.current.pgn()
+        if (fen !== boardState.fen || moves != boardState.moves) setBoardState({fen, moves})
+    }
+
+    return <SearchPage {...{ chess, boardState, setBoardState, loading, error, data }} />;
 };
 
 export default ThePage;
