@@ -31,7 +31,6 @@ const FenOrPgn = ({ boardState, setBoardState, chess }) => {
                 alert(ex.toString());
             }
         }
-
         setBoardState({fen, moves})
     };
 

@@ -134,11 +134,14 @@ const SearchPage = ({ chess, boardState, setBoardState }) => {
         skip: boardState.fen === "start",
     });
 
-    if (data) {
-        // console.dir(data, {depth:3})
-        chess.current.loadPgn(data.getOpeningForFenFull.moves)
-    }
+
     const { fen } = boardState;
+
+    if (data) {
+        chess.current.loadPgn(data.getOpeningForFenFull.moves)
+        const moves = chess.current.pgn()
+        if (fen !== boardState.fen || moves != boardState.moves) setBoardState({fen, moves})
+    }
 
     return (
         <div className="row" style={{ color: "white" }}>
@@ -252,8 +255,8 @@ const ThePage = () => {
 
     if (!paramsRead) {
         const { fen, moves } = readParams();
-        setBoardState({ fen, moves });
         paramsRead = true;
+        setBoardState({ fen, moves });
     }
 
     return <SearchPage {...{ chess, boardState, setBoardState }} />;
