@@ -190,7 +190,7 @@ const ThePage = () => {
     const { fen } = boardState;
 
     if (data) {
-        chess.current.loadPgn(data.getOpeningForFenFull.moves)
+        chess.current.loadPgn(data.getOpeningForFenFull?.moves??"")
         const moves = chess.current.pgn()
         if (fen !== boardState.fen || moves !== boardState.moves) setBoardState({fen, moves})
     }
