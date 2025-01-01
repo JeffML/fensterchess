@@ -8,7 +8,6 @@ import { ActionButton } from "./common/Buttons.js";
 
 import { FENEX, NO_ENTRY_FOUND } from "./common/consts.js";
 
-
 const GET_OPENING = gql`
     query getOpening($fen: String!, $loose: Boolean) {
         getOpeningForFenFull(fen: $fen, loose: $loose) {
@@ -32,8 +31,14 @@ const GET_OPENING = gql`
     }
 `;
 
-
-const SearchPage = ({ chess, boardState, setBoardState, loading, error, data }) => {
+const SearchPage = ({
+    chess,
+    boardState,
+    setBoardState,
+    loading,
+    error,
+    data,
+}) => {
     const reset = () => {
         setBoardState({ fen: "start", moves: "" });
         chess.current.reset();
@@ -62,7 +67,7 @@ const SearchPage = ({ chess, boardState, setBoardState, loading, error, data }) 
         setBoardState({ fen, moves });
     };
 
-    const {fen} = boardState;
+    const { fen } = boardState;
 
     return (
         <div className="row" style={{ color: "white" }}>
@@ -170,7 +175,7 @@ const ThePage = () => {
                 qfen = "start";
             }
 
-            return { moves: "", fen: qfen??"start" };
+            return { moves: "", fen: qfen ?? "start" };
         }
     };
 
@@ -180,22 +185,28 @@ const ThePage = () => {
         setBoardState({ fen, moves });
     }
 
-
     const { error, data, loading } = useQuery(GET_OPENING, {
         variables: { fen: boardState.fen, loose: true },
         skip: boardState.fen === "start",
     });
 
-
     const { fen } = boardState;
 
     if (data) {
-        chess.current.loadPgn(data.getOpeningForFenFull?.moves??chess.current.pgn())
-        const moves = chess.current.pgn()
-        if (fen !== boardState.fen || moves !== boardState.moves) setBoardState({fen, moves})
+        if (data.getOpeningForFenFull) {
+            chess.current.loadPgn(data.getOpeningForFenFull.moves);
+        }
+        const moves = chess.current.pgn();
+        
+        if (fen !== boardState.fen || moves !== boardState.moves)
+            setBoardState({ fen, moves });
     }
 
-    return <SearchPage {...{ chess, boardState, setBoardState, loading, error, data }} />;
+    return (
+        <SearchPage
+            {...{ chess, boardState, setBoardState, loading, error, data }}
+        />
+    );
 };
 
 export default ThePage;

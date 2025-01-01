@@ -6,6 +6,7 @@ import { Fragment, useContext, useRef, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { ActionButton } from "./common/Buttons.js";
+import PliesAryToMovesStringSpan from "./common/PliesAryToMovesStringSpan.js";
 import { SelectedSitesContext } from "./common/SelectedSitesContext.js";
 import StackedBarChart from "./common/StackedBarChart.js";
 import "./stylesheets/grid.css";
@@ -14,7 +15,6 @@ import {
     movesStringToPliesAry,
     pliesAryToMovesString,
 } from "./utils/openings.js";
-import PliesAryToMovesStringSpan from "./common/PliesAryToMovesStringSpan.js";
 import sleep from "./utils/sleep.js";
 
 const blueBoldStyle = { color: "LightSkyBlue" };
@@ -295,22 +295,14 @@ const Players = ({ pgnSumm }) => {
     );
 };
 
-const ChessboardWithControls = ({
-    fen,
-    setFen,
-    chess,
-    plies,
-    plyIndex,
-    setPlyIndex,
-}) => {
+const ChessboardWithControls = ({ chess, plies, plyIndex, setPlyIndex }) => {
     const doRest = () => {
         const currMoves = pliesAryToMovesString(
             plies.current.slice(0, plyIndex)
         );
         chess.current.loadPgn(currMoves);
-        const currFen = chess.current.fen();
-        setFen(currFen);
     };
+
     const back = () => {
         setPlyIndex(Math.max(--plyIndex, 0));
         doRest();
@@ -320,12 +312,15 @@ const ChessboardWithControls = ({
         setPlyIndex(Math.min(++plyIndex, plies.current.length));
         doRest();
     };
+
+    const fen = chess.current.fen()
+
     return (
         <div>
             <Chessboard
                 position={fen}
                 squareSize={30}
-                animated={true}
+                animated={false}
                 coordinateVisible={false}
             />
             <div style={{ marginLeft: "-10%", marginTop: "-3%" }}>
@@ -397,7 +392,7 @@ const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
     );
 };
 
-const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
+const OpeningDetails = ({ game, opening, chess }) => {
     const { eco, name, moves: openingMoves } = opening;
     const gamePliesRef = useRef(game.pojo().mainVariation);
     const openingPliesRef = useRef(movesStringToPliesAry(openingMoves ?? ""));
@@ -411,9 +406,11 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
 
     const onClickHandler = () => {
         const domain = window.location.origin;
-        const newBrowserTab = domain + `?moves=${openingMoves}`
+        const newBrowserTab = domain + `?moves=${openingMoves}`;
         window.open(newBrowserTab, "_blank");
-    }
+    };
+
+    const fen = chess.current.fen()
 
     return (
         <div
@@ -425,8 +422,6 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
         >
             <ChessboardWithControls
                 {...{
-                    fen,
-                    setFen,
                     chess,
                     plies: gamePliesRef,
                     plyIndex,
@@ -453,7 +448,13 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
                 <span>Result:</span>
                 <span>{game.result()}</span>
                 <span>Fenster Opening Name:</span>
-                <span className="fakeLink" style={{color:"cyan"}} onClick={()=>onClickHandler()}>{name}</span>
+                <span
+                    className="fakeLink"
+                    style={{ color: "cyan" }}
+                    onClick={() => onClickHandler()}
+                >
+                    {name}
+                </span>
                 <span>ECO:</span>
                 <span> {eco}</span>
                 <span>Moves:</span>{" "}
@@ -467,7 +468,6 @@ const OpeningDetails = ({ game, opening, fen, setFen, chess }) => {
 };
 
 const OpeningTab = ({ game }) => {
-    const [fen, setFen] = useState();
     const chess = useRef(new Chess());
 
     const fens = game
@@ -493,8 +493,9 @@ const OpeningTab = ({ game }) => {
 
     if (data) {
         const openings = data.getOpeningsForFens2;
-        const opening = openings.at(-1)??{};
-        return <OpeningDetails {...{ opening, game, fen, setFen, chess }} />;
+        const opening = openings.at(-1) ?? {};
+        chess.current.loadPgn(opening.moves)
+        return <OpeningDetails {...{ opening, game, chess }} />;
     }
 };
 
