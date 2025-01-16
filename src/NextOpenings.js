@@ -169,7 +169,7 @@ const NextOpenings = ({ legalMoves, transpositions, handleMovePlayed }) => {
 
                 <div className="row">
                     <div className="column">
-                        <h3 className="row">Next Moves</h3>
+                        <h3 className="row">Continuations</h3>
                         <NextOpeningsGrid
                             {...{
                                 legalMoves,

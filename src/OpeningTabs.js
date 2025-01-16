@@ -96,11 +96,11 @@ const OpeningTabs = ({
 
     return (
         <Tabs
-            style={{ minWidth: "-webkit-fill-available", marginRight: "2em" }}
+            style={{ minWidth: "100%", marginRight: "2em" }}
         >
             <TabList className="left" style={{ marginBottom: "0px" }}>
                 {legalMoves && legalMoves.length !== 0 && (
-                    <Tab style={tabStyle}>Next Moves</Tab>
+                    <Tab style={tabStyle}>Variations</Tab>
                 )}
                 {showTransitions && <Tab style={tabStyle}>Roots</Tab>}
                 {html && <Tab style={tabStyle}>Theory</Tab>}
