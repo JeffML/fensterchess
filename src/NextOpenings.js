@@ -28,11 +28,11 @@ const NextOpeningsGrid = ({ handleMovePlayed, legalMoves: dupeLegals, sortBy }) 
             throw Error(`unknown case ${sortBy}`);
     }
 
-    const ListItem = ({ name, score, eco, theMove, nextPly }, index) => {
+    const ListItem = ({ name, score, eco, src, theMove, nextPly }, index) => {
         const backgroundColor = index % 2 ? "darkslategrey" : "slategrey";
         return (
             <div
-                key={nextPly}
+                key={nextPly + `_${index}`}
                 id="listItem"
                 style={{
                     backgroundColor,
@@ -47,7 +47,7 @@ const NextOpeningsGrid = ({ handleMovePlayed, legalMoves: dupeLegals, sortBy }) 
                         style={{ textAlign: "left" }}
                         onClick={() => handleMovePlayed(nextPly)}
                     >
-                        {name}
+                        {src==="interpolated"?(<i>{name}</i>):name}
                     </span>
                 </div>
                 <div style={{ textAlign: "left" }}>{score}</div>

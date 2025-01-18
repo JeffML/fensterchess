@@ -31,9 +31,9 @@ const moveLists = ({ nextMoves: variations, currentMoves }) => {
     let transpositions = [];
 
     for (const variation of variations??[]) {
-        const lm = legalMove(currentMoves, variation);
-        if (lm) {
-            legalMoves.push(lm);
+        const continuation = legalMove(currentMoves, variation);
+        if (continuation) {
+            legalMoves.push(continuation);
         } else {
             transpositions.push(variation);
         }

@@ -19,6 +19,7 @@ const GET_OPENING = gql`
                 moves
                 score
                 eco
+                src
             }
             from {
                 name

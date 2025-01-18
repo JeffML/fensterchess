@@ -16,7 +16,7 @@ const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
                 name,
                 moves: currentMoves,
                 next: nextMoves,
-                from,
+                from, src,
             },
         } = data;
 
@@ -37,7 +37,7 @@ const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
                             fontFamily: "sans",
                         }}
                     >
-                        {eco}&nbsp;{name}
+                        {eco}&nbsp;{src==="interpolated"?(<i>{name}</i>):name}
                     </span>
                 </span>
 
