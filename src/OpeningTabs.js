@@ -22,11 +22,11 @@ const Theory2 = ({ html }) => {
  * - moved to from current move sequence (legal move)
  * - transposed to from a different move sequence (yet same position as current move sequence)
  *
- * @param {*} nextMoves
+ * @param {*} variations
  * @param {*} currentMoves
  * @returns {{ legalMoves: {}; transpositions: {}; }}
  */
-const moveLists = ({ nextMoves: variations, currentMoves }) => {
+const moveLists = ({ variations, currentMoves }) => {
     let legalMoves = [];
     let transpositions = [];
 
@@ -63,7 +63,7 @@ const legalMove = (moves, variation) => {
 
 const OpeningTabs = ({
     boardState, setBoardState, 
-    nextMoves,
+    variations,
     currentMoves,
     handleMovePlayed,
     sites,
@@ -86,7 +86,7 @@ const OpeningTabs = ({
     const [html, setHtml] = useState(null);
 
     const { legalMoves, transpositions } = moveLists({
-        nextMoves,
+        variations,
         currentMoves,
     });
 

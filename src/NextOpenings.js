@@ -1,17 +1,20 @@
 import { sortEnum } from "./common/consts.js";
-import {uniqWith} from "./utils/uniqWith.js"
+import { uniqWith } from "./utils/uniqWith.js";
 import { Fragment, useState } from "react";
-import "./stylesheets/nextMovesRow.css";
+import "./stylesheets/variationsRow.css";
 
 /**
  * Shows next opening variations from current positions
  * Note that with loose matching (position only), the current position may come from multiple
- * move sequences, leading to duplicate "to" variations appearing. CloudAnt (editor?) doesn't appear 
+ * move sequences, leading to duplicate "to" variations appearing. CloudAnt (editor?) doesn't appear
  * to support fat arrow functions, making it very hard to write a coherent reduce function.
  */
-const NextOpeningsGrid = ({ handleMovePlayed, legalMoves: dupeLegals, sortBy }) => {
-
-    const legalMoves = uniqWith(dupeLegals, (a, b) => a.moves === b.moves)
+const NextOpeningsGrid = ({
+    handleMovePlayed,
+    legalMoves: dupeLegals,
+    sortBy,
+}) => {
+    const legalMoves = uniqWith(dupeLegals, (a, b) => a.moves === b.moves);
     const toSort = [...legalMoves];
 
     switch (sortBy) {
@@ -47,7 +50,7 @@ const NextOpeningsGrid = ({ handleMovePlayed, legalMoves: dupeLegals, sortBy }) 
                         style={{ textAlign: "left" }}
                         onClick={() => handleMovePlayed(nextPly)}
                     >
-                        {src==="interpolated"?(<i>{name}</i>):name}
+                        {src === "interpolated" ? <i>{name}</i> : name}
                     </span>
                 </div>
                 <div style={{ textAlign: "left" }}>{score}</div>
@@ -62,16 +65,16 @@ const NextOpeningsGrid = ({ handleMovePlayed, legalMoves: dupeLegals, sortBy }) 
     );
 };
 
-// see comment above on dupe "to" records
-const TranspositionsGrid = ({ transpositions:dupeTrans, sortBy }) => {
-    // open a new tab with this transposition
-    const handleMovePlayed = (moves) => {
-        const domain = window.location.origin;
-        const newBrowserTab = domain + `?moves=${moves}`;
-        window.open(newBrowserTab, "_blank");
-    };
+// open a new tab with this move list
+const handleMoves = (moves) => {
+    const domain = window.location.origin;
+    const newBrowserTab = domain + `?moves=${moves}`;
+    window.open(newBrowserTab, "_blank");
+};
 
-    const transpositions = uniqWith(dupeTrans, (a, b) => a.moves === b.moves)
+// see comment above on dupe "to" records
+const TranspositionsGrid = ({ transpositions: dupeTrans, sortBy }) => {
+    const transpositions = uniqWith(dupeTrans, (a, b) => a.moves === b.moves);
     const toSort = [...transpositions];
 
     switch (sortBy) {
@@ -111,7 +114,7 @@ const TranspositionsGrid = ({ transpositions:dupeTrans, sortBy }) => {
                 <div className="fakeLink">
                     <span
                         style={{ textAlign: "left" }}
-                        onClick={() => handleMovePlayed(moves)}
+                        onClick={() => handleMoves(moves)}
                     >
                         {name}
                     </span>
@@ -214,12 +217,12 @@ const Roots = ({ moves: omoves, from }) => {
         return (
             <Fragment key={name}>
                 <div
-                    className="white"
-                    style={{ textAlign: "left", marginLeft: "40px" }}
+                    className="fakeLink" onClick={()=>handleMoves(moves)}
+                    style={{ textAlign: "left", marginLeft: "40px", marginRight: "100px"}}
                 >
                     {name}
                 </div>
-                <div className="white">{moves}</div>
+                <div className="white left" >{moves}</div>
             </Fragment>
         );
     });

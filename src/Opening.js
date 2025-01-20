@@ -15,7 +15,7 @@ const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
                 eco,
                 name,
                 moves: currentMoves,
-                next: nextMoves,
+                next: variations,
                 from, src,
             },
         } = data;
@@ -45,7 +45,7 @@ const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
                     {...{
                         boardState,
                         setBoardState,
-                        nextMoves,
+                        variations,
                         currentMoves,
                         handleMovePlayed,
                         sites,
