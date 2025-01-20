@@ -172,7 +172,7 @@ const NextOpenings = ({ legalMoves, transpositions, handleMovePlayed }) => {
 
                 <div className="row">
                     <div className="column">
-                        <h3 className="row">Continuations</h3>
+                        <h3 className="row" style={{marginBottom: "0px"}}>Continuations</h3>
                         <NextOpeningsGrid
                             {...{
                                 legalMoves,
@@ -185,7 +185,7 @@ const NextOpenings = ({ legalMoves, transpositions, handleMovePlayed }) => {
                 {transpositions.length !== 0 && (
                     <div className="row">
                         <div className="column">
-                            <h3 className="row">Transpositions</h3>
+                            <h3 className="row" style={{marginBottom: "0", marginTop:"-10px"}}>Transpositions</h3>
                             <TranspositionsGrid
                                 {...{
                                     transpositions,
@@ -217,12 +217,17 @@ const Roots = ({ moves: omoves, from }) => {
         return (
             <Fragment key={name}>
                 <div
-                    className="fakeLink" onClick={()=>handleMoves(moves)}
-                    style={{ textAlign: "left", marginLeft: "40px", marginRight: "100px"}}
+                    className="fakeLink"
+                    onClick={() => handleMoves(moves)}
+                    style={{
+                        textAlign: "left",
+                        marginLeft: "40px",
+                        marginRight: "100px",
+                    }}
                 >
                     {name}
                 </div>
-                <div className="white left" >{moves}</div>
+                <div className="white left">{moves}</div>
             </Fragment>
         );
     });
