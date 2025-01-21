@@ -48,38 +48,43 @@ const About = () => (
                 <a href="https://en.wikipedia.org/wiki/Encyclopaedia_of_Chess_Openings#Main_ECO_codes">
                     ECO code
                 </a>
-                . Directly below that are continuations. There are two types:
+                . Directly below that are variations. There are two types:
                 <ul>
                     <li>
                         Those that can be played from the current opening
-                        sequence, called 'Next Moves';
+                        sequence, called 'Continuations';
                     </li>
                     <li>
                         Variations with a conflicting move sequence, called
-                        transpositions
+                        'Transpositions'
                     </li>
                 </ul>
-                The latter needs some explaination. Let's look at the move
-                sequence 1.c4 d5:
+                The latter needs some explanation. Let's look at the move
+                sequence <b>1.c4 d5</b>:
                 <img
-                    src="resources/NextVsTransposition.png"
+                    src="resources/Transpositions.png"
                     className="image"
                     alt="Next and Transposition variations"
                 />
                 </p>
-                <p>From the current position, we can arrive at all three positons
-                arising from the variations listed in the Next Moves tab.
-                However, two continuations can be played directly (<b>2. cxd5</b> and <b>2.Nf3</b>).
-                The two others are transpositions whose move sequences are in
-                conflict with the current variation. In these cases, <b>2. c4</b> can't
-                be played, because <b>1. c4</b> was played already. If you click on the
-                variation name of the transposition, it will open a new tab with that variation's
+                <p>From the current position, it is possible to move directly to the two positions listed under 'Continuations' by playing either 
+               <b>2. cxd5</b> and <b>2.Nf3</b>.
+                The two variations listed under 'Transpositions' have move sequences that are in
+                conflict with the current opening shown on the board. In both of these cases, <b>2. c4</b> can't
+                be played, because <b>1. c4</b> was already played. Clicking on the
+                varition name of the transposition will open a new browser tab with the transposition's
                 move sequence.
             </p>
             <p>
-                The rightmost column is a chess engine evaluation* of the
-                continuation. A positive score is better for White, and negative
-                is better for Black. The continuations can be sorted by
+                Some opening names are italicized. These are <a href="https://medium.com/@jefflowery/navigating-chess-openings-part-2-408a488d919b">interpolated openings</a>. These were
+                added to fill in missing move sequences between variations from the original reference sources used by 
+                <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>. Interpolated openings allow
+                navigation continuity between variations.
+            </p>
+            <p>
+                The rightmost column is a chess engine evaluation of the
+                variation. A positive score is better for White, and negative
+                is better for Black. The variations can be sorted by
                 evaluation (absolute value, ascending), variation name, or ECO
                 code.
             </p>
@@ -97,7 +102,7 @@ const About = () => (
             />
             <h3>External Info</h3>
             <p>
-                At the upper right, available on all pages, is a selector to
+                On all pages is a selector on the upper right to
                 include information from FICS or lichess. If one of
                 these has been selected, then the External Info tab will be
                 displayed. On this tab is game data from the external site(s)
@@ -107,12 +112,11 @@ const About = () => (
                     className="image"
                     alt="external site data"
                 />
-                In the above image, lichess and FICS have been selected, and the
-                External Info tab pane show the game information each site has.
-                FICS has 8119 games with this position, and has 23010. FICS does
-                not have a variation name for this position, Lichess has the
-                same variation name as Fenster has, but this won't always be the
-                case as variation names are not standardized.
+                </p><p>In the above image, lichess was selected earlier, and the
+                External Info tab pane shows aggregate game information from that site.
+                Lichess shows 464 games in it's database with this position. It also has the
+                same opening name as Fenster, though this won't always be the
+                case as opening names are not standardized.
             </p>
             <h3>Roots</h3>
             <p>
@@ -125,7 +129,7 @@ const About = () => (
                 book is named <b>DO6 Queen's Gambit</b>. This position can be
                 arrived at via the move sequences{" "}
                 <b>English Opening: Anglo-Scandinavian Defense</b> or from the{" "}
-                <b>Queen's Pawn Game</b>.
+                <b>Queen's Pawn Game</b>. Clicking on the root opening name will open a new browser tab with that opening.
             </p>
             <h3>Similar openings</h3>
             <p>
@@ -138,18 +142,6 @@ const About = () => (
                 alt="similar openings shown"
                 className="image"
             />
-            <h3> What does the '*' mean? </h3>
-            <p>
-                Some entries in Fenster's opening "book" are <i>interpolated</i>
-                , meaning that they respresent moves that were missing between
-                to varitions in the original{" "}
-                <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>{" "}
-                data (itself pulled form several different sources). To provide
-                continuity between variations, new "variations" were inserted
-                (interpolated) to fill in the gaps. If there is a gap between
-                variations "A" and "B", then the interpolated variation names
-                will be "A*".
-            </p>
             <h2>The PGN Import Page</h2>
             <img
                 src="resources/PgnImport.png"
@@ -157,7 +149,7 @@ const About = () => (
                 className="image"
             />
             <p>
-                This page has links to games at
+                This page has links to games at {" "}
                 <a href="https://theweekinchess.com/">The Week in Chess</a>{" "}
                 website. Clicking on the a link will show information from the
                 PGN file in the Summary tab. Selecting one or more of the check
@@ -188,6 +180,7 @@ const About = () => (
                 alt="the PGN import page"
                 className="image"
             />
+            <p>By clicking on the Fenster Opening Name, a new Fenster page will be opened with that variation.</p>
             <h2>Visualizations</h2>
             <img
                 src="resources/Visualizations.png"
