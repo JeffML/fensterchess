@@ -204,16 +204,11 @@ const NextOpenings = ({ legalMoves, transpositions, handleMovePlayed }) => {
 
 /**
  * Root move sequences for current position
- *
- * @param {{ moves: any; from: any; }} param0
- * @param {*} param0.moves: omoves
- * @param {*} param0.from
- * @returns {*}
  */
-const Roots = ({ moves: omoves, from }) => {
+const Roots = ({ from }) => {
     if (from.length === 0) return null;
 
-    const roots = Object.entries(from).map(([, { name, moves }]) => {
+    const roots = Object.entries(from).map(([, { name, moves, src }]) => {
         return (
             <Fragment key={name}>
                 <div
@@ -225,7 +220,7 @@ const Roots = ({ moves: omoves, from }) => {
                         marginRight: "100px",
                     }}
                 >
-                    {name}
+                    {src === "interpolated"? <i>{name}</i> : name}
                 </div>
                 <div className="white left">{moves}</div>
             </Fragment>
