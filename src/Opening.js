@@ -1,14 +1,15 @@
 import { SelectedSitesContext } from "./common/SelectedSitesContext.js";
 import { OpeningTabs } from "./OpeningTabs.js";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { NO_ENTRY_FOUND } from "./common/consts.js";
 
 const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
     const sites = useContext(SelectedSitesContext);
+    const [lastKnownOpening, setLastKnownOpening = useState("")
 
     if (data) {
         if (data.getOpeningForFenFull === null) {
-            return <div className="double-column left">{NO_ENTRY_FOUND}</div>;
+            return <div className="double-column left">{lastKnownOpening}</div>;
         }
         let {
             getOpeningForFenFull: {
@@ -19,6 +20,8 @@ const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
                 from, src,
             },
         } = data;
+
+        setLastKnownOpening(name)
 
         return (
             <div className="double-column left">
