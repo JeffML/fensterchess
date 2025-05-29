@@ -40,6 +40,8 @@ const SearchPage = ({
     error,
     data,
 }) => {
+    const [lastKnownOpening, setLastKnownOpening] = useState("")
+
     const reset = () => {
         setBoardState({ fen: "start", moves: "" });
         chess.current.reset();
@@ -125,7 +127,7 @@ const SearchPage = ({
                                 boardState,
                                 setBoardState,
                                 handleMovePlayed,
-                                data,
+                                data,lastKnownOpening, setLastKnownOpening
                             }}
                         />
                     )}

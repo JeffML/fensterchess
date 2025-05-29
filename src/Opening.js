@@ -3,9 +3,9 @@ import { OpeningTabs } from "./OpeningTabs.js";
 import { useContext, useState } from "react";
 import { NO_ENTRY_FOUND } from "./common/consts.js";
 
-const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
+const Opening = ({ boardState, setBoardState, handleMovePlayed, data, lastKnownOpening, setLastKnownOpening}) => {
     const sites = useContext(SelectedSitesContext);
-    const [lastKnownOpening, setLastKnownOpening = useState("")
+
 
     if (data) {
         if (data.getOpeningForFenFull === null) {
@@ -25,24 +25,7 @@ const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
 
         return (
             <div className="double-column left">
-                <span
-                    className="font-cinzel"
-                    style={{
-                        fontSize: "larger",
-                    }}
-                >
-                    Opening:&nbsp;&nbsp;
-                    <span
-                        style={{
-                            fontWeight: "bolder",
-                            display: "inline",
-                            color: "aquamarine",
-                            fontFamily: "sans",
-                        }}
-                    >
-                        {eco}&nbsp;{src==="interpolated"?(<i>{name}</i>):name}
-                    </span>
-                </span>
+                {OpeningName({eco, src, name})}
 
                 <OpeningTabs
                     {...{
@@ -75,3 +58,24 @@ const Opening = ({ boardState, setBoardState, handleMovePlayed, data }) => {
 };
 
 export {Opening}
+
+const OpeningName = ({eco, src, name}) => {
+    return <span
+        className="font-cinzel"
+        style={{
+            fontSize: "larger",
+        }}
+    >
+        Opening:&nbsp;&nbsp;
+        <span
+            style={{
+                fontWeight: "bolder",
+                display: "inline",
+                color: "aquamarine",
+                fontFamily: "sans",
+            }}
+        >
+            {eco}&nbsp;{src === "interpolated" ? (<i>{name}</i>) : name}
+        </span>
+    </span>;
+}
