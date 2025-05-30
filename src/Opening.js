@@ -1,16 +1,18 @@
 import { SelectedSitesContext } from "./common/SelectedSitesContext.js";
 import { OpeningTabs } from "./OpeningTabs.js";
-import { useContext, useState } from "react";
-import { NO_ENTRY_FOUND } from "./common/consts.js";
+import { useContext, useEffect } from "react";
+// import { NO_ENTRY_FOUND } from "./common/consts.js";
 
 const Opening = ({ boardState, setBoardState, handleMovePlayed, data, lastKnownOpening, setLastKnownOpening}) => {
     const sites = useContext(SelectedSitesContext);
 
-
-    if (data) {
-        if (data.getOpeningForFenFull === null) {
-            return <div className="double-column left">{lastKnownOpening}</div>;
+    useEffect(() => {
+        if (data?.getOpeningForFenFull) {
+            setLastKnownOpening(data.getOpeningForFenFull);
         }
+    }, [data, setLastKnownOpening]);
+
+    if (data?.getOpeningForFenFull) {
         let {
             getOpeningForFenFull: {
                 eco,
@@ -21,11 +23,9 @@ const Opening = ({ boardState, setBoardState, handleMovePlayed, data, lastKnownO
             },
         } = data;
 
-        setLastKnownOpening(name)
-
         return (
             <div className="double-column left">
-                {OpeningName({eco, src, name})}
+                <OpeningName {...{eco, src, name}} />
 
                 <OpeningTabs
                     {...{
@@ -42,9 +42,11 @@ const Opening = ({ boardState, setBoardState, handleMovePlayed, data, lastKnownO
                 />
             </div>
         );
-    } else
+    } else {
+        const {eco, name, src} = lastKnownOpening
         return (
             <div className="double-column">
+                <OpeningName {...{eco, name, src}} />
                 <OpeningTabs
                     {...{
                         boardState,
@@ -55,6 +57,7 @@ const Opening = ({ boardState, setBoardState, handleMovePlayed, data, lastKnownO
                 />
             </div>
         );
+    }
 };
 
 export {Opening}

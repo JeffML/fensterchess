@@ -91,7 +91,8 @@ const OpeningTabs = ({
     });
 
     useEffect(() => {
-        theoryRequest(currentMoves, setHtml);
+        if (currentMoves)
+            theoryRequest(currentMoves, setHtml);
     }, [currentMoves]);
 
     return (

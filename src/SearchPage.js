@@ -1,12 +1,12 @@
-import { gql, useQuery } from "@apollo/client";
-import { Chess } from "chess.js";
-import { Chessboard } from "kokopu-react";
-import { useRef, useState } from "react";
-import { FenOrPgn } from "./FenOrPgn.js";
-import { Opening } from "./Opening.js";
-import { ActionButton } from "./common/Buttons.js";
+import { gql, useQuery } from '@apollo/client';
+import { Chess } from 'chess.js';
+import { Chessboard } from 'kokopu-react';
+import { useRef, useState } from 'react';
+import { FenOrPgn } from './FenOrPgn.js';
+import { Opening } from './Opening.js';
+import { ActionButton } from './common/Buttons.js';
 
-import { FENEX, NO_ENTRY_FOUND } from "./common/consts.js";
+import { FENEX, NO_ENTRY_FOUND } from './common/consts.js';
 
 const GET_OPENING = gql`
     query getOpening($fen: String!, $loose: Boolean) {
@@ -40,10 +40,10 @@ const SearchPage = ({
     error,
     data,
 }) => {
-    const [lastKnownOpening, setLastKnownOpening] = useState("")
+    const [lastKnownOpening, setLastKnownOpening] = useState({});
 
     const reset = () => {
-        setBoardState({ fen: "start", moves: "" });
+        setBoardState({ fen: 'start', moves: '' });
         chess.current.reset();
     };
 
@@ -56,7 +56,7 @@ const SearchPage = ({
         chess.current.move(move);
         const fen = chess.current.fen();
         let moves = chess.current.pgn();
-        const movesPosition = moves.lastIndexOf("]"); // end of SetUp FEN
+        const movesPosition = moves.lastIndexOf(']'); // end of SetUp FEN
         if (movesPosition > -1) {
             moves = moves.substring(movesPosition + 3, moves.length); // +3 for the newlines between SetUp FEN and move list
         }
@@ -73,8 +73,8 @@ const SearchPage = ({
     const { fen } = boardState;
 
     return (
-        <div className="row" style={{ color: "white" }}>
-            <div className="column" style={{ alignItems: "center" }}>
+        <div className="row" style={{ color: 'white' }}>
+            <div className="column" style={{ alignItems: 'center' }}>
                 <Chessboard
                     interactionMode="playMoves"
                     position={fen}
@@ -82,41 +82,41 @@ const SearchPage = ({
                 />
                 <div className="row centered">
                     <ActionButton
-                        {...{ onClick: () => back(), text: "<< Back" }}
+                        {...{ onClick: () => back(), text: '<< Back' }}
                     />
                     <ActionButton
-                        {...{ onClick: () => reset(), text: "Reset" }}
+                        {...{ onClick: () => reset(), text: 'Reset' }}
                     />
                 </div>
 
                 <div className="row">
                     <div className="column">
-                        <div className="row" style={{ marginBottom: "10px" }}>
+                        <div className="row" style={{ marginBottom: '10px' }}>
                             Drag pieces above, or paste a move sequence or FEN
                             below:
                         </div>
                         <div className="row">
                             <FenOrPgn
                                 {...{ boardState, setBoardState, chess }}
-                            />{" "}
+                            />{' '}
                         </div>
                     </div>
                 </div>
             </div>
 
             <div className="double-column left">
-                <div className="row" style={{ marginTop: "0px" }}>
+                <div className="row" style={{ marginTop: '0px' }}>
                     {loading && (
-                        <span style={{ color: "lightgreen" }}>
+                        <span style={{ color: 'lightgreen' }}>
                             Searching...
                         </span>
                     )}
 
                     {error &&
-                        (error.message.startsWith("not_found") ? (
+                        (error.message.startsWith('not_found') ? (
                             NO_ENTRY_FOUND
                         ) : (
-                            <span style={{ color: "red" }}>
+                            <span style={{ color: 'red' }}>
                                 {error.toString()}
                             </span>
                         ))}
@@ -127,7 +127,9 @@ const SearchPage = ({
                                 boardState,
                                 setBoardState,
                                 handleMovePlayed,
-                                data,lastKnownOpening, setLastKnownOpening
+                                data,
+                                lastKnownOpening,
+                                setLastKnownOpening,
                             }}
                         />
                     )}
@@ -138,14 +140,14 @@ const SearchPage = ({
 };
 
 const loadMoves = (moves, chess) => {
-    let fen = "";
+    let fen = '';
 
     try {
         chess.current.loadPgn(moves);
         fen = chess.current.fen();
     } catch (e) {
         console.error(e);
-        moves = "";
+        moves = '';
     } finally {
         return { moves, fen };
     }
@@ -154,31 +156,31 @@ const loadMoves = (moves, chess) => {
 let paramsRead = false;
 
 const ThePage = () => {
-    const [boardState, setBoardState] = useState({ fen: "start", moves: "" });
+    const [boardState, setBoardState] = useState({ fen: 'start', moves: '' });
 
     const chess = useRef(new Chess());
     const url = new URLSearchParams(window.location.search);
 
     const readParams = () => {
-        const qmoves = url.get("moves");
-        url.delete("moves"); // done with param
+        const qmoves = url.get('moves');
+        url.delete('moves'); // done with param
 
         if (qmoves) {
             const { moves, fen } = loadMoves(qmoves, chess);
             return { moves, fen };
         } else {
-            let qfen = url.get("fen");
-            url.delete("fen");
+            let qfen = url.get('fen');
+            url.delete('fen');
 
             if (qfen) {
-                if (!FENEX.test(qfen.current.split(" ")[0])) {
-                    qfen = "start";
+                if (!FENEX.test(qfen.current.split(' ')[0])) {
+                    qfen = 'start';
                 }
             } else {
-                qfen = "start";
+                qfen = 'start';
             }
 
-            return { moves: "", fen: qfen ?? "start" };
+            return { moves: '', fen: qfen ?? 'start' };
         }
     };
 
@@ -190,7 +192,7 @@ const ThePage = () => {
 
     const { error, data, loading } = useQuery(GET_OPENING, {
         variables: { fen: boardState.fen, loose: true },
-        skip: boardState.fen === "start",
+        skip: boardState.fen === 'start',
     });
 
     const { fen } = boardState;
@@ -200,7 +202,7 @@ const ThePage = () => {
             chess.current.loadPgn(data.getOpeningForFenFull.moves);
         }
         const moves = chess.current.pgn();
-        
+
         if (fen !== boardState.fen || moves !== boardState.moves)
             setBoardState({ fen, moves });
     }
