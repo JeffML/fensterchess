@@ -25,7 +25,7 @@ const FenOrPgn = ({ boardState, setBoardState, chess }) => {
         } else {
             // PGN?
             try {
-                chess.current.loadPgn(input);
+                chess.current.loadPgn(input.replaceAll('"', ''));
                 moves = chess.current.pgn()     // canonical pgn
                 fen = chess.current.fen();
             } catch (ex) {

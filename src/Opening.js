@@ -78,7 +78,7 @@ const OpeningName = ({eco, src, name}) => {
                 fontFamily: "sans",
             }}
         >
-            {eco}&nbsp;{src === "interpolated" ? (<i>{name}</i>) : name}
+            {eco}&nbsp;{src === "interpolated" ? (<i>{name}</i>) : (name || "Unknown")}
         </span>
     </span>;
 }
