@@ -1,7 +1,7 @@
 import { FENEX } from "./common/consts.js";
 import "./stylesheets/textarea.css";
 
-const FenOrPgn = ({ boardState, setBoardState, chess }) => {
+const FenOrPgn = ({ boardState, setBoardState, chess, setLastKnownOpening }) => {
     const {fen, moves} = boardState
 
     const text = `FEN:\n${fen}\n\nmoves: ${moves}`;
@@ -33,6 +33,7 @@ const FenOrPgn = ({ boardState, setBoardState, chess }) => {
             }
         }
         setBoardState({fen, moves})
+        setLastKnownOpening({})
     };
 
 

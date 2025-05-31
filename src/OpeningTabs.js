@@ -70,6 +70,7 @@ const OpeningTabs = ({
     eco,
     name,
     from,
+    lastKnownOpening,
 }) => {
     const tabStyle = {
         border: "1px solid #FFFFFF ",
@@ -94,6 +95,8 @@ const OpeningTabs = ({
         if (currentMoves)
             theoryRequest(currentMoves, setHtml);
     }, [currentMoves]);
+
+    const hasLastMove = Object.keys(lastKnownOpening).length !== 0
 
     return (
         <Tabs
@@ -132,7 +135,7 @@ const OpeningTabs = ({
                 )}
                 {html && (
                     <TabPanel>
-                        <Theory2 {...{ html }} />
+                        {hasLastMove && <Theory2 {...{ html }} />}
                     </TabPanel>
                 )}
                 {showExternal && (

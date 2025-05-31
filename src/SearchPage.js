@@ -97,7 +97,7 @@ const SearchPage = ({
                         </div>
                         <div className="row">
                             <FenOrPgn
-                                {...{ boardState, setBoardState, chess }}
+                                {...{ boardState, setBoardState, chess, setLastKnownOpening }}
                             />{' '}
                         </div>
                     </div>
