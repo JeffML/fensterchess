@@ -1,17 +1,20 @@
 {
   "name": "fenster",
-  "version": "2.6.2",
+  "version": "3.0",
   "private": false,
   "type": "module",
   "dependencies": {
     "@apollo/client": "^3.8.6",
     "@apollo/link-context": "^2.0.0-beta.3",
+    "@babel/core": "^7.27.4",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@tanstack/react-query": "^5.79.2",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.5.1",
     "chess.js": "^1.0.0-beta.8",
     "dompurify": "^3.0.8",
+    "eslint": "^9.28.0",
     "eslint-config-react-app": "^7.0.1",
     "fast-xml-parser": "^4.0.12",
     "graphql": "^16.6.0",
@@ -20,6 +23,7 @@
     "kokopu-react": "^3.3.0",
     "node-fetch": "^3.3.0",
     "node-html-parser": "^6.1.11",
+    "octokit": "^5.0.3",
     "p5": "^1.9.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -58,7 +62,6 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^9.0.0",
     "eslint-plugin-react": "^7.32.1"
   }
 }

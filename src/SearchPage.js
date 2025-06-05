@@ -97,7 +97,12 @@ const SearchPage = ({
                         </div>
                         <div className="row">
                             <FenOrPgn
-                                {...{ boardState, setBoardState, chess, setLastKnownOpening }}
+                                {...{
+                                    boardState,
+                                    setBoardState,
+                                    chess,
+                                    setLastKnownOpening,
+                                }}
                             />{' '}
                         </div>
                     </div>
@@ -155,7 +160,7 @@ const loadMoves = (moves, chess) => {
 
 let paramsRead = false;
 
-const ThePage = () => {
+const ThePage = (openingBook) => {
     const [boardState, setBoardState] = useState({ fen: 'start', moves: '' });
 
     const chess = useRef(new Chess());
@@ -190,26 +195,30 @@ const ThePage = () => {
         setBoardState({ fen, moves });
     }
 
-    const { error, data, loading } = useQuery(GET_OPENING, {
-        variables: { fen: boardState.fen, loose: true },
-        skip: boardState.fen === 'start',
-    });
+    // const { error, data, loading } = useQuery(GET_OPENING, {
+    //     variables: { fen: boardState.fen, loose: true },
+    //     skip: boardState.fen === 'start',
+    // });
 
     const { fen } = boardState;
+    let data = null;
 
-    if (data) {
-        if (data.getOpeningForFenFull) {
-            chess.current.loadPgn(data.getOpeningForFenFull.moves);
+    if (fen !== 'start') {
+        data = {getOpeningForFenFull: openingBook[fen]} // TBD: loose opening book
+        
+        if (data) {
+            if (data.getOpeningForFenFull) {
+                chess.current.loadPgn(data.getOpeningForFenFull.moves);
+            }
+            const moves = chess.current.pgn();
+
+            if (fen !== boardState.fen || moves !== boardState.moves)
+                setBoardState({ fen, moves });
         }
-        const moves = chess.current.pgn();
-
-        if (fen !== boardState.fen || moves !== boardState.moves)
-            setBoardState({ fen, moves });
     }
-
     return (
         <SearchPage
-            {...{ chess, boardState, setBoardState, loading, error, data }}
+            {...{ chess, boardState, setBoardState, data }}
         />
     );
 };
