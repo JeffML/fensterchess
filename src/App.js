@@ -30,7 +30,7 @@ function App() {
                 <PageHeader
                     {...{ subheading: SUBTITLES[mode], mode, setMode, isPending }}
                 />
-                {mode === modes.search && <SearchPage {...{openingBook}}/>}
+                {mode === modes.search && <SearchPage {...{openingBook:data}}/>}
                 {mode === modes.pgnAnalyze && <PgnAnalysis {...{ setMode }} />}
                 {mode === modes.visualization && <Visualizations />}
                 {mode === modes.about && <AboutPage />}

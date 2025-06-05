@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 // pulls the opening data from eco.json github repo
  async function getLatestEcoJson() {
     const ROOT = 'https://raw.githubusercontent.com/hayatbiralem/eco.json/master/';

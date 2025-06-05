@@ -160,7 +160,7 @@ const loadMoves = (moves, chess) => {
 
 let paramsRead = false;
 
-const ThePage = (openingBook) => {
+const ThePage = ({openingBook}) => {
     const [boardState, setBoardState] = useState({ fen: 'start', moves: '' });
 
     const chess = useRef(new Chess());
