@@ -9,7 +9,7 @@ import SearchPage from './SearchPage.js';
 // import TestComponent from "./TestComponent.js";
 import { Visualizations } from './Visualizations.js';
 import { useQuery } from '@tanstack/react-query';
-import { openingBook } from './datasource/getLatestEcoJson.js';
+import { openingBook, fromTo } from './datasource/getLatestEcoJson.js';
 
 function App() {
     const [mode, setMode] = useState(isTestMode ? modes.test : modes.search);
@@ -17,26 +17,47 @@ function App() {
     const { isPending, isError, error, data } = useQuery({
         queryKey: ['repoData'],
         queryFn: async () => {
-            const ob = await openingBook() // TBD: error checking
-            return ob
-        }
+            const ob = await openingBook(); // TBD: error checking
+            const { from, to } = await fromTo();
+            return { ob, from, to };
+        },
     });
 
-    if (isError) return 'An error has occurred: ' + error.message;
+    if (isError) {
+        console.error(error)
+        return <span className='white'>An error has occurred: {error.message}</span>
+    }
 
-    return data && (
-        <div className="App">
-            <SelectedSitesContextProvider>
-                <PageHeader
-                    {...{ subheading: SUBTITLES[mode], mode, setMode, isPending }}
-                />
-                {mode === modes.search && <SearchPage {...{openingBook:data}}/>}
-                {mode === modes.pgnAnalyze && <PgnAnalysis {...{ setMode }} />}
-                {mode === modes.visualization && <Visualizations />}
-                {mode === modes.about && <AboutPage />}
-                {/* {mode === modes.test && <TestComponent />} */}
-            </SelectedSitesContextProvider>
-        </div>
+    return (
+        data && (
+            <div className="App">
+                <SelectedSitesContextProvider>
+                    <PageHeader
+                        {...{
+                            subheading: SUBTITLES[mode],
+                            mode,
+                            setMode,
+                            isPending,
+                        }}
+                    />
+                    {mode === modes.search && (
+                        <SearchPage
+                            {...{
+                                openingBook: data.ob,
+                                from: data.from,
+                                to: data.to,
+                            }}
+                        />
+                    )}
+                    {mode === modes.pgnAnalyze && (
+                        <PgnAnalysis {...{ setMode }} />
+                    )}
+                    {mode === modes.visualization && <Visualizations />}
+                    {mode === modes.about && <AboutPage />}
+                    {/* {mode === modes.test && <TestComponent />} */}
+                </SelectedSitesContextProvider>
+            </div>
+        )
     );
 }
 

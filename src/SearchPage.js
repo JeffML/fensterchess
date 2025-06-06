@@ -1,36 +1,36 @@
-import { gql, useQuery } from '@apollo/client';
+// import { gql } from '@apollo/client';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'kokopu-react';
 import { useRef, useState } from 'react';
 import { FenOrPgn } from './FenOrPgn.js';
 import { Opening } from './Opening.js';
 import { ActionButton } from './common/Buttons.js';
-
+import {pos} from './utils/chessTools.js'
 import { FENEX, NO_ENTRY_FOUND } from './common/consts.js';
 
-const GET_OPENING = gql`
-    query getOpening($fen: String!, $loose: Boolean) {
-        getOpeningForFenFull(fen: $fen, loose: $loose) {
-            eco
-            name
-            moves
-            next {
-                name
-                moves
-                score
-                eco
-                src
-            }
-            from {
-                name
-                moves
-            }
-            aliases
-            score
-            src
-        }
-    }
-`;
+// const GET_OPENING = gql`
+//     query getOpening($fen: String!, $loose: Boolean) {
+//         getOpeningForFenFull(fen: $fen, loose: $loose) {
+//             eco
+//             name
+//             moves
+//             next {
+//                 name
+//                 moves
+//                 score
+//                 eco
+//                 src
+//             }
+//             from {
+//                 name
+//                 moves
+//             }
+//             aliases
+//             score
+//             src
+//         }
+//     }
+// `;
 
 const SearchPage = ({
     chess,
@@ -160,7 +160,7 @@ const loadMoves = (moves, chess) => {
 
 let paramsRead = false;
 
-const ThePage = ({openingBook}) => {
+const ThePage = ({openingBook, from, to}) => {
     const [boardState, setBoardState] = useState({ fen: 'start', moves: '' });
 
     const chess = useRef(new Chess());
@@ -204,10 +204,11 @@ const ThePage = ({openingBook}) => {
     let data = null;
 
     if (fen !== 'start') {
-        data = {getOpeningForFenFull: openingBook[fen]} // TBD: loose opening book
+        data = {getOpeningForFenFull: openingBook[fen]}
         
         if (data) {
             if (data.getOpeningForFenFull) {
+                data.getOpeningForFenFull.next = to[pos(fen)].map(fen => openingBook[fen])
                 chess.current.loadPgn(data.getOpeningForFenFull.moves);
             }
             const moves = chess.current.pgn();

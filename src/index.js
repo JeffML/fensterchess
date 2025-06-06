@@ -13,7 +13,6 @@ import { token, serverUri } from './common/consts.js';
 import {
     QueryClient,
     QueryClientProvider,
-    useQuery
 } from '@tanstack/react-query';
 
 // Note: serverUri can be changed by env var REACT_APP_SERVER (see consts.js)
