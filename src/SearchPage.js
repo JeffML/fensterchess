@@ -208,7 +208,8 @@ const ThePage = ({openingBook, from, to}) => {
         
         if (data) {
             if (data.getOpeningForFenFull) {
-                data.getOpeningForFenFull.next = to[pos(fen)].map(fen => openingBook[fen])
+                const nexts = to[pos(fen)]??[]
+                data.getOpeningForFenFull.next = nexts.map(fen => openingBook[fen])
                 chess.current.loadPgn(data.getOpeningForFenFull.moves);
             }
             const moves = chess.current.pgn();
