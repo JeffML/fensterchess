@@ -5,7 +5,7 @@ import { isTestMode, modes, SUBTITLES } from './common/consts.js';
 import { SelectedSitesContextProvider } from './common/SelectedSitesContext.js';
 import PageHeader from './PageHeader.js';
 import PgnAnalysis from './PgnAnalyzePage.js';
-import SearchPage from './SearchPage.js';
+import {SearchPageContainer} from './SearchPage.js';
 // import TestComponent from "./TestComponent.js";
 import { Visualizations } from './Visualizations.js';
 import { useQuery } from '@tanstack/react-query';
@@ -41,7 +41,7 @@ function App() {
                         }}
                     />
                     {mode === modes.search && (
-                        <SearchPage
+                        <SearchPageContainer
                             {...{
                                 openingBook: data.ob,
                                 from: data.from,

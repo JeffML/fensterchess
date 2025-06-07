@@ -1,4 +1,3 @@
-// import { gql } from '@apollo/client';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'kokopu-react';
 import { useRef, useState } from 'react';
@@ -7,30 +6,7 @@ import { Opening } from './Opening.js';
 import { ActionButton } from './common/Buttons.js';
 import {pos} from './utils/chessTools.js'
 import { FENEX, NO_ENTRY_FOUND } from './common/consts.js';
-
-// const GET_OPENING = gql`
-//     query getOpening($fen: String!, $loose: Boolean) {
-//         getOpeningForFenFull(fen: $fen, loose: $loose) {
-//             eco
-//             name
-//             moves
-//             next {
-//                 name
-//                 moves
-//                 score
-//                 eco
-//                 src
-//             }
-//             from {
-//                 name
-//                 moves
-//             }
-//             aliases
-//             score
-//             src
-//         }
-//     }
-// `;
+import {scores} from './datasource/scores.js'
 
 const SearchPage = ({
     chess,
@@ -160,12 +136,7 @@ const loadMoves = (moves, chess) => {
 
 let paramsRead = false;
 
-const ThePage = ({openingBook, from, to}) => {
-    const [boardState, setBoardState] = useState({ fen: 'start', moves: '' });
-
-    const chess = useRef(new Chess());
-    const url = new URLSearchParams(window.location.search);
-
+function readParamsMaybe(url, chess, setBoardState) {
     const readParams = () => {
         const qmoves = url.get('moves');
         url.delete('moves'); // done with param
@@ -194,22 +165,31 @@ const ThePage = ({openingBook, from, to}) => {
         paramsRead = true;
         setBoardState({ fen, moves });
     }
+}
 
-    // const { error, data, loading } = useQuery(GET_OPENING, {
-    //     variables: { fen: boardState.fen, loose: true },
-    //     skip: boardState.fen === 'start',
-    // });
+
+const SearchPageContainer = ({openingBook, from, to}) => {
+    const [boardState, setBoardState] = useState({ fen: 'start', moves: '' });
+
+    const chess = useRef(new Chess());
+    const url = new URLSearchParams(window.location.search);
+
+    readParamsMaybe(url, chess, setBoardState);
 
     const { fen } = boardState;
     let data = null;
 
     if (fen !== 'start') {
-        data = {getOpeningForFenFull: openingBook[fen]}
+        data = {getOpeningForFenFull: {...openingBook[fen], score:scores[fen]}}
         
         if (data) {
             if (data.getOpeningForFenFull) {
                 const nexts = to[pos(fen)]??[]
-                data.getOpeningForFenFull.next = nexts.map(fen => openingBook[fen])
+                data.getOpeningForFenFull.next = nexts.map(fen => {
+                    const variation = {...openingBook[fen], score:scores[fen]}
+                    return variation
+                })
+
                 chess.current.loadPgn(data.getOpeningForFenFull.moves);
             }
             const moves = chess.current.pgn();
@@ -225,4 +205,5 @@ const ThePage = ({openingBook, from, to}) => {
     );
 };
 
-export default ThePage;
+export {SearchPageContainer};
+

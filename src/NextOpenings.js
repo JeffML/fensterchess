@@ -6,8 +6,7 @@ import "./stylesheets/variationsRow.css";
 /**
  * Shows next opening variations from current positions
  * Note that with loose matching (position only), the current position may come from multiple
- * move sequences, leading to duplicate "to" variations appearing. CloudAnt (editor?) doesn't appear
- * to support fat arrow functions, making it very hard to write a coherent reduce function.
+ * move sequences, leading to duplicate "to" variations appearing. 
  */
 const NextOpeningsGrid = ({
     handleMovePlayed,

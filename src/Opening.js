@@ -27,12 +27,13 @@ const Opening = ({
                 next: variations,
                 from,
                 src,
+                score,
             },
         } = data;
 
         return (
             <div className="double-column left">
-                <OpeningName {...{ eco, src, name }} />
+                <OpeningName {...{ eco, src, name, score }} />
 
                 <OpeningTabs
                     {...{
@@ -51,17 +52,17 @@ const Opening = ({
             </div>
         );
     } else {
-        const { eco, name, src } = lastKnownOpening;
+        const { eco, name, src, score } = lastKnownOpening;
         return (
             <div className="double-column left">
-                <OpeningName {...{ eco, name, src }} />
+                <OpeningName {...{ eco, name, src, score }} />
                 <OpeningTabs
                     {...{
                         boardState,
                         setBoardState,
                         handleMovePlayed,
                         sites,
-                        lastKnownOpening
+                        lastKnownOpening,
                     }}
                 />
             </div>
@@ -71,7 +72,19 @@ const Opening = ({
 
 export { Opening };
 
-const OpeningName = ({ eco, src, name }) => {
+const Eval = ({ score }) => (
+    <span
+        className="white"
+        style={{
+            marginLeft: '1rem',
+            fontSize: 'smaller',
+        }}
+    >
+        eval: {score}
+    </span>
+);
+
+const OpeningName = ({ eco, src, name, score }) => {
     return (
         <span
             className="font-cinzel"
@@ -89,7 +102,18 @@ const OpeningName = ({ eco, src, name }) => {
                 }}
             >
                 {eco}&nbsp;
-                {src === 'interpolated' ? <i>{name}</i> : name || 'Unknown'}
+                {src === 'interpolated' ? (
+                    <i>
+                        {name} <Eval {...{score}}></Eval>
+                    </i>
+                ) : (
+                    (
+                        <span>
+                            {name}
+                            <Eval {...{score}}></Eval>
+                        </span>
+                    ) || 'Unknown'
+                )}
             </span>
         </span>
     );
