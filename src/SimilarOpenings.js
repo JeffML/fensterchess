@@ -22,6 +22,7 @@ const SimilarOpenings = ({ boardState, setBoardState }) => {
         return <span>Loading...</span>;
     }
     if (error) {
+        console.error(error)
         return <span> ERROR: {error.toString()}</span>;
     }
     if (data) {

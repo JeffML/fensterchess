@@ -4,9 +4,9 @@ import { useRef, useState } from 'react';
 import { FenOrPgn } from './FenOrPgn.js';
 import { Opening } from './Opening.js';
 import { ActionButton } from './common/Buttons.js';
-import {pos} from './utils/chessTools.js'
+import { pos } from './utils/chessTools.js';
 import { FENEX, NO_ENTRY_FOUND } from './common/consts.js';
-import {scores} from './datasource/scores.js'
+import { scores } from './datasource/scores.js';
 
 const SearchPage = ({
     chess,
@@ -167,8 +167,7 @@ function readParamsMaybe(url, chess, setBoardState) {
     }
 }
 
-
-const SearchPageContainer = ({openingBook, from, to}) => {
+const SearchPageContainer = ({ openingBook, from, to }) => {
     const [boardState, setBoardState] = useState({ fen: 'start', moves: '' });
 
     const chess = useRef(new Chess());
@@ -180,30 +179,27 @@ const SearchPageContainer = ({openingBook, from, to}) => {
     let data = null;
 
     if (fen !== 'start') {
-        data = {getOpeningForFenFull: {...openingBook[fen], score:scores[fen]}}
-        
-        if (data) {
-            if (data.getOpeningForFenFull) {
-                const nexts = to[pos(fen)]??[]
-                data.getOpeningForFenFull.next = nexts.map(fen => {
-                    const variation = {...openingBook[fen], score:scores[fen]}
-                    return variation
-                })
+        data = {
+            getOpeningForFenFull: openingBook[fen]
+                ? { ...openingBook[fen], score: scores[fen] }
+                : null,
+        };
 
-                chess.current.loadPgn(data.getOpeningForFenFull.moves);
-            }
-            const moves = chess.current.pgn();
+        if (data.getOpeningForFenFull) {
+            const nexts = to[pos(fen)] ?? [];
+            data.getOpeningForFenFull.next = nexts.map((fen) => {
+                const variation = { ...openingBook[fen], score: scores[fen] };
+                return variation;
+            });
 
-            if (fen !== boardState.fen || moves !== boardState.moves)
-                setBoardState({ fen, moves });
+            chess.current.loadPgn(data.getOpeningForFenFull.moves);
         }
+        const moves = chess.current.pgn();
+
+        if (fen !== boardState.fen || moves !== boardState.moves)
+            setBoardState({ fen, moves });
     }
-    return (
-        <SearchPage
-            {...{ chess, boardState, setBoardState, data }}
-        />
-    );
+    return <SearchPage {...{ chess, boardState, setBoardState, data }} />;
 };
 
-export {SearchPageContainer};
-
+export { SearchPageContainer };
