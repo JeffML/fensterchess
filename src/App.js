@@ -4,7 +4,7 @@ import './App.css';
 import { isTestMode, modes, SUBTITLES } from './common/consts.js';
 import { SelectedSitesContextProvider } from './common/SelectedSitesContext.js';
 import PageHeader from './PageHeader.js';
-import PgnAnalysis from './PgnAnalyzePage.js';
+import {AnalyzePgnPage} from './AnalyzePgnPage.js';
 import {SearchPageContainer} from './SearchPage.js';
 // import TestComponent from "./TestComponent.js";
 import { Visualizations } from './Visualizations.js';
@@ -50,7 +50,7 @@ function App() {
                         />
                     )}
                     {mode === modes.pgnAnalyze && (
-                        <PgnAnalysis {...{ setMode }} />
+                        <AnalyzePgnPage {...{ setMode, openingBook: data.ob }} />
                     )}
                     {mode === modes.visualization && <Visualizations />}
                     {mode === modes.about && <AboutPage />}
