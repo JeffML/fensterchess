@@ -1,4 +1,5 @@
 import { FENEX } from "./common/consts.js";
+import { sanitizeInput } from "./utils/sanitizeInput.js";
 import "./stylesheets/textarea.css";
 
 const FenOrPgn = ({ boardState, setBoardState, chess, setLastKnownOpening }) => {
@@ -9,14 +10,15 @@ const FenOrPgn = ({ boardState, setBoardState, chess, setLastKnownOpening }) => 
     const handleInput = (e) => {
         e.preventDefault();
         let input = e.clipboardData.getData("text");
-        const stubFen = input.trim().split(" ")[0].replace('"', '');
+        input = sanitizeInput(input)
+        const stubFen = input.split(" ")[0];
 
         let moves="", fen="start"
 
         // FEN?
         if (FENEX.test(stubFen)) {
             try {
-                fen = input.trim().replaceAll(/["\n]/g, '');
+                fen = input;
                 chess.current.load(fen);  
                 fen = chess.current.fen()   //scrubs e.p. falsities
             } catch (ex) {
@@ -25,7 +27,7 @@ const FenOrPgn = ({ boardState, setBoardState, chess, setLastKnownOpening }) => 
         } else {
             // PGN?
             try {
-                chess.current.loadPgn(input.replaceAll('"', ''));
+                chess.current.loadPgn(input);
                 moves = chess.current.pgn()     // canonical pgn
                 fen = chess.current.fen();
             } catch (ex) {
