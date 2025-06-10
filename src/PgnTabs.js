@@ -29,17 +29,6 @@ const GET_PGN_FILES = gql`
     }
 `;
 
-// const FIND_OPENINGS = gql`
-//     query FindOpeningsForFens($fens: [String]!) {
-//         getOpeningsForFens2(fens: $fens) {
-//             eco
-//             name
-//             moves
-//             fen
-//         }
-//     }
-// `;
-
 const GET_OPENING_ADDITIONAL = gql`
     query getOpeningAdditional($fen: String!, $sites: [String]!) {
         getOpeningAdditional(fen: $fen, sites: $sites) {
@@ -485,23 +474,11 @@ const findOpeningForGame = (game, openingBook) => {
         }
     }
 
-    return opening
+    return opening;
 };
 
 const OpeningTab = ({ game, openingBook }) => {
     const chess = useRef(new Chess());
-
-    // const fens = game
-    //     ? game
-    //           .nodes()
-    //           .slice(0, 50)
-    //           .map((n) => n.fen())
-    //     : null;
-
-    // const { data, loading } = useQuery(FIND_OPENINGS, {
-    //     variables: { fens },
-    //     skip: game === null,
-    // });
 
     if (!game)
         return (
@@ -510,15 +487,9 @@ const OpeningTab = ({ game, openingBook }) => {
             </span>
         );
 
-    // if (loading) return <span className="white">Loading...</span>;
-
-    // if (data) {
-        const opening = findOpeningForGame(game, openingBook)
-        // const openings = data.getOpeningsForFens2;
-        // const opening = openings.at(-1) ?? {};
-        chess.current.loadPgn(opening.moves);
-        return <OpeningDetails {...{ opening, game, chess }} />;
-    // }
+    const opening = findOpeningForGame(game, openingBook);
+    chess.current.loadPgn(opening.moves);
+    return <OpeningDetails {...{ opening, game, chess }} />;
 };
 
 const AdditionalOpenings = ({ fen }) => {
