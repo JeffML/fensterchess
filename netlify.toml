@@ -1,8 +1,7 @@
 # example netlify.toml
 [build]
-  command = "yarn build"
-  publish = "build"
-  build = "esbuild"
+  command = "vite build"
+  publish = "dist"
 
 [dev]
   targetPort = 3000
