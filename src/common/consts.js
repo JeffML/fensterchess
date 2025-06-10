@@ -43,10 +43,13 @@ const sites = Object.keys(siteUrls);
 const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
 const DEFAULT_SERVER = "fenster-s.netlify.app";
 
-const token = process.env.REACT_APP_QUOTE; // authentication token
-const alias = process.env.REACT_APP_SERVER; // this can be set as follows: "REACT_APP_SERVER=flum netlify dev"
+// const token = process.env.REACT_APP_QUOTE; // authentication token
+// const alias = process.env.REACT_APP_SERVER; // this can be set as follows: "REACT_APP_SERVER=flum netlify dev"
 
-const isTestMode = process.env.REACT_APP_TEST_MODE === "flum"; // brings up test page
+const token = import.meta.env.REACT_APP_QUOTE; // authentication token
+const alias = import.meta.env.REACT_APP_SERVER; // this can be set as follows: "REACT_APP_SERVER=flum netlify dev"
+
+const isTestMode = import.meta.env.REACT_APP_TEST_MODE === "flum"; // brings up test page
 
 // prettier-ignore
 const serverUri = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}/.netlify/functions/server`;

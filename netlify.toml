@@ -1,8 +1,11 @@
 # example netlify.toml
 [build]
-  command = "react-scripts build"
+  command = "yarn build"
   publish = "build"
   build = "esbuild"
+
+[dev]
+  targetPort = 3000
 
 [functions]
   directory = "netlify/functions"
