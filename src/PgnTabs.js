@@ -1,23 +1,23 @@
-import { gql, useQuery } from "@apollo/client";
-import { Chess } from "chess.js";
-import { pgnRead } from "kokopu";
-import { Chessboard } from "kokopu-react";
-import { Fragment, useContext, useRef, useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import "react-tabs/style/react-tabs.css";
-import { ActionButton } from "./common/Buttons.js";
-import PliesAryToMovesStringSpan from "./common/PliesAryToMovesStringSpan.js";
-import { SelectedSitesContext } from "./common/SelectedSitesContext.js";
-import StackedBarChart from "./common/StackedBarChart.js";
-import "./stylesheets/grid.css";
-import "./stylesheets/tabs.css";
+import { gql, useQuery } from '@apollo/client';
+import { Chess } from 'chess.js';
+import { pgnRead } from 'kokopu';
+import { Chessboard } from 'kokopu-react';
+import { Fragment, useContext, useRef, useState } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
+import { ActionButton } from './common/Buttons.js';
+import PliesAryToMovesStringSpan from './common/PliesAryToMovesStringSpan.js';
+import { SelectedSitesContext } from './common/SelectedSitesContext.js';
+import StackedBarChart from './common/StackedBarChart.js';
+import './stylesheets/grid.css';
+import './stylesheets/tabs.css';
 import {
     movesStringToPliesAry,
     pliesAryToMovesString,
-} from "./utils/openings.js";
-import sleep from "./utils/sleep.js";
+} from './utils/openings.js';
+import sleep from './utils/sleep.js';
 
-const blueBoldStyle = { color: "LightSkyBlue" };
+const blueBoldStyle = { color: 'LightSkyBlue' };
 
 // file requests for (a) link
 const GET_PGN_FILES = gql`
@@ -54,7 +54,7 @@ const GET_OPENING_ADDITIONAL = gql`
 `;
 
 const getPgnSummary = (pgn) => {
-    const ETC = ", etc.";
+    const ETC = ', etc.';
     const db = pgnRead(pgn);
     const gmCt = db.gameCount();
 
@@ -101,12 +101,12 @@ const getPgnSummary = (pgn) => {
 
 const Openings = ({ openings, setFlash, filter, setFilter }) => {
     const gridStyle = {
-        display: "grid",
-        gridTemplate: "1fr 2fr",
-        maxHeight: "250px",
-        minWidth: "fit-content",
-        marginTop: "1em",
-        overflowX: "visible",
+        display: 'grid',
+        gridTemplate: '1fr 2fr',
+        maxHeight: '250px',
+        minWidth: 'fit-content',
+        marginTop: '1em',
+        overflowX: 'visible',
     };
 
     const sleepTime = 300;
@@ -136,10 +136,10 @@ const Openings = ({ openings, setFlash, filter, setFilter }) => {
         <div style={gridStyle} className="scrollableY white">
             <span
                 className="font-cinzel left"
-                style={{ ...blueBoldStyle, gridColumn: "span 2" }}
+                style={{ ...blueBoldStyle, gridColumn: 'span 2' }}
             >
                 Openings
-                <span style={{ fontSize: "smaller", paddingTop: "2px" }}>
+                <span style={{ fontSize: 'smaller', paddingTop: '2px' }}>
                     &nbsp;(from PGN)
                 </span>
             </span>
@@ -154,7 +154,7 @@ const Openings = ({ openings, setFlash, filter, setFilter }) => {
                             defaultChecked={filter.includes(o)}
                         ></input>
                         <span key={o + i} className="left">
-                            {o ?? "(no name)"}
+                            {o ?? '(no name)'}
                         </span>
                     </Fragment>
                 ))}
@@ -199,34 +199,34 @@ const PgnSummaryTab = ({ pgnSumm, setFlash, filter, setFilter }) => {
 const Players = ({ pgnSumm }) => {
     const { players } = pgnSumm;
     const gridStyle = {
-        display: "grid",
-        gridTemplateColumns: "1fr 3fr 1fr",
-        gap: "2em",
+        display: 'grid',
+        gridTemplateColumns: '1fr 3fr 1fr',
+        gap: '2em',
     };
 
-    const [method, setMethod] = useState("name");
+    const [method, setMethod] = useState('name');
 
     const sort = (a, b) => {
         const titleSort = [
-            "GM",
-            "WGM",
-            "IM",
-            "WIM",
-            "FM",
-            "WFM",
-            "CM",
-            "WCM",
-            "NM",
-            "",
+            'GM',
+            'WGM',
+            'IM',
+            'WIM',
+            'FM',
+            'WFM',
+            'CM',
+            'WCM',
+            'NM',
+            '',
         ];
 
-        if (method === "name") return a.name.localeCompare(b.name);
-        if (method === "ELO")
+        if (method === 'name') return a.name.localeCompare(b.name);
+        if (method === 'ELO')
             return parseInt(b.elo ?? 0) - parseInt(a.elo ?? 0);
-        if (method === "title") {
+        if (method === 'title') {
             return (
-                titleSort.indexOf(a.title ?? "") -
-                titleSort.indexOf(b.title ?? "")
+                titleSort.indexOf(a.title ?? '') -
+                titleSort.indexOf(b.title ?? '')
             );
         }
     };
@@ -237,13 +237,13 @@ const Players = ({ pgnSumm }) => {
         <>
             <div
                 style={{
-                    whiteSpace: "nowrap",
-                    color: "powderblue",
-                    justifyContent: "space-evenly",
+                    whiteSpace: 'nowrap',
+                    color: 'powderblue',
+                    justifyContent: 'space-evenly',
                 }}
             >
-                Sort by:{" "}
-                <label style={{ marginLeft: "1em" }}>
+                Sort by:{' '}
+                <label style={{ marginLeft: '1em' }}>
                     <input
                         type="radio"
                         name="sortBy"
@@ -253,7 +253,7 @@ const Players = ({ pgnSumm }) => {
                     />
                     Player name
                 </label>
-                <label style={{ display: "inline", marginLeft: "1em" }}>
+                <label style={{ display: 'inline', marginLeft: '1em' }}>
                     <input
                         type="radio"
                         name="sortBy"
@@ -262,7 +262,7 @@ const Players = ({ pgnSumm }) => {
                     />
                     Player ELO
                 </label>
-                <label style={{ display: "inline", marginLeft: "1em" }}>
+                <label style={{ display: 'inline', marginLeft: '1em' }}>
                     <input
                         type="radio"
                         name="sortBy"
@@ -282,7 +282,7 @@ const Players = ({ pgnSumm }) => {
                             style={{
                                 ...gridStyle,
                                 backgroundColor:
-                                    i % 2 ? "slategray" : "inherit",
+                                    i % 2 ? 'slategray' : 'inherit',
                             }}
                         >
                             <span className="left">{title}</span>
@@ -313,7 +313,7 @@ const ChessboardWithControls = ({ chess, plies, plyIndex, setPlyIndex }) => {
         doRest();
     };
 
-    const fen = chess.current.fen()
+    const fen = chess.current.fen();
 
     return (
         <div>
@@ -323,16 +323,16 @@ const ChessboardWithControls = ({ chess, plies, plyIndex, setPlyIndex }) => {
                 animated={false}
                 coordinateVisible={false}
             />
-            <div style={{ marginLeft: "-10%", marginTop: "-3%" }}>
+            <div style={{ marginLeft: '-10%', marginTop: '-3%' }}>
                 <ActionButton
                     onClick={back}
                     text="&lArr;"
-                    style={{ fontSize: "14pt" }}
+                    style={{ fontSize: '14pt' }}
                 ></ActionButton>
                 <ActionButton
                     onClick={forward}
                     text="&rArr;"
-                    style={{ fontSize: "14pt" }}
+                    style={{ fontSize: '14pt' }}
                 ></ActionButton>
             </div>
         </div>
@@ -341,16 +341,16 @@ const ChessboardWithControls = ({ chess, plies, plyIndex, setPlyIndex }) => {
 
 const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
     const openingMovesStyle = {
-        color: "powderblue",
+        color: 'powderblue',
     };
     const ellipsesStyle = {
-        border: "solid 1px darkgray",
-        fontSize: "16pt",
-        color: "limegreen",
-        display: "inline-block",
-        lineHeight: "0px",
-        borderRadius: "3px",
-        height: "12px",
+        border: 'solid 1px darkgray',
+        fontSize: '16pt',
+        color: 'limegreen',
+        display: 'inline-block',
+        lineHeight: '0px',
+        borderRadius: '3px',
+        height: '12px',
     };
 
     const [showGameMoves, setShowGameMoves] = useState(false);
@@ -367,12 +367,12 @@ const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
         gameMoves = PliesAryToMovesStringSpan(gamePlies, {
             start: opLen,
             plyIndex,
-            color: "lightgreen",
+            color: 'lightgreen',
         });
     }
     const openingMoves = PliesAryToMovesStringSpan(openingPliesRef.current, {
         plyIndex,
-        color: "powderblue",
+        color: 'powderblue',
     });
 
     return (
@@ -395,29 +395,29 @@ const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
 const OpeningDetails = ({ game, opening, chess }) => {
     const { eco, name, moves: openingMoves } = opening;
     const gamePliesRef = useRef(game.pojo().mainVariation);
-    const openingPliesRef = useRef(movesStringToPliesAry(openingMoves ?? ""));
+    const openingPliesRef = useRef(movesStringToPliesAry(openingMoves ?? ''));
     const [plyIndex, setPlyIndex] = useState(openingPliesRef.current.length);
 
     const event = game.event();
     const white =
-        (game.playerTitle("w") ?? "  ") + "   " + game.playerName("w");
+        (game.playerTitle('w') ?? '  ') + '   ' + game.playerName('w');
     const black =
-        (game.playerTitle("b") ?? "  ") + "   " + game.playerName("b");
+        (game.playerTitle('b') ?? '  ') + '   ' + game.playerName('b');
 
     const onClickHandler = () => {
         const domain = window.location.origin;
         const newBrowserTab = domain + `?moves=${openingMoves}`;
-        window.open(newBrowserTab, "_blank");
+        window.open(newBrowserTab, '_blank');
     };
 
-    const fen = chess.current.fen()
+    const fen = chess.current.fen();
 
     return (
         <div
             style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 3fr",
-                marginTop: "1em",
+                display: 'grid',
+                gridTemplateColumns: '1fr 3fr',
+                marginTop: '1em',
             }}
         >
             <ChessboardWithControls
@@ -431,12 +431,12 @@ const OpeningDetails = ({ game, opening, chess }) => {
             <div
                 id="game-details"
                 style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 3fr",
-                    textAlign: "left",
-                    gridAutoRows: "minContent",
-                    gridAutoColumns: "minContent",
-                    marginLeft: ".6em",
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 3fr',
+                    textAlign: 'left',
+                    gridAutoRows: 'minContent',
+                    gridAutoColumns: 'minContent',
+                    marginLeft: '.6em',
                 }}
             >
                 <span>Event:</span>
@@ -450,14 +450,14 @@ const OpeningDetails = ({ game, opening, chess }) => {
                 <span>Fenster Opening Name:</span>
                 <span
                     className="fakeLink"
-                    style={{ color: "cyan" }}
+                    style={{ color: 'cyan' }}
                     onClick={() => onClickHandler()}
                 >
                     {name}
                 </span>
                 <span>ECO:</span>
                 <span> {eco}</span>
-                <span>Moves:</span>{" "}
+                <span>Moves:</span>{' '}
                 <Moves {...{ gamePliesRef, openingPliesRef, plyIndex }} />
                 <span>FEN:</span>
                 <span>{fen}</span>
@@ -467,7 +467,28 @@ const OpeningDetails = ({ game, opening, chess }) => {
     );
 };
 
-const OpeningTab = ({ game }) => {
+const findOpeningForGame = (game, openingBook) => {
+    const fens = game
+        .nodes()
+        .slice(0, 50)
+        .map((n) => n.fen());
+
+    let opening;
+
+    for (let fen of fens.reverse()) {
+        const obEntry = openingBook[fen];
+        if (obEntry) {
+            const { eco, name, moves } = obEntry;
+
+            opening = { eco, name, moves, fen };
+            break;
+        }
+    }
+
+    return opening
+};
+
+const OpeningTab = ({ game, openingBook }) => {
     const chess = useRef(new Chess());
 
     const fens = game
@@ -484,7 +505,7 @@ const OpeningTab = ({ game }) => {
 
     if (!game)
         return (
-            <span className="white" style={{ fontSize: "larger" }}>
+            <span className="white" style={{ fontSize: 'larger' }}>
                 Please select an opening from the Games tab
             </span>
         );
@@ -492,9 +513,10 @@ const OpeningTab = ({ game }) => {
     if (loading) return <span className="white">Loading...</span>;
 
     if (data) {
+        const op2 = findOpeningForGame(game, openingBook)
         const openings = data.getOpeningsForFens2;
         const opening = openings.at(-1) ?? {};
-        chess.current.loadPgn(opening.moves)
+        chess.current.loadPgn(opening.moves);
         return <OpeningDetails {...{ opening, game, chess }} />;
     }
 };
@@ -518,20 +540,20 @@ const AdditionalOpenings = ({ fen }) => {
 
     const { loading, data } = useQuery(GET_OPENING_ADDITIONAL, {
         variables: { fen, sites },
-        skip: fen === "start" || sites.length === 0,
+        skip: fen === 'start' || sites.length === 0,
     });
 
     if (loading)
         return (
             <div
                 style={{
-                    display: "grid",
-                    gridTemplateColumns: "auto",
-                    gridColumnStart: "2",
-                    gridColumnEnd: "auto",
+                    display: 'grid',
+                    gridTemplateColumns: 'auto',
+                    gridColumnStart: '2',
+                    gridColumnEnd: 'auto',
                 }}
             >
-                <strong style={{ marginRight: "1em", color: "#FFCE44" }}>
+                <strong style={{ marginRight: '1em', color: '#FFCE44' }}>
                     Loading...
                 </strong>
             </div>
@@ -548,33 +570,33 @@ const AdditionalOpenings = ({ fen }) => {
                     id="AdditionalOpenings"
                     key={site}
                     style={{
-                        display: "contents",
-                        gridColumnStart: "1",
-                        textAlign: "left",
-                        color: "white",
+                        display: 'contents',
+                        gridColumnStart: '1',
+                        textAlign: 'left',
+                        color: 'white',
                     }}
                 >
                     <span>&nbsp;</span>
                     <span>&nbsp;</span>
-                    <strong style={{ marginRight: "1em" }}>{site}:</strong>{" "}
+                    <strong style={{ marginRight: '1em' }}>{site}:</strong>{' '}
                     <span>{alsoKnownAs[i]}</span>
-                    <div style={{ marginRight: "3em" }}>
-                        <span style={{ marginLeft: "1em", marginRight: "1em" }}>
+                    <div style={{ marginRight: '3em' }}>
+                        <span style={{ marginLeft: '1em', marginRight: '1em' }}>
                             games:
-                        </span>{" "}
+                        </span>{' '}
                         {games ?? 0}
                     </div>
                     <span>
                         {games && (
                             <>
-                                {" "}
+                                {' '}
                                 w/d/l: &nbsp;&nbsp;
                                 <StackedBarChart
                                     {...{
                                         pctgs: { w, b, d },
-                                        style: { display: "inline-grid" },
+                                        style: { display: 'inline-grid' },
                                     }}
-                                />{" "}
+                                />{' '}
                             </>
                         )}
                     </span>
@@ -588,10 +610,10 @@ const AdditionalOpenings = ({ fen }) => {
 
 const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
     const gridStyle = {
-        display: "grid",
-        gridTemplateColumns: "1fr 2fr 3fr 3fr 4fr 1fr",
-        maxHeight: "250px",
-        gap: "3px",
+        display: 'grid',
+        gridTemplateColumns: '1fr 2fr 3fr 3fr 4fr 1fr',
+        maxHeight: '250px',
+        gap: '3px',
     };
 
     const games = Array.from(db.games());
@@ -612,8 +634,8 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
                 <span>White</span>
                 <span>Black</span>
                 <span>
-                    Opening{" "}
-                    <span style={{ fontSize: "smaller" }}>(from PGN)</span>
+                    Opening{' '}
+                    <span style={{ fontSize: 'smaller' }}>(from PGN)</span>
                 </span>
                 <span>Result</span>
             </div>
@@ -622,14 +644,14 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
                 {games.filter(filterFunc).map((g, i) => {
                     const pgnOpening = g.opening();
                     let variant = g.variant();
-                    if (variant && variant === "regular") variant = null;
+                    if (variant && variant === 'regular') variant = null;
 
                     return (
                         <Fragment key={i}>
                             <span>{g.fullRound()}</span>
                             <span>{g.dateAsString()}</span>
-                            <span>{g.playerName("w")}</span>
-                            <span>{g.playerName("b")}</span>
+                            <span>{g.playerName('w')}</span>
+                            <span>{g.playerName('b')}</span>
                             {variant && (
                                 <span>{variant} variant not supported</span>
                             )}
@@ -638,7 +660,7 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
                                     className="fakeLink"
                                     onClick={() => clickHandler(g)}
                                 >
-                                    {pgnOpening ?? "N/A"}
+                                    {pgnOpening ?? 'N/A'}
                                 </span>
                             )}
 
@@ -651,7 +673,7 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
     );
 };
 
-const PgnGames = ({ pgn, tabIndex, setTabIndex }) => {
+const PgnGames = ({ pgn, tabIndex, setTabIndex, openingBook }) => {
     const [game, setGame] = useState(null);
     const [flash, setFlash] = useState(false);
     const [filter, setFilter] = useState([]);
@@ -660,11 +682,11 @@ const PgnGames = ({ pgn, tabIndex, setTabIndex }) => {
 
     return (
         <Tabs selectedIndex={tabIndex} onSelect={setTabIndex}>
-            <TabList className="left" style={{ marginBottom: "0px" }}>
+            <TabList className="left" style={{ marginBottom: '0px' }}>
                 <Tab className="react-tabs__tab tab-base">Summary</Tab>
                 <Tab
                     className={`react-tabs__tab tab-base tab-flash1 ${
-                        flash ? "tab-flash2" : ""
+                        flash ? 'tab-flash2' : ''
                     }`}
                 >
                     Games
@@ -673,13 +695,13 @@ const PgnGames = ({ pgn, tabIndex, setTabIndex }) => {
                     {...{ disabled: tabIndex !== 2 }}
                     className="react-tabs__tab tab-base"
                     style={{
-                        color: tabIndex !== 2 ? "GrayText" : "lightgreen",
+                        color: tabIndex !== 2 ? 'GrayText' : 'lightgreen',
                     }}
                 >
                     Opening
                 </Tab>
             </TabList>
-            <div style={{ border: "thick solid white" }}>
+            <div style={{ border: 'thick solid white' }}>
                 <TabPanel>
                     <PgnSummaryTab
                         {...{ pgnSumm, setFlash, filter, setFilter }}
@@ -691,7 +713,7 @@ const PgnGames = ({ pgn, tabIndex, setTabIndex }) => {
                     />
                 </TabPanel>
                 <TabPanel>
-                    <OpeningTab {...{ game }} />
+                    <OpeningTab {...{ game, openingBook }} />
                 </TabPanel>
             </div>
         </Tabs>
@@ -703,11 +725,14 @@ Arguments are url OR pgn.
 
 If given a url, query TWIC for games; else load the pgn file directly.
 */
-const PgnTabs = ({ url = null, pgn }) => {
+const PgnTabs = ({ link, openingBook }) => {
+    const { url = null, pgn } = link;
+
     // controlled mode; see https://www.npmjs.com/package/react-tabs#controlled-vs-uncontrolled-mode
     const [tabIndex, setTabIndex] = useState(0);
 
-    const dummyMetaPgnInput = { link: url, lastModified: "" };
+    const dummyMetaPgnInput = { link: url, lastModified: '' };
+
     const { error, data, loading } = useQuery(GET_PGN_FILES, {
         variables: { pgnLinks: [dummyMetaPgnInput] },
         skip: url === null,
@@ -723,6 +748,7 @@ const PgnTabs = ({ url = null, pgn }) => {
                     pgn: data?.getPgnFiles[0].pgn || pgn,
                     tabIndex,
                     setTabIndex,
+                    openingBook,
                 }}
             />
         );

@@ -50,7 +50,7 @@ function App() {
                         />
                     )}
                     {mode === modes.pgnAnalyze && (
-                        <AnalyzePgnPage {...{ setMode, openingBook: data.ob }} />
+                        <AnalyzePgnPage {...{ openingBook: data.ob }} />
                     )}
                     {mode === modes.visualization && <Visualizations />}
                     {mode === modes.about && <AboutPage />}
