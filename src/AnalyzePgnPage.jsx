@@ -33,6 +33,12 @@ const GET_PGN_LINKS = gql`
     }
 `;
 
+const GET_RSS_XML = gql`
+    query GetRssXML($url: String) {
+        getRssXml(url: $url)
+    }
+`;
+
 const PgnFileUploader = ({ setLink }) => {
     const handler = (e) => {
         const listener = (e) => {
@@ -63,46 +69,50 @@ const PgnFileUploader = ({ setLink }) => {
 };
 
 const RssFeed = () => {
-    const [json, setJson] = useState({});
+    const [json, setJson] = useState(null);
 
-    // const rss =
-    //     "https://corsproxy.io/https://theweekinchess.com/twic-rss-feed";     // no longer functioning as of 07/06/2025
-
-    const rss =
-        'https://api.allorigins.win/raw?url=https://theweekinchess.com/twic-rss-feed';
+    const { loading, error, data } = useQuery(GET_RSS_XML, {
+        variables: { url: 'https://theweekinchess.com/twic-rss-feed' },
+        skip: json,
+    });
 
     useEffect(() => {
-        async function getJSON() {
-            const j = await getFeedAsJson(rss);
-            setJson(j);
+        if (data) {
+            setJson(getFeedAsJson(data.getRssXml));
         }
+    }, [data]);
 
-        getJSON();
-    }, [rss]);
+    if (error) console.error(error);
 
     return (
-        <div className="white" style={{ textAlign: 'left' }}>
-            <h3 style={{ marginLeft: '-1.5em' }}>
-                News from{' '}
-                <a target="_blank" rel="noreferrer" href={json?.link}>
-                    {json?.title}
-                </a>
-            </h3>
-            {/* <h4>{json?.description}</h4> */}
-            {json.items?.map((item) => (
-                <Fragment key={item.title}>
-                    <b>
-                        <a target="_blank" rel="noreferrer" href={item.link}>
-                            {item.title}
-                        </a>
-                    </b>
-                    <br />
-                    <div style={newsStyle}>
-                        {item.description.slice(0, 250)}
-                    </div>
-                </Fragment>
-            ))}
-        </div>
+        json && (
+            <div className="white" style={{ textAlign: 'left' }}>
+                <h3 style={{ marginLeft: '-1.5em' }}>
+                    News from{' '}
+                    <a target="_blank" rel="noreferrer" href={json?.link}>
+                        {json?.title}
+                    </a>
+                </h3>
+                {/* <h4>{json?.description}</h4> */}
+                {json.items?.map((item) => (
+                    <Fragment key={item.title}>
+                        <b>
+                            <a
+                                target="_blank"
+                                rel="noreferrer"
+                                href={item.link}
+                            >
+                                {item.title}
+                            </a>
+                        </b>
+                        <br />
+                        <div style={newsStyle}>
+                            {item.description.slice(0, 250)}
+                        </div>
+                    </Fragment>
+                ))}
+            </div>
+        )
     );
 };
 
@@ -171,7 +181,7 @@ const PgnChooser = ({ link, setLink }) => {
 /**
  * Fetch PGN urls from a site; then process each pgn file.
  */
-const AnalyzePgnPage = ({openingBook}) => {
+const AnalyzePgnPage = ({ openingBook }) => {
     const [link, setLink] = useState({}); // currently selected link
 
     // show either the list of links (along with meta data), or a "deep dive" into the pgn data itself
@@ -182,10 +192,10 @@ const AnalyzePgnPage = ({openingBook}) => {
                 <RssFeed />
             </div>
             <div>
-                <PgnTabs {...{link, openingBook}} />
+                <PgnTabs {...{ link, openingBook }} />
             </div>
         </>
     );
 };
 
-export {AnalyzePgnPage};
+export { AnalyzePgnPage };
