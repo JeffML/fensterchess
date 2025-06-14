@@ -80,7 +80,7 @@ const OpeningTabs = ({
     const {fen} = boardState
     const { move, color } = toPlay(fen);
 
-    const searchable = move > 5 || (move === "5" && color === "b");
+    const searchable = move > 4;
     const showExternal = sites.selectedSites.length > 0;
     const showTransitions = from && from.length > 1;
 

@@ -58,4 +58,9 @@ function parseMoves(moveString) {
 //return position part of FEN string
 const pos = (fen) => fen.split(' ')[0];
 
-export { movesToFen, toPlay, theoryRequest, parseMoves, pos };
+function pgnMovesOnly(pgn) {
+    const i = pgn.lastIndexOf(']');
+    return pgn.slice(i + 2);
+}
+
+export { movesToFen, toPlay, theoryRequest, parseMoves, pos, pgnMovesOnly };

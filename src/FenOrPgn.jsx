@@ -1,11 +1,12 @@
 import { FENEX } from "./common/consts.js";
 import { sanitizeInput } from "./utils/sanitizeInput.js";
+import { pgnMovesOnly } from "./utils/chessTools.js";
 import "./stylesheets/textarea.css";
 
 const FenOrPgn = ({ boardState, setBoardState, chess, setLastKnownOpening }) => {
     const {fen, moves} = boardState
 
-    const text = `FEN:\n${fen}\n\nmoves: ${moves}`;
+    const text = `FEN:\n${fen}\n\nmoves: ${pgnMovesOnly(moves)}`;
 
     const handleInput = (e) => {
         e.preventDefault();

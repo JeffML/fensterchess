@@ -38,18 +38,19 @@ const siteUrls = {
     // shredder: "https://www.shredderchess.com/",
 };
 
+const alias = import.meta.env.VITE_APP_SERVER; // this can be set as follows: "VITE_APP_SERVER=flum netlify dev"
+const DEFAULT_SERVER = "fenster-s.netlify.app";
+const SERVER = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}`
+
 const sites = Object.keys(siteUrls);
 
 const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
-const DEFAULT_SERVER = "fenster-s.netlify.app";
 
 const token = import.meta.env.VITE_APP_QUOTE; // authentication token
-const alias = import.meta.env.VITE_APP_SERVER; // this can be set as follows: "REACT_APP_SERVER=flum netlify dev"
-
 const isTestMode = import.meta.env.VITE_APP_TEST_MODE === "flum"; // brings up test page
 
 // prettier-ignore
-const serverUri = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}/.netlify/functions/server`;
+const serverUri = `${SERVER}/.netlify/functions/server`;
 // console.log(`alias was ${alias}, serverUri is ${serverUri}`)
 
 const RANKS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -83,4 +84,5 @@ export {
     ECO_CATS,
     isTestMode,
     NO_ENTRY_FOUND,
+    SERVER
 };

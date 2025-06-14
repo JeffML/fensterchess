@@ -1,12 +1,13 @@
 import { Chess } from 'chess.js';
 import { Chessboard } from 'kokopu-react';
-import { useRef, useState } from 'react';
+import { useRef, useState, useContext } from 'react';
 import { FenOrPgn } from './FenOrPgn.jsx';
 import { Opening } from './Opening.jsx';
 import { ActionButton } from './common/Buttons.jsx';
 import { pos } from './utils/chessTools.js';
 import { FENEX, NO_ENTRY_FOUND } from './common/consts.js';
 import { scores } from './datasource/scores.js';
+import { OpeningBookContext } from './common/OpeningBookContext';
 
 const SearchPage = ({
     chess,
@@ -167,7 +168,7 @@ function readParamsMaybe(url, chess, setBoardState) {
     }
 }
 
-const SearchPageContainer = ({ openingBook, from, to }) => {
+const SearchPageContainer = ({ from, to }) => {
     const [boardState, setBoardState] = useState({ fen: 'start', moves: '' });
 
     const chess = useRef(new Chess());
@@ -177,7 +178,10 @@ const SearchPageContainer = ({ openingBook, from, to }) => {
 
     const { fen } = boardState;
     let data = null;
+    const { openingBook } = useContext(OpeningBookContext);
 
+    if (!openingBook) return <div>Loading...</div>;
+    
     if (fen !== 'start') {
         data = {
             getOpeningForFenFull: openingBook[fen]
