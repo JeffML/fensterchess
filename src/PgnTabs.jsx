@@ -16,6 +16,7 @@ import {
     pliesAryToMovesString,
 } from './utils/openings.js';
 import sleep from './utils/sleep.js';
+import {OpeningBookContext} from './contexts/OpeningBookContext.jsx'
 
 const blueBoldStyle = { color: 'LightSkyBlue' };
 
@@ -456,7 +457,9 @@ const OpeningDetails = ({ game, opening, chess }) => {
     );
 };
 
-const findOpeningForGame = (game, openingBook) => {
+const findOpeningForGame = (game) => {
+    const { openingBook } = useContext(OpeningBookContext);
+
     const fens = game
         .nodes()
         .slice(0, 50)
@@ -477,7 +480,7 @@ const findOpeningForGame = (game, openingBook) => {
     return opening;
 };
 
-const OpeningTab = ({ game, openingBook }) => {
+const OpeningTab = ({ game }) => {
     const chess = useRef(new Chess());
 
     if (!game)
@@ -487,7 +490,7 @@ const OpeningTab = ({ game, openingBook }) => {
             </span>
         );
 
-    const opening = findOpeningForGame(game, openingBook);
+    const opening = findOpeningForGame(game);
     chess.current.loadPgn(opening.moves);
     return <OpeningDetails {...{ opening, game, chess }} />;
 };
@@ -644,7 +647,7 @@ const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
     );
 };
 
-const PgnGames = ({ pgn, tabIndex, setTabIndex, openingBook }) => {
+const PgnGames = ({ pgn, tabIndex, setTabIndex }) => {
     const [game, setGame] = useState(null);
     const [flash, setFlash] = useState(false);
     const [filter, setFilter] = useState([]);
@@ -684,7 +687,7 @@ const PgnGames = ({ pgn, tabIndex, setTabIndex, openingBook }) => {
                     />
                 </TabPanel>
                 <TabPanel>
-                    <OpeningTab {...{ game, openingBook }} />
+                    <OpeningTab {...{ game }} />
                 </TabPanel>
             </div>
         </Tabs>
@@ -696,7 +699,7 @@ Arguments are url OR pgn.
 
 If given a url, query TWIC for games; else load the pgn file directly.
 */
-const PgnTabs = ({ link, openingBook }) => {
+const PgnTabs = ({ link }) => {
     const { url = null, pgn } = link;
 
     // controlled mode; see https://www.npmjs.com/package/react-tabs#controlled-vs-uncontrolled-mode
@@ -719,7 +722,7 @@ const PgnTabs = ({ link, openingBook }) => {
                     pgn: data?.getPgnFiles[0].pgn || pgn,
                     tabIndex,
                     setTabIndex,
-                    openingBook,
+                    
                 }}
             />
         );

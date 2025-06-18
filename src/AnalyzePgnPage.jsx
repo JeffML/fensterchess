@@ -181,7 +181,7 @@ const PgnChooser = ({ link, setLink }) => {
 /**
  * Fetch PGN urls from a site; then process each pgn file.
  */
-const AnalyzePgnPage = ({ openingBook }) => {
+const AnalyzePgnPage = () => {
     const [link, setLink] = useState({}); // currently selected link
 
     // show either the list of links (along with meta data), or a "deep dive" into the pgn data itself
@@ -192,7 +192,7 @@ const AnalyzePgnPage = ({ openingBook }) => {
                 <RssFeed />
             </div>
             <div>
-                <PgnTabs {...{ link, openingBook }} />
+                <PgnTabs {...{ link }} />
             </div>
         </>
     );

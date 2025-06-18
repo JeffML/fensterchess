@@ -18,7 +18,6 @@ function App() {
     const { isPending, isError, error, data } = useQuery({
         queryKey: ['fromTo'],
         queryFn: async () => {
-            // const ob = await openingBook(); // TBD: error checking
             const { from, to } = await fromTo();
             return { from, to };
         },
