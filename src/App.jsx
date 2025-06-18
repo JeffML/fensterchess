@@ -9,7 +9,7 @@ import { SearchPageContainer } from './SearchPage.jsx';
 // import TestComponent from "./TestComponent.js";
 import { Visualizations } from './Visualizations.jsx';
 import { useQuery } from '@tanstack/react-query';
-import { openingBook, fromTo } from './datasource/getLatestEcoJson.js';
+import { fromTo } from './datasource/getLatestEcoJson.js';
 import { OpeningBookProvider } from './contexts/OpeningBookContext.jsx';
 
 function App() {
