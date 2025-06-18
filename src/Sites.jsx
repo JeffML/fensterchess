@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { sites, siteUrls } from "./common/consts.js";
-import { SelectedSitesContext } from "./common/SelectedSitesContext.jsx";
+import { SelectedSitesContext } from "./contexts/SelectedSitesContext.jsx";
 
 const siteTab = (_, s) => {
     window.open(siteUrls[s], "_blank");

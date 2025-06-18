@@ -140,7 +140,7 @@ const PgnChooser = ({ link, setLink }) => {
                     <a
                         target="_blank"
                         rel="noreferrer"
-                        href="https://theweekinchess.com/a-year-of-pgn-game-files"
+                        // href="https://theweekinchess.com/a-year-of-pgn-game-files"
                     >
                         TWIC games
                     </a>

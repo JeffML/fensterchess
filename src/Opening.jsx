@@ -1,4 +1,4 @@
-import { SelectedSitesContext } from './common/SelectedSitesContext.jsx';
+import { SelectedSitesContext } from './contexts/SelectedSitesContext.jsx';
 import { OpeningTabs } from './OpeningTabs.jsx';
 import { useContext, useEffect } from 'react';
 

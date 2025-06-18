@@ -2,7 +2,7 @@ import { useState } from 'react';
 import AboutPage from './AboutPage.jsx';
 import './App.css';
 import { isTestMode, modes, SUBTITLES } from './common/consts.js';
-import { SelectedSitesContextProvider } from './common/SelectedSitesContext.jsx';
+import { SelectedSitesContextProvider } from './contexts/SelectedSitesContext.jsx';
 import PageHeader from './PageHeader.jsx';
 import { AnalyzePgnPage } from './AnalyzePgnPage.jsx';
 import { SearchPageContainer } from './SearchPage.jsx';
@@ -10,7 +10,7 @@ import { SearchPageContainer } from './SearchPage.jsx';
 import { Visualizations } from './Visualizations.jsx';
 import { useQuery } from '@tanstack/react-query';
 import { openingBook, fromTo } from './datasource/getLatestEcoJson.js';
-import { OpeningBookProvider } from './common/OpeningBookContext.jsx';
+import { OpeningBookProvider } from './contexts/OpeningBookContext.jsx';
 
 function App() {
     const [mode, setMode] = useState(isTestMode ? modes.test : modes.search);

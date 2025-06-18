@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { useContext} from "react";
-import { SelectedSitesContext } from "./common/SelectedSitesContext.jsx";
+import { SelectedSitesContext } from "./contexts/SelectedSitesContext.jsx";
 import StackedBarChart from "./common/StackedBarChart.jsx";
 
 

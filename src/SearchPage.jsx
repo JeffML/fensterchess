@@ -7,7 +7,7 @@ import { ActionButton } from './common/Buttons.jsx';
 import { pos } from './utils/chessTools.js';
 import { FENEX, NO_ENTRY_FOUND } from './common/consts.js';
 import { scores } from './datasource/scores.js';
-import { OpeningBookContext } from './common/OpeningBookContext';
+import { OpeningBookContext } from './contexts/OpeningBookContext';
 
 const SearchPage = ({
     chess,

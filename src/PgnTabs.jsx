@@ -7,7 +7,7 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { ActionButton } from './common/Buttons.jsx';
 import PliesAryToMovesStringSpan from './common/PliesAryToMovesStringSpan.jsx';
-import { SelectedSitesContext } from './common/SelectedSitesContext.jsx';
+import { SelectedSitesContext } from './contexts/SelectedSitesContext.jsx';
 import StackedBarChart from './common/StackedBarChart.jsx';
 import './stylesheets/grid.css';
 import './stylesheets/tabs.css';
