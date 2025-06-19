@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { MostActiveSquaresByEco, MostActiveByPiece } from "./MostActive.jsx";
-import { FromToCircle } from "./FromToCircle.jsx";
+import ecoCodes from "../datasource/ecoCodes.js";
+import { ECO_FLOWCHART, FROM_TO, MOST_ACTIVE, PIECE_DESTINATION } from "../Visualizations.jsx";
 import { BallOfMud } from "./BallOfMud.jsx";
-import ecoCodes from "../common/ecoCodes.js";
 import { ColorAndPieces } from "./ColorAndPieces.jsx";
-import { MOST_ACTIVE, FROM_TO, PIECE_DESTINATION, ECO_FLOWCHART } from "../Visualizations.jsx";
-import {EcoFlowchart} from './EcoFlowchart.jsx'
+import { EcoFlowchart } from './EcoFlowchart.jsx';
+import { FromToCircle } from "./FromToCircle.jsx";
+import { MostActiveByPiece, MostActiveSquaresByEco } from "./MostActive.jsx";
 
 function EcoCatCode({ cat, setCat, setCode }) {
     const cats = Object.keys(ecoCodes);

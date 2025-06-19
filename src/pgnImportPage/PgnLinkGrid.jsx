@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
-import { ActionButton } from "./common/Buttons.jsx";
-import { INCR } from "./common/consts.js";
+import { ActionButton } from "../common/Buttons.jsx";
+import { INCR } from "../common/consts.js";
 
 // HEAD requests for each link
 const GET_PGN_LINK_META = gql`

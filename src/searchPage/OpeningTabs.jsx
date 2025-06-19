@@ -1,8 +1,8 @@
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { NextOpenings, Roots } from "./NextOpenings.jsx";
-import { parseMoves, theoryRequest, toPlay } from "./utils/chessTools.js";
 import { Chess } from "chess.js";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { parseMoves, theoryRequest, toPlay } from "../utils/chessTools.js";
+import { NextOpenings, Roots } from "./NextOpenings.jsx";
 import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional.jsx";
 import { SimilarOpenings } from "./SimilarOpenings.jsx";
 

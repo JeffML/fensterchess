@@ -1,7 +1,7 @@
-import { sortEnum } from "./common/consts.js";
-import { uniqWith } from "./utils/uniqWith.js";
 import { Fragment, useState } from "react";
-import "./stylesheets/variationsRow.css";
+import { sortEnum } from "../common/consts.js";
+import "../stylesheets/variationsRow.css";
+import { uniqWith } from "../utils/uniqWith.js";
 
 /**
  * Shows next opening variations from current positions

@@ -4,13 +4,13 @@ import './App.css';
 import { isTestMode, modes, SUBTITLES } from './common/consts.js';
 import { SelectedSitesContextProvider } from './contexts/SelectedSitesContext.jsx';
 import PageHeader from './PageHeader.jsx';
-import { AnalyzePgnPage } from './AnalyzePgnPage.jsx';
-import { SearchPageContainer } from './SearchPage.jsx';
+import { AnalyzePgnPage } from './pgnImportPage/AnalyzePgnPage.jsx';
+import { SearchPageContainer } from './searchPage/SearchPage.jsx';
 // import TestComponent from "./TestComponent.js";
-import { Visualizations } from './Visualizations.jsx';
 import { useQuery } from '@tanstack/react-query';
-import { fromTo } from './datasource/getLatestEcoJson.js';
 import { OpeningBookProvider } from './contexts/OpeningBookContext.jsx';
+import { fromTo } from './datasource/getLatestEcoJson.js';
+import { Visualizations } from './Visualizations.jsx';
 
 function App() {
     const [mode, setMode] = useState(isTestMode ? modes.test : modes.search);

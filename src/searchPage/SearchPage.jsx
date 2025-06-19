@@ -1,13 +1,13 @@
 import { Chess } from 'chess.js';
 import { Chessboard } from 'kokopu-react';
-import { useRef, useState, useContext } from 'react';
+import { useContext, useRef, useState } from 'react';
+import { ActionButton } from '../common/Buttons.jsx';
+import { FENEX, NO_ENTRY_FOUND } from '../common/consts.js';
+import { OpeningBookContext } from '../contexts/OpeningBookContext.jsx';
+import { scores } from '../datasource/scores.js';
+import { pos } from '../utils/chessTools.js';
 import { FenOrPgn } from './FenOrPgn.jsx';
 import { Opening } from './Opening.jsx';
-import { ActionButton } from './common/Buttons.jsx';
-import { pos } from './utils/chessTools.js';
-import { FENEX, NO_ENTRY_FOUND } from './common/consts.js';
-import { scores } from './datasource/scores.js';
-import { OpeningBookContext } from './contexts/OpeningBookContext';
 
 const SearchPage = ({
     chess,

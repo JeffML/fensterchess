@@ -1,8 +1,8 @@
-import data from "../common/ecoCodes.js";
-import { ECO_CATS } from "../common/consts.js";
-import "./EcoFlowchart.css";
-import { useState } from "react";
 import { Chessboard } from "kokopu-react";
+import { useState } from "react";
+import { ECO_CATS } from "../common/consts.js";
+import data from "../datasource/ecoCodes.js";
+import "./EcoFlowchart.css";
 
 const EcoCats = ({ category }) => {
     const [cat, desc] = category;

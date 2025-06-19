@@ -1,10 +1,10 @@
 import { gql, useQuery } from '@apollo/client';
-import { useState, useEffect, Fragment } from 'react';
-import { INCR } from './common/consts.js';
-import PgnTabs from './PgnTabs.jsx';
+import { Fragment, useEffect, useState } from 'react';
+import { INCR } from '../common/consts.js';
+import '../stylesheets/fileSelector.css';
+import { getFeedAsJson } from '../utils/getFeedAsJson.js';
 import PgnLinkGrid from './PgnLinkGrid.jsx';
-import { getFeedAsJson } from './utils/getFeedAsJson.js';
-import './stylesheets/fileSelector.css';
+import PgnTabs from './PgnTabs.jsx';
 
 const radioStyle = {
     display: 'flex',

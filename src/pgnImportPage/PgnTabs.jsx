@@ -5,18 +5,18 @@ import { Chessboard } from 'kokopu-react';
 import { Fragment, useContext, useRef, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import { ActionButton } from './common/Buttons.jsx';
-import PliesAryToMovesStringSpan from './common/PliesAryToMovesStringSpan.jsx';
-import { SelectedSitesContext } from './contexts/SelectedSitesContext.jsx';
-import StackedBarChart from './common/StackedBarChart.jsx';
-import './stylesheets/grid.css';
-import './stylesheets/tabs.css';
+import { ActionButton } from '../common/Buttons.jsx';
+import PliesAryToMovesStringSpan from '../common/PliesAryToMovesStringSpan.jsx';
+import StackedBarChart from '../common/StackedBarChart.jsx';
+import { OpeningBookContext } from '../contexts/OpeningBookContext.jsx';
+import { SelectedSitesContext } from '../contexts/SelectedSitesContext.jsx';
+import '../stylesheets/grid.css';
+import '../stylesheets/tabs.css';
 import {
     movesStringToPliesAry,
     pliesAryToMovesString,
-} from './utils/openings.js';
-import sleep from './utils/sleep.js';
-import {OpeningBookContext} from './contexts/OpeningBookContext.jsx'
+} from '../utils/openings.js';
+import sleep from '../utils/sleep.js';
 
 const blueBoldStyle = { color: 'LightSkyBlue' };
 

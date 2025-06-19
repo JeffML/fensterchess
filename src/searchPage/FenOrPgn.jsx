@@ -1,7 +1,7 @@
-import { FENEX } from "./common/consts.js";
-import { sanitizeInput } from "./utils/sanitizeInput.js";
-import { pgnMovesOnly } from "./utils/chessTools.js";
-import "./stylesheets/textarea.css";
+import { FENEX } from "../common/consts.js";
+import "../stylesheets/textarea.css";
+import { pgnMovesOnly } from "../utils/chessTools.js";
+import { sanitizeInput } from "../utils/sanitizeInput.js";
 
 const FenOrPgn = ({ boardState, setBoardState, chess, setLastKnownOpening }) => {
     const {fen, moves} = boardState
@@ -52,4 +52,4 @@ const FenOrPgn = ({ boardState, setBoardState, chess, setLastKnownOpening }) => 
     );
 };
 
-export {FenOrPgn}
+export { FenOrPgn };

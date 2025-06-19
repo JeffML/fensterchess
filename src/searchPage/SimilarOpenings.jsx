@@ -1,8 +1,8 @@
-import { useContext } from 'react';
-import { Chessboard } from 'kokopu-react';
 import { useQuery } from '@tanstack/react-query';
-import { SERVER } from './common/consts.js';
-import { OpeningBookContext } from './contexts/OpeningBookContext.jsx';
+import { Chessboard } from 'kokopu-react';
+import { useContext } from 'react';
+import { SERVER } from '../common/consts.js';
+import { OpeningBookContext } from '../contexts/OpeningBookContext.jsx';
 
 
 const getSimilar = async (fen) => {
