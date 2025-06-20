@@ -23,7 +23,7 @@ const SimilarOpenings = ({ boardState, setBoardState }) => {
         error,
         data,
     } = useQuery({
-        queryKey: ['getSimilar'],
+        queryKey: ['getSimilar', fen],
         queryFn: async () => {
             const sims = await getSimilar(fen);
             return { getSimilarOpenings: sims.similar };
@@ -33,7 +33,7 @@ const SimilarOpenings = ({ boardState, setBoardState }) => {
     if (loading) {
         return <span>Loading...</span>;
     }
-    if (error) {
+    if (isError) {
         console.error(error);
         return <span> ERROR: {error.toString()}</span>;
     }

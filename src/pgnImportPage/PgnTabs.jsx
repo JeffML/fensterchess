@@ -1,4 +1,5 @@
 import { gql, useQuery } from '@apollo/client';
+import { useQuery as useQueryRQ } from '@tanstack/react-query';
 import { Chess } from 'chess.js';
 import { pgnRead } from 'kokopu';
 import { Chessboard } from 'kokopu-react';
@@ -8,6 +9,7 @@ import 'react-tabs/style/react-tabs.css';
 import { ActionButton } from '../common/Buttons.jsx';
 import PliesAryToMovesStringSpan from '../common/PliesAryToMovesStringSpan.jsx';
 import StackedBarChart from '../common/StackedBarChart.jsx';
+import { SERVER } from '../common/consts.js';
 import { OpeningBookContext } from '../contexts/OpeningBookContext.jsx';
 import { SelectedSitesContext } from '../contexts/SelectedSitesContext.jsx';
 import '../stylesheets/grid.css';
@@ -16,19 +18,20 @@ import {
     movesStringToPliesAry,
     pliesAryToMovesString,
 } from '../utils/openings.js';
-import sleep from '../utils/sleep.js';
+import { PgnSummaryTab } from './tabContent/PgnSummaryTab.jsx';
 
-const blueBoldStyle = { color: 'LightSkyBlue' };
 
-// file requests for (a) link
-const GET_PGN_FILES = gql`
-    query GetPgnFiles($pgnLinks: [MetaPgnInput]) {
-        getPgnFiles(pgnLinks: $pgnLinks) {
-            link
-            pgn
-        }
-    }
-`;
+// pgn file requests for url links
+const getPgnFiles = async ({ pgnLinks }) => {
+    const response = await fetch(
+        SERVER + '/.netlify/functions/getPgnFiles', {
+            method: "POST",
+            body: JSON.stringify({ pgnLinks }),
+        })
+
+    const data = await response.json();
+    return {getPgnFiles: data};
+};
 
 const GET_OPENING_ADDITIONAL = gql`
     query getOpeningAdditional($fen: String!, $sites: [String]!) {
@@ -89,201 +92,6 @@ const getPgnSummary = (pgn) => {
     };
 };
 
-const Openings = ({ openings, setFlash, filter, setFilter }) => {
-    const gridStyle = {
-        display: 'grid',
-        gridTemplate: '1fr 2fr',
-        maxHeight: '250px',
-        minWidth: 'fit-content',
-        marginTop: '1em',
-        overflowX: 'visible',
-    };
-
-    const sleepTime = 300;
-
-    const handler = async ({ target }) => {
-        setFlash(true);
-        await sleep(sleepTime);
-        setFlash(false);
-        await sleep(sleepTime);
-        setFlash(true);
-        await sleep(sleepTime);
-        setFlash(false);
-        await sleep(sleepTime);
-        setFlash(true);
-        await sleep(sleepTime);
-        setFlash(false);
-
-        if (target.checked)
-            setFilter((prev) => {
-                prev.push(target.value);
-                return prev;
-            });
-        else setFilter((prev) => prev.filter((f) => f !== target.value));
-    };
-
-    return (
-        <div style={gridStyle} className="scrollableY white">
-            <span
-                className="font-cinzel left"
-                style={{ ...blueBoldStyle, gridColumn: 'span 2' }}
-            >
-                Openings
-                <span style={{ fontSize: 'smaller', paddingTop: '2px' }}>
-                    &nbsp;(from PGN)
-                </span>
-            </span>
-            {Array.from(openings)
-                .sort((a, b) => a.localeCompare(b))
-                .map((o, i) => (
-                    <Fragment key={o + i}>
-                        <input
-                            type="checkbox"
-                            value={o}
-                            onClick={handler}
-                            defaultChecked={filter.includes(o)}
-                        ></input>
-                        <span key={o + i} className="left">
-                            {o ?? '(no name)'}
-                        </span>
-                    </Fragment>
-                ))}
-        </div>
-    );
-};
-
-const PgnSummaryTab = ({ pgnSumm, setFlash, filter, setFilter }) => {
-    const { count, high, low, openings, event } = pgnSumm;
-
-    return (
-        <>
-            <div className="row">
-                <div name="details" className="column left white">
-                    <div>
-                        <span style={blueBoldStyle}>Event:</span> {event}
-                    </div>
-                    <div>
-                        <span style={blueBoldStyle}>Games:</span> {count}
-                    </div>
-                    <div>
-                        <span style={blueBoldStyle}>High Rating:</span> {high}
-                    </div>
-                    <div>
-                        <span style={blueBoldStyle}>Low Rating:</span>
-                        {low}
-                    </div>
-                    <div className="row">
-                        <Openings
-                            {...{ openings, setFlash, filter, setFilter }}
-                        />
-                    </div>
-                </div>
-                <div className="column left">
-                    <Players {...{ pgnSumm }} />
-                </div>
-            </div>
-        </>
-    );
-};
-
-const Players = ({ pgnSumm }) => {
-    const { players } = pgnSumm;
-    const gridStyle = {
-        display: 'grid',
-        gridTemplateColumns: '1fr 3fr 1fr',
-        gap: '2em',
-    };
-
-    const [method, setMethod] = useState('name');
-
-    const sort = (a, b) => {
-        const titleSort = [
-            'GM',
-            'WGM',
-            'IM',
-            'WIM',
-            'FM',
-            'WFM',
-            'CM',
-            'WCM',
-            'NM',
-            '',
-        ];
-
-        if (method === 'name') return a.name.localeCompare(b.name);
-        if (method === 'ELO')
-            return parseInt(b.elo ?? 0) - parseInt(a.elo ?? 0);
-        if (method === 'title') {
-            return (
-                titleSort.indexOf(a.title ?? '') -
-                titleSort.indexOf(b.title ?? '')
-            );
-        }
-    };
-
-    const onChange = (e) => setMethod(e.target.value);
-
-    return (
-        <>
-            <div
-                style={{
-                    whiteSpace: 'nowrap',
-                    color: 'powderblue',
-                    justifyContent: 'space-evenly',
-                }}
-            >
-                Sort by:{' '}
-                <label style={{ marginLeft: '1em' }}>
-                    <input
-                        type="radio"
-                        name="sortBy"
-                        value="name"
-                        defaultChecked="true"
-                        onChange={onChange}
-                    />
-                    Player name
-                </label>
-                <label style={{ display: 'inline', marginLeft: '1em' }}>
-                    <input
-                        type="radio"
-                        name="sortBy"
-                        value="ELO"
-                        onChange={onChange}
-                    />
-                    Player ELO
-                </label>
-                <label style={{ display: 'inline', marginLeft: '1em' }}>
-                    <input
-                        type="radio"
-                        name="sortBy"
-                        value="title"
-                        onChange={onChange}
-                    />
-                    Player Title
-                </label>
-            </div>
-            <div className="column scrollableY">
-                {Object.values(players)
-                    .sort(sort)
-                    .map(({ name, elo, title }, i) => (
-                        <div
-                            className="left white"
-                            key={name}
-                            style={{
-                                ...gridStyle,
-                                backgroundColor:
-                                    i % 2 ? 'slategray' : 'inherit',
-                            }}
-                        >
-                            <span className="left">{title}</span>
-                            <span className="left">{name}</span>
-                            <span>{elo}</span>
-                        </div>
-                    ))}
-            </div>
-        </>
-    );
-};
 
 const ChessboardWithControls = ({ chess, plies, plyIndex, setPlyIndex }) => {
     const doRest = () => {
@@ -707,22 +515,27 @@ const PgnTabs = ({ link }) => {
 
     const dummyMetaPgnInput = { link: url, lastModified: '' };
 
-    const { error, data, loading } = useQuery(GET_PGN_FILES, {
-        variables: { pgnLinks: [dummyMetaPgnInput] },
-        skip: url === null,
+    const { isError, isPending, error, data } = useQueryRQ({
+        queryKey: ['pgnFiles', url],
+        queryFn: async () => {
+            const pgnFiles = await getPgnFiles({
+                pgnLinks: [dummyMetaPgnInput],
+            });
+            return pgnFiles
+        },
+        enabled: url !== null,
     });
 
     if (error) console.error(error.toLocaleString());
-    if (loading) return <span className="white">Loading...</span>;
+    if (url && isPending) return <span className="white">Loading...</span>;
 
     if (data || pgn) {
         return (
             <PgnGames
                 {...{
-                    pgn: data?.getPgnFiles[0].pgn || pgn,
+                    pgn: data.getPgnFiles[0].pgn || pgn,
                     tabIndex,
                     setTabIndex,
-                    
                 }}
             />
         );
