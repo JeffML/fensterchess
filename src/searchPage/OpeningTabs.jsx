@@ -2,9 +2,9 @@ import { Chess } from "chess.js";
 import { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { parseMoves, theoryRequest, toPlay } from "../utils/chessTools.js";
-import { NextOpenings, Roots } from "./NextOpenings.jsx";
 import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional.jsx";
 import { SimilarOpenings } from "./SimilarOpenings.jsx";
+import { NextOpenings } from "./nextOpeningsEtc/NextOpenings.jsx";
 
 const chess = new Chess();
 
