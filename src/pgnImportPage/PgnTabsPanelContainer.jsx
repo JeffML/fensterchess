@@ -1,10 +1,8 @@
 import { gql, useQuery } from '@apollo/client';
 import { useQuery as useQueryRQ } from '@tanstack/react-query';
-import { Chess } from 'chess.js';
 import { pgnRead } from 'kokopu';
 import { Chessboard } from 'kokopu-react';
-import { Fragment, useContext, useRef, useState } from 'react';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import { useContext, useRef, useState } from 'react';
 import 'react-tabs/style/react-tabs.css';
 import { ActionButton } from '../common/Buttons.jsx';
 import PliesAryToMovesStringSpan from '../common/PliesAryToMovesStringSpan.jsx';
@@ -18,19 +16,17 @@ import {
     movesStringToPliesAry,
     pliesAryToMovesString,
 } from '../utils/openings.js';
-import { PgnSummaryTab } from './tabContent/PgnSummaryTab.jsx';
-
+import { PgnTabsPanel } from './PgnTabsPanel.jsx';
 
 // pgn file requests for url links
 const getPgnFiles = async ({ pgnLinks }) => {
-    const response = await fetch(
-        SERVER + '/.netlify/functions/getPgnFiles', {
-            method: "POST",
-            body: JSON.stringify({ pgnLinks }),
-        })
+    const response = await fetch(SERVER + '/.netlify/functions/getPgnFiles', {
+        method: 'POST',
+        body: JSON.stringify({ pgnLinks }),
+    });
 
     const data = await response.json();
-    return {getPgnFiles: data};
+    return { getPgnFiles: data };
 };
 
 const GET_OPENING_ADDITIONAL = gql`
@@ -46,7 +42,7 @@ const GET_OPENING_ADDITIONAL = gql`
     }
 `;
 
-const getPgnSummary = (pgn) => {
+export const getPgnSummary = (pgn) => {
     const ETC = ', etc.';
     const db = pgnRead(pgn);
     const gmCt = db.gameCount();
@@ -91,7 +87,6 @@ const getPgnSummary = (pgn) => {
         event: mainEvent,
     };
 };
-
 
 const ChessboardWithControls = ({ chess, plies, plyIndex, setPlyIndex }) => {
     const doRest = () => {
@@ -190,7 +185,7 @@ const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
     );
 };
 
-const OpeningDetails = ({ game, opening, chess }) => {
+export const OpeningDetails = ({ game, opening, chess }) => {
     const { eco, name, moves: openingMoves } = opening;
     const gamePliesRef = useRef(game.pojo().mainVariation);
     const openingPliesRef = useRef(movesStringToPliesAry(openingMoves ?? ''));
@@ -265,7 +260,7 @@ const OpeningDetails = ({ game, opening, chess }) => {
     );
 };
 
-const findOpeningForGame = (game) => {
+export const findOpeningForGame = (game) => {
     const { openingBook } = useContext(OpeningBookContext);
 
     const fens = game
@@ -286,21 +281,6 @@ const findOpeningForGame = (game) => {
     }
 
     return opening;
-};
-
-const OpeningTab = ({ game }) => {
-    const chess = useRef(new Chess());
-
-    if (!game)
-        return (
-            <span className="white" style={{ fontSize: 'larger' }}>
-                Please select an opening from the Games tab
-            </span>
-        );
-
-    const opening = findOpeningForGame(game);
-    chess.current.loadPgn(opening.moves);
-    return <OpeningDetails {...{ opening, game, chess }} />;
 };
 
 const AdditionalOpenings = ({ fen }) => {
@@ -390,124 +370,12 @@ const AdditionalOpenings = ({ fen }) => {
     }
 };
 
-const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
-    const gridStyle = {
-        display: 'grid',
-        gridTemplateColumns: '1fr 2fr 3fr 3fr 4fr 1fr',
-        maxHeight: '250px',
-        gap: '3px',
-    };
-
-    const games = Array.from(db.games());
-
-    const clickHandler = (g) => {
-        setTabIndex(2);
-        setGame(g);
-    };
-
-    const filterFunc = (game) =>
-        !filter.length || filter.includes(game.opening());
-
-    return (
-        <>
-            <div name="lefty" style={gridStyle} className="white font-cinzel">
-                <span>Round</span>
-                <span>Date</span>
-                <span>White</span>
-                <span>Black</span>
-                <span>
-                    Opening{' '}
-                    <span style={{ fontSize: 'smaller' }}>(from PGN)</span>
-                </span>
-                <span>Result</span>
-            </div>
-            <hr />
-            <div name="lefty" style={gridStyle} className="scrollableY white">
-                {games.filter(filterFunc).map((g, i) => {
-                    const pgnOpening = g.opening();
-                    let variant = g.variant();
-                    if (variant && variant === 'regular') variant = null;
-
-                    return (
-                        <Fragment key={i}>
-                            <span>{g.fullRound()}</span>
-                            <span>{g.dateAsString()}</span>
-                            <span>{g.playerName('w')}</span>
-                            <span>{g.playerName('b')}</span>
-                            {variant && (
-                                <span>{variant} variant not supported</span>
-                            )}
-                            {!variant && (
-                                <span
-                                    className="fakeLink"
-                                    onClick={() => clickHandler(g)}
-                                >
-                                    {pgnOpening ?? 'N/A'}
-                                </span>
-                            )}
-
-                            <span>{g.result()}</span>
-                        </Fragment>
-                    );
-                })}
-            </div>
-        </>
-    );
-};
-
-const PgnGames = ({ pgn, tabIndex, setTabIndex }) => {
-    const [game, setGame] = useState(null);
-    const [flash, setFlash] = useState(false);
-    const [filter, setFilter] = useState([]);
-
-    const pgnSumm = getPgnSummary(pgn);
-
-    return (
-        <Tabs selectedIndex={tabIndex} onSelect={setTabIndex}>
-            <TabList className="left" style={{ marginBottom: '0px' }}>
-                <Tab className="react-tabs__tab tab-base">Summary</Tab>
-                <Tab
-                    className={`react-tabs__tab tab-base tab-flash1 ${
-                        flash ? 'tab-flash2' : ''
-                    }`}
-                >
-                    Games
-                </Tab>
-                <Tab
-                    {...{ disabled: tabIndex !== 2 }}
-                    className="react-tabs__tab tab-base"
-                    style={{
-                        color: tabIndex !== 2 ? 'GrayText' : 'lightgreen',
-                    }}
-                >
-                    Opening
-                </Tab>
-            </TabList>
-            <div style={{ border: 'thick solid white' }}>
-                <TabPanel>
-                    <PgnSummaryTab
-                        {...{ pgnSumm, setFlash, filter, setFilter }}
-                    />
-                </TabPanel>
-                <TabPanel>
-                    <GamesTab
-                        {...{ db: pgnSumm.db, filter, setGame, setTabIndex }}
-                    />
-                </TabPanel>
-                <TabPanel>
-                    <OpeningTab {...{ game }} />
-                </TabPanel>
-            </div>
-        </Tabs>
-    );
-};
-
 /*
 Arguments are url OR pgn.
 
 If given a url, query TWIC for games; else load the pgn file directly.
 */
-const PgnTabs = ({ link }) => {
+export const PgnTabsPanelContainer = ({ link }) => {
     const { url = null, pgn } = link;
 
     // controlled mode; see https://www.npmjs.com/package/react-tabs#controlled-vs-uncontrolled-mode
@@ -521,7 +389,7 @@ const PgnTabs = ({ link }) => {
             const pgnFiles = await getPgnFiles({
                 pgnLinks: [dummyMetaPgnInput],
             });
-            return pgnFiles
+            return pgnFiles;
         },
         enabled: url !== null,
     });
@@ -531,7 +399,7 @@ const PgnTabs = ({ link }) => {
 
     if (data || pgn) {
         return (
-            <PgnGames
+            <PgnTabsPanel
                 {...{
                     pgn: data.getPgnFiles[0].pgn || pgn,
                     tabIndex,
@@ -542,4 +410,3 @@ const PgnTabs = ({ link }) => {
     }
 };
 
-export default PgnTabs;

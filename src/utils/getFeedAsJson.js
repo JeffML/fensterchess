@@ -1,6 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 
-const getFeedAsJson = (xml) => {
+export const getFeedAsJson = (xml) => {
     const json = new XMLParser().parse(xml);
 
     const {
@@ -18,4 +18,3 @@ const getFeedAsJson = (xml) => {
     return { title, link, description, items };
 };
 
-export { getFeedAsJson };

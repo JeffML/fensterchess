@@ -66,7 +66,7 @@ function PgnMetaRow({ link, setLink }) {
     }
 }
 
-const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
+export const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
     const doMore = () => {
         setEnd((p) => p + INCR);
     };
@@ -113,4 +113,4 @@ const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
     );
 };
 
-export default PgnLinkGrid;
+
