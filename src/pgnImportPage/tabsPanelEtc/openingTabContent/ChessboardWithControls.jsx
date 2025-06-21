@@ -1,5 +1,6 @@
 import { Chessboard } from "kokopu-react";
 import { ActionButton } from '../../../common/Buttons';
+import { pliesAryToMovesString } from "../../../utils/openings";
 
 export const ChessboardWithControls = ({ chess, plies, plyIndex, setPlyIndex }) => {
     const doRest = () => {
