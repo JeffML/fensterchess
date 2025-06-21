@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import { GamesTab } from './GamesTab';
-import { OpeningTab } from './OpeningTab';
 import { getPgnSummary } from './PgnTabsPanelContainer';
-import { PgnSummaryTab } from './tabContent/PgnSummaryTab';
+import { GamesTab } from './tabsPanelEtc/GamesTab.jsx';
+import { OpeningTab } from './tabsPanelEtc/OpeningTab';
+import { PgnSummaryTab } from './tabsPanelEtc/PgnSummaryTab';
 
 export const PgnTabsPanel = ({ pgn, tabIndex, setTabIndex }) => {
     const [game, setGame] = useState(null);
