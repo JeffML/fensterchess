@@ -1,0 +1,20 @@
+.grid-column {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.grid-child {
+    display: flex;
+    margin-left: 2em;
+}
+
+.grid-style {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    max-height: 250px;
+    min-width: fit-content;
+    margin-top: 1em;
+    overflow-x: visible;
+    column-gap: 1px;
+    color: white;
+}

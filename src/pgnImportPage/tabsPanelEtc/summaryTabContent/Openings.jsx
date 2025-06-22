@@ -1,16 +1,9 @@
 import { Fragment } from 'react/jsx-runtime';
+import '../../../stylesheets/pgnImport.css';
 import { sleep } from '../../../utils/sleep';
 import { blueBoldStyle } from '../PgnSummaryTab';
 
 export const Openings = ({ openings, setFlash, filter, setFilter }) => {
-    const gridStyle = {
-        display: 'grid',
-        gridTemplate: '1fr 2fr',
-        maxHeight: '250px',
-        minWidth: 'fit-content',
-        marginTop: '1em',
-        overflowX: 'visible',
-    };
 
     const sleepTime = 300;
 
@@ -36,7 +29,7 @@ export const Openings = ({ openings, setFlash, filter, setFilter }) => {
     };
 
     return (
-        <div style={gridStyle} className="scrollableY white">
+        <div  className="scrollableY white openings-grid">
             <span
                 className="font-cinzel left"
                 style={{ ...blueBoldStyle, gridColumn: 'span 2' }}

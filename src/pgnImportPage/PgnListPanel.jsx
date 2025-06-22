@@ -1,15 +1,9 @@
 import { gql, useQuery } from "@apollo/client";
 import { useState } from 'react';
 import { INCR } from '../common/consts';
+import '../stylesheets/pgnImport.css';
 import { PgnLinkGrid } from "./PgnLinkGrid";
 
-const radioStyle = {
-    display: 'flex',
-    paddingTop: '2em',
-    paddingBottom: '2em',
-    marginLeft: '2em',
-    gap: '1em',
-};
 
 
 // pulls pgn links off of the page at $url
@@ -32,7 +26,7 @@ export const PgnListPanel = ({ link, setLink }) => {
 
     return (
         <div>
-            <div style={radioStyle} className="white">
+            <div className="white radio-style">
                 <input
                     type="radio"
                     name="pgnMode"

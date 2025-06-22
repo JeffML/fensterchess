@@ -1,4 +1,4 @@
-import packageJson from '../../package.json' // okay if it's open source anyway
+import packageJson from '../../package.json'; // it's okay if it's open source anyway
 
 const APP_NAME = "Fenster";
 const VERSION = packageJson.version
@@ -67,22 +67,6 @@ const ECO_CATS = [
 const NO_ENTRY_FOUND = "No Entry Found in Opening Book"
 
 export {
-    APP_NAME,
-    SUBTITLES,
-    INCR,
-    COMPARE,
-    sortEnum,
-    modes,
-    sites,
-    siteUrls,
-    FENEX,
-    VERSION,
-    token,
-    serverUri,
-    RANKS,
-    FILES,
-    ECO_CATS,
-    isTestMode,
-    NO_ENTRY_FOUND,
-    SERVER
+    APP_NAME, COMPARE, ECO_CATS, FENEX, FILES, INCR, NO_ENTRY_FOUND, RANKS, SERVER, SUBTITLES, VERSION, isTestMode, modes, serverUri, siteUrls, sites, sortEnum, token
 };
+

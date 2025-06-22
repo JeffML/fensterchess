@@ -27,7 +27,7 @@ p {
     margin: 1.5rem;
 }
 
-h3 + p {
+h3+p {
     margin: 2rem;
 }
 
@@ -36,4 +36,10 @@ h3 + p {
     border: 5px solid darkkhaki;
     margin-left: 10%;
     margin-top: 1rem;
+}
+
+.version {
+    font-size: 12pt;
+    margin-left: 1em;
+    margin-top: 1em;
 }

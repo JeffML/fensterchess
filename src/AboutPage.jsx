@@ -1,13 +1,12 @@
 import './App.css';
-import './stylesheets/about.css';
 import { VERSION } from './common/consts.js';
+import './stylesheets/about.css';
 
 const About = () => (
     <>
         <div
-            className="font-cinzel white left"
-            style={{ fontSize: '12pt', marginLeft: '1em', marginTop: '1em' }}
-        >
+            className="font-cinzel white left version"
+            >
             version {VERSION}
         </div>
         <div className="about">

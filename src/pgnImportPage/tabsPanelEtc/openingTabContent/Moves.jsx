@@ -1,18 +1,10 @@
 import { useState } from "react";
 import PliesAryToMovesStringSpan from '../../../common/PliesAryToMovesStringSpan';
+import '../../../stylesheets/pgnImport.css';
 
 export const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
     const openingMovesStyle = {
         color: 'powderblue',
-    };
-    const ellipsesStyle = {
-        border: 'solid 1px darkgray',
-        fontSize: '16pt',
-        color: 'limegreen',
-        display: 'inline-block',
-        lineHeight: '0px',
-        borderRadius: '3px',
-        height: '12px',
     };
 
     const [showGameMoves, setShowGameMoves] = useState(false);
@@ -41,9 +33,8 @@ export const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
         <span>
             <span style={openingMovesStyle}>{openingMoves}&nbsp;</span>
             {!showGameMoves && (
-                <span
-                    style={ellipsesStyle}
-                    className="hoverEffect"
+                <span 
+                    className="ellipses hover-effect"
                     onClick={clickHandler}
                 >
                     ...

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import './stylesheets/vizz.css';
 import { Display } from "./vizzes/Display.jsx";
 
 const MOST_ACTIVE = "most active squares";
@@ -16,11 +17,10 @@ const visualizations = [
 
 const Graphs = ({ graphs, handler }) => {
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
+        <div id='graphs' className="grid-column">
             {graphs.map((g) => (
                 <div
-                    key={g.name}
-                    style={{ display: "flex", marginLeft: "2em" }}
+                    key={g.name} className="grid-child"
                 >
                     <label>
                         <input
@@ -40,11 +40,10 @@ const Graphs = ({ graphs, handler }) => {
 
 const Heatmaps = ({ heatmaps, handler }) => {
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
+        <div id="heatmaps" className="grid-column">
             {heatmaps.map((g) => (
                 <div
-                    key={g.name}
-                    style={{ display: "flex", marginLeft: "2em" }}
+                    key={g.name} className="grid-child"
                 >
                     <label>
                         <input
@@ -62,17 +61,6 @@ const Heatmaps = ({ heatmaps, handler }) => {
     );
 };
 
-const gridStyle = {
-    display: "grid",
-    gridTemplateColumns: "1fr 2fr",
-    maxHeight: "250px",
-    minWidth: "fit-content",
-    marginTop: "1em",
-    overflowX: "visible",
-    columnGap: "1px",
-    color: "white",
-};
-
 const Visualizations = () => {
     const [viz, setViz] = useState("");
     const handler = ({ target }) => {
@@ -83,7 +71,7 @@ const Visualizations = () => {
     const heatmaps = visualizations.filter((o) => o.type === "heatmap");
 
     return (
-        <div className="white" style={gridStyle}>
+        <div className="white grid-style">
             <div
                 style={{
                     textAlign: "left",
@@ -105,4 +93,5 @@ const Visualizations = () => {
     );
 };
 
-export { Visualizations, FROM_TO, PIECE_DESTINATION, MOST_ACTIVE, ECO_FLOWCHART };
+export { ECO_FLOWCHART, FROM_TO, MOST_ACTIVE, PIECE_DESTINATION, Visualizations };
+

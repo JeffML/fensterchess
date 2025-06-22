@@ -1,4 +1,5 @@
 import { Fragment } from 'react/jsx-runtime';
+import '../../stylesheets/pgnImport.css';
 
 
 export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
@@ -20,7 +21,7 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
 
     return (
         <>
-            <div name="lefty" style={gridStyle} className="white font-cinzel">
+            <div name="lefty" className="white font-cinzel games-tab-grid">
                 <span>Round</span>
                 <span>Date</span>
                 <span>White</span>
@@ -32,7 +33,7 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
                 <span>Result</span>
             </div>
             <hr />
-            <div name="lefty" style={gridStyle} className="scrollableY white">
+            <div name="lefty" className="scrollableY white games-tab-grid">
                 {games.filter(filterFunc).map((g, i) => {
                     const pgnOpening = g.opening();
                     let variant = g.variant();

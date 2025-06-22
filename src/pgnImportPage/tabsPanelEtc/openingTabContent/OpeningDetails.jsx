@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
+import '../../../stylesheets/pgnImport.css';
 import { movesStringToPliesAry } from '../../../utils/openings';
 import { AdditionalDetails } from './AdditionalDetails';
 import { ChessboardWithControls } from './ChessboardWithControls';
 import { Moves } from './Moves';
-
 
 export const OpeningDetails = ({ game, opening, chess }) => {
     const { eco, name, moves: openingMoves } = opening;
@@ -26,13 +26,7 @@ export const OpeningDetails = ({ game, opening, chess }) => {
     const fen = chess.current.fen();
 
     return (
-        <div
-            style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 3fr',
-                marginTop: '1em',
-            }}
-        >
+        <div id="openingDetails" className="opening-details">
             <ChessboardWithControls
                 {...{
                     chess,
@@ -41,17 +35,7 @@ export const OpeningDetails = ({ game, opening, chess }) => {
                     setPlyIndex,
                 }}
             />
-            <div
-                id="game-details"
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 3fr',
-                    textAlign: 'left',
-                    gridAutoRows: 'minContent',
-                    gridAutoColumns: 'minContent',
-                    marginLeft: '.6em',
-                }}
-            >
+            <div id="gameDetails" className="game-details">
                 <span>Event:</span>
                 <span>{event}</span>
                 <span>White:</span>

@@ -3,7 +3,7 @@ import { Chessboard } from 'kokopu-react';
 import { useContext } from 'react';
 import { SERVER } from '../common/consts.js';
 import { OpeningBookContext } from '../contexts/OpeningBookContext.jsx';
-
+import '../stylesheets/similar.css';
 
 const getSimilar = async (fen) => {
     const response = await fetch(
@@ -15,7 +15,7 @@ const getSimilar = async (fen) => {
 
 const SimilarOpenings = ({ boardState, setBoardState }) => {
     const { fen, moves } = boardState;
-    const {openingBook} = useContext(OpeningBookContext)
+    const { openingBook } = useContext(OpeningBookContext);
 
     const {
         isPending: loading,
@@ -47,13 +47,9 @@ const SimilarOpenings = ({ boardState, setBoardState }) => {
         const sims = fullSimInfo.map((sim) => {
             return (
                 <div
+                    id="similar-opening"
                     key={sim.fen}
-                    style={{
-                        display: 'grid',
-                        justifyItems: 'flex-start',
-                        paddingLeft: '2em',
-                        paddingTop: '0.7em',
-                    }}
+                    className="similar-opening"
                 >
                     <span
                         style={{ paddingBottom: '3px' }}
@@ -68,12 +64,7 @@ const SimilarOpenings = ({ boardState, setBoardState }) => {
         });
 
         return (
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                }}
-            >
+            <div id="no-similar" className='similar-openings'>
                 {sims}
             </div>
         );

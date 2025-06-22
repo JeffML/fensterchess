@@ -1,0 +1,11 @@
+.similar-opening {
+    display: grid;
+    justify-items: flex-start;
+    padding-left: 2em;
+    padding-top: 0.7em;
+}
+
+.similar-openings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}

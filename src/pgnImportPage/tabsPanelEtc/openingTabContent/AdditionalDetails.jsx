@@ -2,6 +2,7 @@ import { gql, useQuery } from '@apollo/client';
 import { useContext } from "react";
 import StackedBarChart from "../../../common/StackedBarChart";
 import { SelectedSitesContext } from '../../../contexts/SelectedSitesContext';
+import '../../../stylesheets/pgnImport.css';
 
 const GET_OPENING_ADDITIONAL = gql`
     query getOpeningAdditional($fen: String!, $sites: [String]!) {
@@ -39,14 +40,7 @@ export const AdditionalDetails = ({ fen }) => {
 
     if (loading)
         return (
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'auto',
-                    gridColumnStart: '2',
-                    gridColumnEnd: 'auto',
-                }}
-            >
+            <div id="additionalDetailsLoading" className='additional-details-loading'>
                 <strong style={{ marginRight: '1em', color: '#FFCE44' }}>
                     Loading...
                 </strong>
@@ -63,12 +57,7 @@ export const AdditionalDetails = ({ fen }) => {
                 <div
                     id="AdditionalDetails"
                     key={site}
-                    style={{
-                        display: 'contents',
-                        gridColumnStart: '1',
-                        textAlign: 'left',
-                        color: 'white',
-                    }}
+                    className='additional-details'
                 >
                     <span>&nbsp;</span>
                     <span>&nbsp;</span>
