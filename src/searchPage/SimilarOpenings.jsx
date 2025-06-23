@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Chessboard } from 'kokopu-react';
 import { useContext } from 'react';
-import { SERVER } from '../common/consts.js';
+import { SERVER } from '../common/urlConsts.js';
 import { OpeningBookContext } from '../contexts/OpeningBookContext.jsx';
 import '../stylesheets/similar.css';
 

@@ -1,5 +1,6 @@
 import './App.css';
 import { VERSION } from './common/consts.js';
+import { CHESS_DATA, DISCUSSION, ECO_JSON, FICS_GAMES, ISSUES, LICHESS, MEDIUM_INTERPOLATED2, WIKI_ECO, WIKI_THEORY } from './common/urlConsts.js';
 import './stylesheets/about.css';
 
 const About = () => (
@@ -14,7 +15,7 @@ const About = () => (
                 Fenster is a comprehensive chess opening reference with over
                 15,000 variations in its database. The opening database content
                 is public and can be found at{' '}
-                <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>.
+                <a href={ECO_JSON}>eco.json</a>.
             </p>
             <p>
                 At present, there is no repository of chess games, though
@@ -23,10 +24,10 @@ const About = () => (
             </p>
             <ul style={{marginLeft: "inherit"}}>
                 <li>
-                    <a href="https://www.ficsgames.org/">FICS</a>
+                    <a href={FICS_GAMES}>FICS</a>
                 </li>
                 <li>
-                    <a href="https://lichess.org/">lichess</a>
+                    <a href={LICHESS}>lichess</a>
                 </li>
             </ul>
             <h2>The Search Page</h2>
@@ -44,7 +45,7 @@ const About = () => (
             <p>
                 At the top of the right column is the opening name, along with
                 its{' '}
-                <a href="https://en.wikipedia.org/wiki/Encyclopaedia_of_Chess_Openings#Main_ECO_codes">
+                <a href={WIKI_ECO}>
                     ECO code
                 </a>
                 . Directly below that are variations. There are two types:
@@ -80,12 +81,12 @@ const About = () => (
             </p>
             <p>
                 Some opening names are italicized. These are{' '}
-                <a href="https://medium.com/@jefflowery/navigating-chess-openings-part-2-408a488d919b">
+                <a href={MEDIUM_INTERPOLATED2}>
                     interpolated openings
                 </a>
                 . These were added to fill in missing move sequences between
                 variations from the original reference sources used by
-                <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>.
+                <a href={ECO_JSON}>eco.json</a>.
                 Interpolated openings allow navigation continuity between
                 variations.
             </p>
@@ -98,7 +99,7 @@ const About = () => (
             <h3>Theory</h3>
             <p>
                 This is a short explanation of the ideas behind the opening from{' '}
-                <a href="https://en.wikibooks.org/wiki/Chess_Opening_Theory">
+                <a href={WIKI_THEORY}>
                     Wikibooks
                 </a>
             </p>
@@ -160,7 +161,7 @@ const About = () => (
             />
             <p>
                 This page has links to games at{' '}
-                <a href="https://theweekinchess.com/">The Week in Chess</a>{' '}
+                <a href={TWIC}>The Week in Chess</a>{' '}
                 website. Clicking on the a link will show information from the
                 PGN file in the Summary tab. Selecting one or more of the check
                 boxes under Openings (at left) will filter the games shown in
@@ -222,7 +223,7 @@ const About = () => (
             <p>
                 Similar to above, this heatmap pertains to specific pieces and
                 player color. Inspired by{' '}
-                <a href="https://github.com/Ramon-Deniz/ChessData">
+                <a href={CHESS_DATA}>
                     this project
                 </a>
                 .
@@ -230,11 +231,11 @@ const About = () => (
             <h2>Questions? Bugs? Feature requests?</h2>
             The Fenster client is an open source project maintained on github.
             There you can open a{' '}
-            <a href="https://github.com/JeffML/fensterchess/discussions/1">
+            <a href={DISCUSSION}>
                 discussion
             </a>
             ,{' '}
-            <a href="https://github.com/JeffML/fensterchess/issues">
+            <a href={ISSUES}>
                 log a bug, or request a feature
             </a>
             .

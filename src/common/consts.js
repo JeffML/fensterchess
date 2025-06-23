@@ -1,20 +1,21 @@
 import packageJson from '../../package.json'; // it's okay if it's open source anyway
+import { FICS, LICHESS, SERVER } from './urlConsts';
 
-const APP_NAME = "Fenster";
-const VERSION = packageJson.version
+export const APP_NAME = "Fenster";
+export const VERSION = packageJson.version
 
-const INCR = 5; // list increment
+export const INCR = 5; // list increment
 
-const COMPARE = 1;
+export const COMPARE = 1;
 
-const sortEnum = {
+export const sortEnum = {
     EVALUATION: 1,
     NAME: 2,
     // RESULTS: 3,
     ECO: 4,
 };
 
-const modes = {
+export const modes = {
     main: 1,
     test: 2,
     search: 3,
@@ -23,40 +24,36 @@ const modes = {
     visualization: 6,
 };
 
-const SUBTITLES = [];
+export const SUBTITLES = [];
 SUBTITLES[modes.search] = "Search Openings";
 SUBTITLES[modes.admin] = "Test and Administration";
 SUBTITLES[modes.pgnAnalyze] = "Import and Analyze PGN";
 SUBTITLES[modes.visualization] = "Visualization";
 SUBTITLES[modes.about] = "About Fenster";
 
-// Note: shredder has been down before; check https://www.shredderchess.com/online/opening-database.html or see fenster-s getOpeningAdditional resolver
-// Update: removed by request of the Shredder guy
-const siteUrls = {
-    FICS: "https://www.freechess.org/",
-    lichess: "https://lichess.org/",
-    // shredder: "https://www.shredderchess.com/",
+export const siteUrls = {
+    FICS,
+    lichess: LICHESS,
+    // SHREDDER
 };
 
-const alias = import.meta.env.VITE_APP_SERVER; // this can be set as follows: "VITE_APP_SERVER=flum netlify dev"
-const DEFAULT_SERVER = "fenster-s.netlify.app";
-const SERVER = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}`
 
-const sites = Object.keys(siteUrls);
 
-const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
+export const sites = Object.keys(siteUrls);
 
-const token = import.meta.env.VITE_APP_QUOTE; // authentication token
-const isTestMode = import.meta.env.VITE_APP_TEST_MODE === "flum"; // brings up test page
+export const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
+
+export const token = import.meta.env.VITE_APP_QUOTE; // authentication token
+export const isTestMode = import.meta.env.VITE_APP_TEST_MODE === "flum"; // brings up test page
 
 // prettier-ignore
-const serverUri = `${SERVER}/.netlify/functions/server`;
+export const serverUri = `${SERVER}/.netlify/functions/server`;
 // console.log(`alias was ${alias}, serverUri is ${serverUri}`)
 
-const RANKS = [1, 2, 3, 4, 5, 6, 7, 8];
-const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"];
+export const RANKS = [1, 2, 3, 4, 5, 6, 7, 8];
+export const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
-const ECO_CATS = [
+export const ECO_CATS = [
     ["A", "Flank Openings"],
     ["B", "Semi-Open Games"],
     ["C", "Open Games, and French Defense"],
@@ -64,9 +61,6 @@ const ECO_CATS = [
     ["E", "Indian Defenses"],
 ];
 
-const NO_ENTRY_FOUND = "No Entry Found in Opening Book"
+export const NO_ENTRY_FOUND = "No Entry Found in Opening Book"
 
-export {
-    APP_NAME, COMPARE, ECO_CATS, FENEX, FILES, INCR, NO_ENTRY_FOUND, RANKS, SERVER, SUBTITLES, VERSION, isTestMode, modes, serverUri, siteUrls, sites, sortEnum, token
-};
 

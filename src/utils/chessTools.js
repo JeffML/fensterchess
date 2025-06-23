@@ -1,6 +1,7 @@
 import { Chess } from 'chess.js';
-import { movesStringToPliesAry } from './openings.js';
 import DOMPurify from 'dompurify';
+import { WIKI_THEORY_API, WIKI_THEORY_API_QS } from '../common/urlConsts.js';
+import { movesStringToPliesAry } from './openings.js';
 
 const movesToFen = (moves) => {
     const chess = new Chess();
@@ -30,8 +31,8 @@ const theoryRequest = async (currentMoves, setHtml) => {
         return moves.join('/');
     };
 
-    const url = `https://en.wikibooks.org/w/api.php?titles=Chess_Opening_Theory/${urlMoves()}&redirects&origin=*&action=query&prop=extracts&formatversion=2&format=json&exchars=1200`;
-
+    const url = `${WIKI_THEORY_API}${urlMoves()}${WIKI_THEORY_API_QS}`;
+    
     const response = await fetch(url);
     const json = await response.json();
     const html = json.query?.pages[0]?.extract;
@@ -63,4 +64,5 @@ function pgnMovesOnly(pgn) {
     return pgn.slice(i + 2);
 }
 
-export { movesToFen, toPlay, theoryRequest, parseMoves, pos, pgnMovesOnly };
+export { movesToFen, parseMoves, pgnMovesOnly, pos, theoryRequest, toPlay };
+

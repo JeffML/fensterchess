@@ -1,5 +1,6 @@
 import { gql, useQuery } from '@apollo/client';
 import { Fragment, useEffect, useState } from 'react';
+import { TWIC_RSS } from '../common/urlConsts';
 import { getFeedAsJson } from "../utils/getFeedAsJson";
 
 const newsStyle = {
@@ -20,7 +21,7 @@ export const RssFeed = () => {
     const [json, setJson] = useState(null);
 
     const { loading, error, data } = useQuery(GET_RSS_XML, {
-        variables: { url: 'https://theweekinchess.com/twic-rss-feed' },
+        variables: { url: TWIC_RSS },
         skip: json,
     });
 

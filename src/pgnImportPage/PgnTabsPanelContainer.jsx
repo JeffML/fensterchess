@@ -2,7 +2,7 @@ import { useQuery as useQueryRQ } from '@tanstack/react-query';
 import { pgnRead } from 'kokopu';
 import { useState } from 'react';
 import 'react-tabs/style/react-tabs.css';
-import { SERVER } from '../common/consts.js';
+import { SERVER } from '../common/urlConsts.js';
 import '../stylesheets/grid.css';
 import '../stylesheets/tabs.css';
 import { PgnTabsPanel } from './PgnTabsPanel.jsx';
