@@ -15,7 +15,7 @@ const AnalyzePgnPage = () => {
     // show either the list of links (along with meta data), or a "deep dive" into the pgn data itself
     return (
         <>
-            <div className="grid-style">
+            <div className="grid-style-top-panel">
                 <PgnListPanel {...{ link, setLink }} />
                 <RssFeed />
             </div>

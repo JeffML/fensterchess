@@ -86,7 +86,7 @@
     gap: 2em;
 }
 
-.grid-style {
+.grid-style-top-panel {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
 }
