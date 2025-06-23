@@ -1,5 +1,4 @@
 import { Fragment } from 'react/jsx-runtime';
-import '../../../stylesheets/pgnImport.css';
 import { sleep } from '../../../utils/sleep';
 import { blueBoldStyle } from '../PgnSummaryTab';
 

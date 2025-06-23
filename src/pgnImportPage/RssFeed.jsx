@@ -55,7 +55,7 @@ export const RssFeed = () => {
                         </b>
                         <br />
                         <div className='news'>
-                            {item.description.slice(0, 350)}
+                            {item.description.slice(0, 325)}
                         </div>
                     </Fragment>
                 ))}

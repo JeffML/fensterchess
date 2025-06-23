@@ -1,6 +1,6 @@
 import { useState } from "react";
-import ecoCodes from "../datasource/ecoCodes.js";
 import { ECO_FLOWCHART, FROM_TO, MOST_ACTIVE, PIECE_DESTINATION } from "../Visualizations.jsx";
+import ecoCodes from "../datasource/ecoCodes.js";
 import { BallOfMud } from "./BallOfMud.jsx";
 import { ColorAndPieces } from "./ColorAndPieces.jsx";
 import { EcoFlowchart } from './EcoFlowchart.jsx';
@@ -9,17 +9,11 @@ import { MostActiveByPiece, MostActiveSquaresByEco } from "./MostActive.jsx";
 
 function EcoCatCode({ cat, setCat, setCode }) {
     const cats = Object.keys(ecoCodes);
-    const radioGridStyle = {
-        display: "grid",
-        gridTemplateColumns: "repeat(5, 4rem)",
-        padding: "3px",
-        marginLeft: "2em",
-    };
 
     return (
         <div style={{ marginLeft: "10%" }}>
             <span className=" left font-cinzel">ECO Categories</span>
-            <div style={{ ...radioGridStyle }}>
+            <div className="radio-grid">
                 {cats.map((c) => (
                     <label key={c}>
                         {c}

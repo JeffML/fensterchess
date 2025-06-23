@@ -1,7 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { useState } from 'react';
 import { INCR } from '../common/consts';
-import '../stylesheets/pgnImport.css';
 import { PgnLinkGrid } from "./PgnLinkGrid";
 
 

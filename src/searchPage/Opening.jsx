@@ -93,13 +93,8 @@ const OpeningName = ({ eco, src, name, score }) => {
             }}
         >
             Opening:&nbsp;&nbsp;
-            <span
-                style={{
-                    fontWeight: 'bolder',
-                    display: 'inline',
-                    color: 'aquamarine',
-                    fontFamily: 'sans',
-                }}
+            <span className='opening-name'
+
             >
                 {eco}&nbsp;
                 {src === 'interpolated' ? (

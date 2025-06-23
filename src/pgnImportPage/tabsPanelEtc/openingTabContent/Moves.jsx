@@ -1,6 +1,5 @@
 import { useState } from "react";
 import PliesAryToMovesStringSpan from '../../../common/PliesAryToMovesStringSpan';
-import '../../../stylesheets/pgnImport.css';
 
 export const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
     const openingMovesStyle = {

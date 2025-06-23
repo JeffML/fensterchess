@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import '../../../stylesheets/pgnImport.css';
 import { movesStringToPliesAry } from '../../../utils/openings';
 import { AdditionalDetails } from './AdditionalDetails';
 import { ChessboardWithControls } from './ChessboardWithControls';

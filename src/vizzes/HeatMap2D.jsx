@@ -2,20 +2,6 @@ import HeatMap from "jsheatmap";
 import { RANKS as ordinals, FILES as files } from "../common/consts.js";
 import { Fragment } from "react";
 
-const square = {
-    width: "2em",
-    height: "2em",
-    textShadow: "1px 1px #000000",
-    lineHeight: "2rem",
-};
-
-const gridStyle = {
-    display: "grid",
-    gridTemplateColumns: "repeat(8, 1fr)",
-    gridGap: "1px",
-    marginBottom: "3em"
-};
-
 // eslint-disable-next-line no-unused-vars
 const rgbColor = (rgb) =>
     `rgb(${rgb.red * 100}%, ${rgb.green * 100}%, ${rgb.blue * 100}%)`;
@@ -24,7 +10,7 @@ const Square = ({ rgb, value }) => {
     const bgColor = `hsl(196deg 36% ${value > 0 ? 95 - value * 5 : 95}%)`;
 
     return (
-        <div style={{ ...square, backgroundColor: bgColor }}>{value}</div>
+        <div className="square" style={{backgroundColor: bgColor }}>{value}</div>
     );
 
 };
@@ -51,7 +37,7 @@ const HeatMap2D = ({ dests }) => {
         </Fragment>;
     });
 
-    return <div style={gridStyle}>{ranks}</div>;
+    return <div className="hmgrid">{ranks}</div>;
 };
 
 export { HeatMap2D };

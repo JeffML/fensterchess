@@ -1,6 +1,4 @@
 import { Fragment } from 'react/jsx-runtime';
-import '../../stylesheets/pgnImport.css';
-
 
 export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
     const gridStyle = {

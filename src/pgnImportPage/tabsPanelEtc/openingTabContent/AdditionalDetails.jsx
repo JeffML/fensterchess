@@ -2,7 +2,6 @@ import { gql, useQuery } from '@apollo/client';
 import { useContext } from "react";
 import StackedBarChart from "../../../common/StackedBarChart";
 import { SelectedSitesContext } from '../../../contexts/SelectedSitesContext';
-import '../../../stylesheets/pgnImport.css';
 
 const GET_OPENING_ADDITIONAL = gql`
     query getOpeningAdditional($fen: String!, $sites: [String]!) {

@@ -1,15 +1,7 @@
 import { useState } from 'react';
 
-
-
 export const Players = ({ pgnSumm }) => {
     const { players } = pgnSumm;
-    const gridStyle = {
-        display: 'grid',
-        gridTemplateColumns: '1fr 3fr 1fr',
-        gap: '2em',
-    };
-
     const [method, setMethod] = useState('name');
 
     const sort = (a, b) => {
@@ -41,13 +33,7 @@ export const Players = ({ pgnSumm }) => {
 
     return (
         <>
-            <div
-                style={{
-                    whiteSpace: 'nowrap',
-                    color: 'powderblue',
-                    justifyContent: 'space-evenly',
-                }}
-            >
+            <div id="players" className="players">
                 Sort by:{' '}
                 <label style={{ marginLeft: '1em' }}>
                     <input
@@ -55,7 +41,8 @@ export const Players = ({ pgnSumm }) => {
                         name="sortBy"
                         value="name"
                         defaultChecked="true"
-                        onChange={onChange} />
+                        onChange={onChange}
+                    />
                     Player name
                 </label>
                 <label style={{ display: 'inline', marginLeft: '1em' }}>
@@ -63,7 +50,8 @@ export const Players = ({ pgnSumm }) => {
                         type="radio"
                         name="sortBy"
                         value="ELO"
-                        onChange={onChange} />
+                        onChange={onChange}
+                    />
                     Player ELO
                 </label>
                 <label style={{ display: 'inline', marginLeft: '1em' }}>
@@ -71,7 +59,8 @@ export const Players = ({ pgnSumm }) => {
                         type="radio"
                         name="sortBy"
                         value="title"
-                        onChange={onChange} />
+                        onChange={onChange}
+                    />
                     Player Title
                 </label>
             </div>
@@ -80,11 +69,11 @@ export const Players = ({ pgnSumm }) => {
                     .sort(sort)
                     .map(({ name, elo, title }, i) => (
                         <div
-                            className="left white"
+                            className="left white player"
                             key={name}
                             style={{
-                                ...gridStyle,
-                                backgroundColor: i % 2 ? 'slategray' : 'inherit',
+                                backgroundColor:
+                                    i % 2 ? 'slategray' : 'inherit',
                             }}
                         >
                             <span className="left">{title}</span>

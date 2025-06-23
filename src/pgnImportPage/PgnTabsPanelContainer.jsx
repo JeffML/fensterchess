@@ -18,8 +18,6 @@ const getPgnFiles = async ({ pgnLinks }) => {
     return { getPgnFiles: data };
 };
 
-
-
 export const getPgnSummary = (pgn) => {
     const ETC = ', etc.';
     const db = pgnRead(pgn);
@@ -66,11 +64,6 @@ export const getPgnSummary = (pgn) => {
     };
 };
 
-
-
-
-
-
 /*
 Arguments are url OR pgn.
 
@@ -110,4 +103,3 @@ export const PgnTabsPanelContainer = ({ link }) => {
         );
     }
 };
-

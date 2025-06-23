@@ -5,6 +5,7 @@ import { ActionButton } from '../common/Buttons.jsx';
 import { FENEX, NO_ENTRY_FOUND } from '../common/consts.js';
 import { OpeningBookContext } from '../contexts/OpeningBookContext.jsx';
 import { scores } from '../datasource/scores.js';
+import '../stylesheets/search.css';
 import { pos } from '../utils/chessTools.js';
 import { FenOrPgn } from './FenOrPgn.jsx';
 import { Opening } from './Opening.jsx';

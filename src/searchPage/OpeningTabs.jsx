@@ -72,10 +72,6 @@ const OpeningTabs = ({
     from,
     lastKnownOpening,
 }) => {
-    const tabStyle = {
-        border: "1px solid #FFFFFF ",
-        borderRadius: "10px 10px 0 0",
-    };
 
     const {fen} = boardState
     const { move, color } = toPlay(fen);
@@ -102,14 +98,14 @@ const OpeningTabs = ({
         <Tabs
             style={{ minWidth: "100%", marginRight: "2em" }}
         >
-            <TabList className="left" style={{ marginBottom: "0px" }}>
+            <TabList className="left openings-tablist">
                 {legalMoves && legalMoves.length !== 0 && (
-                    <Tab style={tabStyle}>Variations</Tab>
+                    <Tab >Variations</Tab>
                 )}
-                {showTransitions && <Tab style={tabStyle}>Roots</Tab>}
-                {html && <Tab style={tabStyle}>Theory</Tab>}
-                {showExternal && <Tab style={tabStyle}>External Info</Tab>}
-                {searchable && <Tab style={tabStyle}>Similar Openings</Tab>}
+                {showTransitions && <Tab >Roots</Tab>}
+                {html && <Tab >Theory</Tab>}
+                {showExternal && <Tab >External Info</Tab>}
+                {searchable && <Tab >Similar Openings</Tab>}
             </TabList>
             <div style={{ border: "thick solid white" }}>
                 {legalMoves && legalMoves.length !== 0 && (

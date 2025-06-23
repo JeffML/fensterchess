@@ -11,13 +11,8 @@ const Roots = ({ from }) => {
         return (
             <Fragment key={name}>
                 <div
-                    className="fakeLink"
+                    className="fakeLink root"
                     onClick={() => handleMoves(moves)}
-                    style={{
-                        textAlign: "left",
-                        marginLeft: "40px",
-                        marginRight: "100px",
-                    }}
                 >
                     {src === "interpolated" ? <i>{name}</i> : name}
                 </div>

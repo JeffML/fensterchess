@@ -18,3 +18,17 @@
     column-gap: 1px;
     color: white;
 }
+
+.square {
+    width: 2em;
+    height: 2em;
+    text-shadow: 1px 1px #000000;
+    line-height: 2rem;
+}
+
+.hmgrid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-gap: 1px;
+    margin-bottom: 3em;
+}

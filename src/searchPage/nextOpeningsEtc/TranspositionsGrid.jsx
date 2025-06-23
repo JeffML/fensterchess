@@ -31,12 +31,7 @@ export const TranspositionsGrid = ({ transpositions: dupeTrans, sortBy }) => {
                     backgroundColor,
                 }}
             >
-                <div
-                    style={{
-                        textAlign: 'left',
-                        paddingLeft: '1em',
-                        fontFamily: 'mono',
-                    }}
+                <div className='move'
                 >
                     {moves.replace(/(\d{1,3}\.)\s/g, '$1')}
                 </div>

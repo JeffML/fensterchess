@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import '../stylesheets/analyze.css';
 import '../stylesheets/fileSelector.css';
+import '../stylesheets/pgnImport.css';
 import { PgnListPanel } from './PgnListPanel.jsx';
 import { PgnTabsPanelContainer } from './PgnTabsPanelContainer.jsx';
 import { RssFeed } from './RssFeed.jsx';
