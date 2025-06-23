@@ -192,7 +192,12 @@ const SearchPageContainer = ({ from, to }) => {
 
         if (data.getOpeningForFenFull) {
             const nexts = to[pos(fen)] ?? [];
+            const froms = from[pos(fen)] ?? []
             data.getOpeningForFenFull.next = nexts.map((fen) => {
+                const variation = { ...openingBook[fen], score: scores[fen] };
+                return variation;
+            });
+            data.getOpeningForFenFull.from = froms.map((fen) => {
                 const variation = { ...openingBook[fen], score: scores[fen] };
                 return variation;
             });

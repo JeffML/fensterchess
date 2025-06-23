@@ -4,7 +4,7 @@ import { handleMoves } from "./handleMoves";
 /**
  * Root move sequences for current position
  */
-const Roots = ({ from }) => {
+export const Roots = ({ from }) => {
     if (from.length === 0) return null;
 
     const roots = Object.entries(from).map(([, { name, moves, src }]) => {
