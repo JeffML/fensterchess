@@ -12,12 +12,6 @@ const newsStyle = {
     marginBottom: '1em',
 };
 
-// const GET_RSS_XML = gql`
-//     query GetRssXML($url: String) {
-//         getRssXml(url: $url)
-//     }
-// `;
-
 const getRssXml = async(url) => {
     const response = await fetch(
         SERVER + '/.netlify/functions/getRssXml?url=' + TWIC_RSS
@@ -29,11 +23,6 @@ const getRssXml = async(url) => {
 
 export const RssFeed = () => {
     const [json, setJson] = useState(null);
-
-    // const { loading, error, data } = useQuery(GET_RSS_XML, {
-    //     variables: { url: TWIC_RSS },
-    //     skip: json,
-    // });
 
     const {isError, error, data} = useQuery({
         queryKey: [getRssXml, dateStringShort()],
