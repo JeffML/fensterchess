@@ -89,6 +89,8 @@
 .grid-style-top-panel {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    height: 50%;
+    overflow-y: scroll;
 }
 
 .link-grid {
@@ -98,6 +100,11 @@
     grid-column-gap: 2em;
     margin-left: 2em;
     max-height: 0;
-    text-align: "start";
-    color: "white";
+    text-align: start;
+    color: white;
+}
+
+.pgn-tabs-panel {
+    position: relative; 
+    background-color: #3F3F3F;
 }

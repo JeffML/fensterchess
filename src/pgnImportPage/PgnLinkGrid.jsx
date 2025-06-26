@@ -5,23 +5,7 @@ import { INCR } from "../common/consts.js";
 import { SERVER } from '../common/urlConsts.js';
 import { dateStringShort } from "../utils/dateStringShort.js";
 
-// HEAD requests for each link
-// const GET_PGN_LINK_META = gql`
-//     query getPgnLinkMeta($url: String!) {
-//         getPgnLinkMeta(url: $url) {
-//             link
-//             contentLength
-//             lastModified
-//         }
-//     }
-// `;
-
-
-
 function PgnMetaRow({ link, setLink }) {
-    // const { error, loading, data } = useQuery(GET_PGN_LINK_META, {
-    //     variables: { url: link },
-    // });
 
     const getPgnLinkMeta = async() => {
         const response = await fetch(SERVER + '/.netlify/functions/getPgnLinkMeta?url='+link)

@@ -13,7 +13,7 @@ export const PgnTabsPanel = ({ pgn, tabIndex, setTabIndex }) => {
     const pgnSumm = getPgnSummary(pgn);
 
     return (
-        <Tabs selectedIndex={tabIndex} onSelect={setTabIndex} >
+        <Tabs selectedIndex={tabIndex} onSelect={setTabIndex} className="pgn-tabs-panel">
             <TabList className="left" style={{ marginBottom: '0px' }}>
                 <Tab className="react-tabs__tab tab-base">Summary</Tab>
                 <Tab
