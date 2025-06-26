@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { ActionButton } from "../common/Buttons.jsx";
 import { INCR } from "../common/consts.js";
+import { dateStringShort } from "../utils/dateStringShort.js";
 
 // HEAD requests for each link
 const GET_PGN_LINK_META = gql`
@@ -41,11 +42,12 @@ function PgnMetaRow({ link, setLink }) {
         const { lastModified, contentLength } = data.getPgnLinkMeta;
 
         const millis = Date.parse(lastModified);
-        const localeTime = new Date(millis).toLocaleString("en-US", {
-            hour12: false,
-            dateStyle: "short",
-            timeStyle: "short",
-        });
+        const localeTime = dateStringShort(millis)
+        // const localeTime = new Date(millis).toLocaleString("en-US", {
+        //     hour12: false,
+        //     dateStyle: "short",
+        //     timeStyle: "short",
+        // });
 
         return (
             <>
