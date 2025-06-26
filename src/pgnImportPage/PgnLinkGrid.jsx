@@ -1,53 +1,56 @@
-import { gql, useQuery } from "@apollo/client";
+// import { gql, useQuery } from "@apollo/client";k
+import { useQuery } from "@tanstack/react-query";
 import { ActionButton } from "../common/Buttons.jsx";
 import { INCR } from "../common/consts.js";
+import { SERVER } from '../common/urlConsts.js';
 import { dateStringShort } from "../utils/dateStringShort.js";
 
 // HEAD requests for each link
-const GET_PGN_LINK_META = gql`
-    query getPgnLinkMeta($url: String!) {
-        getPgnLinkMeta(url: $url) {
-            link
-            contentLength
-            lastModified
-        }
-    }
-`;
+// const GET_PGN_LINK_META = gql`
+//     query getPgnLinkMeta($url: String!) {
+//         getPgnLinkMeta(url: $url) {
+//             link
+//             contentLength
+//             lastModified
+//         }
+//     }
+// `;
 
-const gridStyle = {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    padding: "3px",
-    gridColumnGap: "2em",
-    marginLeft: "2em",
-};
+
 
 function PgnMetaRow({ link, setLink }) {
-    const { error, loading, data } = useQuery(GET_PGN_LINK_META, {
-        variables: { url: link },
-    });
+    // const { error, loading, data } = useQuery(GET_PGN_LINK_META, {
+    //     variables: { url: link },
+    // });
 
-    if (error) {
+    const getPgnLinkMeta = async() => {
+        const response = await fetch(SERVER + '/.netlify/functions/getPgnLinkMeta?url='+link)
+        const data = await response.json()
+        return data
+    }
+    
+    const {isError, isPending, error, data} = useQuery({
+        queryKey: ["getPgnLinkMeta", dateStringShort()],
+        queryFn: getPgnLinkMeta
+    })
+
+
+    if (isError) {
         console.error(error.toLocaleString());
         return <span>ERROR!</span>;
     }
 
-    if (loading) return <span>...</span>;
+    if (isPending) return <span>...</span>;
 
     const clickHandler = () => {
         setLink({ url: link });
     };
 
     if (data) {
-        const { lastModified, contentLength } = data.getPgnLinkMeta;
+        const { lastModified, contentLength } = data;
 
         const millis = Date.parse(lastModified);
         const localeTime = dateStringShort(millis)
-        // const localeTime = new Date(millis).toLocaleString("en-US", {
-        //     hour12: false,
-        //     dateStyle: "short",
-        //     timeStyle: "short",
-        // });
 
         return (
             <>
@@ -89,15 +92,9 @@ export const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
 
     return (
         <div
-            style={{
-                ...gridStyle,
-                maxHeight: 0,
-                textAlign: "start",
-                color: "white",
-            }}
-            className="font-cinzel"
+            className="font-cinzel link-grid white"
         >
-            <Headers />
+            <Headers/>
             <PgnMetaRows />
 
             {end < links.length ? (

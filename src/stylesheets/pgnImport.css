@@ -90,3 +90,14 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
 }
+
+.link-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 3px;
+    grid-column-gap: 2em;
+    margin-left: 2em;
+    max-height: 0;
+    text-align: "start";
+    color: "white";
+}
