@@ -1,4 +1,4 @@
-div[name=lefty]>span {
+.games-tab-grid>span {
     text-align: left;
 }
 

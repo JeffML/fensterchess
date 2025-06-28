@@ -232,15 +232,3 @@ div.scrollableY {
   white-space: nowrap;
 }
 
-.scrollable, 
-.scrollableY::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: 7px;
-}
-
-.scrollable, 
-.scrollableY::-webkit-scrollbar-thumb {
-  border-radius: 4px;
-  background-color: green;
-  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
-}

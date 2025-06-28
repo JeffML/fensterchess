@@ -1,6 +1,8 @@
 import { Chess } from "chess.js";
+import { useContext } from "react";
+import { OpeningBookContext } from '../contexts/OpeningBookContext';
 
-const getFensForMoves = (plies) => {
+export const getFensForMoves = (plies) => {
     const chess = new Chess();
     const [fens, varMoves] = plies.reduce(
         ([a, b], move) => {
@@ -15,7 +17,7 @@ const getFensForMoves = (plies) => {
     return [fens, varMoves];
 };
 
-const pliesAryToMovesString = (plies) => {
+export const pliesAryToMovesString = (plies) => {
     return plies.reduce((prev, curr, i) => {
         if (i % 2 === 0) prev += `${i / 2 + 1}. `;
         prev += `${curr} `;
@@ -23,7 +25,7 @@ const pliesAryToMovesString = (plies) => {
     }, "");
 };
 
-const movesStringToPliesAry = (moves) => {
+export const movesStringToPliesAry = (moves) => {
     const plies = moves.split(/\s+/).map((move) => {
         const matches = move.match(/(?:\d{1,3}\.)?(.*)/);
         return matches[1];
@@ -31,8 +33,27 @@ const movesStringToPliesAry = (moves) => {
     return plies.filter((p) => p !== "");
 };
 
-export {
-    getFensForMoves,
-    movesStringToPliesAry,
-    pliesAryToMovesString,
+
+export const findOpeningForKokopuGame = (game) => {
+    const { openingBook } = useContext(OpeningBookContext);
+
+    const fens = game
+        .nodes()
+        .slice(0, 50)
+        .map((n) => n.fen());
+
+    let opening;
+
+    for (let fen of fens.reverse()) {
+        const obEntry = openingBook[fen];
+        if (obEntry) {
+            const { eco, name, moves } = obEntry;
+
+            opening = { eco, name, moves, fen };
+            break;
+        }
+    }
+
+    return opening;
 };
+

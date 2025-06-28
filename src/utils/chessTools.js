@@ -9,7 +9,18 @@ const movesToFen = (moves) => {
     return chess.fen();
 };
 
-// const newName = (name) => name.replace(/(\s\(i\))+/, "*");
+export const getFullOpeningNameFromKokopuGame = (g) => {
+    let opening = g.opening();
+    const variation = g.openingVariation();
+    const subVariation = g.openingSubVariation();
+
+    if (variation) {
+        opening+=': ' + variation
+        if (subVariation) opening += ` (${subVariation})`
+    }
+
+    return opening;
+};
 
 const toPlay = (fen) => {
     const splitFen = fen.split(' ');
@@ -32,7 +43,7 @@ const theoryRequest = async (currentMoves, setHtml) => {
     };
 
     const url = `${WIKI_THEORY_API}${urlMoves()}${WIKI_THEORY_API_QS}`;
-    
+
     const response = await fetch(url);
     const json = await response.json();
     const html = json.query?.pages[0]?.extract;
@@ -65,4 +76,3 @@ function pgnMovesOnly(pgn) {
 }
 
 export { movesToFen, parseMoves, pgnMovesOnly, pos, theoryRequest, toPlay };
-

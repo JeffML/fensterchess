@@ -15,9 +15,23 @@
 
 .games-tab-grid {
     display: grid;
-    grid-template-columns: 1fr 2fr 3fr 3fr 4fr 1fr;
+    grid-template-columns: 0.2fr 1fr 2fr 2fr 4fr 0.5fr;
     max-height: 250px;
     gap: 3px;
+    grid-column-gap: 2em;
+}
+
+#games-header {
+    margin-top: 10px;
+    color: antiquewhite;
+}
+#games-header>span>span{
+    font-size: small;
+    margin-left: 1em;
+}
+
+#games-rows {
+    overflow-y: scroll;
 }
 
 .additional-details-loading {

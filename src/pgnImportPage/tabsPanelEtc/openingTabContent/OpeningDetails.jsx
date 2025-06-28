@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { getFullOpeningNameFromKokopuGame } from '../../../utils/chessTools';
 import { movesStringToPliesAry } from '../../../utils/openings';
 import { AdditionalDetails } from './AdditionalDetails';
 import { ChessboardWithControls } from './ChessboardWithControls';
@@ -43,6 +44,8 @@ export const OpeningDetails = ({ game, opening, chess }) => {
                 <span>{black}</span>
                 <span>Result:</span>
                 <span>{game.result()}</span>
+                <span>PGN Opening Name</span>
+                <span>{getFullOpeningNameFromKokopuGame(game)}</span>
                 <span>Fenster Opening Name:</span>
                 <span
                     className="fakeLink"
