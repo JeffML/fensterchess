@@ -17,6 +17,7 @@ export const WIKI_THEORY_API = "https://en.wikibooks.org/w/api.php?titles=Chess_
 export const WIKI_THEORY_API_QS = "&redirects&origin=*&action=query&prop=extracts&formatversion=2&format=json&exchars=1200"
 export const TWIC = "https://theweekinchess.com/"
 export const TWIC_RSS = TWIC + 'twic-rss-feed'
+export const TWIC_PGN_LINKS = TWIC + "a-year-of-pgn-game-files"
 export const CHESS_DATA ="https://github.com/Ramon-Deniz/ChessData"
 export const DISCUSSION ="https://github.com/JeffML/fensterchess/discussions/1"
 export const ISSUES = "https://github.com/JeffML/fensterchess/issues"

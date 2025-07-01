@@ -1,20 +1,21 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { INCR } from '../common/consts';
+import { SERVER, TWIC_PGN_LINKS } from '../common/urlConsts';
+import { dateStringShort } from '../utils/dateStringShort';
 import { PgnLinkGrid } from "./PgnLinkGrid";
 
-
-
-// pulls pgn links off of the page at $url
-const GET_PGN_LINKS = gql`
-    query GetPgnLinks($url: String) {
-        getPgnLinks(url: $url)
-    }
-`;
-
+const getPgnLinks = async (url) => {
+    const response = await fetch(SERVER + './.netlify/functions/getPgnLinks?url='+url)
+    const data = {getPgnLinks: await response.json()}
+    return data
+}
 
 export const PgnListPanel = ({ link, setLink }) => {
-    const { loading, error, data } = useQuery(GET_PGN_LINKS);
+    const {isPending, isError, data, error} = useQuery({
+        queryFn : ()=>getPgnLinks(TWIC_PGN_LINKS),
+        queryKey : ["pgnLinks", TWIC_PGN_LINKS, dateStringShort()]
+    })
     const [end, setEnd] = useState(INCR);
     const [pgnMode, setPgnMode] = useState('twic');
 
@@ -54,8 +55,8 @@ export const PgnListPanel = ({ link, setLink }) => {
 
             {pgnMode === 'twic' && (
                 <div>
-                    {error && <p>ERROR! {error.toString()}</p>}
-                    {loading && <p style={{ minWidth: '40%' }}>Loading ...</p>}
+                    {isError && <p>ERROR! {error.toString()}</p>}
+                    {isPending && <p style={{ minWidth: '40%' }}>Loading ...</p>}
                     {data && (
                         <PgnLinkGrid
                             {...{

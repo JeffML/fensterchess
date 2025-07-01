@@ -1,28 +1,34 @@
 import './App.css';
 import { VERSION } from './common/consts.js';
-import { CHESS_DATA, DISCUSSION, ECO_JSON, FICS_GAMES, ISSUES, LICHESS, MEDIUM_INTERPOLATED2, WIKI_ECO, WIKI_THEORY } from './common/urlConsts.js';
+import {
+    CHESS_DATA,
+    DISCUSSION,
+    ECO_JSON,
+    FICS_GAMES,
+    ISSUES,
+    LICHESS,
+    MEDIUM_INTERPOLATED2,
+    TWIC,
+    WIKI_ECO,
+    WIKI_THEORY
+} from './common/urlConsts.js';
 import './stylesheets/about.css';
 
 const About = () => (
     <>
-        <div
-            className="font-cinzel white left version"
-            >
-            version {VERSION}
-        </div>
+        <div className="font-cinzel white left version">version {VERSION}</div>
         <div className="about">
             <p>
                 Fenster is a comprehensive chess opening reference with over
                 15,000 variations in its database. The opening database content
-                is public and can be found at{' '}
-                <a href={ECO_JSON}>eco.json</a>.
+                is public and can be found at <a href={ECO_JSON}>eco.json</a>.
             </p>
             <p>
                 At present, there is no repository of chess games, though
                 Fenster is capable of pulling game metadata from the following
                 sources:{' '}
             </p>
-            <ul style={{marginLeft: "inherit"}}>
+            <ul style={{ marginLeft: 'inherit' }}>
                 <li>
                     <a href={FICS_GAMES}>FICS</a>
                 </li>
@@ -44,13 +50,10 @@ const About = () => (
             />
             <p>
                 At the top of the right column is the opening name, along with
-                its{' '}
-                <a href={WIKI_ECO}>
-                    ECO code
-                </a>
-                . Directly below that are variations. There are two types:
+                its <a href={WIKI_ECO}>ECO code</a>. Directly below that are
+                variations. There are two types:
             </p>
-            <ul style={{marginLeft: "inherit"}}>
+            <ul style={{ marginLeft: 'inherit' }}>
                 <li>
                     Those that can be played from the current opening sequence,
                     called 'Continuations'
@@ -81,14 +84,11 @@ const About = () => (
             </p>
             <p>
                 Some opening names are italicized. These are{' '}
-                <a href={MEDIUM_INTERPOLATED2}>
-                    interpolated openings
-                </a>
-                . These were added to fill in missing move sequences between
-                variations from the original reference sources used by
-                <a href={ECO_JSON}>eco.json</a>.
-                Interpolated openings allow navigation continuity between
-                variations.
+                <a href={MEDIUM_INTERPOLATED2}>interpolated openings</a>. These
+                were added to fill in missing move sequences between variations
+                from the original reference sources used by
+                <a href={ECO_JSON}>eco.json</a>. Interpolated openings allow
+                navigation continuity between variations.
             </p>
             <p>
                 The rightmost column is a chess engine evaluation of the
@@ -99,9 +99,7 @@ const About = () => (
             <h3>Theory</h3>
             <p>
                 This is a short explanation of the ideas behind the opening from{' '}
-                <a href={WIKI_THEORY}>
-                    Wikibooks
-                </a>
+                <a href={WIKI_THEORY}>Wikibooks</a>
             </p>
             <img
                 src="resources/Theory.png"
@@ -161,11 +159,10 @@ const About = () => (
             />
             <p>
                 This page has links to games at{' '}
-                <a href={TWIC}>The Week in Chess</a>{' '}
-                website. Clicking on the a link will show information from the
-                PGN file in the Summary tab. Selecting one or more of the check
-                boxes under Openings (at left) will filter the games shown in
-                the Games tab.{' '}
+                <a href={TWIC}>The Week in Chess</a> website. Clicking on the a
+                link will show information from the PGN file in the Summary tab.
+                Selecting one or more of the check boxes under Openings (at
+                left) will filter the games shown in the Games tab.{' '}
             </p>
             <img
                 src="resources/PgnGameFilter.png"
@@ -222,23 +219,12 @@ const About = () => (
             <h3>Destination squares</h3>
             <p>
                 Similar to above, this heatmap pertains to specific pieces and
-                player color. Inspired by{' '}
-                <a href={CHESS_DATA}>
-                    this project
-                </a>
-                .
+                player color. Inspired by <a href={CHESS_DATA}>this project</a>.
             </p>
             <h2>Questions? Bugs? Feature requests?</h2>
             The Fenster client is an open source project maintained on github.
-            There you can open a{' '}
-            <a href={DISCUSSION}>
-                discussion
-            </a>
-            ,{' '}
-            <a href={ISSUES}>
-                log a bug, or request a feature
-            </a>
-            .
+            There you can open a <a href={DISCUSSION}>discussion</a>,{' '}
+            <a href={ISSUES}>log a bug, or request a feature</a>.
         </div>
     </>
 );

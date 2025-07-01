@@ -1,4 +1,3 @@
-// import { gql, useQuery } from "@apollo/client";k
 import { useQuery } from "@tanstack/react-query";
 import { ActionButton } from "../common/Buttons.jsx";
 import { INCR } from "../common/consts.js";
