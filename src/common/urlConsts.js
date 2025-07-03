@@ -2,6 +2,7 @@ const alias = import.meta.env.VITE_APP_SERVER; // this can be set as follows: "V
 const DEFAULT_SERVER = "fenster-s.netlify.app";
 
 export const SERVER = `https://${alias? alias + "--" : ""}${DEFAULT_SERVER}`
+export const SERVER_FN_URL = SERVER + '/.netlify/functions'
 export const FICS ="https://www.freechess.org/"
 export const LICHESS = "https://lichess.org/"
 

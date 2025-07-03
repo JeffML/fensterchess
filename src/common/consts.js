@@ -37,8 +37,6 @@ export const siteUrls = {
     // SHREDDER
 };
 
-
-
 export const sites = Object.keys(siteUrls);
 
 export const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;

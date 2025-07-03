@@ -1,21 +1,24 @@
-import { gql, useQuery } from "@apollo/client";
+// import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 import StackedBarChart from "../common/StackedBarChart.jsx";
 import { SelectedSitesContext } from "../contexts/SelectedSitesContext.jsx";
+import { externalOpeningStats } from "../datasource/externalOpeningStats.js";
+import { dateStringShort } from "../utils/dateStringShort.js";
 
 
-const GET_OPENING_ADDITIONAL = gql`
-    query getOpeningAdditional($fen: String!, $sites: [String]!) {
-        getOpeningAdditional(fen: $fen, sites: $sites) {
-            alsoKnownAs
-            wins {
-                w
-                b
-                d
-            }
-        }
-    }
-`;
+// const GET_OPENING_ADDITIONAL = gql`
+//     query getOpeningAdditional($fen: String!, $sites: [String]!) {
+//         getOpeningAdditional(fen: $fen, sites: $sites) {
+//             alsoKnownAs
+//             wins {
+//                 w
+//                 b
+//                 d
+//             }
+//         }
+//     }
+// `;
 
 
 
@@ -48,21 +51,33 @@ const wins2pctgs = ({ w, b, d }) => {
 const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
     const { selectedSites: sites } = useContext(SelectedSitesContext);
 
-    const { error, loading, data } = useQuery(GET_OPENING_ADDITIONAL, {
-        variables: { fen, sites },
-        skip: fen === "start",
-    });
-    if (error) {
-        return <span color="red">{error.toString()}</span>;
+    // const { error, loading, data } = useQuery(GET_OPENING_ADDITIONAL, {
+    //     variables: { fen, sites },
+    //     skip: fen === "start",
+    // });
+
+    const {isError, error, data, isPending} = useQuery({
+        queryKey: [fen, sites, dateStringShort],
+        queryFn: async () => externalOpeningStats(fen, sites)
+    })
+
+    if (isError) {
+        console.error(error);
+        return (
+            <span className="white">
+                An error has occurred: {error.message}
+            </span>
+        );
     }
-    if (loading) return <span color="yellow">Loading...</span>;
+
+    if (isPending) return <span color="yellow">Loading...</span>;
 
     if (data) {
-        const json = toJson(data, sites);
+        // const json = toJson(data, sites);
         return (
             <div style={{ marginTop: "1em" }}>
-                {Object.entries(json).map(([site, data]) => {
-                    const { aka, wins } = data;
+                {Object.entries(data).map(([site, data]) => {
+                    const { alsoKnownAs, wins } = data;
                     const games = wins.w + wins.d + wins.b;
                     return (
                         <div
@@ -80,8 +95,8 @@ const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
                             </div>
                             <div className="left">
                                 <span>
-                                    {aka && aka.length ? aka : "(no name)"},{" "}
-                                    {games} games
+                                    {alsoKnownAs}, &nbsp;
+                                    {games.toLocaleString()} games
                                 </span>
                             </div>
                             <div>
