@@ -1,4 +1,3 @@
-// import { gql, useQuery } from '@apollo/client';
 import { useQuery } from '@tanstack/react-query';
 import { Fragment, useEffect, useState } from 'react';
 import { SERVER, TWIC_RSS } from '../common/urlConsts';
