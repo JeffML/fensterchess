@@ -1,65 +1,18 @@
-// import { gql, useQuery } from "@apollo/client";
-import { useQuery } from "@tanstack/react-query";
-import { useContext } from "react";
-import StackedBarChart from "../common/StackedBarChart.jsx";
-import { SelectedSitesContext } from "../contexts/SelectedSitesContext.jsx";
-import { externalOpeningStats } from "../datasource/externalOpeningStats.js";
-import { dateStringShort } from "../utils/dateStringShort.js";
+import { useQuery } from '@tanstack/react-query';
+import { useContext } from 'react';
+import StackedBarChart from '../common/StackedBarChart.jsx';
+import { SelectedSitesContext } from '../contexts/SelectedSitesContext.jsx';
+import { externalOpeningStats } from '../datasource/externalOpeningStats.js';
+import { dateStringShort } from '../utils/dateStringShort.js';
+import { winsAsPercentages } from '../utils/winsAsPercentages.js';
 
-
-// const GET_OPENING_ADDITIONAL = gql`
-//     query getOpeningAdditional($fen: String!, $sites: [String]!) {
-//         getOpeningAdditional(fen: $fen, sites: $sites) {
-//             alsoKnownAs
-//             wins {
-//                 w
-//                 b
-//                 d
-//             }
-//         }
-//     }
-// `;
-
-
-
-const toJson = ({ getOpeningAdditional }, sites) => {
-    const json = {};
-    let { alsoKnownAs, wins } = getOpeningAdditional;
-
-    for (let [i, site] of sites.entries()) {
-        json[site] = {};
-        json[site].aka = alsoKnownAs[i];
-        json[site].wins = wins[i];
-    }
-
-    return json;
-};
-
-const wins2pctgs = ({ w, b, d }) => {
-    let games = w + b + d;
-    const pctg = (n) => Math.round((n / games) * 100);
-
-    if (games) {
-        return {
-            w: pctg(w),
-            b: pctg(b),
-            d: pctg(d),
-        };
-    } else return { w: 0, b: 0, d: 0 };
-};
-
-const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
+export const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
     const { selectedSites: sites } = useContext(SelectedSitesContext);
 
-    // const { error, loading, data } = useQuery(GET_OPENING_ADDITIONAL, {
-    //     variables: { fen, sites },
-    //     skip: fen === "start",
-    // });
-
-    const {isError, error, data, isPending} = useQuery({
+    const { isError, error, data, isPending } = useQuery({
         queryKey: [fen, sites, dateStringShort],
-        queryFn: async () => externalOpeningStats(fen, sites)
-    })
+        queryFn: async () => externalOpeningStats(fen, sites),
+    });
 
     if (isError) {
         console.error(error);
@@ -73,9 +26,8 @@ const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
     if (isPending) return <span color="yellow">Loading...</span>;
 
     if (data) {
-        // const json = toJson(data, sites);
         return (
-            <div style={{ marginTop: "1em" }}>
+            <div style={{ marginTop: '1em' }}>
                 {Object.entries(data).map(([site, data]) => {
                     const { alsoKnownAs, wins } = data;
                     const games = wins.w + wins.d + wins.b;
@@ -83,12 +35,12 @@ const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
                         <div
                             id="opening-additional"
                             key={site}
-                            style={{ marginBottom: "1em" }}
+                            style={{ marginBottom: '1em' }}
                         >
                             <div className="site left">
                                 <span
                                     className="font-cinzel"
-                                    style={{ fontWeight: "bold" }}
+                                    style={{ fontWeight: 'bold' }}
                                 >
                                     {site}
                                 </span>
@@ -102,7 +54,7 @@ const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
                             <div>
                                 {games ? (
                                     <StackedBarChart
-                                        {...{ pctgs: wins2pctgs(wins) }}
+                                        {...{ pctgs: winsAsPercentages(wins) }}
                                     />
                                 ) : null}
                             </div>
@@ -115,4 +67,3 @@ const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
 };
 
 
-export { OpeningAdditionalWithBarChartGrid };

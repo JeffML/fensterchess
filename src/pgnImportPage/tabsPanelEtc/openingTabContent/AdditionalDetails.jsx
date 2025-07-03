@@ -1,45 +1,34 @@
-import { gql, useQuery } from '@apollo/client';
-import { useContext } from "react";
-import StackedBarChart from "../../../common/StackedBarChart";
+import { useQuery } from '@tanstack/react-query';
+import { useContext } from 'react';
+import StackedBarChart from '../../../common/StackedBarChart';
 import { SelectedSitesContext } from '../../../contexts/SelectedSitesContext';
+import { externalOpeningStats } from '../../../datasource/externalOpeningStats';
+import { dateStringShort } from '../../../utils/dateStringShort';
+import { winsAsPercentages } from '../../../utils/winsAsPercentages';
 
-const GET_OPENING_ADDITIONAL = gql`
-    query getOpeningAdditional($fen: String!, $sites: [String]!) {
-        getOpeningAdditional(fen: $fen, sites: $sites) {
-            alsoKnownAs
-            wins {
-                w
-                b
-                d
-            }
-        }
-    }
-`;
 export const AdditionalDetails = ({ fen }) => {
-    const wins2pctgs = ({ w, b, d }) => {
-        let games = w + b + d;
-        const pctg = (n) => Math.round((n / games) * 100);
-
-        if (games) {
-            return {
-                games,
-                w: pctg(w),
-                b: pctg(b),
-                d: pctg(d),
-            };
-        } else return { w: 0, b: 0, d: 0 };
-    };
-
     const sites = useContext(SelectedSitesContext).selectedSites;
 
-    const { loading, data } = useQuery(GET_OPENING_ADDITIONAL, {
-        variables: { fen, sites },
-        skip: fen === 'start' || sites.length === 0,
+    const { isError, error, data, isPending } = useQuery({
+        queryKey: [fen, sites, dateStringShort],
+        queryFn: async () => externalOpeningStats(fen, sites),
     });
 
-    if (loading)
+    if (isError) {
+        console.error(error);
         return (
-            <div id="additionalDetailsLoading" className='additional-details-loading'>
+            <span className="white">
+                An error has occurred: {error.message}
+            </span>
+        );
+    }
+
+    if (isPending)
+        return (
+            <div
+                id="additionalDetailsLoading"
+                className="additional-details-loading"
+            >
                 <strong style={{ marginRight: '1em', color: '#FFCE44' }}>
                     Loading...
                 </strong>
@@ -47,45 +36,55 @@ export const AdditionalDetails = ({ fen }) => {
         );
 
     if (data) {
-        const { alsoKnownAs, wins } = data.getOpeningAdditional;
+        return (
+            <>
+                {Object.entries(data).map(([site, data]) => {
+                    const { alsoKnownAs, wins } = data;
+                    const games = wins.w + wins.d + wins.b;
 
-        const siteData = sites.map((site, i) => {
-            const { games, w, b, d } = wins2pctgs(wins[i]);
-
-            return (
-                <div
-                    id="AdditionalDetails"
-                    key={site}
-                    className='additional-details'
-                >
-                    <span>&nbsp;</span>
-                    <span>&nbsp;</span>
-                    <strong style={{ marginRight: '1em' }}>{site}:</strong>{' '}
-                    <span>{alsoKnownAs[i]}</span>
-                    <div style={{ marginRight: '3em' }}>
-                        <span style={{ marginLeft: '1em', marginRight: '1em' }}>
-                            games:
-                        </span>{' '}
-                        {games ?? 0}
-                    </div>
-                    <span>
-                        {games && (
-                            <>
-                                {' '}
-                                w/d/l: &nbsp;&nbsp;
-                                <StackedBarChart
-                                    {...{
-                                        pctgs: { w, b, d },
-                                        style: { display: 'inline-grid' },
+                    return (
+                        <div
+                            id="AdditionalDetails"
+                            key={site}
+                            className="additional-details"
+                        >
+                            <span>&nbsp;</span>
+                            <span>&nbsp;</span>
+                            <strong style={{ marginRight: '1em' }}>
+                                {site}:
+                            </strong>{' '}
+                            <span>{alsoKnownAs}</span>
+                            <div style={{ marginRight: '3em' }}>
+                                <span
+                                    style={{
+                                        marginLeft: '1em',
+                                        marginRight: '1em',
                                     }}
-                                />{' '}
-                            </>
-                        )}
-                    </span>
-                </div>
-            );
-        });
-
-        return siteData;
+                                >
+                                    games:
+                                </span>{' '}
+                                {games ?? 0}
+                            </div>
+                            <span>
+                                {games && (
+                                    <>
+                                        {' '}
+                                        w/d/l: &nbsp;&nbsp;
+                                        <StackedBarChart
+                                            {...{
+                                                pctgs: winsAsPercentages(wins),
+                                                style: {
+                                                    display: 'inline-grid',
+                                                },
+                                            }}
+                                        />{' '}
+                                    </>
+                                )}
+                            </span>
+                        </div>
+                    );
+                })}
+            </>
+        );
     }
 };
