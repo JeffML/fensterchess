@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { TestComponent } from '../temp/TestComponent.jsx'; // this is going to be a problem deploying!
+// import { TestComponent } from '../temp/TestComponent.jsx'; 
 import AboutPage from './AboutPage.jsx';
 import './App.css';
 import PageHeader from './PageHeader.jsx';
@@ -58,7 +58,7 @@ function App() {
                         )}
                         {mode === modes.visualization && <Visualizations />}
                         {mode === modes.about && <AboutPage />}
-                        <TestComponent/>
+                        {/* <TestComponent/> */}
                     </OpeningBookProvider>
                 </SelectedSitesContextProvider>
             </div>
