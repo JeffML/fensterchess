@@ -1,20 +1,23 @@
-import { useState } from "react";
-import { ECO_FLOWCHART, FROM_TO, MOST_ACTIVE, PIECE_DESTINATION } from "../Visualizations.jsx";
-import ecoCodes from "../datasource/ecoCodes.js";
-import { BallOfMud } from "./BallOfMud.jsx";
-import { ColorAndPieces } from "./ColorAndPieces.jsx";
+import { useState } from 'react';
+import {
+    ECO_FLOWCHART,
+    FROM_TO,
+    MOST_ACTIVE,
+    PIECE_DESTINATION,
+} from '../Visualizations.jsx';
+import { BallOfMud } from './BallOfMud.jsx';
+import { ColorAndPieces } from './ColorAndPieces.jsx';
 import { EcoFlowchart } from './EcoFlowchart.jsx';
-import { FromToCircle } from "./FromToCircle.jsx";
-import { MostActiveByPiece, MostActiveSquaresByEco } from "./MostActive.jsx";
+import { FromToCircle } from './FromToCircle.jsx';
+import { MostActiveByPiece, MostActiveSquaresByEco } from './MostActive.jsx';
+import ecoCats from '../datasource/ecoCats.json';
 
 function EcoCatCode({ cat, setCat, setCode }) {
-    const cats = Object.keys(ecoCodes);
-
     return (
-        <div style={{ marginLeft: "10%" }}>
+        <div style={{ marginLeft: '10%' }}>
             <span className=" left font-cinzel">ECO Categories</span>
             <div className="radio-grid">
-                {cats.map((c) => (
+                {Object.entries(ecoCats).map((c) => (
                     <label key={c}>
                         {c}
                         <input
@@ -23,7 +26,8 @@ function EcoCatCode({ cat, setCat, setCode }) {
                             name="cat"
                             defaultChecked={cat === c}
                             value={c}
-                            onChange={() => setCat(c)} />
+                            onChange={() => setCat(c)}
+                        />
                     </label>
                 ))}
             </div>
@@ -36,12 +40,17 @@ function EcoCatCode({ cat, setCat, setCode }) {
                             size={5}
                             onChange={({ target }) => {
                                 setCode(target.value);
-                            } }
+                            }}
                         >
                             {ecoCodes[cat].map((entry) => (
-                                <option value={entry[0]} key={entry[0]} title={entry[2]}>
+                                <option
+                                    value={entry[0]}
+                                    key={entry[0]}
+                                    title={entry[2]}
+                                >
                                     {cat}
-                                    {entry[0]} {entry[1]}, {entry[2].substring(0, 30)}
+                                    {entry[0]} {entry[1]},{' '}
+                                    {entry[2].substring(0, 30)}
                                 </option>
                             ))}
                         </select>
@@ -74,11 +83,11 @@ export const Display = ({ viz }) => {
                 <MostActiveSquaresByEco {...{ cat, code }} />
             </div>
         );
-    if (viz === "ball of mud") {
+    if (viz === 'ball of mud') {
         // FIXME: HARDWIRED
         const fen =
-            "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2";
-        const type = "pathBySquare";
+            'rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2';
+        const type = 'pathBySquare';
 
         return <BallOfMud {...{ fen, type }} />;
     }
@@ -98,12 +107,10 @@ export const Display = ({ viz }) => {
                         {...{ colors, piece, setColors, setPiece }}
                     />
                 )}
-                <MostActiveByPiece {...{ cat, code, colors, piece}} />
+                <MostActiveByPiece {...{ cat, code, colors, piece }} />
             </div>
         );
-    if (viz === ECO_FLOWCHART) 
-        return (
-            <EcoFlowchart></EcoFlowchart>
-        )
+    if (viz === ECO_FLOWCHART) return <EcoFlowchart></EcoFlowchart>;
+
     return <div className="double-column left" />;
 };

@@ -4,7 +4,7 @@ import { pos } from '../utils/chessTools.js';
 let openingsByCat = { initialized: false };
 
 // pulls the opening data from eco.json github repo
-async function getLatestEcoJson() {
+export async function getLatestEcoJson() {
     if (!openingsByCat.initialized) {
         const ROOT = ECO_JSON_RAW
             ;

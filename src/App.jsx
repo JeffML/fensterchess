@@ -1,16 +1,16 @@
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { TestComponent } from '../temp/TestComponent.jsx'; // this is going to be a problem deploying!
 import AboutPage from './AboutPage.jsx';
 import './App.css';
-import { isTestMode, modes, SUBTITLES } from './common/consts.js';
-import { SelectedSitesContextProvider } from './contexts/SelectedSitesContext.jsx';
 import PageHeader from './PageHeader.jsx';
+import { Visualizations } from './Visualizations.jsx';
+import { SUBTITLES, isTestMode, modes } from './common/consts.js';
+import { OpeningBookProvider } from './contexts/OpeningBookContext.jsx';
+import { SelectedSitesContextProvider } from './contexts/SelectedSitesContext.jsx';
+import { fromTo } from './datasource/getLatestEcoJson.js';
 import { AnalyzePgnPage } from './pgnImportPage/AnalyzePgnPage.jsx';
 import { SearchPageContainer } from './searchPage/SearchPage.jsx';
-// import TestComponent from "./TestComponent.js";
-import { useQuery } from '@tanstack/react-query';
-import { OpeningBookProvider } from './contexts/OpeningBookContext.jsx';
-import { fromTo } from './datasource/getLatestEcoJson.js';
-import { Visualizations } from './Visualizations.jsx';
 
 function App() {
     const [mode, setMode] = useState(isTestMode ? modes.test : modes.search);
@@ -58,8 +58,8 @@ function App() {
                         )}
                         {mode === modes.visualization && <Visualizations />}
                         {mode === modes.about && <AboutPage />}
+                        <TestComponent/>
                     </OpeningBookProvider>
-                    {/* {mode === modes.test && <TestComponent />} */}
                 </SelectedSitesContextProvider>
             </div>
         )

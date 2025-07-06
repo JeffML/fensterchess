@@ -3,7 +3,7 @@ import DOMPurify from 'dompurify';
 import { WIKI_THEORY_API, WIKI_THEORY_API_QS } from '../common/urlConsts.js';
 import { movesStringToPliesAry } from './openings.js';
 
-const movesToFen = (moves) => {
+export const movesToFen = (moves) => {
     const chess = new Chess();
     chess.loadPgn(moves);
     return chess.fen();
@@ -15,21 +15,21 @@ export const getFullOpeningNameFromKokopuGame = (g) => {
     const subVariation = g.openingSubVariation();
 
     if (variation) {
-        opening+=': ' + variation
-        if (subVariation) opening += ` (${subVariation})`
+        opening += ': ' + variation;
+        if (subVariation) opening += ` (${subVariation})`;
     }
 
     return opening;
 };
 
-const toPlay = (fen) => {
+export const toPlay = (fen) => {
     const splitFen = fen.split(' ');
     const color = splitFen.at(-5);
     const move = splitFen.at(-1);
     return { move, color };
 };
 
-const theoryRequest = async (currentMoves, setHtml) => {
+export const theoryRequest = async (currentMoves, setHtml) => {
     const urlMoves = () => {
         const plies = movesStringToPliesAry(currentMoves);
         const moves = plies.map((ply, i) => {
@@ -53,7 +53,7 @@ const theoryRequest = async (currentMoves, setHtml) => {
     }
 };
 
-function parseMoves(moveString) {
+export function parseMoves(moveString) {
     const tokens = moveString.trim().split(/\s+/g);
     const wholeMoves = Math.trunc(tokens.length / 3);
     const partialMoves = tokens.length % 3;
@@ -68,11 +68,35 @@ function parseMoves(moveString) {
 }
 
 //return position part of FEN string
-const pos = (fen) => fen.split(' ')[0];
+export const pos = (fen) => fen.split(' ')[0];
 
-function pgnMovesOnly(pgn) {
+export function pgnMovesOnly(pgn) {
     const i = pgn.lastIndexOf(']');
     return pgn.slice(i + 2);
 }
 
-export { movesToFen, parseMoves, pgnMovesOnly, pos, theoryRequest, toPlay };
+// moveString example: "1. e4 e5 2. d4 exd4"
+export const destinationSquaresFromMoves = (moveString) => {
+    // Step 1: Strip move numbers and split
+    const sanMoves = moveString
+        .replace(/\d+\./g, '') // remove "1.", "2.", etc.
+        .trim()
+        .split(/\s+/); // split into individual SAN moves
+
+    const dests = [];
+    sanMoves.forEach((move, i) => {
+        const isBlack = i % 2;
+        let dest = move.slice(-2);
+        if (dest === '-O') {
+            if (move.slice(-5) === 'O-O-O') {
+                if (isBlack) dests.push(...['c8', 'd8']);
+                else dests.push(...['c1', 'd1']);
+            } else {
+                if (isBlack) dests.push(...['f8', 'g8']);
+                else dests.push(...['f1', 'g1']);
+            }
+        } else if (/[a-h]\d/.test(dest)) dests.push(dest);
+    });
+
+    return dests;
+};

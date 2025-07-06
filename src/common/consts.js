@@ -49,15 +49,7 @@ export const serverUri = `${SERVER}/.netlify/functions/server`;
 // console.log(`alias was ${alias}, serverUri is ${serverUri}`)
 
 export const RANKS = [1, 2, 3, 4, 5, 6, 7, 8];
-export const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"];
-
-export const ECO_CATS = [
-    ["A", "Flank Openings"],
-    ["B", "Semi-Open Games"],
-    ["C", "Open Games, and French Defense"],
-    ["D", "Closed and Semi-Closed Games"],
-    ["E", "Indian Defenses"],
-];
+export const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"]
 
 export const NO_ENTRY_FOUND = "No Entry Found in Opening Book"
 
