@@ -11,18 +11,35 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
     });
 
     const [popupFen, setPopupFen] = useState(null);
+    const [expandedRootFen, setExpandedRootFen] = useState(null);
 
     if (contentStyle !== "block") return null;
     if (isLoading) return <div>Loading...</div>;
     if (isError) return <div>Error: {error?.message || error?.toString()}</div>;
     if ((!data) || data.length === 0) return <div>No openings found.</div>;
 
+    // Find the opening (root or child) for the popupFen
+    let popupOpening = null;
+    if (popupFen) {
+        for (const { rootFen, root, children } of data) {
+            if (rootFen === popupFen) {
+                popupOpening = root;
+                break;
+            }
+            const child = children.find(child => child.fen === popupFen);
+            if (child) {
+                popupOpening = child;
+                break;
+            }
+        }
+    }
+
     // Popup always at a fixed position on the left
     const popupStyle = popupFen
         ? {
             position: 'fixed',
-            left: 24, // px from the left edge of the viewport
-            top: 500, // px from the top, adjust as needed
+            left: 24,
+            top: 500,
             zIndex: 100,
             background: 'rgba(40,40,40,0.97)',
             border: '1px solid #ccc',
@@ -32,24 +49,38 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
         }
         : { display: 'none' };
 
+    const handleRootClick = (fen) => {
+        setExpandedRootFen(expandedRootFen === fen ? null : fen);
+    };
+
     return (
         <div className="content eco-cats" style={{ display: contentStyle, position: 'relative'}}>
-            {data.map(({ rootFen, root, children }, idx) => (
+            {data.map(({ rootFen, root, children }) => (
                 <div className="eco-root-block" key={rootFen}>
                     <div className="row">
                         <span className="column">
                             <span
                                 id="code"
-                                style={{ cursor: 'pointer', textDecoration: 'underline dotted' }}
+                                style={{
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline dotted',
+                                    fontWeight: expandedRootFen === rootFen ? 'bold' : 'normal',
+                                    userSelect: 'none'
+                                }}
+                                onClick={() => handleRootClick(rootFen)}
                                 onMouseEnter={() => setPopupFen(rootFen)}
                                 onMouseLeave={() => setPopupFen(null)}
                             >
+
                                 {root.eco}: {root.name}
+                            <span style={{display: 'inline-block', width: '1.2em', marginLeft: "0.3em"}}>
+                                    {expandedRootFen === rootFen ? '▼' : '▶'}
+                                </span>
                             </span>
                             {/* {root.moves && <span>, {root.moves}</span>} */}
                         </span>
                     </div>
-                    {children.length > 0 && (
+                    {expandedRootFen === rootFen && children.length > 0 && (
                         <ul className="eco-root-openings" style={{marginTop: "-0.5em"}}>
                             {children.map(child => (
                                 <li
@@ -69,6 +100,21 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
             {popupFen && (
                 <div style={popupStyle}>
                     <Chessboard position={popupFen} squareSize={32} />
+                                        {popupOpening && popupOpening.moves && (
+            <div
+                style={{
+                    marginTop: 8,
+                    color: '#fff',
+                    fontSize: '0.95em',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    maxWidth: 300,
+                    textAlign: 'left',
+                }}
+            >
+                {popupOpening.moves}
+            </div>
+                    )}
                 </div>
             )}
         </div>
