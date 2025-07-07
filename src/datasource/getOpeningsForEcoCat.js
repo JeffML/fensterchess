@@ -7,6 +7,7 @@ const A00Root = {
         "eco": "A00",
         "moves": "",
         "name": "Irregular Openings",
+        "isEcoRoot": true
     }
 }
 
@@ -14,13 +15,37 @@ export const getOpeningsForEcoCat = async (cat) => {
     const data = await getLatestEcoJson();
 
     const openings = data[cat].json;
-    
+
+    // Find all eco roots
     let roots = Object.entries(openings)
+        .filter(([fen, opening]) => opening.isEcoRoot)
         .reduce((acc, [fen, opening]) => {
-            if (opening.isEcoRoot) acc[fen] = opening
-            return acc
-        }, {})
-    
-    roots = {...A00Root, ...roots}
-    return { openings, roots };
+            acc[fen] = opening;
+            return acc;
+        }, {});
+
+    if (cat === 'A')
+        roots = { ...A00Root, ...roots };
+
+    // For each root, find all openings that start with the root's move sequence
+    const rootsWithOpenings = Object.entries(roots).map(([rootFen, rootOpening]) => {
+        // Find all openings under this root
+        const children = Object.entries(openings)
+            .filter(([fen, opening]) =>
+                opening.eco === rootOpening.eco && !opening.isEcoRoot
+            )
+            .map(([fen, opening]) => ({
+                fen,
+                name: opening.name,
+                moves: opening.moves,
+            }));
+
+        return {
+            rootFen,
+            root: rootOpening,
+            children,
+        };
+    });
+
+    return rootsWithOpenings;
 };
