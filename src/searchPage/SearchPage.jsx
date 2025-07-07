@@ -151,7 +151,7 @@ function readParamsMaybe(url, chess, setBoardState) {
             url.delete('fen');
 
             if (qfen) {
-                if (!FENEX.test(qfen.current.split(' ')[0])) {
+                if (!FENEX.test(qfen.split(' ')[0])) {
                     qfen = 'start';
                 }
             } else {
