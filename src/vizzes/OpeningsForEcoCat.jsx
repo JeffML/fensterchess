@@ -39,7 +39,7 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
         ? {
             position: 'fixed',
             left: 24,
-            top: 500,
+            top: 450,
             zIndex: 100,
             background: 'rgba(40,40,40,0.97)',
             border: '1px solid #ccc',
