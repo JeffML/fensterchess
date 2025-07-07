@@ -32,3 +32,57 @@
     grid-gap: 1px;
     margin-bottom: 3em;
 }
+
+.eco-root-name {
+    cursor: pointer;
+    text-decoration: underline dotted;
+    font-weight: normal;
+    user-select: none;
+}
+
+.eco-root-name.expanded {
+    font-weight: bold;
+}
+
+.eco-arrow {
+    display: inline-block;
+    width: 1.2em;
+    margin-left: 0.3em;
+    cursor: pointer;
+    user-select: none;
+    vertical-align: middle;
+}
+
+.eco-root-openings {
+    margin-top: -0.5em;
+}
+
+.eco-child-name {
+    cursor: pointer;
+    text-decoration: underline dotted;
+    margin-bottom: 0.4em;
+}
+
+.eco-popup {
+    position: fixed;
+    left: 24px;
+    top: 450px;
+    z-index: 100;
+    background: rgba(40,40,40,0.97);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px;
+    pointer-events: none;
+    min-width: 180px;
+    text-align: center;
+}
+
+.eco-popup-moves {
+    margin-top: 8px;
+    color: #fff;
+    font-size: 0.95em;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-width: 300px;
+    text-align: left;
+}

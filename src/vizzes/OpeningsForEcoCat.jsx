@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Chessboard } from 'kokopu-react';
 import { useState } from 'react';
 import { getOpeningsForEcoCat } from '../datasource/getOpeningsForEcoCat';
+import '../stylesheets/vizz.css';
 
 export const OpeningsForEcoCat = ({ category, contentStyle }) => {
     const { data, isLoading, isError, error } = useQuery({
@@ -34,19 +35,8 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
         }
     }
 
-    // Popup always at a fixed position on the left
     const popupStyle = popupFen
-        ? {
-              position: 'fixed',
-              left: 24,
-              top: 450,
-              zIndex: 100,
-              background: 'rgba(40,40,40,0.97)',
-              border: '1px solid #ccc',
-              borderRadius: 4,
-              padding: 4,
-              pointerEvents: 'none',
-          }
+        ? { }
         : { display: 'none' };
 
     const handleRootClick = (fen) => {
@@ -64,16 +54,7 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
                         <span className="column">
                             <span
                                 id="code"
-                                style={{
-                                    cursor: 'pointer',
-                                    textDecoration: 'underline dotted',
-                                    fontWeight:
-                                        expandedRootFen === rootFen
-                                            ? 'bold'
-                                            : 'normal',
-                                    userSelect: 'none',
-                                    // Remove marginRight here
-                                }}
+                                className={`eco-root-name${expandedRootFen === rootFen ? ' expanded' : ''}`}
                                 onClick={() =>
                                     window.open(
                                         `https://fensterchess.com/?fen=${encodeURIComponent(
@@ -87,14 +68,7 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
                             >
                                 {root.eco}: {root.name}
                                 <span
-                                    style={{
-                                        display: 'inline-block',
-                                        width: '1.2em',
-                                        marginLeft: '0.3em',
-                                        cursor: 'pointer',
-                                        userSelect: 'none',
-                                        verticalAlign: 'middle',
-                                    }}
+                                    className="eco-arrow"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleRootClick(rootFen);
@@ -104,21 +78,15 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
                                 </span>
                             </span>
                         </span>
-                        {/* {root.moves && <span>, {root.moves}</span>} */}
                     </div>
                     {expandedRootFen === rootFen && children.length > 0 && (
                         <ul
                             className="eco-root-openings"
-                            style={{ marginTop: '-0.5em' }}
                         >
                             {children.map((child) => (
                                 <li
                                     key={child.fen}
-                                    style={{
-                                        cursor: 'pointer',
-                                        textDecoration: 'underline dotted',
-                                        marginBottom: '0.4em',
-                                    }}
+                                    className="eco-child-name"
                                     onMouseEnter={() => setPopupFen(child.fen)}
                                     onMouseLeave={() => setPopupFen(null)}
                                     onClick={() =>
@@ -131,7 +99,6 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
                                     }
                                 >
                                     {child.name}
-                                    {/* {child.moves && <span> ({child.moves})</span>} */}
                                 </li>
                             ))}
                         </ul>
@@ -139,20 +106,10 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
                 </div>
             ))}
             {popupFen && (
-                <div style={popupStyle}>
+                <div className="eco-popup" style={popupStyle}>
                     <Chessboard position={popupFen} squareSize={32} />
                     {popupOpening && popupOpening.moves && (
-                        <div
-                            style={{
-                                marginTop: 8,
-                                color: '#fff',
-                                fontSize: '0.95em',
-                                whiteSpace: 'pre-wrap',
-                                wordBreak: 'break-word',
-                                maxWidth: 300,
-                                textAlign: 'left',
-                            }}
-                        >
+                        <div className="eco-popup-moves">
                             {popupOpening.moves}
                         </div>
                     )}
