@@ -31,12 +31,14 @@ export const getEcoRootsForCat = async (cat) => {
 }
 
 export const getOpeningsForEcoCat = async (cat) => {
-    const roots = getEcoRootsForCat(cat)
+    const roots = await getEcoRootsForCat(cat)
+    const json = await getLatestEcoJson()
+    const openingsForCat = json[cat]
 
     // For each root, find all openings that start with the root's move sequence
     const rootsWithOpenings = Object.entries(roots).map(([rootFen, rootOpening]) => {
         // Find all openings under this root
-        const children = Object.entries(openings)
+        const children = Object.entries(openingsForCat.json)
             .filter(([fen, opening]) =>
                 opening.eco === rootOpening.eco && !opening.isEcoRoot
             )

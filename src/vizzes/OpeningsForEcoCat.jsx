@@ -7,7 +7,7 @@ import '../stylesheets/vizz.css';
 export const OpeningsForEcoCat = ({ category, contentStyle }) => {
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ['openingsForCat', category],
-        queryFn: () => getOpeningsForEcoCat(category),
+        queryFn: async () => getOpeningsForEcoCat(category),
         enabled: contentStyle === 'block',
     });
 
