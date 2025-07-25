@@ -1,19 +1,11 @@
 /* eslint-disable eqeqeq */
 import { useRef, useEffect } from "react";
-import { useQuery, gql } from "@apollo/client";
+import { useQuery } from "@tanstack/react-query";
+import { getOpeningsForEcoCode } from "../datasource/getOpeningsForEcoCode.js";
 import p5 from "p5";
 import getColorForValue from "./colorGradient.js";
 import { FILES, RANKS } from "../common/consts.js";
-
-const GET_FROM_TO = gql`
-    query getFromTo($cat: String!, $code: String) {
-        getFromTo(cat: $cat, code: $code) {
-            eco
-            fen
-            moves
-        }
-    }
-`;
+import {Chess} from 'chess.js'
 
 const squareColors = FILES.map((file, fileNo) =>
     RANKS.map((rank) => {
@@ -45,7 +37,7 @@ const drawCircles = (p, moveCoords, stepCount, angle, step) => {
     } while (stepCount++ < 64);
 }
 
-const FromToCircleImpl = ({ moves }) => {
+const FromToCircleImpl = ({ fromTos }) => {
     const renderRef = useRef();
 
     useEffect(() => {
@@ -81,10 +73,10 @@ const FromToCircleImpl = ({ moves }) => {
 
             p.draw = () => {
 
-                if (!moves) return;
+                if (!fromTos) return;
                 p.translate(p.width / 2, p.height / 2);
                 p.push()
-                moves.forEach((move) => {
+                fromTos.forEach((move) => {
                     // note the == for rank: integer vs string issue
                     const fromCoord = moveCoords.find(
                         ({ file, rank }) =>
@@ -119,7 +111,7 @@ const FromToCircleImpl = ({ moves }) => {
         });
 
         return remove;
-    }, [moves]);
+    }, [fromTos]);
 
     return (
         <div
@@ -131,37 +123,37 @@ const FromToCircleImpl = ({ moves }) => {
 };
 
 const FromToCircle = ({ cat, code }) => {
-    const { error, data, loading } = useQuery(GET_FROM_TO, {
-        variables: { cat, code },
-        skip: !code,
-    });
+    const {isPending, isError, error, data} = useQuery( {
+        queryFn: async() => getOpeningsForEcoCode(code),
+        queryKey: ['getOpeningsForEcoCode', code],
+        enabled: code != null
+    })
 
-    if (error) {
+    if (isError) {
         console.error(error);
-        return <span>error.toString()</span>;
+        return <span>{error.toString()}</span>;
     }
-    if (loading)
+    if (isPending && code)
         return (
             <div>
                 <span className="white">Loading...</span>
             </div>
         );
+
     if (data) {
-        // console.dir(data, { depth: 3 });
+        const chess = new Chess()
+        const fromTos = new Set()
 
-        // TODO: this reduce can probably go into the db view
-        let allMoves = data.getFromTo.reduce((acc, { moves }) => {
-            moves.forEach((move) => acc.add(move.toString()));
-            return acc;
-        }, new Set());
+        data.forEach( ({moves}) => {
+            chess.loadPgn(moves)
+            const history = chess.history({verbose:true})
+            history.forEach(({from, to}) => {
+                fromTos.add([from, to])
+            })
 
-        allMoves = Array.from(new Set(allMoves));
+        })
 
-        for (let i = 0; i < allMoves.length; i++) {
-            allMoves[i] = allMoves[i].split(",");
-        }
-
-        return <FromToCircleImpl {...{ moves: allMoves }} />;
+        return <FromToCircleImpl {...{fromTos}} />;
     }
 };
 
