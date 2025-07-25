@@ -5,7 +5,6 @@ import {
     MOST_ACTIVE,
     PIECE_DESTINATION,
 } from '../Visualizations.jsx';
-import { BallOfMud } from './BallOfMud.jsx';
 import { ColorAndPieces } from './ColorAndPieces.jsx';
 import { EcoFlowchart } from './EcoFlowchart.jsx';
 import { FromToCircle } from './FromToCircle.jsx';
@@ -100,14 +99,6 @@ export const Display = ({ viz }) => {
                 <MostActiveSquaresByEco {...{ cat, code }} />
             </div>
         );
-    if (viz === 'ball of mud') {
-        // FIXME: HARDWIRED
-        const fen =
-            'rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2';
-        const type = 'pathBySquare';
-
-        return <BallOfMud {...{ fen, type }} />;
-    }
     if (viz === FROM_TO)
         return (
             <div className="double-column left">
