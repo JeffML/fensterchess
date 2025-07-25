@@ -1,16 +1,16 @@
 # example netlify.toml
 [build]
-  command = "vite build"
+  command = "yarn run build"
   publish = "dist"
-
-[dev]
-  targetPort = 8080
 
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
   external_node_modules = ["express", "import-fresh"]
 
+
+  ## [functions."courses"] 
+  ##  included_files = ["dataForLambdas/courseHtml/**/*.html"]
 
   ## Uncomment to use this redirect for Single Page Applications like create-react-app.
   ## Not needed for static site generators.
@@ -21,9 +21,9 @@
 
   ## (optional) Settings for Netlify Dev
   ## https://github.com/netlify/cli/blob/main/docs/netlify-dev.md#project-detection
-  #[dev]
-  #  command = "yarn start" # Command to start your dev server
-  #  port = 3000 # Port that the dev server will be listening on
+  [dev]
+    command = "yarn dev" # Command to start your dev server
+    targetPort = 3000 # Port that the dev server will be listening on
   #  publish = "dist" # Folder with the static content for _redirect file
 
   ## more info on configuring this file: https://www.netlify.com/docs/netlify-toml-reference/

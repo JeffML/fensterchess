@@ -11,52 +11,69 @@ import { EcoFlowchart } from './EcoFlowchart.jsx';
 import { FromToCircle } from './FromToCircle.jsx';
 import { MostActiveByPiece, MostActiveSquaresByEco } from './MostActive.jsx';
 import ecoCats from '../datasource/ecoCats.json';
+import { getEcoRootsForCat } from '../datasource/getOpeningsForEcoCat.js';
+import { useQuery } from '@tanstack/react-query';
+
+const EcoCats = ({ setCat, cat }) => (
+    <div className="radio-grid">
+        {Object.entries(ecoCats).map(([c]) => (
+            <label key={c}>
+                {c}
+                <input
+                    display="inline"
+                    type="radio"
+                    name="cat"
+                    defaultChecked={cat === c}
+                    value={c}
+                    onChange={() => setCat(c)}
+                />
+            </label>
+        ))}
+    </div>
+);
+
+const EcoCodes = ({ setCode, cat }) => {
+    const { isPending, isError, error, data: ecoCodes } = useQuery({
+        queryKey: ['getEcoRootsForCat', cat],
+        queryFn: async () => await getEcoRootsForCat(cat),
+        enabled: cat != null, // loose equality handles undefined as well
+    });
+
+    if (isPending) return null;
+    if (isError) console.error(error);
+
+    return (
+        <>
+            <span className=" left font-cinzel">ECO Codes</span>
+            <div>
+                <select
+                    id="eco-codes"
+                    size={5}
+                    onChange={({ target }) => {
+                        setCode(target.value);
+                    }}
+                >
+                    {Object.entries(ecoCodes).map(([, {name, eco, moves}]) => (
+                        <option
+                            value={eco}
+                            key={eco}
+                            title={name}
+                        >
+                            {eco} {name}, {moves.substring(0, 30)}
+                        </option>
+                    ))}
+                </select>
+            </div>
+        </>
+    );
+};
 
 function EcoCatCode({ cat, setCat, setCode }) {
     return (
         <div style={{ marginLeft: '10%' }}>
             <span className=" left font-cinzel">ECO Categories</span>
-            <div className="radio-grid">
-                {Object.entries(ecoCats).map((c) => (
-                    <label key={c}>
-                        {c}
-                        <input
-                            display="inline"
-                            type="radio"
-                            name="cat"
-                            defaultChecked={cat === c}
-                            value={c}
-                            onChange={() => setCat(c)}
-                        />
-                    </label>
-                ))}
-            </div>
-            {ecoCodes[cat] && (
-                <>
-                    <span className=" left font-cinzel">ECO Codes</span>
-                    <div>
-                        <select
-                            id="eco-codes"
-                            size={5}
-                            onChange={({ target }) => {
-                                setCode(target.value);
-                            }}
-                        >
-                            {ecoCodes[cat].map((entry) => (
-                                <option
-                                    value={entry[0]}
-                                    key={entry[0]}
-                                    title={entry[2]}
-                                >
-                                    {cat}
-                                    {entry[0]} {entry[1]},{' '}
-                                    {entry[2].substring(0, 30)}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </>
-            )}
+            <EcoCats {...{ setCat, cat }} />
+            <EcoCodes {...{ setCode, cat }} />
         </div>
     );
 }

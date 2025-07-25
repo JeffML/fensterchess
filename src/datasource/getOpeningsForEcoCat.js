@@ -11,12 +11,12 @@ const A00Root = {
     }
 }
 
-export const getOpeningsForEcoCat = async (cat) => {
+export const getEcoRootsForCat = async (cat) => {
     const data = await getLatestEcoJson();
 
     const openings = data[cat].json;
 
-    // Find all eco roots
+        // Find all eco roots
     let roots = Object.entries(openings)
         .filter(([fen, opening]) => opening.isEcoRoot)
         .reduce((acc, [fen, opening]) => {
@@ -26,6 +26,12 @@ export const getOpeningsForEcoCat = async (cat) => {
 
     if (cat === 'A')
         roots = { ...A00Root, ...roots };
+
+    return roots;
+}
+
+export const getOpeningsForEcoCat = async (cat) => {
+    const roots = getEcoRootsForCat(cat)
 
     // For each root, find all openings that start with the root's move sequence
     const rootsWithOpenings = Object.entries(roots).map(([rootFen, rootOpening]) => {

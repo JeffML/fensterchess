@@ -1,6 +1,6 @@
 {
   "name": "fenster",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "private": false,
   "type": "module",
   "dependencies": {
@@ -25,9 +25,9 @@
     "**/nth-check": "2.0.1"
   },
   "scripts": {
-    "start": "vite",
+    "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "preview": "vite preview"
   },
   "browserslist": {
     "production": [
