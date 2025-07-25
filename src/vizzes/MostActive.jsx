@@ -65,6 +65,7 @@ const HeatMaps = ({ dests, type, setType }) => {
 
 const DestinationFrequenciesByEco = ({ cat, code }) => {
     if (code === "all") code = undefined;
+    else if (code) code = code.substr(1,2)
 
     const { error, data, loading } = useQuery(GET_DEST_FREQ, {
         variables: { cat, code },
@@ -92,6 +93,7 @@ const MostActiveByPiece = ({ cat, code, colors, piece }) => {
     const [type, setType] = useState();
 
     if (code === "all") code = undefined;
+    else if (code) code = code.substr(1,2)
 
     const { error, data, loading } = useQuery(GET_DEST_FREQ, {
         variables: { cat, code, groupLevel:4 },
