@@ -2,9 +2,9 @@ import { useState } from "react";
 import './stylesheets/vizz.css';
 import { Display } from "./vizzes/Display.jsx";
 
-const MOST_ACTIVE = "most active squares";
+const MOST_ACTIVE = "Destination Squares (for all pieces)";
 const FROM_TO = "from-to squares";
-const PIECE_DESTINATION = "destination squares";
+const PIECE_DESTINATION = "Destination Squares (detailed)";
 const ECO_FLOWCHART = "ECO Categories";
 
 const visualizations = [
@@ -12,7 +12,6 @@ const visualizations = [
     { name: ECO_FLOWCHART, type: "graph" },
     { name: MOST_ACTIVE, type: "heatmap" },
     { name: PIECE_DESTINATION, type: "heatmap" },
-    // "ball of mud": {type: "graph"},               TODO (or not)
 ];
 
 const Graphs = ({ graphs, handler }) => {
