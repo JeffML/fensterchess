@@ -1,7 +1,9 @@
-import { useQuery, gql } from "@apollo/client";
+import { useQuery as useQueryApollo, gql } from "@apollo/client";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { HeatMap3D } from "./HeatMap3D.jsx";
 import { HeatMap2D } from "./HeatMap2D.jsx";
+import { getMostActiveSquaresByEco } from "../datasource/getMostActiveSquaresByEco.js";
 
 const GET_DEST_FREQ = gql`
     query getDestFreq($cat: String!, $code: String, $groupLevel: Int) {
@@ -11,6 +13,7 @@ const GET_DEST_FREQ = gql`
         }
     }
 `;
+
 
 const HeatMapType = ({ type, setType }) => {
     const gridStyle = {
@@ -63,28 +66,30 @@ const HeatMaps = ({ dests, type, setType }) => {
     );
 };
 
-const DestinationFrequenciesByEco = ({ cat, code }) => {
-    if (code === "all") code = undefined;
-    else if (code) code = code.substr(1,2)
-
-    const { error, data, loading } = useQuery(GET_DEST_FREQ, {
-        variables: { cat, code },
-        skip: !cat || !code,
-    });
+const MostActiveSquaresByEco = ({ cat, code }) => {
 
     const [type, setType] = useState();
 
-    if (error) console.error(error.toString());
-    if (loading) return <div className="double-column left">Loading...</div>;
+    if (code === "all") code = undefined;
+    else if (code) code = code.substr(1,2)
+
+    // const { error, data, loading } = useQuery(GET_DEST_FREQ, {
+    //     variables: { cat, code },
+    //     skip: !cat || !code,
+    // });
+
+    const {isError, isPending, error, data} = useQuery({
+        queryFn: async() => getMostActiveSquaresByEco(cat+code),
+        queryKey: ['getMostActiveSquaresByEco', cat+code],
+        enabled: code != null
+    })
+
+    if (code == null) return null
+
+    if (isError) console.error(error.toString());
+    if (isPending) return <div className="double-column left">Loading...</div>;
     if (data) {
-        // summate the data for each square
-        const dests = data.getDestinationSquareByFrequency.reduce((acc, d) => {
-            const dest = d.key[2].substr(-2);
-            acc[dest] ??= 0;
-            acc[dest] += d.value;
-            return acc;
-        }, {});
-        return <HeatMaps {...{ dests, type, setType }} />;
+        return <HeatMaps {...{ dests: data, type, setType }} />;
     }
     return null;
 };
@@ -95,7 +100,7 @@ const MostActiveByPiece = ({ cat, code, colors, piece }) => {
     if (code === "all") code = undefined;
     else if (code) code = code.substr(1,2)
 
-    const { error, data, loading } = useQuery(GET_DEST_FREQ, {
+    const { error, data, loading } = useQueryApollo(GET_DEST_FREQ, {
         variables: { cat, code, groupLevel:4 },
         skip: !cat || !code,
     });
@@ -132,6 +137,6 @@ const MostActiveByPiece = ({ cat, code, colors, piece }) => {
 };
 
 export {
-    DestinationFrequenciesByEco as MostActiveSquaresByEco,
+    MostActiveSquaresByEco,
     MostActiveByPiece,
 };
