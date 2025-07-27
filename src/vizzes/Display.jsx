@@ -80,8 +80,8 @@ function EcoCatCode({ cat, setCat, setCode }) {
 export const Display = ({ viz }) => {
     const [cat, setCat] = useState();
     const [code, setCode] = useState();
-    const [colors, setColors] = useState([]);
-    const [piece, setPiece] = useState();
+    const [colors, setColors] = useState(["White"]);
+    const [piece, setPiece] = useState('P');
 
     if (!viz)
         return (
