@@ -9,6 +9,7 @@ export const getMostActiveSquaresByEco = async(eco) => {
     openings.forEach(opening => {
         const plies = movesStringToPliesAry(opening.moves)
         plies.forEach( ply => {
+            ply = ply.replace("+", "")
             const dest = ply.slice(-2)
             destinationCounts[dest]??=0;
             destinationCounts[dest]++
@@ -26,6 +27,7 @@ export const getMostActiveSquaresByEcoDetailed = async(eco) => {
     openings.forEach(opening => {
         const plies = movesStringToPliesAry(opening.moves)
         plies.forEach( (ply, i) => {
+            ply = ply.replace('+', '')
             const dest = ply.slice(-2)
             let piece = ply[0]
             if ("abcdefgh".includes(piece)) piece = 'P'
