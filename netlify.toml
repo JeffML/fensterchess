@@ -2,11 +2,12 @@
 [build]
   command = "yarn run build"
   publish = "dist"
+  functions = "netlify/functions"
 
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
-  external_node_modules = ["express", "import-fresh"]
+# [functions]
+#  directory = "netlify/functions"
+#  node_bundler = "esbuild"
+#  external_node_modules = ["express", "import-fresh"]
 
 
   ## [functions."courses"] 

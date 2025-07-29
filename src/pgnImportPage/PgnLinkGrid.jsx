@@ -1,13 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { ActionButton } from "../common/Buttons.jsx";
 import { INCR } from "../common/consts.js";
-import { SERVER } from '../common/urlConsts.js';
 import { dateStringShort } from "../utils/dateStringShort.js";
 
 function PgnMetaRow({ link, setLink }) {
 
     const getPgnLinkMeta = async() => {
-        const response = await fetch(SERVER + '/.netlify/functions/getPgnLinkMeta?url='+link)
+        const response = await fetch('/.netlify/functions/getPgnLinkMeta?url='+link)
         const data = await response.json()
         return data
     }

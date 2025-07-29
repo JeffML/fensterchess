@@ -2,14 +2,13 @@ import { useQuery as useQueryRQ } from '@tanstack/react-query';
 import { pgnRead } from 'kokopu';
 import { useState } from 'react';
 import 'react-tabs/style/react-tabs.css';
-import { SERVER } from '../common/urlConsts.js';
 import '../stylesheets/grid.css';
 import '../stylesheets/tabs.css';
 import { PgnTabsPanel } from './PgnTabsPanel.jsx';
 
 // pgn file requests for url links
 const getPgnFiles = async ({ pgnLinks }) => {
-    const response = await fetch(SERVER + '/.netlify/functions/getPgnFiles', {
+    const response = await fetch('/.netlify/functions/getPgnFiles', {
         method: 'POST',
         body: JSON.stringify({ pgnLinks }),
     });

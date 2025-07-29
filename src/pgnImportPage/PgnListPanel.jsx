@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { INCR } from '../common/consts';
-import { SERVER_FN_URL, TWIC_PGN_LINKS } from '../common/urlConsts';
+import { TWIC_PGN_LINKS } from '../common/urlConsts';
 import { dateStringShort } from '../utils/dateStringShort';
 import { PgnLinkGrid } from './PgnLinkGrid';
 
 const getPgnLinks = async (url) => {
-    const response = await fetch(SERVER_FN_URL + `/getPgnLinks?url=${url}`);
+    const response = await fetch(`/.netlify/functions/getPgnLinks?url=${url}`);
     const data = { getPgnLinks: await response.json() };
     return data;
 };

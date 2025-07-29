@@ -1,7 +1,6 @@
-import { SERVER_FN_URL } from "../common/urlConsts";
 
 export const externalOpeningStats = async (fen, sites) => {
-    const response = await fetch(SERVER_FN_URL + '/getExternalOpeningStats', {
+    const response = await fetch('/.netlify/functions/getExternalOpeningStats', {
         method: 'POST',
         body: JSON.stringify({ fen, sites }),
     });

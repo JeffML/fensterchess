@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { Chessboard } from 'kokopu-react';
 import { useContext } from 'react';
-import { SERVER } from '../common/urlConsts.js';
 import { OpeningBookContext } from '../contexts/OpeningBookContext.jsx';
 import '../stylesheets/similar.css';
 
 const getSimilar = async (fen) => {
     const response = await fetch(
-        SERVER + '/.netlify/functions/getSimilarForFen?fen=' + fen
+        '/.netlify/functions/getSimilarForFen?fen=' + fen
     );
     const data = await response.json();
     return data;

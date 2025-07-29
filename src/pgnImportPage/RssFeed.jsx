@@ -1,24 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { Fragment, useEffect, useState } from 'react';
-import { SERVER, TWIC_RSS } from '../common/urlConsts';
+import { TWIC_RSS } from '../common/urlConsts';
 import { dateStringShort } from '../utils/dateStringShort';
 import { getFeedAsJson } from "../utils/getFeedAsJson";
 
-const getRssXml = async(url) => {
+const getRssXml2 = async(url) => {
     const response = await fetch(
-        SERVER + '/.netlify/functions/getRssXml?url=' + TWIC_RSS
+        '/.netlify/functions/getRssXml?url=' + TWIC_RSS
     )
     const data = await response.text();
     return data;
 }
 
-
 export const RssFeed = () => {
     const [json, setJson] = useState(null);
 
     const {isError, error, data} = useQuery({
-        queryKey: ["getRssXml", dateStringShort()],
-        queryFn: getRssXml
+        queryKey: ["getRssXml2", dateStringShort()],
+        queryFn: getRssXml2
     })
 
     useEffect(() => {
