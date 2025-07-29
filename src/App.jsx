@@ -46,7 +46,7 @@ function App() {
                         }}
                     />
                     <OpeningBookProvider>
-                        <Suspense fallback={<div>Loading...</div>}>
+                        <Suspense fallback={<div className='white'>Loading...</div>}>
                             {mode === modes.search && (
                                 <SearchPageContainer
                                     {...{

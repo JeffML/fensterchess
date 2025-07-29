@@ -1,6 +1,7 @@
 import { Chess } from "chess.js";
 import { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import 'react-tabs/style/react-tabs.css'
 import { parseMoves, theoryRequest, toPlay } from "../utils/chessTools.js";
 import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional.jsx";
 import { SimilarOpenings } from "./SimilarOpenings.jsx";
