@@ -26,4 +26,4 @@ const AnalyzePgnPage = () => {
     );
 };
 
-export { AnalyzePgnPage };
+export { AnalyzePgnPage as default };

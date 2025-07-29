@@ -35,9 +35,7 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
         }
     }
 
-    const popupStyle = popupFen
-        ? { }
-        : { display: 'none' };
+    const popupStyle = popupFen ? {} : { display: 'none' };
 
     const handleRootClick = (fen) => {
         setExpandedRootFen(expandedRootFen === fen ? null : fen);
@@ -54,7 +52,11 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
                         <span className="column">
                             <span
                                 id="code"
-                                className={`eco-root-name${expandedRootFen === rootFen ? ' expanded' : ''}`}
+                                className={`eco-root-name${
+                                    expandedRootFen === rootFen
+                                        ? ' expanded'
+                                        : ''
+                                }`}
                                 onClick={() =>
                                     window.open(
                                         `https://fensterchess.com/?fen=${encodeURIComponent(
@@ -80,9 +82,7 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
                         </span>
                     </div>
                     {expandedRootFen === rootFen && children.length > 0 && (
-                        <ul
-                            className="eco-root-openings"
-                        >
+                        <ul className="eco-root-openings">
                             {children.map((child) => (
                                 <li
                                     key={child.fen}

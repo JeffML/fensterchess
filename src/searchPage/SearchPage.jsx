@@ -212,4 +212,4 @@ const SearchPageContainer = ({ from, to }) => {
     return <SearchPage {...{ chess, boardState, setBoardState, data }} />;
 };
 
-export { SearchPageContainer };
+export { SearchPageContainer as default};

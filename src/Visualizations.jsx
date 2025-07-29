@@ -92,5 +92,5 @@ const Visualizations = () => {
     );
 };
 
-export { ECO_FLOWCHART, FROM_TO, MOST_ACTIVE, PIECE_DESTINATION, Visualizations };
+export { ECO_FLOWCHART, FROM_TO, MOST_ACTIVE, PIECE_DESTINATION, Visualizations as default };
 
