@@ -11,7 +11,7 @@ import { fromTo } from './datasource/getLatestEcoJson.js';
 const AboutPage = lazy(() => import('./AboutPage.jsx')); // default export
 const Visualizations = lazy(() => import('./Visualizations.jsx')); 
 const AnalyzePgnPage = lazy(() => import('./pgnImportPage/AnalyzePgnPage.jsx')); 
-const SearchPageContainer = lazy(() => import('./searchPage/SearchPage.jsx')); 
+const SearchPageContainer = lazy(() => import('./searchPage/SearchPageContainer.jsx')); 
 
 function App() {
     const [mode, setMode] = useState(isTestMode ? modes.test : modes.search);
