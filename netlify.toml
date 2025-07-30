@@ -9,6 +9,8 @@
 #  node_bundler = "esbuild"
 #  external_node_modules = ["express", "import-fresh"]
 
+[functions."getFromTosForFen"] 
+   included_files = ["data/fromToPositionIndexed.json"]
 
   ## [functions."courses"] 
   ##  included_files = ["dataForLambdas/courseHtml/**/*.html"]

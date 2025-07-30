@@ -1,6 +1,6 @@
-const similarData = require('./similar.json')
+import similarData from './similar.json'
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
     const fen = event.queryStringParameters?.fen;
     if (!fen) {
         return {

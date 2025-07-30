@@ -1,5 +1,5 @@
 import { ECO_JSON_RAW } from '../common/urlConsts.js';
-import { pos } from '../utils/chessTools.js';
+// import { pos } from '../utils/chessTools.js';
 
 let openingsByCat = { initialized: false };
 
@@ -15,7 +15,7 @@ export async function getLatestEcoJson() {
             D: { url: ROOT + 'ecoD.json' },
             E: { url: ROOT + 'ecoE.json' },
             IN: { url: ROOT + 'eco_interpolated.json' },
-            FT: { url: ROOT + 'fromTo.json' },
+            // FT: { url: ROOT + 'fromTo.json' },
         };
 
         const promises = [];
@@ -50,18 +50,4 @@ export async function openingBook() {
     };
 
     return openingBook;
-}
-
-export async function fromTo () {
-    const {FT} = await getLatestEcoJson()
-
-    const fromTo = FT.json.reduce((acc, [from, to]) => {
-        acc.to[pos(from)] ??= []  
-        acc.to[pos(from)].push(to) // continuations from FEN
-        acc.from[pos(to)] ??= []
-        acc.from[pos(to)].push(from) // roots of FEN
-        return acc;
-    }, {to: {}, from:{}})
-
-    return fromTo
 }

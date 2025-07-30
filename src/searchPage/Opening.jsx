@@ -13,22 +13,20 @@ const Opening = ({
     const sites = useContext(SelectedSitesContext);
 
     useEffect(() => {
-        if (data?.getOpeningForFenFull) {
-            setLastKnownOpening(data.getOpeningForFenFull);
+        if (data) {
+            setLastKnownOpening(data);
         }
     }, [data, setLastKnownOpening]);
 
-    if (data?.getOpeningForFenFull) {
+    if (data) {
         let {
-            getOpeningForFenFull: {
-                eco,
-                name,
-                moves: currentMoves,
-                next: variations,
-                from,
-                src,
-                score,
-            },
+            eco,
+            name,
+            moves: currentMoves,
+            next: variations,
+            from,
+            src,
+            score,
         } = data;
 
         return (
@@ -93,19 +91,17 @@ const OpeningName = ({ eco, src, name, score }) => {
             }}
         >
             Opening:&nbsp;&nbsp;
-            <span className='opening-name'
-
-            >
+            <span className="opening-name">
                 {eco}&nbsp;
                 {src === 'interpolated' ? (
                     <i>
-                        {name} <Eval {...{score}}></Eval>
+                        {name} <Eval {...{ score }}></Eval>
                     </i>
                 ) : (
                     (
                         <span>
                             {name}
-                            <Eval {...{score}}></Eval>
+                            <Eval {...{ score }}></Eval>
                         </span>
                     ) || 'Unknown'
                 )}
