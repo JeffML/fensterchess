@@ -10,7 +10,7 @@ export const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
     const { selectedSites: sites } = useContext(SelectedSitesContext);
 
     const { isError, error, data, isPending } = useQuery({
-        queryKey: [fen, sites, dateStringShort],
+        queryKey: [fen, sites, dateStringShort()],
         queryFn: async () => externalOpeningStats(fen, sites),
     });
 
