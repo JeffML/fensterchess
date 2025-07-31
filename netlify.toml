@@ -12,6 +12,9 @@
 [functions."getFromTosForFen"] 
    included_files = ["data/fromToPositionIndexed.json"]
 
+ [functions."scoresForFens"] 
+   included_files = ["data/scores.json"]
+
   ## [functions."courses"] 
   ##  included_files = ["dataForLambdas/courseHtml/**/*.html"]
 

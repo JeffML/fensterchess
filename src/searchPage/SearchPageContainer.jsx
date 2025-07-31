@@ -60,8 +60,9 @@ const getFromTosForFen = async (fen) => {
 };
 
 const getScoresForFens = async (json) => {
-    const response = await fetch('/.netlify/functions/getScoresForFens', {
+    const response = await fetch('/.netlify/functions/scoresForFens', {
         method: 'POST',
+        headers: {"Content-type": 'application/json'},
         body: JSON.stringify(json),
     });
 
@@ -86,30 +87,31 @@ const SearchPageContainer = () => {
         enabled: fen != null && fen !== 'start',
     });
 
-    // const {isPending: isPending2, isError:isError2, error:error2, data: data2} = useQuery({
-    //     queryKey: ['scoresForFens', fen],
-    //     queryFn: getScoresForFens(data)
-    // })
-
-    const data2 = { score: 1.2, next: [], from: [] };
+    const {isPending: isPending2, isError:isError2, error:error2, data: data2} = useQuery({
+        queryKey: ['scoresForFens', fen],
+        queryFn: async () => getScoresForFens({fen, ...data}),
+        enabled: data != null
+    })
 
     if (!openingBook) return <div>Loading...</div>;
 
     const opening = openingBook[fen];
 
     if (data && data2 && opening) {
-        opening.score = data2.score;
+        const {score, nextScores, fromScores} = data2
+        opening.score = score;
+        
         opening.next = data.next.map((fen, i) => {
             const variation = {
                 ...openingBook[fen],
-                score: 0,
+                score: nextScores[i],
             };
             return variation;
         });
         opening.from = data.from.map((fen, i) => {
             const variation = {
                 ...openingBook[fen],
-                score: 0,
+                score: fromScores[i],
             };
             return variation;
         });
