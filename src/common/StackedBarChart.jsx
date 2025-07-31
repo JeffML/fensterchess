@@ -1,3 +1,5 @@
+import "../stylesheets/grid.css"
+
 const StackedBarChart = ({ pctgs: { w, b, d }, style}) => (
     <div id="games-chart" style={style}>
         {w !== 0 && <div id="white" style={{ gridColumn: `span ${w}` }}>
