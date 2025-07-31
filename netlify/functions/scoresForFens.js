@@ -1,4 +1,3 @@
-import { dataTagErrorSymbol } from '@tanstack/react-query';
 import fs from 'fs';
 
 export const handler = async (event) => {
