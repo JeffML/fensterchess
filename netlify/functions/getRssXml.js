@@ -1,6 +1,9 @@
 import https from 'https';
-export const handler = async (event, context) => {
+import { authFailureResponse, authenticateRequest } from './utils/auth'
 
+export const handler = async (event, context) => {
+    if (!authenticateRequest(event)) return authFailureResponse;
+    
     const url = event.queryStringParameters?.url;
     if (!url) {
         return {

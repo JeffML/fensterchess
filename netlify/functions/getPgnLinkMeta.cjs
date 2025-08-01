@@ -1,6 +1,9 @@
 const https = require('https');
+import { authFailureResponse, authenticateRequest } from './utils/auth'
 
 exports.handler = async (event) => {
+    if (!authenticateRequest(event)) return authFailureResponse;
+
     const url = event.queryStringParameters?.url;
     if (!url) {
         return {

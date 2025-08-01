@@ -1,6 +1,9 @@
 import similarData from './similar.json'
+import { authFailureResponse, authenticateRequest } from './utils/auth'
 
 export const handler = async (event) => {
+    if (!authenticateRequest(event)) return authFailureResponse;
+
     const fen = event.queryStringParameters?.fen;
     if (!fen) {
         return {

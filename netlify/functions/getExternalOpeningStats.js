@@ -1,4 +1,5 @@
 import { XMLParser } from 'fast-xml-parser';
+import { authenticateRequest, authFailureResponse } from './utils/auth';
 
 // see https://lichess.org/api#tag/Opening-Explorer/operation/openingExplorerMaster
 const lichessRequest = async ({ fen }) => {
@@ -86,6 +87,8 @@ const siteRequests = {
 };
 
 export const handler = async (event) => {
+    if (!authenticateRequest(event)) return authFailureResponse;
+    
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 501, // Not Implemented

@@ -33,7 +33,7 @@ export const RssFeed = () => {
             <div className="white" style={{ textAlign: 'left' }}>
                 <h3 style={{ marginLeft: '-1.5em' }}>
                     News from{' '}
-                    <a target="_blank" rel="noreferrer" href={json?.link}>
+                    <a target="_blank" rel="noreferrer" href={json?.link} style={{color: 'limegreen'}}> 
                         {json?.title}
                     </a>
                 </h3>
@@ -45,6 +45,7 @@ export const RssFeed = () => {
                                 target="_blank"
                                 rel="noreferrer"
                                 href={item.link}
+                                style={{color:'limegreen'}}
                             >
                                 {item.title}
                             </a>

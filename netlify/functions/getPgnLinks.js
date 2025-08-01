@@ -1,11 +1,13 @@
 import https from 'https';
 import { parse } from 'node-html-parser';
 import resolver from 'url';
-
+import { authFailureResponse, authenticateRequest } from './utils/auth'
 /*
   returns a list of pgn links from an html page
  */
 export const handler = async (event) => {
+    if (!authenticateRequest(event)) return authFailureResponse;
+    
     const url = event.queryStringParameters?.url;
     try {
         const p = new Promise((resolve) => {

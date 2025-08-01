@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { authFailureResponse, authenticateRequest } from './utils/auth'
 
 const result = fs.readFileSync('data/fromToPositionIndexed.json')
 
@@ -12,6 +13,8 @@ if (json == null) console.error("did not read data file")
 const pos = (fen) => fen.split(' ')[0];
 
 export const handler = async(event) => {
+    if (!authenticateRequest(event)) return authFailureResponse;
+    
     const fen = event.queryStringParameters?.fen
 
     if (!fen) {
