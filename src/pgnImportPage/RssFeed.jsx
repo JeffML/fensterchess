@@ -2,23 +2,23 @@ import { useQuery } from '@tanstack/react-query';
 import { Fragment, useEffect, useState } from 'react';
 import { TWIC_RSS } from '../common/urlConsts';
 import { dateStringShort } from '../utils/dateStringShort';
-import { getFeedAsJson } from "../utils/getFeedAsJson";
+import { getFeedAsJson } from '../utils/getFeedAsJson';
 
-const getRssXml2 = async(url) => {
+const getRssXml2 = async (url) => {
     const response = await fetch(
         '/.netlify/functions/getRssXml?url=' + TWIC_RSS
-    )
+    );
     const data = await response.text();
     return data;
-}
+};
 
 export const RssFeed = () => {
     const [json, setJson] = useState(null);
 
-    const {isError, error, data} = useQuery({
-        queryKey: ["getRssXml2", dateStringShort()],
-        queryFn: getRssXml2
-    })
+    const { isError, error, data } = useQuery({
+        queryKey: ['getRssXml2', dateStringShort()],
+        queryFn: getRssXml2,
+    });
 
     useEffect(() => {
         if (data) {
@@ -50,7 +50,7 @@ export const RssFeed = () => {
                             </a>
                         </b>
                         <br />
-                        <div className='news'>
+                        <div className="news">
                             {item.description.slice(0, 325)}
                         </div>
                     </Fragment>

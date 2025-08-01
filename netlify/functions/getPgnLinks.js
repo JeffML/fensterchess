@@ -28,7 +28,7 @@ export const handler = async (event) => {
             links.push(resolver.resolve(url, els[i].attributes.href)); //expands the partial link to a full one
         }
 
-        console.log(JSON.stringify(links));
+        // console.log(JSON.stringify(links));
 
         return {
             statusCode: 200,

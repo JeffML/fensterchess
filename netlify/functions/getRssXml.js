@@ -1,6 +1,6 @@
 import https from 'https';
+export const handler = async (event, context) => {
 
-export const handler = async (event) => {
     const url = event.queryStringParameters?.url;
     if (!url) {
         return {
