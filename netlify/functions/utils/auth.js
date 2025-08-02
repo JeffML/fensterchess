@@ -1,5 +1,3 @@
-import https from 'https';
-
 export const authenticateRequest = (event) => {
     const origin = event.headers.origin || event.headers.referer;
     const authHeader = event.headers.authorization;
@@ -17,7 +15,7 @@ export const authenticateRequest = (event) => {
     }
 
     // Secret token for other access - stored in env vars
-    const validToken = process.env.API_SECRET_TOKEN; // Never commit this
+    const validToken = process.env.VITE_API_SECRET_TOKEN; // Never commit this
     if (authHeader === `Bearer ${validToken}`) {
         return true;
     }

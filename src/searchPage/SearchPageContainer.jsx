@@ -54,15 +54,29 @@ function readParamsMaybe(url, chess, setBoardState) {
 
 const getFromTosForFen = async (fen) => {
     const fromTos = await fetch(
-        '/.netlify/functions/getFromTosForFen?fen=' + fen
+        '/.netlify/functions/getFromTosForFen?fen=' + fen,
+        {
+            headers: {
+                Authorization: `Bearer ${
+                    import.meta.env.VITE_API_SECRET_TOKEN
+                }`,
+            },
+        }
     );
     return await fromTos.json();
 };
 
 const getScoresForFens = async (json) => {
+    console.log("X-foo test")
     const response = await fetch('/.netlify/functions/scoresForFens', {
         method: 'POST',
-        headers: {"Content-type": 'application/json'},
+        headers: {
+            Authorization: `Bearer ${
+                    import.meta.env.VITE_API_SECRET_TOKEN
+                }`,
+            'Content-type': 'application/json',
+            'X-foo': 'flum!'
+        },
         body: JSON.stringify(json),
     });
 
@@ -87,20 +101,25 @@ const SearchPageContainer = () => {
         enabled: fen != null && fen !== 'start',
     });
 
-    const {isPending: isPending2, isError:isError2, error:error2, data: data2} = useQuery({
+    const {
+        isPending: isPending2,
+        isError: isError2,
+        error: error2,
+        data: data2,
+    } = useQuery({
         queryKey: ['scoresForFens', fen],
-        queryFn: async () => getScoresForFens({fen, ...data}),
-        enabled: data != null
-    })
+        queryFn: async () => getScoresForFens({ fen, ...data }),
+        enabled: data != null,
+    });
 
     if (!openingBook) return <div>Loading...</div>;
 
     const opening = openingBook[fen];
 
     if (data && data2 && opening) {
-        const {score, nextScores, fromScores} = data2
+        const { score, nextScores, fromScores } = data2;
         opening.score = score;
-        
+
         opening.next = data.next.map((fen, i) => {
             const variation = {
                 ...openingBook[fen],
@@ -123,7 +142,9 @@ const SearchPageContainer = () => {
     if (fen !== boardState.fen || moves !== boardState.moves)
         setBoardState({ fen, moves });
 
-    return <SearchPage {...{ chess, boardState, setBoardState, data:opening }} />;
+    return (
+        <SearchPage {...{ chess, boardState, setBoardState, data: opening }} />
+    );
 };
 
 export default SearchPageContainer;
