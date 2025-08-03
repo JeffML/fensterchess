@@ -26,7 +26,7 @@ export const HeatMap3D = ({ dests }) => {
         }
 
         new p5((p) => {
-            remove = p.remove;
+            // remove = p.remove;
             let rotX = 45;
             let rotY = 0;
             // let sliderZ;
@@ -34,11 +34,7 @@ export const HeatMap3D = ({ dests }) => {
             const height = 400;
             let font;
 
-            p.preload = () => {
-                font = p.loadFont("resources/Cinzel-Medium.ttf");
-            };
-
-            p.setup = () => {
+            p.setup = async () => {
                 p.createCanvas(width, height, p.WEBGL).parent(
                     renderRef.current
                 );
@@ -53,6 +49,7 @@ export const HeatMap3D = ({ dests }) => {
                 );
                 // sliderZ = p.createSlider(-20, -10, 45);
                 p.angleMode(p.DEGREES);
+                font = await p.loadFont("resources/Cinzel-Medium.ttf");
                 p.textFont(font);
             };
 
@@ -127,7 +124,7 @@ export const HeatMap3D = ({ dests }) => {
             };
         });
 
-        return remove;
+        // return remove;
     }, [freqs, root]);
 
     return <div id="renderRef" ref={renderRef} style={{marginBottom: "3em"}}></div>;
