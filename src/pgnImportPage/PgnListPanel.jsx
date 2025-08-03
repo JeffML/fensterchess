@@ -6,7 +6,11 @@ import { dateStringShort } from '../utils/dateStringShort';
 import { PgnLinkGrid } from './PgnLinkGrid';
 
 const getPgnLinks = async (url) => {
-    const response = await fetch(`/.netlify/functions/getPgnLinks?url=${url}`);
+    const response = await fetch(`/.netlify/functions/getPgnLinks?url=${url}`, {
+        headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
+        },
+    });
     const data = { getPgnLinks: await response.json() };
     return data;
 };

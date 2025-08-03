@@ -11,6 +11,9 @@ const getPgnFiles = async ({ pgnLinks }) => {
     const response = await fetch('/.netlify/functions/getPgnFiles', {
         method: 'POST',
         body: JSON.stringify({ pgnLinks }),
+        headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
+        },
     });
 
     const data = await response.json();

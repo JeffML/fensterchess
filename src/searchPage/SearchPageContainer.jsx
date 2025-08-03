@@ -67,7 +67,6 @@ const getFromTosForFen = async (fen) => {
 };
 
 const getScoresForFens = async (json) => {
-    console.log("X-foo test")
     const response = await fetch('/.netlify/functions/scoresForFens', {
         method: 'POST',
         headers: {
@@ -75,7 +74,6 @@ const getScoresForFens = async (json) => {
                     import.meta.env.VITE_API_SECRET_TOKEN
                 }`,
             'Content-type': 'application/json',
-            'X-foo': 'flum!'
         },
         body: JSON.stringify(json),
     });

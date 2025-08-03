@@ -20,7 +20,7 @@ export const authenticateRequest = (event) => {
         return true;
     }
 
-    console.dir({AuthFailure: {origin, authHeader}}, {depth: 3})
+    console.error(JSON.stringify({AuthFailure: {origin, authHeader}}))
     return false;
 };
 

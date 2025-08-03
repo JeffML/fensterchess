@@ -1,21 +1,28 @@
-import { useQuery } from "@tanstack/react-query";
-import { ActionButton } from "../common/Buttons.jsx";
-import { INCR } from "../common/consts.js";
-import { dateStringShort } from "../utils/dateStringShort.js";
+import { useQuery } from '@tanstack/react-query';
+import { ActionButton } from '../common/Buttons.jsx';
+import { INCR } from '../common/consts.js';
+import { dateStringShort } from '../utils/dateStringShort.js';
 
 function PgnMetaRow({ link, setLink }) {
+    const getPgnLinkMeta = async () => {
+        const response = await fetch(
+            '/.netlify/functions/getPgnLinkMeta?url=' + link,
+            {
+                headers: {
+                    Authorization: `Bearer ${
+                        import.meta.env.VITE_API_SECRET_TOKEN
+                    }`,
+                },
+            }
+        );
+        const data = await response.json();
+        return data;
+    };
 
-    const getPgnLinkMeta = async() => {
-        const response = await fetch('/.netlify/functions/getPgnLinkMeta?url='+link)
-        const data = await response.json()
-        return data
-    }
-    
-    const {isError, isPending, error, data} = useQuery({
-        queryKey: ["getPgnLinkMeta", dateStringShort()],
-        queryFn: getPgnLinkMeta
-    })
-
+    const { isError, isPending, error, data } = useQuery({
+        queryKey: ['getPgnLinkMeta', dateStringShort()],
+        queryFn: getPgnLinkMeta,
+    });
 
     if (isError) {
         console.error(error.toLocaleString());
@@ -32,21 +39,21 @@ function PgnMetaRow({ link, setLink }) {
         const { lastModified, contentLength } = data;
 
         const millis = Date.parse(lastModified);
-        const localeTime = dateStringShort(millis)
+        const localeTime = dateStringShort(millis);
 
         return (
             <>
                 <span
                     className="fakeLink"
-                    style={{ color: "cyan" }}
+                    style={{ color: 'cyan' }}
                     onClick={clickHandler}
                 >
-                    {link.substring(link.lastIndexOf("/") + 1)}
+                    {link.substring(link.lastIndexOf('/') + 1)}
                 </span>
                 <span>{localeTime}</span>
                 <span>
                     {Math.round(contentLength / 1000)}
-                    <span style={{ fontSize: "smaller" }}>K</span>
+                    <span style={{ fontSize: 'smaller' }}>K</span>
                 </span>
             </>
         );
@@ -73,25 +80,21 @@ export const PgnLinkGrid = ({ links, end, setEnd, setLink }) => {
     };
 
     return (
-        <div
-            className="font-cinzel link-grid white"
-        >
-            <Headers/>
+        <div className="font-cinzel link-grid white">
+            <Headers />
             <PgnMetaRows />
 
             {end < links.length ? (
                 <span colSpan="4">
                     <ActionButton
                         {...{
-                            style: { width: "8em" },
+                            style: { width: '8em' },
                             onClick: () => doMore(),
-                            text: "More...",
+                            text: 'More...',
                         }}
-                    />{" "}
+                    />{' '}
                 </span>
             ) : null}
         </div>
     );
 };
-
-

@@ -6,7 +6,14 @@ import '../stylesheets/similar.css';
 
 const getSimilar = async (fen) => {
     const response = await fetch(
-        '/.netlify/functions/getSimilarForFen?fen=' + fen
+        '/.netlify/functions/getSimilarForFen?fen=' + fen,
+        {
+            headers: {
+                Authorization: `Bearer ${
+                    import.meta.env.VITE_API_SECRET_TOKEN
+                }`,
+            },
+        }
     );
     const data = await response.json();
     return data;
@@ -63,7 +70,7 @@ const SimilarOpenings = ({ boardState, setBoardState }) => {
         });
 
         return (
-            <div id="no-similar" className='similar-openings'>
+            <div id="no-similar" className="similar-openings">
                 {sims}
             </div>
         );

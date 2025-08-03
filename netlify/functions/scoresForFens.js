@@ -2,7 +2,7 @@ import fs from 'fs';
 import { authFailureResponse, authenticateRequest } from './utils/auth'
 
 export const handler = async (event) => {
-    // if (!authenticateRequest(event)) return authFailureResponse;
+    if (!authenticateRequest(event)) return authFailureResponse;
     
     if (event.httpMethod !== 'POST') {
         return {

@@ -6,7 +6,14 @@ import { getFeedAsJson } from '../utils/getFeedAsJson';
 
 const getRssXml2 = async (url) => {
     const response = await fetch(
-        '/.netlify/functions/getRssXml?url=' + TWIC_RSS
+        '/.netlify/functions/getRssXml?url=' + TWIC_RSS,
+        {
+            headers: {
+                Authorization: `Bearer ${
+                    import.meta.env.VITE_API_SECRET_TOKEN
+                }`,
+            },
+        }
     );
     const data = await response.text();
     return data;
@@ -33,7 +40,12 @@ export const RssFeed = () => {
             <div className="white" style={{ textAlign: 'left' }}>
                 <h3 style={{ marginLeft: '-1.5em' }}>
                     News from{' '}
-                    <a target="_blank" rel="noreferrer" href={json?.link} style={{color: 'limegreen'}}> 
+                    <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href={json?.link}
+                        style={{ color: 'limegreen' }}
+                    >
                         {json?.title}
                     </a>
                 </h3>
@@ -45,7 +57,7 @@ export const RssFeed = () => {
                                 target="_blank"
                                 rel="noreferrer"
                                 href={item.link}
-                                style={{color:'limegreen'}}
+                                style={{ color: 'limegreen' }}
                             >
                                 {item.title}
                             </a>
