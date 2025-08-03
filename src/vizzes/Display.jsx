@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import {
     ECO_FLOWCHART,
     FROM_TO,
@@ -6,10 +6,13 @@ import {
     PIECE_DESTINATION,
 } from '../Visualizations.jsx';
 import { ColorAndPieces } from './ColorAndPieces.jsx';
-import { EcoFlowchart } from './EcoFlowchart.jsx';
-import { FromToCircle } from './FromToCircle.jsx';
-import { MostActiveByPiece, MostActiveSquaresByEco } from './MostActive.jsx';
 import { EcoCatCode } from './EcoCatSelector.jsx';
+
+// Lazy load heavy components
+const EcoFlowchart = lazy(() => import('./EcoFlowchart.jsx').then(m => ({ default: m.EcoFlowchart })));
+const FromToCircle = lazy(() => import('./FromToCircle.jsx').then(m => ({ default: m.FromToCircle })));
+const MostActiveByPiece = lazy(() => import('./MostActive.jsx').then(m => ({ default: m.MostActiveByPiece })));
+const MostActiveSquaresByEco = lazy(() => import('./MostActive.jsx').then(m => ({ default: m.MostActiveSquaresByEco })));
 
 export const Display = ({ viz }) => {
     const [cat, setCat] = useState();
@@ -27,11 +30,15 @@ export const Display = ({ viz }) => {
             </div>
         );
 
+    const Loading = () => <div>Loading...</div>;
+
     if (viz === MOST_ACTIVE)
         return (
             <div className="double-column left">
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
-                <MostActiveSquaresByEco {...{ cat, code }} />
+                <Suspense fallback={<Loading />}>
+                    <MostActiveSquaresByEco {...{ cat, code }} />
+                </Suspense>
             </div>
         );
 
@@ -39,7 +46,9 @@ export const Display = ({ viz }) => {
         return (
             <div className="double-column left">
                 <EcoCatCode {...{ cat, setCat, code, setCode }} />
-                <FromToCircle {...{ cat, code }} />
+                <Suspense fallback={<Loading />}>
+                    <FromToCircle {...{ cat, code }} />
+                </Suspense>
             </div>
         );
 
@@ -52,11 +61,18 @@ export const Display = ({ viz }) => {
                         {...{ colors, piece, setColors, setPiece }}
                     />
                 )}
-                <MostActiveByPiece {...{ cat, code, colors, piece }} />
+                <Suspense fallback={<Loading />}>
+                    <MostActiveByPiece {...{ cat, code, colors, piece }} />
+                </Suspense>
             </div>
         );
 
-    if (viz === ECO_FLOWCHART) return <EcoFlowchart />;
+    if (viz === ECO_FLOWCHART) 
+        return (
+            <Suspense fallback={<Loading />}>
+                <EcoFlowchart />
+            </Suspense>
+        );
 
     return <div className="double-column left" />;
 };
