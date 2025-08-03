@@ -1,6 +1,11 @@
-import { useState } from "react";
+import { useState, lazy, Suspense} from "react";
 import './stylesheets/vizz.css';
-import { Display } from "./vizzes/Display.jsx";
+// import { Display } from "./vizzes/Display.jsx";
+
+const Display = lazy(() => 
+    import("./vizzes/Display.jsx").then(module => ({ default: module.Display }))
+);
+
 
 const MOST_ACTIVE = "Destination Squares (for all pieces)";
 const FROM_TO = "from-to squares";
@@ -57,7 +62,9 @@ const Visualizations = () => {
                 </div>
             </div>
             
-            <Display viz={viz} />
+            <Suspense fallback={<div>Loading visualization...</div>}>
+                <Display viz={viz} />
+            </Suspense>
         </div>
     );
 };
