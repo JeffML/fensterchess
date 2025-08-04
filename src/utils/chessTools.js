@@ -1,7 +1,5 @@
 import { Chess } from 'chess.js';
-import DOMPurify from 'dompurify';
-import { WIKI_THEORY_API, WIKI_THEORY_API_QS } from '../common/urlConsts.js';
-import { movesStringToPliesAry } from './openings.js';
+
 
 export const movesToFen = (moves) => {
     const chess = new Chess();
@@ -27,30 +25,6 @@ export const toPlay = (fen) => {
     const color = splitFen.at(-5);
     const move = splitFen.at(-1);
     return { move, color };
-};
-
-export const theoryRequest = async (currentMoves, setHtml) => {
-    const urlMoves = () => {
-        const plies = movesStringToPliesAry(currentMoves);
-        const moves = plies.map((ply, i) => {
-            const move = Math.ceil((i + 1) / 2) + '.';
-            const black = (i + 1) % 2 === 0;
-
-            return move + (black ? '..' : '_') + ply;
-        });
-
-        return moves.join('/');
-    };
-
-    const url = `${WIKI_THEORY_API}${urlMoves()}${WIKI_THEORY_API_QS}`;
-
-    const response = await fetch(url);
-    const json = await response.json();
-    const html = json.query?.pages[0]?.extract;
-    if (html) {
-        const clean = DOMPurify.sanitize(html);
-        setHtml(clean);
-    }
 };
 
 export function parseMoves(moveString) {

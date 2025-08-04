@@ -2,22 +2,14 @@ import { Chess } from "chess.js";
 import { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import 'react-tabs/style/react-tabs.css'
-import { parseMoves, theoryRequest, toPlay } from "../utils/chessTools.js";
+import { parseMoves, toPlay } from "../utils/chessTools.js";
 import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional.jsx";
 import { SimilarOpenings } from "./SimilarOpenings.jsx";
 import { NextOpenings } from "./nextOpeningsEtc/NextOpenings.jsx";
 import { Roots } from "./nextOpeningsEtc/Roots.jsx";
+import { Theory, theoryRequest } from "./Theory.jsx";
 
 const chess = new Chess();
-
-const Theory2 = ({ html }) => {
-    return (
-        <div
-            style={{ textAlign: "left", marginLeft: "1em" }}
-            dangerouslySetInnerHTML={{ __html: html }}
-        />
-    );
-};
 
 /**
  * An "next" opening variation can be either:
@@ -133,7 +125,7 @@ const OpeningTabs = ({
                 )}
                 {html && (
                     <TabPanel>
-                        {hasLastMove && <Theory2 {...{ html }} />}
+                        {hasLastMove && <Theory {...{ html }} />}
                     </TabPanel>
                 )}
                 {showExternal && (
