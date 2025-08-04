@@ -1,21 +1,16 @@
 # About
-[Fenster](https://fensterchess.com) is a chess opening database. The client is open source and maintained in this repository. There is an associated server project, which acts as a proxy for some third-party data requests. Most opening data is pulled directly from the github project <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>.
+[Fenster](https://fensterchess.com) is an open-source web application for chess opening research. It uses opening data pulled directly from the github project <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>.
 
 ## Tech Stack
 Major techs/dependencies are as follows:
 * Vite 
-* Netlify (web hosting service)
+* Netlify (a web hosting service)
 * Node
 * React
 * chess.js and kokopu
 
+## Development Environment
+The project expects to be hosted on [Netlify](https://www.netlify.com/), and there is a [free tier](https://www.netlify.com/pricing/) that you can sign up for. After installing the dependencies in package.json, you will need to install the Netlify command line interface ([netlify_cli](https://docs.netlify.com/api-and-cli-guides/cli-guides/get-started-with-cli/)). Once installed, you can launch a local web app (localhost:8888) from the command line: `netlify dev`.
 
-## Areas to work on
-* There's always room for CSS improvements.
-* Tests
-    * Version 3.1.0 marked a switch from CRA to Vite
-        * This means Vitest can be used for a testing framework
-* Fenster uses several open APIs to fetch opening data
-    * A master games server with an open API has yet to be found
-
-A local client can be spun up using `yarn start`.  Code changes are automatically reflected in the browser. If encountering problems, send an email to <a href="mailto:fensterchess@gmail.com">Fenster</a>, describing what you are trying to do and you can recieve your own private credential. You can also [raise an issue](https://github.com/JeffML/fensterchess/issues) in GitHub.
+## Troubleshooting
+If encountering problems, send an email to <a href="mailto:fensterchess@gmail.com">Fenster</a>, describing what you are trying to do and you can recieve your own private credential. You can also [raise an issue](https://github.com/JeffML/fensterchess/issues) in GitHub.
