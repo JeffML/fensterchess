@@ -17,7 +17,7 @@ const getPgnFiles = async ({ pgnLinks }) => {
     });
 
     const data = await response.json();
-    return { getPgnFiles: data };
+    return data;
 };
 
 export const getPgnSummary = (pgn) => {
@@ -97,7 +97,7 @@ export const PgnTabsPanelContainer = ({ link }) => {
         return (
             <PgnTabsPanel
                 {...{
-                    pgn: data.getPgnFiles[0].pgn || pgn,
+                    pgn: data? data[0].pgn : pgn,
                     tabIndex,
                     setTabIndex,
                 }}

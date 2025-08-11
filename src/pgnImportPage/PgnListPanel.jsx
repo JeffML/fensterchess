@@ -4,6 +4,7 @@ import { INCR } from '../common/consts';
 import { TWIC_PGN_LINKS } from '../common/urlConsts';
 import { dateStringShort } from '../utils/dateStringShort';
 import { PgnLinkGrid } from './PgnLinkGrid';
+import {PgnFileUploader} from './PgnFileUploader'
 
 const getPgnLinks = async (url) => {
     const response = await fetch(`/.netlify/functions/getPgnLinks?url=${url}`, {
