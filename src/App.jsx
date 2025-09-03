@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import { useState, lazy, Suspense } from 'react';
 import './App.css';
 import PageHeader from './PageHeader.jsx';

@@ -91,12 +91,12 @@ const SearchPageContainer = () => {
     readParamsMaybe(url, chess, setBoardState);
 
     const { fen } = boardState;
-    const { openingBook } = useContext(OpeningBookContext);
+    const { openingBook, positionBook } = useContext(OpeningBookContext);
 
     const { isPending, isError, error, data } = useQuery({
         queryKey: ['fromTosForFen', fen],
         queryFn: async () => getFromTosForFen(fen),
-        enabled: fen != null && fen !== 'start',
+        enabled: fen != null && fen !== 'start' && openingBook[fen] != null,
     });
 
     const {
@@ -112,7 +112,11 @@ const SearchPageContainer = () => {
 
     if (!openingBook) return <div>Loading...</div>;
 
-    const opening = openingBook[fen];
+    let opening = openingBook[fen] 
+    if (!opening && fen !== 'start') {
+        const posEntry = positionBook[fen.split(' ')[0]]
+        if (posEntry) opening = openingBook[posEntry[0]]; 
+    }
 
     if (data && data2 && opening) {
         const { score, nextScores, fromScores } = data2;
@@ -121,14 +125,14 @@ const SearchPageContainer = () => {
         opening.next = data.next.map((fen, i) => {
             const variation = {
                 ...openingBook[fen],
-                score: nextScores[i],
+                score: nextScores?.[i],
             };
             return variation;
         });
         opening.from = data.from.map((fen, i) => {
             const variation = {
                 ...openingBook[fen],
-                score: fromScores[i],
+                score: fromScores?.[i],
             };
             return variation;
         });

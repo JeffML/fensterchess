@@ -1,5 +1,4 @@
 import { ECO_JSON_RAW } from '../common/urlConsts.js';
-// import { pos } from '../utils/chessTools.js';
 
 let openingsByCat = { initialized: false };
 
@@ -7,7 +6,7 @@ let openingsByCat = { initialized: false };
 export async function getLatestEcoJson() {
     if (!openingsByCat.initialized) {
         const ROOT = ECO_JSON_RAW
-            ;
+            
         openingsByCat = {
             A: { url: ROOT + 'ecoA.json' },
             B: { url: ROOT + 'ecoB.json' },
