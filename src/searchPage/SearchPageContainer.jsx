@@ -4,6 +4,7 @@ import { FENEX } from '../common/consts.js';
 import { OpeningBookContext } from '../contexts/OpeningBookContext.jsx';
 import SearchPage from './SearchPage.jsx';
 import { useQuery } from '@tanstack/react-query';
+import { findOpening, getFromTosForFen, getScoresForFens } from '../datasource/findOpening.js';
 
 const loadMoves = (moves, chess) => {
     let fen = '';
@@ -52,36 +53,6 @@ function readParamsMaybe(url, chess, setBoardState) {
     }
 }
 
-const getFromTosForFen = async (fen) => {
-    const fromTos = await fetch(
-        '/.netlify/functions/getFromTosForFen?fen=' + fen,
-        {
-            headers: {
-                Authorization: `Bearer ${
-                    import.meta.env.VITE_API_SECRET_TOKEN
-                }`,
-            },
-        }
-    );
-    return await fromTos.json();
-};
-
-const getScoresForFens = async (json) => {
-    const response = await fetch('/.netlify/functions/scoresForFens', {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${
-                    import.meta.env.VITE_API_SECRET_TOKEN
-                }`,
-            'Content-type': 'application/json',
-        },
-        body: JSON.stringify(json),
-    });
-
-    const data = await response.json();
-    return data;
-};
-
 const SearchPageContainer = () => {
     const [boardState, setBoardState] = useState({ fen: 'start', moves: '' });
 
@@ -93,7 +64,7 @@ const SearchPageContainer = () => {
     const { fen } = boardState;
     const { openingBook, positionBook } = useContext(OpeningBookContext);
 
-    const { isPending, isError, error, data } = useQuery({
+    const { isPending, isError, error, data:fromTosForFen } = useQuery({
         queryKey: ['fromTosForFen', fen],
         queryFn: async () => getFromTosForFen(fen),
         enabled: fen != null && fen !== 'start' && openingBook[fen] != null,
@@ -103,42 +74,16 @@ const SearchPageContainer = () => {
         isPending: isPending2,
         isError: isError2,
         error: error2,
-        data: data2,
+        data: scoresForFens,
     } = useQuery({
         queryKey: ['scoresForFens', fen],
-        queryFn: async () => getScoresForFens({ fen, ...data }),
-        enabled: data != null,
+        queryFn: async () => getScoresForFens({ fen, ...fromTosForFen }),
+        enabled: fromTosForFen != null,
     });
 
     if (!openingBook) return <div>Loading...</div>;
 
-    let opening = openingBook[fen] 
-    if (!opening && fen !== 'start') {
-        const posEntry = positionBook[fen.split(' ')[0]]
-        if (posEntry) opening = openingBook[posEntry[0]]; 
-    }
-
-    if (data && data2 && opening) {
-        const { score, nextScores, fromScores } = data2;
-        opening.score = score;
-
-        opening.next = data.next.map((fen, i) => {
-            const variation = {
-                ...openingBook[fen],
-                score: nextScores?.[i],
-            };
-            return variation;
-        });
-        opening.from = data.from.map((fen, i) => {
-            const variation = {
-                ...openingBook[fen],
-                score: fromScores?.[i],
-            };
-            return variation;
-        });
-
-        chess.current.loadPgn(opening.moves);
-    }
+    let opening = findOpening(openingBook, fen, positionBook, fromTosForFen, scoresForFens, chess);
     const moves = chess.current.pgn();
 
     if (fen !== boardState.fen || moves !== boardState.moves)
@@ -150,3 +95,6 @@ const SearchPageContainer = () => {
 };
 
 export default SearchPageContainer;
+
+
+
