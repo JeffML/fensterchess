@@ -24,8 +24,7 @@ const About = () => (
                 is public and can be found at <a href={ECO_JSON}>eco.json</a>.
             </p>
             <p>
-                At present, there is no repository of chess games, though
-                Fenster is capable of pulling game metadata from the following
+                Fenster is not a repository of chess games, though it does pull game metadata from the following
                 sources:{' '}
             </p>
             <ul style={{ marginLeft: 'inherit' }}>
