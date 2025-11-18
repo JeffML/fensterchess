@@ -5,6 +5,7 @@
   "private": false,
   "type": "module",
   "dependencies": {
+    "@chess-pgn/chess-pgn": "^0.1.0-beta.2",
     "@netlify/vite-plugin": "^2.5.4",
     "@tanstack/react-query": "^5.83.0",
     "chess.js": "^1.4.0",
