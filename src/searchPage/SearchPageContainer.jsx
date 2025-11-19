@@ -1,4 +1,4 @@
-import { Chess } from "chess.js";
+import { ChessPGN } from "@chess-pgn/chess-pgn";
 import { useContext, useRef, useState, useEffect } from "react";
 import { FENEX } from "../common/consts.js";
 import { OpeningBookContext } from "../contexts/OpeningBookContext.jsx";
@@ -50,7 +50,7 @@ function readParams(url, chess) {
 const SearchPageContainer = () => {
   const [boardState, setBoardState] = useState({ fen: "start", moves: "" });
 
-  const chess = useRef(new Chess());
+  const chess = useRef(new ChessPGN());
 
   // Read URL parameters on mount
   useEffect(() => {

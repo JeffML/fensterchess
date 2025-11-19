@@ -30,7 +30,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest --run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui --run"
   },
   "browserslist": {
     "production": [

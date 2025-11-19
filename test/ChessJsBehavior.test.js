@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Chess } from "chess.js";
+import { ChessPGN } from "@chess-pgn/chess-pgn";
 
-describe("Chess.js behavior with moves", () => {
+describe("ChessPGN behavior with moves", () => {
   it("should correctly parse PGN moves and return FEN", () => {
-    const chess = new Chess();
+    const chess = new ChessPGN();
     const moves = "1. d4 Nf6 2. c4 e6 3. Nf3 d5 4. Nc3 Nbd7 5. cxd5 exd5";
 
     console.log("Initial FEN:", chess.fen());
@@ -26,7 +26,7 @@ describe("Chess.js behavior with moves", () => {
   });
 
   it("should handle URL-encoded moves", () => {
-    const chess = new Chess();
+    const chess = new ChessPGN();
     const encodedMoves =
       "1.%20d4%20Nf6%202.%20c4%20e6%203.%20Nf3%20d5%204.%20Nc3%20Nbd7%205.%20cxd5%20exd5";
     const decodedMoves = decodeURIComponent(encodedMoves);
