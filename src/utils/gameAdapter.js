@@ -5,6 +5,8 @@
  * allowing gradual migration from kokopu to chessPGN.
  */
 
+import { ChessPGN } from "@chess-pgn/chess-pgn";
+
 /**
  * GameAdapter wraps a chessPGN Game to provide kokopu-compatible API
  */
@@ -144,6 +146,35 @@ export class GameAdapter {
    */
   unwrap() {
     return this._game;
+  }
+
+  /**
+   * Get an array of position nodes (each move in the game)
+   * Mimics kokopu's nodes() method which returns positions after each move
+   * @returns {Array<Object>} Array of nodes with fen() and notation() methods
+   */
+  nodes() {
+    const game = this._game;
+    const moves = game.history({ verbose: true });
+
+    // We need to replay the game to get FEN after each move
+    // Create a new game and replay moves
+    const replay = new ChessPGN();
+
+    const nodes = [];
+    for (const move of moves) {
+      replay.move(move.san);
+      const currentFen = replay.fen();
+      const notation = move.san;
+
+      // Create a node object that mimics kokopu's node interface
+      nodes.push({
+        fen: () => currentFen,
+        notation: () => notation,
+      });
+    }
+
+    return nodes;
   }
 }
 

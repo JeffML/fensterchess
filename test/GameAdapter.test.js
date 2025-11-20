@@ -211,4 +211,26 @@ describe("GameAdapter vs Kokopu compatibility", () => {
       expect(adapter.variant()).toBe(kokopuGame.variant());
     });
   });
+
+  it("should implement nodes() method compatible with kokopu", () => {
+    // Create fresh instances for this test
+    const kokopuDb = pgnRead(SAMPLE_PGN);
+    const kokopuGame = Array.from(kokopuDb.games())[0];
+
+    const chessPgnGame = new ChessPGN();
+    chessPgnGame.loadPgn(SAMPLE_PGN);
+    const adapter = new GameAdapter(chessPgnGame);
+
+    const kokopuNodes = kokopuGame.nodes();
+    const adapterNodes = adapter.nodes();
+
+    // Should have same number of nodes
+    expect(adapterNodes.length).toBe(kokopuNodes.length);
+
+    // Check first few nodes match
+    for (let i = 0; i < Math.min(3, kokopuNodes.length); i++) {
+      expect(adapterNodes[i].fen()).toBe(kokopuNodes[i].fen());
+      expect(adapterNodes[i].notation()).toBe(kokopuNodes[i].notation());
+    }
+  });
 });

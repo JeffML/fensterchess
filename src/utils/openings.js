@@ -1,6 +1,4 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
-import { useContext } from "react";
-import { OpeningBookContext } from "../contexts/OpeningBookContext";
 
 export const getFensForMoves = (plies) => {
   const chess = new ChessPGN();
@@ -33,9 +31,7 @@ export const movesStringToPliesAry = (moves) => {
   return plies.filter((p) => p !== "");
 };
 
-export const findOpeningForKokopuGame = (game) => {
-  const { openingBook } = useContext(OpeningBookContext);
-
+export const findOpeningForKokopuGame = (game, openingBook) => {
   const fens = game
     .nodes()
     .slice(0, 50)

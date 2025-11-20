@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Fragment } from "react/jsx-runtime";
 import { getFullOpeningNameFromKokopuGame } from "../../utils/chessTools";
 import { findOpeningForKokopuGame } from "../../utils/openings";
+import { OpeningBookContext } from "../../contexts/OpeningBookContext";
 
 export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
+  const { openingBook } = useContext(OpeningBookContext);
   const [openingSrc, setOpeningSrc] = useState("pgn");
   const [games, setGames] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,7 +98,7 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
       <div id="games-rows" className="white games-tab-grid">
         {games.filter(filterFunc).map((g, i) => {
           const pgnOpening = getFullOpeningNameFromKokopuGame(g);
-          const fensterOpening = findOpeningForKokopuGame(g);
+          const fensterOpening = findOpeningForKokopuGame(g, openingBook);
           let variant = g.variant();
           if (variant && variant === "regular") variant = null;
           // logOpening(pgnOpening, fensterOpening);
@@ -104,8 +106,13 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
           const opening =
             openingSrc === "pgn" ? pgnOpening : fensterOpening?.name;
 
+          // Create unique key from game properties
+          const key = `${g.playerName("w")}-${g.playerName(
+            "b"
+          )}-${g.dateAsString()}-${g.fullRound()}-${i}`;
+
           return (
-            <Fragment key={i}>
+            <Fragment key={key}>
               <span style={{ marginLeft: "15px" }}>{g.fullRound()}</span>
               <span>{g.dateAsString()}</span>
               <span>{g.playerName("w")}</span>

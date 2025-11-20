@@ -1,9 +1,11 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
-import { useRef } from "react";
+import { useRef, useContext } from "react";
 import { findOpeningForKokopuGame } from "../../utils/openings";
+import { OpeningBookContext } from "../../contexts/OpeningBookContext";
 import { OpeningDetails } from "./openingTabContent/OpeningDetails";
 
 export const OpeningTab = ({ game }) => {
+  const { openingBook } = useContext(OpeningBookContext);
   const chess = useRef(new ChessPGN());
 
   if (!game)
@@ -13,7 +15,7 @@ export const OpeningTab = ({ game }) => {
       </span>
     );
 
-  const opening = findOpeningForKokopuGame(game);
+  const opening = findOpeningForKokopuGame(game, openingBook);
   chess.current.loadPgn(opening.moves);
   return <OpeningDetails {...{ opening, game, chess }} />;
 };
