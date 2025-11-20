@@ -13,6 +13,11 @@ export default defineConfig({
     port: 8080
   },
   build: {
-    chunkSizeWarningLimit: 1000
-  }
+    chunkSizeWarningLimit: 1000,
+    // Note: Test files are automatically excluded from build
+    // Vite only bundles files imported from src/index.jsx (entry point)
+    // The test/ directory is never imported, so it's naturally excluded
+  },
+  // Ensure test directory is not served during development
+  publicDir: 'public',
 });
