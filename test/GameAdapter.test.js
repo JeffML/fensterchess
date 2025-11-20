@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { pgnRead } from 'kokopu';
-import { ChessPGN } from '@chess-pgn/chess-pgn';
-import { GameAdapter, adaptGame } from '../src/utils/gameAdapter';
+import { describe, it, expect, beforeEach } from "vitest";
+import { pgnRead } from "kokopu";
+import { ChessPGN } from "@chess-pgn/chess-pgn";
+import { GameAdapter, adaptGame } from "../src/utils/gameAdapter";
 
 // Sample PGN for testing
 const SAMPLE_PGN = `[Event "Rated Blitz game"]
@@ -33,7 +33,7 @@ const MINIMAL_PGN = `[Event "Test Event"]
 
 1. e4 e5 *`;
 
-describe('GameAdapter', () => {
+describe("GameAdapter", () => {
   let kokopuGame;
   let chessPgnGame;
   let adapter;
@@ -42,30 +42,32 @@ describe('GameAdapter', () => {
     // Parse with both libraries
     const kokopuDb = pgnRead(SAMPLE_PGN);
     kokopuGame = Array.from(kokopuDb.games())[0];
-    
+
     chessPgnGame = new ChessPGN();
     chessPgnGame.loadPgn(SAMPLE_PGN);
-    
+
     adapter = new GameAdapter(chessPgnGame);
   });
 
-  describe('opening information', () => {
-    it('should return the opening name', () => {
+  describe("opening information", () => {
+    it("should return the opening name", () => {
       expect(adapter.opening()).toBe(kokopuGame.opening());
       expect(adapter.opening()).toBe("Queen's Gambit Declined");
     });
 
-    it('should return the opening variation', () => {
+    it("should return the opening variation", () => {
       expect(adapter.openingVariation()).toBe(kokopuGame.openingVariation());
-      expect(adapter.openingVariation()).toBe('Orthodox Defense');
+      expect(adapter.openingVariation()).toBe("Orthodox Defense");
     });
 
-    it('should return the opening sub-variation', () => {
-      expect(adapter.openingSubVariation()).toBe(kokopuGame.openingSubVariation());
-      expect(adapter.openingSubVariation()).toBe('Classical Variation');
+    it("should return the opening sub-variation", () => {
+      expect(adapter.openingSubVariation()).toBe(
+        kokopuGame.openingSubVariation()
+      );
+      expect(adapter.openingSubVariation()).toBe("Classical Variation");
     });
 
-    it('should handle missing opening information', () => {
+    it("should handle missing opening information", () => {
       const minimalChessGame = new ChessPGN();
       minimalChessGame.loadPgn(MINIMAL_PGN);
       const minimalAdapter = new GameAdapter(minimalChessGame);
@@ -76,40 +78,40 @@ describe('GameAdapter', () => {
     });
   });
 
-  describe('game metadata', () => {
-    it('should return the round information', () => {
+  describe("game metadata", () => {
+    it("should return the round information", () => {
       expect(adapter.fullRound()).toBe(kokopuGame.fullRound());
-      expect(adapter.fullRound()).toBe('1');
+      expect(adapter.fullRound()).toBe("1");
     });
 
-    it('should return the date as string', () => {
+    it("should return the date as string", () => {
       expect(adapter.dateAsString()).toBe(kokopuGame.dateAsString());
-      expect(adapter.dateAsString()).toBe('November 15, 2023');
+      expect(adapter.dateAsString()).toBe("November 15, 2023");
     });
 
-    it('should return white player name', () => {
-      expect(adapter.playerName('w')).toBe(kokopuGame.playerName('w'));
-      expect(adapter.playerName('w')).toBe('PlayerOne');
+    it("should return white player name", () => {
+      expect(adapter.playerName("w")).toBe(kokopuGame.playerName("w"));
+      expect(adapter.playerName("w")).toBe("PlayerOne");
     });
 
-    it('should return black player name', () => {
-      expect(adapter.playerName('b')).toBe(kokopuGame.playerName('b'));
-      expect(adapter.playerName('b')).toBe('PlayerTwo');
+    it("should return black player name", () => {
+      expect(adapter.playerName("b")).toBe(kokopuGame.playerName("b"));
+      expect(adapter.playerName("b")).toBe("PlayerTwo");
     });
 
-    it('should return game result', () => {
+    it("should return game result", () => {
       expect(adapter.result()).toBe(kokopuGame.result());
-      expect(adapter.result()).toBe('1-0');
+      expect(adapter.result()).toBe("1-0");
     });
 
-    it('should return variant', () => {
+    it("should return variant", () => {
       expect(adapter.variant()).toBe(kokopuGame.variant());
-      expect(adapter.variant()).toBe('regular');
+      expect(adapter.variant()).toBe("regular");
     });
   });
 
-  describe('pojo() method', () => {
-    it('should return a plain object with game data matching kokopu format', () => {
+  describe("pojo() method", () => {
+    it("should return a plain object with game data matching kokopu format", () => {
       const adapterPojo = adapter.pojo();
       const kokopuPojo = kokopuGame.pojo();
 
@@ -120,14 +122,14 @@ describe('GameAdapter', () => {
       expect(adapterPojo.result).toBe(kokopuPojo.result);
     });
 
-    it('should include ELO ratings', () => {
+    it("should include ELO ratings", () => {
       const pojo = adapter.pojo();
-      
+
       expect(pojo.white.elo).toBe(2100);
       expect(pojo.black.elo).toBe(2050);
     });
 
-    it('should handle missing ELO ratings', () => {
+    it("should handle missing ELO ratings", () => {
       const minimalChessGame = new ChessPGN();
       minimalChessGame.loadPgn(MINIMAL_PGN);
       const minimalAdapter = new GameAdapter(minimalChessGame);
@@ -138,29 +140,29 @@ describe('GameAdapter', () => {
     });
   });
 
-  describe('adaptGame factory function', () => {
-    it('should create a GameAdapter instance', () => {
+  describe("adaptGame factory function", () => {
+    it("should create a GameAdapter instance", () => {
       const adapted = adaptGame(chessPgnGame);
       expect(adapted).toBeInstanceOf(GameAdapter);
     });
 
-    it('should return adapter with correct methods', () => {
+    it("should return adapter with correct methods", () => {
       const adapted = adaptGame(chessPgnGame);
       expect(adapted.opening()).toBe("Queen's Gambit Declined");
-      expect(adapted.playerName('w')).toBe('PlayerOne');
+      expect(adapted.playerName("w")).toBe("PlayerOne");
     });
   });
 
-  describe('unwrap method', () => {
-    it('should return the underlying chessPGN game', () => {
+  describe("unwrap method", () => {
+    it("should return the underlying chessPGN game", () => {
       const unwrapped = adapter.unwrap();
       expect(unwrapped).toBe(chessPgnGame);
       expect(unwrapped).toBeInstanceOf(ChessPGN);
     });
   });
 
-  describe('edge cases', () => {
-    it('should handle games with default values', () => {
+  describe("edge cases", () => {
+    it("should handle games with default values", () => {
       const defaultPgn = `[Event "?"]
 [Site "?"]
 [Date "????.??.??"]
@@ -176,38 +178,35 @@ describe('GameAdapter', () => {
       const adapted = new GameAdapter(game);
 
       expect(adapted.opening()).toBeUndefined();
-      expect(adapted.playerName('w')).toBe('?');
-      expect(adapted.dateAsString()).toBe('????.??.??');
-      expect(adapted.result()).toBe('*');
+      expect(adapted.playerName("w")).toBe("?");
+      expect(adapted.dateAsString()).toBe("????.??.??");
+      expect(adapted.result()).toBe("*");
     });
   });
 });
 
-describe('GameAdapter vs Kokopu compatibility', () => {
-  it('should match kokopu API for all test cases', () => {
-    const testPgns = [
-      SAMPLE_PGN,
-      MINIMAL_PGN,
-    ];
+describe("GameAdapter vs Kokopu compatibility", () => {
+  it("should match kokopu API for all test cases", () => {
+    const testPgns = [SAMPLE_PGN, MINIMAL_PGN];
 
     testPgns.forEach((pgn, index) => {
       const kokopuDb = pgnRead(pgn);
       const kokopuGame = Array.from(kokopuDb.games())[0];
-      
+
       const chessPgnGame = new ChessPGN();
       chessPgnGame.loadPgn(pgn);
       const adapter = new GameAdapter(chessPgnGame);
 
       console.log(`Test case ${index + 1}:`);
-      console.log('  Kokopu opening:', kokopuGame.opening());
-      console.log('  Adapter opening:', adapter.opening());
-      
+      console.log("  Kokopu opening:", kokopuGame.opening());
+      console.log("  Adapter opening:", adapter.opening());
+
       // Compare key methods
       expect(adapter.opening()).toBe(kokopuGame.opening());
       expect(adapter.fullRound()).toBe(kokopuGame.fullRound());
       expect(adapter.dateAsString()).toBe(kokopuGame.dateAsString());
-      expect(adapter.playerName('w')).toBe(kokopuGame.playerName('w'));
-      expect(adapter.playerName('b')).toBe(kokopuGame.playerName('b'));
+      expect(adapter.playerName("w")).toBe(kokopuGame.playerName("w"));
+      expect(adapter.playerName("b")).toBe(kokopuGame.playerName("b"));
       expect(adapter.result()).toBe(kokopuGame.result());
       expect(adapter.variant()).toBe(kokopuGame.variant());
     });

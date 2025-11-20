@@ -1,6 +1,6 @@
 /**
  * Adapter to make @chess-pgn/chess-pgn Game objects compatible with kokopu Game API
- * 
+ *
  * This adapter wraps a chessPGN Game to provide the same interface as kokopu Game objects,
  * allowing gradual migration from kokopu to chessPGN.
  */
@@ -18,7 +18,7 @@ export class GameAdapter {
    * @returns {string|undefined} Opening name or undefined if not present
    */
   opening() {
-    const opening = this._game.header()['Opening'];
+    const opening = this._game.header()["Opening"];
     return opening || undefined;
   }
 
@@ -27,7 +27,7 @@ export class GameAdapter {
    * @returns {string|undefined} Opening variation or undefined if not present
    */
   openingVariation() {
-    const variation = this._game.header()['Variation'];
+    const variation = this._game.header()["Variation"];
     return variation || undefined;
   }
 
@@ -36,7 +36,7 @@ export class GameAdapter {
    * @returns {string|undefined} Opening sub-variation or undefined if not present
    */
   openingSubVariation() {
-    const subVariation = this._game.header()['SubVariation'];
+    const subVariation = this._game.header()["SubVariation"];
     return subVariation || undefined;
   }
 
@@ -45,9 +45,9 @@ export class GameAdapter {
    * @returns {string|undefined} Round information or undefined if not present
    */
   fullRound() {
-    const round = this._game.header()['Round'];
+    const round = this._game.header()["Round"];
     // Return undefined for missing or '?' values to match kokopu behavior
-    return (round && round !== '?') ? round : undefined;
+    return round && round !== "?" ? round : undefined;
   }
 
   /**
@@ -55,24 +55,34 @@ export class GameAdapter {
    * @returns {string} Date string
    */
   dateAsString() {
-    const dateStr = this._game.header()['Date'] || '????.??.??';
-    
+    const dateStr = this._game.header()["Date"] || "????.??.??";
+
     // If it's the default or malformed, return as-is
-    if (dateStr === '????.??.??' || !dateStr.match(/^\d{4}\.\d{2}\.\d{2}$/)) {
+    if (dateStr === "????.??.??" || !dateStr.match(/^\d{4}\.\d{2}\.\d{2}$/)) {
       return dateStr;
     }
-    
+
     // Convert from "2023.11.15" to "November 15, 2023"
-    const [year, month, day] = dateStr.split('.');
+    const [year, month, day] = dateStr.split(".");
     const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
-    
+
     const monthIndex = parseInt(month, 10) - 1;
     const monthName = monthNames[monthIndex] || month;
     const dayNum = parseInt(day, 10);
-    
+
     return `${monthName} ${dayNum}, ${year}`;
   }
 
@@ -82,8 +92,8 @@ export class GameAdapter {
    * @returns {string} Player name
    */
   playerName(color) {
-    const colorKey = color === 'w' ? 'White' : 'Black';
-    return this._game.header()[colorKey] || '?';
+    const colorKey = color === "w" ? "White" : "Black";
+    return this._game.header()[colorKey] || "?";
   }
 
   /**
@@ -91,7 +101,7 @@ export class GameAdapter {
    * @returns {string} Result string (1-0, 0-1, 1/2-1/2, or *)
    */
   result() {
-    return this._game.header()['Result'] || '*';
+    return this._game.header()["Result"] || "*";
   }
 
   /**
@@ -100,7 +110,7 @@ export class GameAdapter {
    */
   variant() {
     // chessPGN doesn't have variant support yet, assume regular chess
-    return 'regular';
+    return "regular";
   }
 
   /**
@@ -112,16 +122,16 @@ export class GameAdapter {
     const headers = this._game.header();
     return {
       white: {
-        name: this.playerName('w'),
-        elo: parseInt(headers['WhiteElo']) || undefined,
+        name: this.playerName("w"),
+        elo: parseInt(headers["WhiteElo"]) || undefined,
       },
       black: {
-        name: this.playerName('b'),
-        elo: parseInt(headers['BlackElo']) || undefined,
+        name: this.playerName("b"),
+        elo: parseInt(headers["BlackElo"]) || undefined,
       },
       opening: this.opening(),
-      event: headers['Event'] || '?',
-      site: headers['Site'] || '?',
+      event: headers["Event"] || "?",
+      site: headers["Site"] || "?",
       date: this.dateAsString(),
       round: this.fullRound(),
       result: this.result(),

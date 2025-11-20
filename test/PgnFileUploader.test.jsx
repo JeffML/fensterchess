@@ -1,11 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { describe, it, expect, beforeEach } from 'vitest';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
-import { PgnListPanel } from '../src/pgnImportPage/PgnListPanel.jsx';
-import { PgnTabsPanelContainer } from '../src/pgnImportPage/PgnTabsPanelContainer.jsx';
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { describe, it, expect, beforeEach } from "vitest";
+import { readFileSync } from "fs";
+import { resolve } from "path";
+import { PgnListPanel } from "../src/pgnImportPage/PgnListPanel.jsx";
+import { PgnTabsPanelContainer } from "../src/pgnImportPage/PgnTabsPanelContainer.jsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
  * Test suite for PGN file upload functionality
  * Tests the "Upload PGN" option using wcup25.pgn with kokopu implementation
  */
-describe('PGN File Upload', () => {
+describe("PGN File Upload", () => {
   let setLink;
 
   beforeEach(() => {
@@ -28,9 +28,9 @@ describe('PGN File Upload', () => {
     };
   });
 
-  it('should render Upload PGN option when local mode is selected', async () => {
+  it("should render Upload PGN option when local mode is selected", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <QueryClientProvider client={queryClient}>
         <PgnListPanel link={{}} setLink={setLink} />
@@ -38,29 +38,31 @@ describe('PGN File Upload', () => {
     );
 
     // Should default to TWIC mode - find radio by value
-    const radios = screen.getAllByRole('radio');
-    const twicRadio = radios.find(r => r.value === 'twic');
-    const uploadRadio = radios.find(r => r.value === 'local');
-    
+    const radios = screen.getAllByRole("radio");
+    const twicRadio = radios.find((r) => r.value === "twic");
+    const uploadRadio = radios.find((r) => r.value === "local");
+
     expect(twicRadio).toBeChecked();
 
     // Switch to local upload mode
     await user.click(uploadRadio);
 
     expect(uploadRadio).toBeChecked();
-    expect(screen.getByText('Choose a PGN file:')).toBeInTheDocument();
+    expect(screen.getByText("Choose a PGN file:")).toBeInTheDocument();
   });
 
-  it('should process wcup25.pgn file upload and calculate summary statistics', async () => {
+  it("should process wcup25.pgn file upload and calculate summary statistics", async () => {
     const user = userEvent.setup();
-    
+
     // Read the test PGN file
-    const pgnPath = resolve(__dirname, 'data', 'wcup25.pgn');
-    const pgnContent = readFileSync(pgnPath, 'utf8');
-    
+    const pgnPath = resolve(__dirname, "data", "wcup25.pgn");
+    const pgnContent = readFileSync(pgnPath, "utf8");
+
     // Create a File object from the PGN content
-    const file = new File([pgnContent], 'wcup25.pgn', { type: 'application/x-chess-pgn' });
-    
+    const file = new File([pgnContent], "wcup25.pgn", {
+      type: "application/x-chess-pgn",
+    });
+
     let capturedLink = null;
     const mockSetLink = (link) => {
       capturedLink = link;
@@ -73,12 +75,12 @@ describe('PGN File Upload', () => {
     );
 
     // Switch to local upload mode
-    const radios = screen.getAllByRole('radio');
-    const uploadRadio = radios.find(r => r.value === 'local');
+    const radios = screen.getAllByRole("radio");
+    const uploadRadio = radios.find((r) => r.value === "local");
     await user.click(uploadRadio);
 
     // Get file input and upload
-    const fileInput = screen.getByLabelText('Choose a PGN file:');
+    const fileInput = screen.getByLabelText("Choose a PGN file:");
     await user.upload(fileInput, file);
 
     // Wait for file to be processed
@@ -88,15 +90,15 @@ describe('PGN File Upload', () => {
     });
 
     // Verify PGN content was captured
-    expect(capturedLink.pgn).toContain('FIDE World Cup 2025');
+    expect(capturedLink.pgn).toContain("FIDE World Cup 2025");
     expect(capturedLink.pgn).toContain('[Event "FIDE World Cup 2025"]');
   });
 
-  it('should render PGN tabs panel with uploaded PGN data', () => {
+  it("should render PGN tabs panel with uploaded PGN data", async () => {
     // Read the test PGN file
-    const pgnPath = resolve(__dirname, 'data', 'wcup25.pgn');
-    const pgnContent = readFileSync(pgnPath, 'utf8');
-    
+    const pgnPath = resolve(__dirname, "data", "wcup25.pgn");
+    const pgnContent = readFileSync(pgnPath, "utf8");
+
     const link = { pgn: pgnContent };
 
     render(
@@ -105,30 +107,39 @@ describe('PGN File Upload', () => {
       </QueryClientProvider>
     );
 
+    // Wait for async loading to complete
+    await waitFor(
+      () => {
+        expect(screen.getByText("Summary")).toBeInTheDocument();
+      },
+      { timeout: 5000 }
+    );
+
     // Verify tabs are rendered
-    expect(screen.getByText('Summary')).toBeInTheDocument();
-    expect(screen.getByText('Games')).toBeInTheDocument();
-    expect(screen.getByText('Opening')).toBeInTheDocument();
+    expect(screen.getByText("Games")).toBeInTheDocument();
+    expect(screen.getByText("Opening")).toBeInTheDocument();
   });
 
-  it('should calculate correct game statistics from wcup25.pgn using kokopu', async () => {
-    const pgnPath = resolve(__dirname, 'data', 'wcup25.pgn');
-    const pgnContent = readFileSync(pgnPath, 'utf8');
-    
+  it("should calculate correct game statistics from wcup25.pgn using kokopu", async () => {
+    const pgnPath = resolve(__dirname, "data", "wcup25.pgn");
+    const pgnContent = readFileSync(pgnPath, "utf8");
+
     // Import getPgnSummary dynamically
-    const { getPgnSummary } = await import('../src/pgnImportPage/PgnTabsPanelContainer.jsx');
-    
-    const summary = getPgnSummary(pgnContent);
+    const { getPgnSummary } = await import(
+      "../src/pgnImportPage/PgnTabsPanelContainer.jsx"
+    );
+
+    const summary = await getPgnSummary(pgnContent);
 
     // Verify summary structure
-    expect(summary).toHaveProperty('db');
-    expect(summary).toHaveProperty('players');
-    expect(summary).toHaveProperty('high');
-    expect(summary).toHaveProperty('low');
-    expect(summary).toHaveProperty('avg');
-    expect(summary).toHaveProperty('count');
-    expect(summary).toHaveProperty('openings');
-    expect(summary).toHaveProperty('event');
+    expect(summary).toHaveProperty("db");
+    expect(summary).toHaveProperty("players");
+    expect(summary).toHaveProperty("high");
+    expect(summary).toHaveProperty("low");
+    expect(summary).toHaveProperty("avg");
+    expect(summary).toHaveProperty("count");
+    expect(summary).toHaveProperty("openings");
+    expect(summary).toHaveProperty("event");
 
     // Verify game count
     expect(summary.count).toBeGreaterThan(0);
@@ -137,10 +148,10 @@ describe('PGN File Upload', () => {
     // Verify player data structure
     const playerNames = Object.keys(summary.players);
     expect(playerNames.length).toBeGreaterThan(0);
-    
+
     // Each player should have name and potentially elo
-    playerNames.forEach(name => {
-      expect(summary.players[name]).toHaveProperty('name');
+    playerNames.forEach((name) => {
+      expect(summary.players[name]).toHaveProperty("name");
       expect(summary.players[name].name).toBe(name);
     });
 
@@ -155,27 +166,29 @@ describe('PGN File Upload', () => {
     expect(summary.openings.size).toBeGreaterThan(0);
 
     // Verify event
-    expect(summary.event).toContain('FIDE World Cup 2025');
+    expect(summary.event).toContain("FIDE World Cup 2025");
   });
 
-  it('should iterate through all games in wcup25.pgn correctly', async () => {
-    const pgnPath = resolve(__dirname, 'data', 'wcup25.pgn');
-    const pgnContent = readFileSync(pgnPath, 'utf8');
-    
-    const { getPgnSummary } = await import('../src/pgnImportPage/PgnTabsPanelContainer.jsx');
-    const summary = getPgnSummary(pgnContent);
+  it("should iterate through all games in wcup25.pgn correctly", async () => {
+    const pgnPath = resolve(__dirname, "data", "wcup25.pgn");
+    const pgnContent = readFileSync(pgnPath, "utf8");
+
+    const { getPgnSummary } = await import(
+      "../src/pgnImportPage/PgnTabsPanelContainer.jsx"
+    );
+    const summary = await getPgnSummary(pgnContent);
 
     let gameCount = 0;
-    for (let game of summary.db.games()) {
+    for await (const game of summary.db.games()) {
       gameCount++;
-      
+
       // Verify each game has required pojo structure
       const pojo = game.pojo();
-      expect(pojo).toHaveProperty('white');
-      expect(pojo).toHaveProperty('black');
-      expect(pojo.white).toHaveProperty('name');
-      expect(pojo.black).toHaveProperty('name');
-      
+      expect(pojo).toHaveProperty("white");
+      expect(pojo).toHaveProperty("black");
+      expect(pojo.white).toHaveProperty("name");
+      expect(pojo.black).toHaveProperty("name");
+
       // Stop after checking first few games to keep test fast
       if (gameCount >= 5) break;
     }

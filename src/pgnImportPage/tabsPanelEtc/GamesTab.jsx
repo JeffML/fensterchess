@@ -1,12 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Fragment } from "react/jsx-runtime";
 import { getFullOpeningNameFromKokopuGame } from "../../utils/chessTools";
 import { findOpeningForKokopuGame } from "../../utils/openings";
 
 export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
   const [openingSrc, setOpeningSrc] = useState("pgn");
-  // games in db are kokopu objects, not chessPGN
-  const games = Array.from(db.games());
+  const [games, setGames] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load games from async iterator
+  useEffect(() => {
+    let mounted = true;
+
+    const loadGames = async () => {
+      setIsLoading(true);
+      const gamesList = [];
+      for await (const game of db.games()) {
+        if (!mounted) break;
+        gamesList.push(game);
+      }
+      if (mounted) {
+        setGames(gamesList);
+        setIsLoading(false);
+      }
+    };
+
+    loadGames();
+
+    return () => {
+      mounted = false;
+    };
+  }, [db]);
 
   const clickHandler = (g) => {
     setTabIndex(2);
@@ -29,6 +53,10 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
       )
     );
   };
+
+  if (isLoading) {
+    return <div className="white">Loading games...</div>;
+  }
 
   return (
     <>
