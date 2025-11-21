@@ -1,12 +1,12 @@
 # example netlify.toml
 [build]
-  command = "yarn run build"
+  command = "npm run build"
   publish = "dist"
 
   ## (optional) Settings for Netlify Dev
   ## https://github.com/netlify/cli/blob/main/docs/netlify-dev.md#project-detection
 [dev]
-  command = "yarn run dev"
+  command = "npm run dev"
   targetPort = 3000
   framework = "vite"
 
