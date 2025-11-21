@@ -54,7 +54,7 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
 
   const loadMore = async () => {
     if (isLoadingMore) return;
-    
+
     setIsLoadingMore(true);
     const newGames = [];
     let count = 0;
@@ -71,10 +71,10 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
       }
 
       const updatedLength = games.length + newGames.length;
-      
+
       setGames((prev) => [...prev, ...newGames]);
       currentPositionRef.current = updatedLength;
-      
+
       // Check if we've loaded all games
       // Either we got fewer games than requested (end of file) or we've reached the total
       if (count < BATCH_SIZE || updatedLength >= totalGames) {
@@ -164,38 +164,36 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
       </div>
       <hr />
       <div id="games-rows" className="white games-tab-grid">
-        {games
-          .filter(filterFunc)
-          .map((g, i) => {
-            // Only use PGN openings (from headers) - skip fenster for performance
-            const pgnOpening = getFullOpeningNameFromKokopuGame(g);
-            const opening = pgnOpening;
+        {games.filter(filterFunc).map((g, i) => {
+          // Only use PGN openings (from headers) - skip fenster for performance
+          const pgnOpening = getFullOpeningNameFromKokopuGame(g);
+          const opening = pgnOpening;
 
-            let variant = g.variant();
-            if (variant && variant === "regular") variant = null;
+          let variant = g.variant();
+          if (variant && variant === "regular") variant = null;
 
-            // Create unique key from game properties
-            const key = `${g.playerName("w")}-${g.playerName(
-              "b"
-            )}-${g.dateAsString()}-${g.fullRound()}-${i}`;
+          // Create unique key from game properties
+          const key = `${g.playerName("w")}-${g.playerName(
+            "b"
+          )}-${g.dateAsString()}-${g.fullRound()}-${i}`;
 
-            return (
-              <Fragment key={key}>
-                <span style={{ marginLeft: "15px" }}>{g.fullRound()}</span>
-                <span>{g.dateAsString()}</span>
-                <span>{g.playerName("w")}</span>
-                <span>{g.playerName("b")}</span>
-                {variant && <span>{variant} variant not supported</span>}
-                {!variant && (
-                  <span className="fakeLink" onClick={() => clickHandler(g)}>
-                    {opening ?? "N/A"}
-                  </span>
-                )}
+          return (
+            <Fragment key={key}>
+              <span style={{ marginLeft: "15px" }}>{g.fullRound()}</span>
+              <span>{g.dateAsString()}</span>
+              <span>{g.playerName("w")}</span>
+              <span>{g.playerName("b")}</span>
+              {variant && <span>{variant} variant not supported</span>}
+              {!variant && (
+                <span className="fakeLink" onClick={() => clickHandler(g)}>
+                  {opening ?? "N/A"}
+                </span>
+              )}
 
-                <span>{g.result()}</span>
-              </Fragment>
-            );
-          })}
+              <span>{g.result()}</span>
+            </Fragment>
+          );
+        })}
       </div>
       {hasMore && (
         <div style={{ textAlign: "center", padding: "20px" }}>
@@ -212,8 +210,8 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
               borderRadius: "4px",
             }}
           >
-            {isLoadingMore 
-              ? "Loading..." 
+            {isLoadingMore
+              ? "Loading..."
               : `Load Next ${BATCH_SIZE} (showing ${games.length} of ${totalGames})`}
           </button>
         </div>

@@ -53,7 +53,7 @@ export class GameAdapter {
   }
 
   /**
-   * Get the date as a string formatted like kokopu (e.g., "November 15, 2023")
+   * Get the date as a string formatted with 3-letter month abbreviation (e.g., "Nov 15, 2023")
    * @returns {string} Date string
    */
   dateAsString() {
@@ -64,28 +64,14 @@ export class GameAdapter {
       return dateStr;
     }
 
-    // Convert from "2023.11.15" to "November 15, 2023"
+    // Convert from "2023.11.15" to "Nov 15, 2023"
     const [year, month, day] = dateStr.split(".");
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
-    const monthIndex = parseInt(month, 10) - 1;
-    const monthName = monthNames[monthIndex] || month;
+    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
+    
+    const monthAbbr = date.toLocaleDateString('en-US', { month: 'short' });
     const dayNum = parseInt(day, 10);
 
-    return `${monthName} ${dayNum}, ${year}`;
+    return `${monthAbbr} ${dayNum}, ${year}`;
   }
 
   /**
