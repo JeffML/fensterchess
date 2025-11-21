@@ -6,6 +6,7 @@ import { readFileSync } from "fs";
 import { resolve } from "path";
 import { PgnListPanel } from "../src/pgnImportPage/PgnListPanel.jsx";
 import { PgnTabsPanelContainer } from "../src/pgnImportPage/PgnTabsPanelContainer.jsx";
+import { OpeningBookProvider } from "../src/contexts/OpeningBookContext.jsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -195,4 +196,63 @@ describe("PGN File Upload", () => {
 
     expect(gameCount).toBeGreaterThanOrEqual(5);
   });
+
+  it("should measure Games tab render performance with wcup25.pgn", async () => {
+    const user = userEvent.setup();
+
+    // Read the test PGN file
+    const pgnPath = resolve(__dirname, "data", "wcup25.pgn");
+    const pgnContent = readFileSync(pgnPath, "utf8");
+
+    const { getPgnSummary } = await import(
+      "../src/pgnImportPage/PgnTabsPanelContainer.jsx"
+    );
+
+    console.time("[Performance Test] PGN Summary calculation");
+    const summary = await getPgnSummary(pgnContent);
+    console.timeEnd("[Performance Test] PGN Summary calculation");
+
+    console.log(`[Performance Test] Total games in file: ${summary.count}`);
+    console.time("[Performance Test] Render PgnTabsPanel");
+
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <OpeningBookProvider>
+          <PgnTabsPanelContainer link={{ pgn: pgnContent }} />
+        </OpeningBookProvider>
+      </QueryClientProvider>
+    );
+
+    console.timeEnd("[Performance Test] Render PgnTabsPanel");
+
+    // Wait for summary tab to load
+    await waitFor(() => {
+      expect(screen.getByText(/Summary/i)).toBeInTheDocument();
+    });
+
+    // Click the Games tab
+    const gamesTab = screen.getByText("Games");
+    console.time("[Performance Test] Click Games tab to first render");
+    await user.click(gamesTab);
+
+    // Wait for first game to appear
+    await waitFor(
+      () => {
+        const rows = container.querySelectorAll("#games-rows > span");
+        console.log(
+          `[Performance Test] Checking for games, found ${rows.length} spans`
+        );
+        expect(rows.length).toBeGreaterThan(0);
+      },
+      { timeout: 60000 } // 60 second timeout to see how long it really takes
+    );
+    console.timeEnd("[Performance Test] Click Games tab to first render");
+
+    // Verify games are displayed
+    const gameRows = container.querySelectorAll("#games-rows > span");
+    const gamesDisplayed = gameRows.length / 6; // 6 columns per game
+    console.log(`[Performance Test] Games displayed: ${gamesDisplayed}`);
+    expect(gamesDisplayed).toBeGreaterThanOrEqual(10); // Should show at least 10
+    expect(gamesDisplayed).toBeLessThanOrEqual(25); // Should show at most 25 initially
+  }, 70000); // 70 second total test timeout
 });
