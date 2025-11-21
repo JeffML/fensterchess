@@ -71,8 +71,8 @@ export const getPgnSummary = async (pgn) => {
   // Games are parsed lazily only when actually iterated
   const db = {
     gameCount: () => gmCt,
-    games: async function* () {
-      const gameCursor = new CursorImpl(pgn, indices, { start: 0 });
+    games: async function* (startIndex = 0) {
+      const gameCursor = new CursorImpl(pgn, indices, { start: startIndex });
       for await (const game of gameCursor) {
         yield new GameAdapter(game);
       }

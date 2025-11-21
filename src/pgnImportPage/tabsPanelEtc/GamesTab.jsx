@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { Fragment } from "react/jsx-runtime";
 import { getFullOpeningNameFromKokopuGame } from "../../utils/chessTools";
 import { findOpeningForKokopuGame } from "../../utils/openings";
@@ -8,15 +8,18 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
   const { openingBook } = useContext(OpeningBookContext);
   const [openingSrc, setOpeningSrc] = useState("pgn");
   const [games, setGames] = useState([]);
-  const [displayCount, setDisplayCount] = useState(25);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingAll, setIsLoadingAll] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const totalGames = db.gameCount();
+  const BATCH_SIZE = 25;
+
+  // Track the current position in the game list
+  const currentPositionRef = useRef(0);
 
   // Load games progressively
   useEffect(() => {
     let mounted = true;
-    const INITIAL_BATCH = 25;
 
     const loadGames = async () => {
       const gamesList = [];
@@ -28,7 +31,7 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
         count++;
 
         // Stop after initial batch - don't load all games
-        if (count >= INITIAL_BATCH) {
+        if (count >= BATCH_SIZE) {
           break;
         }
       }
@@ -36,8 +39,9 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
       // Show the games we loaded
       if (mounted) {
         setGames(gamesList);
+        currentPositionRef.current = gamesList.length;
         setIsLoading(false);
-        setIsLoadingAll(count < totalGames); // Still more to load if we stopped early
+        setHasMore(count >= BATCH_SIZE && gamesList.length < totalGames);
       }
     };
 
@@ -48,8 +52,37 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
     };
   }, [db, totalGames]);
 
-  const loadMore = () => {
-    setDisplayCount((prev) => Math.min(prev + 25, games.length));
+  const loadMore = async () => {
+    if (isLoadingMore) return;
+    
+    setIsLoadingMore(true);
+    const newGames = [];
+    let count = 0;
+
+    try {
+      // Create a new iterator starting from our current position
+      for await (const game of db.games(currentPositionRef.current)) {
+        newGames.push(game);
+        count++;
+
+        if (count >= BATCH_SIZE) {
+          break;
+        }
+      }
+
+      const updatedLength = games.length + newGames.length;
+      
+      setGames((prev) => [...prev, ...newGames]);
+      currentPositionRef.current = updatedLength;
+      
+      // Check if we've loaded all games
+      // Either we got fewer games than requested (end of file) or we've reached the total
+      if (count < BATCH_SIZE || updatedLength >= totalGames) {
+        setHasMore(false);
+      }
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
 
   const clickHandler = (g) => {
@@ -132,7 +165,6 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
       <hr />
       <div id="games-rows" className="white games-tab-grid">
         {games
-          .slice(0, displayCount)
           .filter(filterFunc)
           .map((g, i) => {
             // Only use PGN openings (from headers) - skip fenster for performance
@@ -165,27 +197,25 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
             );
           })}
       </div>
-      {displayCount < games.length && (
+      {hasMore && (
         <div style={{ textAlign: "center", padding: "20px" }}>
           <button
             onClick={loadMore}
+            disabled={isLoadingMore}
             style={{
               padding: "10px 20px",
               fontSize: "16px",
-              cursor: "pointer",
-              backgroundColor: "#4CAF50",
+              cursor: isLoadingMore ? "wait" : "pointer",
+              backgroundColor: isLoadingMore ? "#ccc" : "#4CAF50",
               color: "white",
               border: "none",
               borderRadius: "4px",
             }}
           >
-            Load More (showing {displayCount} of {games.length})
+            {isLoadingMore 
+              ? "Loading..." 
+              : `Load Next ${BATCH_SIZE} (showing ${games.length} of ${totalGames})`}
           </button>
-        </div>
-      )}
-      {isLoadingAll && games.length > 0 && (
-        <div style={{ textAlign: "center", padding: "10px", color: "#888" }}>
-          Loading remaining games... ({games.length} of {totalGames})
         </div>
       )}
     </>
