@@ -27,18 +27,17 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
         gamesList.push(game);
         count++;
 
-        // Show first batch immediately
-        if (count === INITIAL_BATCH && mounted) {
-          setGames([...gamesList]);
-          setIsLoading(false);
+        // Stop after initial batch - don't load all games
+        if (count >= INITIAL_BATCH) {
+          break;
         }
       }
 
-      // All loaded
+      // Show the games we loaded
       if (mounted) {
         setGames(gamesList);
         setIsLoading(false);
-        setIsLoadingAll(false);
+        setIsLoadingAll(count < totalGames); // Still more to load if we stopped early
       }
     };
 
@@ -47,7 +46,7 @@ export const GamesTab = ({ db, filter, setGame, setTabIndex }) => {
     return () => {
       mounted = false;
     };
-  }, [db]);
+  }, [db, totalGames]);
 
   const loadMore = () => {
     setDisplayCount((prev) => Math.min(prev + 25, games.length));
