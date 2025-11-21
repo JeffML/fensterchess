@@ -66,9 +66,13 @@ export class GameAdapter {
 
     // Convert from "2023.11.15" to "Nov 15, 2023"
     const [year, month, day] = dateStr.split(".");
-    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
-    
-    const monthAbbr = date.toLocaleDateString('en-US', { month: 'short' });
+    const date = new Date(
+      parseInt(year, 10),
+      parseInt(month, 10) - 1,
+      parseInt(day, 10)
+    );
+
+    const monthAbbr = date.toLocaleDateString("en-US", { month: "short" });
     const dayNum = parseInt(day, 10);
 
     return `${monthAbbr} ${dayNum}, ${year}`;
