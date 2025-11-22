@@ -19,7 +19,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    
+
     /* Allow JS/JSX during migration */
     "allowJs": true,
     "checkJs": false,
