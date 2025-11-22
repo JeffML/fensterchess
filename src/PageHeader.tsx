@@ -1,7 +1,14 @@
 import { APP_NAME } from "./common/consts";
 import MenuBar from "./MenuBar.jsx";
+import { Modes } from "./common/consts";
 
-const PageHeader = ({ subheading, mode, setMode }) => {
+interface PageHeaderProps {
+  subheading: string;
+  mode: Modes;
+  setMode: (mode: Modes) => void;
+}
+
+const PageHeader = ({ subheading, mode, setMode }: PageHeaderProps) => {
   return (
     <>
       <header className="App-header">

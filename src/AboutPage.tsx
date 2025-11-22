@@ -11,7 +11,7 @@ import {
   TWIC,
   WIKI_ECO,
   WIKI_THEORY,
-} from "./common/urlConsts.js";
+} from "./common/urlConsts";
 import "./stylesheets/about.css";
 
 const About = () => (
