@@ -4,10 +4,10 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { parseMoves, toPlay } from "../utils/chessTools";
 import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional";
-import { SimilarOpenings } from "./SimilarOpenings.jsx";
+import { SimilarOpenings } from "./SimilarOpenings";
 import { NextOpenings } from "./nextOpeningsEtc/NextOpenings.jsx";
 import { Roots } from "./nextOpeningsEtc/Roots.jsx";
-import { Theory, theoryRequest } from "./Theory.jsx";
+import { Theory, theoryRequest } from "./Theory";
 
 const chess = new ChessPGN();
 

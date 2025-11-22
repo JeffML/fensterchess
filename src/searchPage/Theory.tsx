@@ -1,8 +1,8 @@
 import DOMPurify from "dompurify";
-import { WIKI_THEORY_API, WIKI_THEORY_API_QS } from "../common/urlConsts.js";
+import { WIKI_THEORY_API, WIKI_THEORY_API_QS } from "../common/urlConsts";
 import { movesStringToPliesAry } from "../utils/openings";
 
-const xformWikibooksUrl = (url) => {
+const xformWikibooksUrl = (url: string): string => {
   // original: https://en.wikibooks.org/w/api.php?titles=Chess_Opening_Theory/1._d4/1...Nf6&amp;redirects&amp;origin=*&amp;action=query&amp;prop=extracts&amp;formatversion=2&amp;format=json&amp;exchars=1200
   // wanted: https://en.wikibooks.org/wiki/Chess_Opening_Theory/1._d4/1...Nf6
   // step 1: truncate
@@ -15,8 +15,19 @@ const xformWikibooksUrl = (url) => {
   return wanted;
 };
 
-export const theoryRequest = async (currentMoves, setHtml) => {
-  const urlMoves = () => {
+interface WikiResponse {
+  query?: {
+    pages: Array<{
+      extract?: string;
+    }>;
+  };
+}
+
+export const theoryRequest = async (
+  currentMoves: string,
+  setHtml: (html: string) => void
+): Promise<void> => {
+  const urlMoves = (): string => {
     const plies = movesStringToPliesAry(currentMoves);
     const moves = plies.map((ply, i) => {
       const move = Math.ceil((i + 1) / 2) + ".";
@@ -32,7 +43,7 @@ export const theoryRequest = async (currentMoves, setHtml) => {
   const link = xformWikibooksUrl(url);
 
   const response = await fetch(url);
-  const json = await response.json();
+  const json: WikiResponse = await response.json();
   let html = json.query?.pages[0]?.extract;
 
   if (html) {
@@ -51,7 +62,7 @@ export const theoryRequest = async (currentMoves, setHtml) => {
   }
 };
 
-export const Theory = ({ html }) => {
+export const Theory = ({ html }: { html: string }) => {
   return (
     <div
       style={{ textAlign: "left", marginLeft: "1em" }}

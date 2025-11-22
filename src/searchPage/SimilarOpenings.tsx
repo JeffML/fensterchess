@@ -3,8 +3,13 @@ import { Chessboard } from "kokopu-react";
 import { useContext } from "react";
 import { OpeningBookContext } from "../contexts/OpeningBookContext";
 import "../stylesheets/similar.css";
+import { BoardState, FEN } from "../types";
 
-const getSimilar = async (fen) => {
+interface SimilarResponse {
+  similar: FEN[];
+}
+
+const getSimilar = async (fen: FEN): Promise<SimilarResponse> => {
   const response = await fetch(
     "/.netlify/functions/getSimilarForFen?fen=" + fen,
     {
@@ -17,9 +22,20 @@ const getSimilar = async (fen) => {
   return data;
 };
 
-const SimilarOpenings = ({ boardState, setBoardState }) => {
+interface SimilarOpeningsProps {
+  boardState: BoardState;
+  setBoardState: (state: BoardState) => void;
+}
+
+const SimilarOpenings = ({ boardState, setBoardState }: SimilarOpeningsProps) => {
   const { fen, moves } = boardState;
-  const { openingBook } = useContext(OpeningBookContext);
+  const context = useContext(OpeningBookContext);
+  
+  if (!context) {
+    return <span>Loading opening book...</span>;
+  }
+  
+  const { openingBook } = context;
 
   const {
     isPending: loading,
@@ -43,9 +59,11 @@ const SimilarOpenings = ({ boardState, setBoardState }) => {
   }
   if (data) {
     const fullSimInfo = data.getSimilarOpenings.map((fen) => {
-      const { name, moves } = openingBook[fen];
+      const opening = openingBook?.[fen];
+      if (!opening) return null;
+      const { name, moves } = opening;
       return { fen, name, moves };
-    });
+    }).filter((sim): sim is { fen: FEN; name: string; moves: string } => sim !== null);
 
     //   if (!openingBook) return <div>Loading...</div>;
     const sims = fullSimInfo.map((sim) => {
