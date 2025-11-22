@@ -10,7 +10,7 @@ const AboutPage = lazy(() => import("./AboutPage")); // default export
 const Visualizations = lazy(() => import("./Visualizations"));
 const AnalyzePgnPage = lazy(() => import("./pgnImportPage/AnalyzePgnPage.jsx"));
 const SearchPageContainer = lazy(
-  () => import("./searchPage/SearchPageContainer.jsx")
+  () => import("./searchPage/SearchPageContainer")
 );
 
 function App() {

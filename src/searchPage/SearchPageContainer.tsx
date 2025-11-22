@@ -1,16 +1,25 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
-import { useContext, useRef, useState, useEffect } from "react";
+import { useContext, useRef, useState, useEffect, MutableRefObject } from "react";
 import { FENEX } from "../common/consts";
 import { OpeningBookContext } from "../contexts/OpeningBookContext";
-import SearchPage from "./SearchPage.jsx";
+import SearchPage from "./SearchPage";
 import { useQuery } from "@tanstack/react-query";
 import {
   findOpening,
   getFromTosForFen,
   getScoresForFens,
 } from "../datasource/findOpening";
+import { BoardState } from "../types";
 
-const loadMoves = (moves, chess) => {
+interface LoadMovesResult {
+  moves: string;
+  fen: string;
+}
+
+const loadMoves = (
+  moves: string,
+  chess: MutableRefObject<ChessPGN>
+): LoadMovesResult => {
   let fen = "";
 
   try {
@@ -24,7 +33,10 @@ const loadMoves = (moves, chess) => {
   }
 };
 
-function readParams(url, chess) {
+function readParams(
+  url: URLSearchParams,
+  chess: MutableRefObject<ChessPGN>
+): BoardState {
   const qmoves = url.get("moves");
   url.delete("moves");
 
@@ -48,7 +60,10 @@ function readParams(url, chess) {
 }
 
 const SearchPageContainer = () => {
-  const [boardState, setBoardState] = useState({ fen: "start", moves: "" });
+  const [boardState, setBoardState] = useState<BoardState>({
+    fen: "start",
+    moves: "",
+  });
 
   const chess = useRef(new ChessPGN());
 
@@ -62,41 +77,33 @@ const SearchPageContainer = () => {
   }, []); // Empty dependency array - only run on mount
 
   const { fen } = boardState;
-  const { openingBook, positionBook } = useContext(OpeningBookContext);
+  const context = useContext(OpeningBookContext);
+  
+  if (!context) return <div>Loading...</div>;
+  
+  const { openingBook, positionBook } = context;
 
-  const {
-    isPending,
-    isError,
-    error,
-    data: fromTosForFen,
-  } = useQuery({
+  const { data: fromTosForFen } = useQuery({
     queryKey: ["fromTosForFen", fen],
     queryFn: async () => getFromTosForFen(fen),
-    enabled: fen != null && fen !== "start" && openingBook[fen] != null,
+    enabled: fen != null && fen !== "start" && openingBook != null && openingBook[fen] != null,
   });
 
-  const {
-    isPending: isPending2,
-    isError: isError2,
-    error: error2,
-    data: scoresForFens,
-  } = useQuery({
+  const { data: scoresForFens } = useQuery({
     queryKey: ["scoresForFens", fen],
-    queryFn: async () => getScoresForFens({ fen, ...fromTosForFen }),
+    queryFn: async () => getScoresForFens({ fen, next: fromTosForFen?.next || [], from: fromTosForFen?.from || [] }),
     enabled: fromTosForFen != null,
   });
-
-  if (!openingBook) return <div>Loading...</div>;
 
   // Get the current moves BEFORE calling findOpening (which may overwrite the chess instance)
   const moves = chess.current.pgn();
 
   let opening = findOpening(
-    openingBook,
+    openingBook!,
     fen,
-    positionBook,
-    fromTosForFen,
-    scoresForFens,
+    positionBook!,
+    fromTosForFen || null,
+    scoresForFens || null,
     chess
   );
 
