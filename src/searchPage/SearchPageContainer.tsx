@@ -1,5 +1,11 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
-import { useContext, useRef, useState, useEffect, MutableRefObject } from "react";
+import {
+  useContext,
+  useRef,
+  useState,
+  useEffect,
+  MutableRefObject,
+} from "react";
 import { FENEX } from "../common/consts";
 import { OpeningBookContext } from "../contexts/OpeningBookContext";
 import SearchPage from "./SearchPage";
@@ -78,20 +84,29 @@ const SearchPageContainer = () => {
 
   const { fen } = boardState;
   const context = useContext(OpeningBookContext);
-  
+
   if (!context) return <div>Loading...</div>;
-  
+
   const { openingBook, positionBook } = context;
 
   const { data: fromTosForFen } = useQuery({
     queryKey: ["fromTosForFen", fen],
     queryFn: async () => getFromTosForFen(fen),
-    enabled: fen != null && fen !== "start" && openingBook != null && openingBook[fen] != null,
+    enabled:
+      fen != null &&
+      fen !== "start" &&
+      openingBook != null &&
+      openingBook[fen] != null,
   });
 
   const { data: scoresForFens } = useQuery({
     queryKey: ["scoresForFens", fen],
-    queryFn: async () => getScoresForFens({ fen, next: fromTosForFen?.next || [], from: fromTosForFen?.from || [] }),
+    queryFn: async () =>
+      getScoresForFens({
+        fen,
+        next: fromTosForFen?.next || [],
+        from: fromTosForFen?.from || [],
+      }),
     enabled: fromTosForFen != null,
   });
 

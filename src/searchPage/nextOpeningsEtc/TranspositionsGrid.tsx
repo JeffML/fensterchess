@@ -43,7 +43,10 @@ export const TranspositionsGrid = ({
         <div className="move">{moves.replace(/(\d{1,3}\.)\s/g, "$1")}</div>
         <div style={{ paddingLeft: "1em" }}>{eco}</div>
         <div className="fakeLink">
-          <span style={{ textAlign: "left" }} onClick={() => handleMoves(moves)}>
+          <span
+            style={{ textAlign: "left" }}
+            onClick={() => handleMoves(moves)}
+          >
             {name}
           </span>
         </div>

@@ -23,7 +23,10 @@ const SortBy = ({ setSortBy }: SortByProps) => {
       Sort By:{" "}
       <select onChange={(e) => setSortBy(parseInt(e.target.value))}>
         {Object.keys(sortEnum).map((option) => (
-          <option key={option} value={sortEnum[option as keyof typeof sortEnum]}>
+          <option
+            key={option}
+            value={sortEnum[option as keyof typeof sortEnum]}
+          >
             {option}
           </option>
         ))}
@@ -72,7 +75,10 @@ export const NextOpenings = ({
         {transpositions.length !== 0 && (
           <div className="row">
             <div className="column">
-              <h3 className="row" style={{ marginBottom: "0", marginTop: "-10px" }}>
+              <h3
+                className="row"
+                style={{ marginBottom: "0", marginTop: "-10px" }}
+              >
                 Transpositions
               </h3>
               <TranspositionsGrid

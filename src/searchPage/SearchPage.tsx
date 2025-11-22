@@ -31,7 +31,9 @@ const SearchPage = ({
   error,
   data,
 }: SearchPageProps) => {
-  const [lastKnownOpening, setLastKnownOpening] = useState<Partial<OpeningType>>({});
+  const [lastKnownOpening, setLastKnownOpening] = useState<
+    Partial<OpeningType>
+  >({});
 
   const reset = () => {
     setBoardState({ fen: "start", moves: "" });
