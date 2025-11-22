@@ -1,76 +1,78 @@
-import { MutableRefObject, useRef, useState } from 'react';
-import { Game } from 'kokopu';
-import { ChessPGN } from '@chess-pgn/chess-pgn';
-import { Opening } from '../../../types';
-import { getFullOpeningNameFromKokopuGame } from '../../../utils/chessTools';
-import { movesStringToPliesAry } from '../../../utils/openings';
-import { AdditionalDetails } from './AdditionalDetails';
-import { ChessboardWithControls } from './ChessboardWithControls';
-import { Moves } from './Moves';
+import { MutableRefObject, useRef, useState } from "react";
+import { GameAdapter } from "../../../utils/gameAdapter";
+import { ChessPGN } from "@chess-pgn/chess-pgn";
+import { Opening } from "../../../types";
+import { getFullOpeningNameFromKokopuGame } from "../../../utils/chessTools";
+import { movesStringToPliesAry } from "../../../utils/openings";
+import { AdditionalDetails } from "./AdditionalDetails";
+import { ChessboardWithControls } from "./ChessboardWithControls";
+import { Moves } from "./Moves";
 
 interface OpeningDetailsProps {
-    game: Game;
-    opening: Opening;
-    chess: MutableRefObject<ChessPGN>;
+  game: GameAdapter;
+  opening: Opening;
+  chess: MutableRefObject<ChessPGN>;
 }
 
-export const OpeningDetails = ({ game, opening, chess }: OpeningDetailsProps) => {
-    const { eco, name, moves: openingMoves } = opening;
-    const gamePliesRef = useRef(game.pojo().mainVariation as string[]);
-    const openingPliesRef = useRef(movesStringToPliesAry(openingMoves ?? ''));
-    const [plyIndex, setPlyIndex] = useState(openingPliesRef.current.length);
+export const OpeningDetails = ({
+  game,
+  opening,
+  chess,
+}: OpeningDetailsProps) => {
+  const { eco, name, moves: openingMoves } = opening;
+  const gamePliesRef = useRef(game.pojo().mainVariation as string[]);
+  const openingPliesRef = useRef(movesStringToPliesAry(openingMoves ?? ""));
+  const [plyIndex, setPlyIndex] = useState(openingPliesRef.current.length);
 
-    const event = game.event();
-    const white =
-        (game.playerTitle('w') ?? '  ') + '   ' + game.playerName('w');
-    const black =
-        (game.playerTitle('b') ?? '  ') + '   ' + game.playerName('b');
+  const event = game.event();
+  const white = (game.playerTitle("w") ?? "  ") + "   " + game.playerName("w");
+  const black = (game.playerTitle("b") ?? "  ") + "   " + game.playerName("b");
 
-    const onClickHandler = () => {
-        const domain = window.location.origin;
-        const newBrowserTab = domain + `?moves=${openingMoves}`;
-        window.open(newBrowserTab, '_blank');
-    };
+  const onClickHandler = () => {
+    const domain = window.location.origin;
+    const newBrowserTab = domain + `?moves=${openingMoves}`;
+    window.open(newBrowserTab, "_blank");
+  };
 
-    const fen = chess.current.fen();
+  const fen = chess.current.fen();
 
-    return (
-        <div id="openingDetails" className="opening-details">
-            <ChessboardWithControls
-                {...{
-                    chess,
-                    plies: gamePliesRef,
-                    plyIndex,
-                    setPlyIndex,
-                }}
-            />
-            <div id="gameDetails" className="game-details">
-                <span>Event:</span>
-                <span>{event}</span>
-                <span>White:</span>
-                <span>{white}</span>
-                <span>Black:</span>
-                <span>{black}</span>
-                <span>Result:</span>
-                <span>{game.result()}</span>
-                <span>PGN Opening Name</span>
-                <span>{getFullOpeningNameFromKokopuGame(game)}</span>
-                <span>Fenster Opening Name:</span>
-                <span
-                    className="fakeLink"
-                    style={{ color: 'cyan' }}
-                    onClick={() => onClickHandler()}
-                >
-                    {name}
-                </span>
-                <span>ECO:</span>
-                <span> {eco}</span>
-                <span>Moves:</span>{' '}
-                <Moves {...{ gamePliesRef, openingPliesRef, plyIndex }} />
-                <span>FEN:</span>
-                <span>{fen}</span>
-                <AdditionalDetails {...{ fen }} />
-            </div>
-        </div>
-    );
+  return (
+    <div id="openingDetails" className="opening-details">
+      <ChessboardWithControls
+        {...{
+          chess,
+          plies: gamePliesRef,
+          plyIndex,
+          setPlyIndex,
+        }}
+      />
+      <div id="gameDetails" className="game-details">
+        <span>Event:</span>
+        <span>{event}</span>
+        <span>White:</span>
+        <span>{white}</span>
+        <span>Black:</span>
+        <span>{black}</span>
+        <span>Result:</span>
+        <span>{game.result()}</span>
+        <span>PGN Opening Name</span>
+        <span>{getFullOpeningNameFromKokopuGame(game)}</span>
+        <span>Fenster Opening Name:</span>
+        <span
+          className="fakeLink"
+          style={{ color: "cyan" }}
+          onClick={() => onClickHandler()}
+        >
+          {name}
+        </span>
+        <span>ECO:</span>
+        <span> {eco}</span>
+        <span>Moves:</span>{" "}
+        <Moves {...{ gamePliesRef, openingPliesRef, plyIndex }} />
+        <span>FEN:</span>
+        <span>{fen}</span>
+        <AdditionalDetails {...{ fen }} />
+      </div>
+    </div>
+  );
 };

@@ -5,20 +5,24 @@ import {
     MOST_ACTIVE,
     PIECE_DESTINATION,
 } from '../Visualizations.jsx';
-import { ColorAndPieces } from './ColorAndPieces.jsx';
-import { EcoCatCode } from './EcoCatSelector.jsx';
+import { ColorAndPieces } from './ColorAndPieces';
+import { EcoCatCode } from './EcoCatSelector';
 
 // Lazy load heavy components
-const EcoFlowchart = lazy(() => import('./EcoFlowchart.jsx').then(m => ({ default: m.EcoFlowchart })));
+const EcoFlowchart = lazy(() => import('./EcoFlowchart').then(m => ({ default: m.EcoFlowchart })));
 const FromToCircle = lazy(() => import('./FromToCircle.jsx').then(m => ({ default: m.FromToCircle })));
-const MostActiveByPiece = lazy(() => import('./MostActive.jsx').then(m => ({ default: m.MostActiveByPiece })));
-const MostActiveSquaresByEco = lazy(() => import('./MostActive.jsx').then(m => ({ default: m.MostActiveSquaresByEco })));
+const MostActiveByPiece = lazy(() => import('./MostActive').then(m => ({ default: m.MostActiveByPiece })));
+const MostActiveSquaresByEco = lazy(() => import('./MostActive').then(m => ({ default: m.MostActiveSquaresByEco })));
 
-export const Display = ({ viz }) => {
-    const [cat, setCat] = useState();
-    const [code, setCode] = useState();
-    const [colors, setColors] = useState(["White"]);
-    const [piece, setPiece] = useState('P');
+interface DisplayProps {
+    viz?: string;
+}
+
+export const Display = ({ viz }: DisplayProps) => {
+    const [cat, setCat] = useState<string | undefined>();
+    const [code, setCode] = useState<string | undefined>();
+    const [colors, setColors] = useState<string[]>(["White"]);
+    const [piece, setPiece] = useState<string>('P');
 
     if (!viz)
         return (

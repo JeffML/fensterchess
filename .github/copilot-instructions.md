@@ -50,6 +50,15 @@ fensterchess consumes chessPGN as a dependency and fetches chess opening data fr
 - Instantiate: `const chess = useRef(new ChessPGN())` (use ref to persist across renders)
 - Display boards with `kokopu-react` components
 
+**CRITICAL - Game Type Usage:**
+
+- **NEVER import `Game` from `kokopu`** in src/ files - kokopu is only in devDependencies for testing
+- Always use `GameAdapter` from `src/utils/gameAdapter.ts` for game objects in application code
+- `GameAdapter` wraps `@chess-pgn/chess-pgn` Game objects and provides kokopu-compatible API
+- `kokopu-react` Chessboard component is OK to use (only UI dependency in production)
+- When iterating games from `indexPgnGames()` cursor, wrap with `new GameAdapter(game)`
+- Test files can use kokopu for compatibility verification only
+
 ### chessPGN (TypeScript Library)
 
 **Delegation Architecture:**

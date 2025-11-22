@@ -4,15 +4,27 @@ import { useState } from 'react';
 import { getOpeningsForEcoCat } from '../datasource/getOpeningsForEcoCat';
 import '../stylesheets/vizz.css';
 
-export const OpeningsForEcoCat = ({ category, contentStyle }) => {
+interface OpeningData {
+    eco?: string;
+    name: string;
+    fen: string;
+    moves?: string;
+}
+
+interface OpeningsForEcoCatProps {
+    category: string;
+    contentStyle: 'none' | 'block';
+}
+
+export const OpeningsForEcoCat = ({ category, contentStyle }: OpeningsForEcoCatProps) => {
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ['openingsForCat', category],
         queryFn: async () => getOpeningsForEcoCat(category),
         enabled: contentStyle === 'block',
     });
 
-    const [popupFen, setPopupFen] = useState(null);
-    const [expandedRootFen, setExpandedRootFen] = useState(null);
+    const [popupFen, setPopupFen] = useState<string | null>(null);
+    const [expandedRootFen, setExpandedRootFen] = useState<string | null>(null);
 
     if (contentStyle !== 'block') return null;
     if (isLoading) return <div>Loading...</div>;
@@ -20,14 +32,14 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
     if (!data || data.length === 0) return <div>No openings found.</div>;
 
     // Find the opening (root or child) for the popupFen
-    let popupOpening = null;
-    if (popupFen) {
+    let popupOpening: OpeningData | null = null;
+    if (popupFen && data) {
         for (const { rootFen, root, children } of data) {
             if (rootFen === popupFen) {
-                popupOpening = root;
+                popupOpening = root as any;
                 break;
             }
-            const child = children.find((child) => child.fen === popupFen);
+            const child = children.find((c) => c.fen === popupFen);
             if (child) {
                 popupOpening = child;
                 break;
@@ -37,7 +49,7 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
 
     const popupStyle = popupFen ? {} : { display: 'none' };
 
-    const handleRootClick = (fen) => {
+    const handleRootClick = (fen: string) => {
         setExpandedRootFen(expandedRootFen === fen ? null : fen);
     };
 
@@ -46,7 +58,7 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
             className="content eco-cats"
             style={{ display: contentStyle, position: 'relative' }}
         >
-            {data.map(({ rootFen, root, children }) => (
+            {data?.map(({ rootFen, root, children }) => (
                 <div className="eco-root-block" key={rootFen}>
                     <div className="row">
                         <span className="column">
@@ -83,22 +95,22 @@ export const OpeningsForEcoCat = ({ category, contentStyle }) => {
                     </div>
                     {expandedRootFen === rootFen && children.length > 0 && (
                         <ul className="eco-root-openings">
-                            {children.map((child) => (
+                            {children.map((c) => (
                                 <li
-                                    key={child.fen}
+                                    key={c.fen}
                                     className="eco-child-name"
-                                    onMouseEnter={() => setPopupFen(child.fen)}
+                                    onMouseEnter={() => setPopupFen(c.fen)}
                                     onMouseLeave={() => setPopupFen(null)}
                                     onClick={() =>
                                         window.open(
                                             `https://fensterchess.com/?fen=${encodeURIComponent(
-                                                child.fen
+                                                c.fen
                                             )}`,
                                             '_blank'
                                         )
                                     }
                                 >
-                                    {child.name}
+                                    {c.name}
                                 </li>
                             ))}
                         </ul>

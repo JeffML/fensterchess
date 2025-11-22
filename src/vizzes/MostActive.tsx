@@ -1,13 +1,42 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { HeatMap3D } from "./HeatMap3D.jsx";
-import { HeatMap2D } from "./HeatMap2D.jsx";
+import { HeatMap2D } from "./HeatMap2D";
 import {
   getMostActiveSquaresByEco,
   getMostActiveSquaresByEcoDetailed,
 } from "../datasource/getMostActiveSquaresByEco";
 
-const HeatMapType = ({ type, setType }) => {
+interface HeatMapTypeProps {
+  type?: string;
+  setType: (type: string) => void;
+}
+
+interface HeatMapsProps {
+  dests: Record<string, number>;
+  type?: string;
+  setType: (type: string) => void;
+}
+
+interface MostActiveSquaresByEcoProps {
+  cat?: string;
+  code?: string;
+}
+
+interface MostActiveByPieceProps {
+  cat?: string;
+  code?: string;
+  colors: string[];
+  piece: string;
+}
+
+interface DetailedSquareData {
+  pieces: string[];
+  isWhite: boolean;
+  count: number;
+}
+
+const HeatMapType = ({ type, setType }: HeatMapTypeProps) => {
   const gridStyle = {
     display: "grid",
     gridTemplateColumns: "auto auto auto auto",
@@ -47,7 +76,7 @@ const HeatMapType = ({ type, setType }) => {
   );
 };
 
-const HeatMaps = ({ dests, type, setType }) => {
+const HeatMaps = ({ dests, type, setType }: HeatMapsProps) => {
   return (
     <div className="double-column left" style={{ marginTop: "1em" }}>
       <HeatMapType {...{ type, setType }} />
@@ -58,21 +87,22 @@ const HeatMaps = ({ dests, type, setType }) => {
   );
 };
 
-const MostActiveSquaresByEco = ({ cat, code }) => {
-  const [type, setType] = useState();
+const MostActiveSquaresByEco = ({ cat, code }: MostActiveSquaresByEcoProps) => {
+  const [type, setType] = useState<string | undefined>();
 
-  if (code === "all") code = undefined;
-  else if (code) code = code.substr(1, 2);
+  let processedCode = code;
+  if (processedCode === "all") processedCode = undefined;
+  else if (processedCode) processedCode = processedCode.substr(1, 2);
 
-  const { isError, isPending, error, data } = useQuery({
-    queryFn: async () => getMostActiveSquaresByEco(cat + code),
-    queryKey: ["getMostActiveSquaresByEco", cat + code],
-    enabled: code != null,
+  const { isError, isPending, error, data } = useQuery<Record<string, number>>({
+    queryFn: async () => getMostActiveSquaresByEco((cat ?? '') + (processedCode ?? '')),
+    queryKey: ["getMostActiveSquaresByEco", (cat ?? '') + (processedCode ?? '')],
+    enabled: processedCode != null,
   });
 
-  if (code == null) return null;
+  if (processedCode == null) return null;
 
-  if (isError) console.error(error.toString());
+  if (isError) console.error(error?.toString());
   if (isPending) return <div className="double-column left">Loading...</div>;
   if (data) {
     return <HeatMaps {...{ dests: data, type, setType }} />;
@@ -80,25 +110,26 @@ const MostActiveSquaresByEco = ({ cat, code }) => {
   return null;
 };
 
-const MostActiveByPiece = ({ cat, code, colors, piece }) => {
-  const [type, setType] = useState();
+const MostActiveByPiece = ({ cat, code, colors, piece }: MostActiveByPieceProps) => {
+  const [type, setType] = useState<string | undefined>();
 
-  if (code === "all") code = undefined;
-  else if (code) code = code.substr(1, 2);
+  let processedCode = code;
+  if (processedCode === "all") processedCode = undefined;
+  else if (processedCode) processedCode = processedCode.substr(1, 2);
 
-  const { isError, isPending, error, data } = useQuery({
-    queryKey: ["mostActiveDetailed", cat + code],
-    queryFn: async () => getMostActiveSquaresByEcoDetailed(cat + code),
-    enabled: code != null,
+  const { isError, isPending, error, data } = useQuery<Record<string, DetailedSquareData>>({
+    queryKey: ["mostActiveDetailed", (cat ?? '') + (processedCode ?? '')],
+    queryFn: async () => getMostActiveSquaresByEcoDetailed((cat ?? '') + (processedCode ?? '')),
+    enabled: processedCode != null,
   });
 
-  if (code == null) return null;
+  if (processedCode == null) return null;
 
-  if (isError) console.error(error.toString());
+  if (isError) console.error(error?.toString());
   if (isPending) return <div className="double-column left">Loading...</div>;
 
   if (data) {
-    const dests = {};
+    const dests: Record<string, number> = {};
     // reduce according to colors and piece selected
     for (const dest in data) {
       const detail = data[dest];

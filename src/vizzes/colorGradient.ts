@@ -1,6 +1,6 @@
+type RGBTuple = [number, number, number, number];
 
-
-const defaultGradients = [
+const defaultGradients: RGBTuple[] = [
     [0, 0, .5, 0.0],
     [0, 0, 1, 0.08], 
     [0, .5, 0, 0.16],
@@ -15,23 +15,23 @@ const defaultGradients = [
     [1, 0, .5, 0.88],
     [1, .5, 0, 0.92],
     [1, .5, .5, 1.0]
-]
+];
 
 //-- Inputs a (value) between 0 and 1 and outputs the [(red), (green) and (blue)]
 //-- values representing that position in the gradient.
-const getColorForValue = (value) => {
-    let rgb = [];
-    const RED = 0,
-        GREEN = 1,
-        BLUE = 2,
-        VALUE = 3;
+const getColorForValue = (value: number): number[] => {
+    const rgb: number[] = [];
+    const RED = 0;
+    const GREEN = 1;
+    const BLUE = 2;
+    const VALUE = 3;
 
     for (let i = 0; i < defaultGradients.length; i++) {
-        let currC = defaultGradients[i];
+        const currC = defaultGradients[i];
         if (value < currC[VALUE]) {
-            let prevC = defaultGradients[Math.max(0, i - 1)];
-            let valueDiff = prevC[VALUE] - currC[VALUE];
-            let fractBetween =
+            const prevC = defaultGradients[Math.max(0, i - 1)];
+            const valueDiff = prevC[VALUE] - currC[VALUE];
+            const fractBetween =
                 valueDiff === 0 ? 0 : (value - currC[VALUE]) / valueDiff;
             rgb[RED] = (prevC[RED] - currC[RED]) * fractBetween + currC[RED];
             rgb[GREEN] =
@@ -42,9 +42,9 @@ const getColorForValue = (value) => {
         }
     }
 
-    let red = defaultGradients[0][RED];
-    let green = defaultGradients[0][GREEN];
-    let blue = defaultGradients[0][BLUE];
+    const red = defaultGradients[0][RED];
+    const green = defaultGradients[0][GREEN];
+    const blue = defaultGradients[0][BLUE];
     return [red, green, blue];
 };
 

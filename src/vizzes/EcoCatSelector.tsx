@@ -1,15 +1,35 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ecoCats from "../datasource/ecoCats.json";
 import { getEcoRootsForCat } from "../datasource/getOpeningsForEcoCat";
 
-const EcoCats = ({ setCat, cat }) => (
+interface EcoCatsProps {
+  setCat: (cat: string) => void;
+  cat?: string;
+}
+
+interface EcoCodesProps {
+  setCode: (code: string) => void;
+  cat?: string;
+}
+
+interface EcoCatCodeProps {
+  cat?: string;
+  setCat: (cat: string) => void;
+  setCode: (code: string) => void;
+}
+
+interface EcoCodeData {
+  name: string;
+  eco: string;
+  moves: string;
+}
+
+const EcoCats = ({ setCat, cat }: EcoCatsProps) => (
   <div className="radio-grid">
     {Object.entries(ecoCats).map(([c]) => (
       <label key={c}>
         {c}
         <input
-          display="inline"
           type="radio"
           name="cat"
           defaultChecked={cat === c}
@@ -21,15 +41,15 @@ const EcoCats = ({ setCat, cat }) => (
   </div>
 );
 
-const EcoCodes = ({ setCode, cat }) => {
+const EcoCodes = ({ setCode, cat }: EcoCodesProps) => {
   const {
     isPending,
     isError,
     error,
     data: ecoCodes,
-  } = useQuery({
+  } = useQuery<Record<string, EcoCodeData>>({
     queryKey: ["getEcoRootsForCat", cat],
-    queryFn: async () => await getEcoRootsForCat(cat),
+    queryFn: async () => await getEcoRootsForCat(cat!),
     enabled: cat != null,
   });
 
@@ -47,7 +67,7 @@ const EcoCodes = ({ setCode, cat }) => {
             setCode(target.value);
           }}
         >
-          {Object.entries(ecoCodes).map(([, { name, eco, moves }]) => (
+          {ecoCodes && Object.entries(ecoCodes).map(([, { name, eco, moves }]) => (
             <option value={eco} key={eco} title={name}>
               {eco} {name}, {moves.substring(0, 30)}
             </option>
@@ -58,7 +78,7 @@ const EcoCodes = ({ setCode, cat }) => {
   );
 };
 
-export function EcoCatCode({ cat, setCat, setCode }) {
+export function EcoCatCode({ cat, setCat, setCode }: EcoCatCodeProps) {
   return (
     <div style={{ marginLeft: "10%" }}>
       <span className=" left font-cinzel">ECO Categories</span>

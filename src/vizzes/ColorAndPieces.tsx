@@ -1,5 +1,18 @@
-const ColorAndPieces = ({ colors, piece, setColors, setPiece }) => {
-    const handler = ({ value, name, checked }) => {
+interface ColorAndPiecesProps {
+    colors: string[];
+    piece: string;
+    setColors: (colors: string[]) => void;
+    setPiece: (piece: string) => void;
+}
+
+interface HandlerTarget {
+    value: string;
+    name: string;
+    checked: boolean;
+}
+
+const ColorAndPieces = ({ colors, piece, setColors, setPiece }: ColorAndPiecesProps) => {
+    const handler = ({ value, name, checked }: HandlerTarget) => {
         if (name === 'color') {
             const newColors = checked
                 ? colors.concat(value)
@@ -25,7 +38,7 @@ const ColorAndPieces = ({ colors, piece, setColors, setPiece }) => {
                                 name="color"
                                 value={c}
                                 defaultChecked={colors.includes(c)}
-                                onClick={(e) => handler(e.target)}
+                                onClick={(e) => handler(e.target as HTMLInputElement)}
                             />
                         </label>
                     );
@@ -47,7 +60,7 @@ const ColorAndPieces = ({ colors, piece, setColors, setPiece }) => {
                             name="piece"
                             value={p}
                             defaultChecked={p === piece}
-                            onClick={(e) => handler(e.target)}
+                            onClick={(e) => handler(e.target as HTMLInputElement)}
                         />
                     </label>
                 ))}

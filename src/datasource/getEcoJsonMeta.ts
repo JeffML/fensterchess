@@ -10,10 +10,13 @@ interface GitHubFileMetadata {
 async function getDownloadUrls(): Promise<GitHubFileMetadata[]> {
   const octokit = new Octokit(); // No auth
 
-  const { data } = await octokit.request("GET /repos/{owner}/{repo}/contents/", {
-    owner: "hayatbiralem",
-    repo: "eco.json",
-  });
+  const { data } = await octokit.request(
+    "GET /repos/{owner}/{repo}/contents/",
+    {
+      owner: "hayatbiralem",
+      repo: "eco.json",
+    }
+  );
 
   // const downloads = data.map((meta) => {
   //     if (filesOfInterest.includes(meta.name)) return meta.download_url;

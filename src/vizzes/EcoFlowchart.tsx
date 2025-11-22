@@ -3,11 +3,16 @@ import ecoCats from '../datasource/ecoCats.json';
 import './EcoFlowchart.css';
 import { OpeningsForEcoCat } from './OpeningsForEcoCat';
 
-const EcoCats = ({ category, desc }) => {
-    const [active, setActive] = useState('');
-    const [contentStyle, setContentStyle] = useState('none');
+interface EcoCatsProps {
+    category: string;
+    desc: string;
+}
 
-    const handler = (e) => {
+const EcoCats = ({ category, desc }: EcoCatsProps) => {
+    const [active, setActive] = useState<string>('');
+    const [contentStyle, setContentStyle] = useState<'none' | 'block'>('none');
+
+    const handler = () => {
         setContentStyle(contentStyle === 'block' ? 'none' : 'block');
         setActive(active === 'active' ? '' : 'active');
     };

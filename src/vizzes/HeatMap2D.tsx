@@ -2,11 +2,15 @@ import HeatMap from "jsheatmap";
 import { RANKS as ordinals, FILES as files } from "../common/consts";
 import { Fragment } from "react";
 
-// eslint-disable-next-line no-unused-vars
-const rgbColor = (rgb) =>
-  `rgb(${rgb.red * 100}%, ${rgb.green * 100}%, ${rgb.blue * 100}%)`;
+interface SquareProps {
+  value: number;
+}
 
-const Square = ({ rgb, value }) => {
+interface HeatMap2DProps {
+  dests: Record<string, number>;
+}
+
+const Square = ({ value }: SquareProps) => {
   const bgColor = `hsl(196deg 36% ${value > 0 ? 95 - value * 5 : 95}%)`;
 
   return (
@@ -16,8 +20,8 @@ const Square = ({ rgb, value }) => {
   );
 };
 
-const destsToRows = (dests) => {
-  const ranks = [];
+const destsToRows = (dests: Record<string, number>): [string, number[]][] => {
+  const ranks: [string, number[]][] = [];
 
   ordinals.forEach((n, i) => {
     ranks[n - 1] = [files[i], files.map((f) => dests[`${f}${n}`] ?? 0)];
@@ -26,15 +30,15 @@ const destsToRows = (dests) => {
   return ranks;
 };
 
-const HeatMap2D = ({ dests }) => {
+const HeatMap2D = ({ dests }: HeatMap2DProps) => {
   const heatmap = new HeatMap(ordinals, destsToRows(dests));
-  const data = heatmap.getData();
+  const data = heatmap.getData() as any;
 
-  const ranks = data.rows.reverse().map(({ cells }, j) => {
+  const ranks = data.rows.reverse().map((row: any, j: number) => {
     return (
       <Fragment key={j}>
-        {cells.colors.map((rgb, i) => (
-          <Square id={i} key={i} {...{ rgb, value: cells.values[i] }} />
+        {row.cells.values.map((_: any, i: number) => (
+          <Square key={i} {...{ value: row.cells.values[i] }} />
         ))}
       </Fragment>
     );
