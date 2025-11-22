@@ -82,9 +82,19 @@ npm run dev  # Runs on localhost:3000
 npm test           # Run once
 npm run test:ui    # Interactive UI
 
+# TypeScript type checking
+npm run type-check  # Check types without building
+
 # Build for production
-npm run build      # Output to dist/
+npm run build      # Type-check + bundle to dist/
 ```
+
+**TypeScript Migration:**
+- In progress: piecemeal conversion from .jsx to .tsx
+- Completed: `src/common/`, `src/contexts/`, `App.tsx`, shared types in `src/types.ts`
+- Pattern: Convert utilities first, then components
+- See `src/TYPES.md` for type usage examples
+- `allowJs: true` in tsconfig enables gradual migration
 
 **Environment Variables:**
 - Set `VITE_API_SECRET_TOKEN` in Netlify dashboard or `.env` for serverless function auth
