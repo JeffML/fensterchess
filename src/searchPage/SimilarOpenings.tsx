@@ -27,14 +27,17 @@ interface SimilarOpeningsProps {
   setBoardState: (state: BoardState) => void;
 }
 
-const SimilarOpenings = ({ boardState, setBoardState }: SimilarOpeningsProps) => {
+const SimilarOpenings = ({
+  boardState,
+  setBoardState,
+}: SimilarOpeningsProps) => {
   const { fen, moves } = boardState;
   const context = useContext(OpeningBookContext);
-  
+
   if (!context) {
     return <span>Loading opening book...</span>;
   }
-  
+
   const { openingBook } = context;
 
   const {
@@ -58,12 +61,16 @@ const SimilarOpenings = ({ boardState, setBoardState }: SimilarOpeningsProps) =>
     return <span> ERROR: {error.toString()}</span>;
   }
   if (data) {
-    const fullSimInfo = data.getSimilarOpenings.map((fen) => {
-      const opening = openingBook?.[fen];
-      if (!opening) return null;
-      const { name, moves } = opening;
-      return { fen, name, moves };
-    }).filter((sim): sim is { fen: FEN; name: string; moves: string } => sim !== null);
+    const fullSimInfo = data.getSimilarOpenings
+      .map((fen) => {
+        const opening = openingBook?.[fen];
+        if (!opening) return null;
+        const { name, moves } = opening;
+        return { fen, name, moves };
+      })
+      .filter(
+        (sim): sim is { fen: FEN; name: string; moves: string } => sim !== null
+      );
 
     //   if (!openingBook) return <div>Loading...</div>;
     const sims = fullSimInfo.map((sim) => {

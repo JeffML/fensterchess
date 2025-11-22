@@ -1,8 +1,15 @@
 import { createContext, useState, ReactNode } from "react";
 
-let selectedSites: string[] = localStorage.sites
-  ? JSON.parse(localStorage.sites)
-  : [];
+const getInitialSites = (): string[] => {
+  try {
+    const sites = localStorage.getItem("sites");
+    return sites ? JSON.parse(sites) : [];
+  } catch {
+    return [];
+  }
+};
+
+let selectedSites: string[] = getInitialSites();
 
 interface SelectedSitesState {
   selectedSites: string[];
@@ -10,6 +17,8 @@ interface SelectedSitesState {
   remove: (site: string) => void;
   get: () => string[];
 }
+
+export type { SelectedSitesState };
 
 const SelectedSitesContext = createContext<SelectedSitesState>({
   selectedSites,
@@ -27,13 +36,13 @@ const SelectedSitesContextProvider = ({
 }: SelectedSitesContextProviderProps) => {
   const add = (site: string) => {
     selectedSites = [...selectedSites, site];
-    localStorage.sites = JSON.stringify(selectedSites);
+    localStorage.setItem("sites", JSON.stringify(selectedSites));
     setState({ ...state, selectedSites });
   };
 
   const remove = (site: string) => {
     selectedSites = selectedSites.filter((s) => s !== site);
-    localStorage.sites = JSON.stringify(selectedSites);
+    localStorage.setItem("sites", JSON.stringify(selectedSites));
     setState({
       ...state,
       selectedSites,

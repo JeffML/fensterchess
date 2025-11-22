@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { SelectedSitesContext } from "../contexts/SelectedSitesContext";
-import { OpeningTabs } from "./OpeningTabs.jsx";
+import { OpeningTabs } from "./OpeningTabs";
 import { BoardState, Opening as OpeningType } from "../types";
 
 interface OpeningProps {
