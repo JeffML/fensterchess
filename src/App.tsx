@@ -2,8 +2,8 @@ import { useState, lazy, Suspense } from "react";
 import "./App.css";
 import PageHeader from "./PageHeader.jsx";
 import { SUBTITLES, isTestMode, modes, Modes } from "./common/consts";
-import { OpeningBookProvider } from "./contexts/OpeningBookContext.jsx";
-import { SelectedSitesContextProvider } from "./contexts/SelectedSitesContext.jsx";
+import { OpeningBookProvider } from "./contexts/OpeningBookContext";
+import { SelectedSitesContextProvider } from "./contexts/SelectedSitesContext";
 
 // Dynamic imports - match the export style of each component
 const AboutPage = lazy(() => import("./AboutPage.jsx")); // default export

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Chessboard } from 'kokopu-react';
 import { useContext } from 'react';
-import { OpeningBookContext } from '../contexts/OpeningBookContext.jsx';
+import { OpeningBookContext } from '../contexts/OpeningBookContext';
 import '../stylesheets/similar.css';
 
 const getSimilar = async (fen) => {

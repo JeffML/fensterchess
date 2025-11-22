@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { SelectedSitesContext } from '../contexts/SelectedSitesContext.jsx';
+import { SelectedSitesContext } from '../contexts/SelectedSitesContext';
 import { OpeningTabs } from './OpeningTabs.jsx';
 
 const Opening = ({

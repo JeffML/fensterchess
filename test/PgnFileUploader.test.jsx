@@ -6,7 +6,7 @@ import { readFileSync } from "fs";
 import { resolve } from "path";
 import { PgnListPanel } from "../src/pgnImportPage/PgnListPanel.jsx";
 import { PgnTabsPanelContainer } from "../src/pgnImportPage/PgnTabsPanelContainer.jsx";
-import { OpeningBookProvider } from "../src/contexts/OpeningBookContext.jsx";
+import { OpeningBookProvider } from "../src/contexts/OpeningBookContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
