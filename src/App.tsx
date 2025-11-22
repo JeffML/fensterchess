@@ -7,7 +7,7 @@ import { SelectedSitesContextProvider } from "./contexts/SelectedSitesContext";
 
 // Dynamic imports - match the export style of each component
 const AboutPage = lazy(() => import("./AboutPage")); // default export
-const Visualizations = lazy(() => import("./Visualizations.jsx"));
+const Visualizations = lazy(() => import("./Visualizations"));
 const AnalyzePgnPage = lazy(() => import("./pgnImportPage/AnalyzePgnPage.jsx"));
 const SearchPageContainer = lazy(
   () => import("./searchPage/SearchPageContainer.jsx")
