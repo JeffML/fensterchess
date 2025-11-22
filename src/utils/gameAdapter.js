@@ -89,6 +89,25 @@ export class GameAdapter {
   }
 
   /**
+   * Get player title by color
+   * @param {string} color - 'w' for white, 'b' for black
+   * @returns {string|undefined} Player title (GM, IM, FM, etc.) or undefined
+   */
+  playerTitle(color) {
+    const colorKey = color === "w" ? "WhiteTitle" : "BlackTitle";
+    const title = this._game.header()[colorKey];
+    return title && title !== "?" ? title : undefined;
+  }
+
+  /**
+   * Get the event name
+   * @returns {string} Event name
+   */
+  event() {
+    return this._game.header()["Event"] || "?";
+  }
+
+  /**
    * Get the game result
    * @returns {string} Result string (1-0, 0-1, 1/2-1/2, or *)
    */
@@ -116,17 +135,20 @@ export class GameAdapter {
       white: {
         name: this.playerName("w"),
         elo: parseInt(headers["WhiteElo"]) || undefined,
+        title: this.playerTitle("w"),
       },
       black: {
         name: this.playerName("b"),
         elo: parseInt(headers["BlackElo"]) || undefined,
+        title: this.playerTitle("b"),
       },
       opening: this.opening(),
-      event: headers["Event"] || "?",
+      event: this.event(),
       site: headers["Site"] || "?",
       date: this.dateAsString(),
       round: this.fullRound(),
       result: this.result(),
+      mainVariation: this.nodes().map((n) => n.notation()),
     };
   }
 

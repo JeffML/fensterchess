@@ -11,15 +11,16 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@chess-pgn/chess-pgn@~0.1.0-beta.3",
+        "npm:@chess-pgn/chess-pgn@~0.1.0-beta.4",
         "npm:@netlify/vite-plugin@^2.5.4",
         "npm:@tanstack/react-query@^5.83.0",
         "npm:@testing-library/jest-dom@^6.6.3",
         "npm:@testing-library/react@^16.1.0",
         "npm:@testing-library/user-event@^14.5.2",
+        "npm:@types/react-dom@^19.2.3",
+        "npm:@types/react@^19.2.6",
         "npm:@vitejs/plugin-react@^4.7.0",
         "npm:@vitest/ui@^2.1.8",
-        "npm:chess.js@^1.4.0",
         "npm:dompurify@^3.2.6",
         "npm:fast-xml-parser@^4.5.3",
         "npm:jsdom@^25.0.1",
@@ -32,6 +33,7 @@
         "npm:react-dom@^18.3.1",
         "npm:react-tabs@^6.1.0",
         "npm:react@^18.3.1",
+        "npm:typescript@^5.9.3",
         "npm:vite@^6.3.5",
         "npm:vitest@^2.1.8",
         "npm:web-vitals@^3.5.2"
