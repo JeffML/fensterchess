@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 import StackedBarChart from "../common/StackedBarChart";
 import { SelectedSitesContext } from "../contexts/SelectedSitesContext";
-import { externalOpeningStats } from "../datasource/externalOpeningStats.js";
+import { externalOpeningStats } from "../datasource/externalOpeningStats";
 import { dateStringShort } from "../utils/dateStringShort.js";
 import { winsAsPercentages } from "../utils/winsAsPercentages.js";
 

@@ -28,7 +28,11 @@ interface VisualizationGroupProps {
   id: string;
 }
 
-const VisualizationGroup = ({ items, handler, id }: VisualizationGroupProps) => (
+const VisualizationGroup = ({
+  items,
+  handler,
+  id,
+}: VisualizationGroupProps) => (
   <div id={id} className="grid-column">
     {items.map((item) => (
       <div key={item.name} className="grid-child">
@@ -67,7 +71,11 @@ const Visualizations = () => {
 
         <div style={{ gridColumn: "1" }}>
           <h3 className="left">Heatmaps</h3>
-          <VisualizationGroup items={heatmaps} handler={handler} id="heatmaps" />
+          <VisualizationGroup
+            items={heatmaps}
+            handler={handler}
+            id="heatmaps"
+          />
         </div>
       </div>
 

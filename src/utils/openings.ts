@@ -1,5 +1,5 @@
-import { ChessPGN } from '@chess-pgn/chess-pgn';
-import type { FEN, Opening, OpeningBook, PGN } from '../types';
+import { ChessPGN } from "@chess-pgn/chess-pgn";
+import type { FEN, Opening, OpeningBook, PGN } from "../types";
 
 export const getFensForMoves = (plies: string[]): [FEN[], PGN[]] => {
   const chess = new ChessPGN();
@@ -21,15 +21,15 @@ export const pliesAryToMovesString = (plies: string[]): string => {
     if (i % 2 === 0) prev += `${i / 2 + 1}. `;
     prev += `${curr} `;
     return prev;
-  }, '');
+  }, "");
 };
 
 export const movesStringToPliesAry = (moves: string): string[] => {
   const plies = moves.split(/\s+/).map((move) => {
     const matches = move.match(/(?:\d{1,3}\.)?(.*)/);
-    return matches ? matches[1] : '';
+    return matches ? matches[1] : "";
   });
-  return plies.filter((p) => p !== '');
+  return plies.filter((p) => p !== "");
 };
 
 interface GameNode {

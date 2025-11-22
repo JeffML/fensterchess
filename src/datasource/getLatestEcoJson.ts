@@ -37,7 +37,8 @@ export async function getLatestEcoJson(): Promise<OpeningsByCat> {
     const promises: Promise<Response>[] = [];
     for (const cat in openingsByCat) {
       if (cat !== "initialized") {
-        const category = openingsByCat[cat as keyof Omit<OpeningsByCat, "initialized">];
+        const category =
+          openingsByCat[cat as keyof Omit<OpeningsByCat, "initialized">];
         if (category) {
           promises.push(fetch(category.url));
         }
@@ -49,7 +50,8 @@ export async function getLatestEcoJson(): Promise<OpeningsByCat> {
 
     for (const cat in openingsByCat) {
       if (cat !== "initialized") {
-        const category = openingsByCat[cat as keyof Omit<OpeningsByCat, "initialized">];
+        const category =
+          openingsByCat[cat as keyof Omit<OpeningsByCat, "initialized">];
         if (category) {
           const json = await res[i++].json();
           category.json = json;

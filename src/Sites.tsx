@@ -19,7 +19,8 @@ const Sites2 = () => {
             value={s}
             defaultChecked={selectedSites.get().includes(s)}
             onClick={({ target }) => {
-              if ((target as HTMLInputElement).checked) selectedSites.add((target as HTMLInputElement).value);
+              if ((target as HTMLInputElement).checked)
+                selectedSites.add((target as HTMLInputElement).value);
               else selectedSites.remove((target as HTMLInputElement).value);
             }}
           ></input>

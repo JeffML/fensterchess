@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import { useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getOpeningsForEcoCode } from "../datasource/getOpeningsForEcoCode.js";
+import { getOpeningsForEcoCode } from "../datasource/getOpeningsForEcoCode";
 import p5 from "p5";
 import getColorForValue from "./colorGradient.js";
 import { FILES, RANKS } from "../common/consts";

@@ -62,7 +62,7 @@ describe("MenuBar", () => {
 
     let searchItem = screen.getByText("Search Openings").parentElement;
     let aboutItem = screen.getByText("About").parentElement;
-    
+
     expect(searchItem).toHaveClass("selected");
     expect(aboutItem).not.toHaveClass("selected");
 
@@ -108,8 +108,10 @@ describe("MenuBar", () => {
     );
 
     const ficsCheckbox = screen.getByLabelText("FICS") as HTMLInputElement;
-    const lichessCheckbox = screen.getByLabelText("lichess") as HTMLInputElement;
-    
+    const lichessCheckbox = screen.getByLabelText(
+      "lichess"
+    ) as HTMLInputElement;
+
     // In test environment without localStorage data, checkboxes start unchecked
     expect(ficsCheckbox.checked).toBe(false);
     expect(lichessCheckbox.checked).toBe(false);
@@ -125,7 +127,9 @@ describe("MenuBar", () => {
       </SelectedSitesContextProvider>
     );
 
-    const lichessCheckbox = screen.getByLabelText("lichess") as HTMLInputElement;
+    const lichessCheckbox = screen.getByLabelText(
+      "lichess"
+    ) as HTMLInputElement;
     expect(lichessCheckbox.checked).toBe(false);
 
     await user.click(lichessCheckbox);
@@ -139,7 +143,7 @@ describe("MenuBar", () => {
     const user = userEvent.setup();
     const mockSetMode = vi.fn();
     const mockWindowOpen = vi.fn();
-    
+
     // Mock window.open
     const originalOpen = window.open;
     window.open = mockWindowOpen;
