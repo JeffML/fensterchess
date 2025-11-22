@@ -1,13 +1,22 @@
-import { useRef, useState } from 'react';
+import { MutableRefObject, useRef, useState } from 'react';
+import { Game } from 'kokopu';
+import { ChessPGN } from '@chess-pgn/chess-pgn';
+import { Opening } from '../../../types';
 import { getFullOpeningNameFromKokopuGame } from '../../../utils/chessTools';
 import { movesStringToPliesAry } from '../../../utils/openings';
 import { AdditionalDetails } from './AdditionalDetails';
 import { ChessboardWithControls } from './ChessboardWithControls';
 import { Moves } from './Moves';
 
-export const OpeningDetails = ({ game, opening, chess }) => {
+interface OpeningDetailsProps {
+    game: Game;
+    opening: Opening;
+    chess: MutableRefObject<ChessPGN>;
+}
+
+export const OpeningDetails = ({ game, opening, chess }: OpeningDetailsProps) => {
     const { eco, name, moves: openingMoves } = opening;
-    const gamePliesRef = useRef(game.pojo().mainVariation);
+    const gamePliesRef = useRef(game.pojo().mainVariation as string[]);
     const openingPliesRef = useRef(movesStringToPliesAry(openingMoves ?? ''));
     const [plyIndex, setPlyIndex] = useState(openingPliesRef.current.length);
 

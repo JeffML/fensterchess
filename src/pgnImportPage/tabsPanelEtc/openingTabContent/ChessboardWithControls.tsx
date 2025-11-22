@@ -1,8 +1,22 @@
-import { Chessboard } from "kokopu-react";
+import { Chessboard } from 'kokopu-react';
+import { MutableRefObject } from 'react';
+import { ChessPGN } from '@chess-pgn/chess-pgn';
 import { ActionButton } from '../../../common/Buttons';
-import { pliesAryToMovesString } from "../../../utils/openings";
+import { pliesAryToMovesString } from '../../../utils/openings';
 
-export const ChessboardWithControls = ({ chess, plies, plyIndex, setPlyIndex }) => {
+interface ChessboardWithControlsProps {
+    chess: MutableRefObject<ChessPGN>;
+    plies: MutableRefObject<string[]>;
+    plyIndex: number;
+    setPlyIndex: (index: number) => void;
+}
+
+export const ChessboardWithControls = ({ 
+    chess, 
+    plies, 
+    plyIndex, 
+    setPlyIndex 
+}: ChessboardWithControlsProps) => {
     const doRest = () => {
         const currMoves = pliesAryToMovesString(
             plies.current.slice(0, plyIndex)

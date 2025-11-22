@@ -4,8 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import { PgnListPanel } from "../src/pgnImportPage/PgnListPanel.jsx";
-import { PgnTabsPanelContainer } from "../src/pgnImportPage/PgnTabsPanelContainer.jsx";
+import { PgnListPanel } from "../src/pgnImportPage/PgnListPanel.tsx";
+import { PgnTabsPanelContainer } from "../src/pgnImportPage/PgnTabsPanelContainer.tsx";
 import { OpeningBookProvider } from "../src/contexts/OpeningBookContext";
 
 const queryClient = new QueryClient({
@@ -127,7 +127,7 @@ describe("PGN File Upload", () => {
 
     // Import getPgnSummary dynamically
     const { getPgnSummary } = await import(
-      "../src/pgnImportPage/PgnTabsPanelContainer.jsx"
+      "../src/pgnImportPage/PgnTabsPanelContainer.tsx"
     );
 
     const summary = await getPgnSummary(pgnContent);
@@ -175,7 +175,7 @@ describe("PGN File Upload", () => {
     const pgnContent = readFileSync(pgnPath, "utf8");
 
     const { getPgnSummary } = await import(
-      "../src/pgnImportPage/PgnTabsPanelContainer.jsx"
+      "../src/pgnImportPage/PgnTabsPanelContainer.tsx"
     );
     const summary = await getPgnSummary(pgnContent);
 
@@ -205,7 +205,7 @@ describe("PGN File Upload", () => {
     const pgnContent = readFileSync(pgnPath, "utf8");
 
     const { getPgnSummary } = await import(
-      "../src/pgnImportPage/PgnTabsPanelContainer.jsx"
+      "../src/pgnImportPage/PgnTabsPanelContainer.tsx"
     );
 
     console.time("[Performance Test] PGN Summary calculation");

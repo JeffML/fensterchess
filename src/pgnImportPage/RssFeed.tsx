@@ -4,7 +4,7 @@ import { TWIC_RSS } from '../common/urlConsts';
 import { dateStringShort } from '../utils/dateStringShort';
 import { getFeedAsJson } from '../utils/getFeedAsJson';
 
-const getRssXml2 = async (url) => {
+const getRssXml2 = async () => {
     const response = await fetch(
         '/.netlify/functions/getRssXml?url=' + TWIC_RSS,
         {
@@ -19,8 +19,19 @@ const getRssXml2 = async (url) => {
     return data;
 };
 
+interface FeedJson {
+    link: string;
+    title: string;
+    description?: string;
+    items?: Array<{
+        title: string;
+        link: string;
+        description: string;
+    }>;
+}
+
 export const RssFeed = () => {
-    const [json, setJson] = useState(null);
+    const [json, setJson] = useState<FeedJson | null>(null);
 
     const { isError, error, data } = useQuery({
         queryKey: ['getRssXml2', dateStringShort()],

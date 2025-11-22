@@ -6,7 +6,11 @@ import { externalOpeningStats } from '../../../datasource/externalOpeningStats';
 import { dateStringShort } from '../../../utils/dateStringShort';
 import { winsAsPercentages } from '../../../utils/winsAsPercentages';
 
-export const AdditionalDetails = ({ fen }) => {
+interface AdditionalDetailsProps {
+    fen: string;
+}
+
+export const AdditionalDetails = ({ fen }: AdditionalDetailsProps) => {
     const sites = useContext(SelectedSitesContext).selectedSites;
 
     const { isError, error, data, isPending } = useQuery({
@@ -38,8 +42,8 @@ export const AdditionalDetails = ({ fen }) => {
     if (data) {
         return (
             <>
-                {Object.entries(data).map(([site, data]) => {
-                    const { alsoKnownAs, wins } = data;
+                {Object.entries(data).map(([site, siteData]) => {
+                    const { alsoKnownAs, wins } = siteData as any;
                     const games = wins.w + wins.d + wins.b;
 
                     return (

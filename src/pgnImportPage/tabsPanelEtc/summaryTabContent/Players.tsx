@@ -1,10 +1,15 @@
 import { useState } from 'react';
+import type { PgnSummary, Player } from '../../PgnTabsPanelContainer';
 
-export const Players = ({ pgnSumm }) => {
+interface PlayersProps {
+    pgnSumm: PgnSummary;
+}
+
+export const Players = ({ pgnSumm }: PlayersProps) => {
     const { players } = pgnSumm;
-    const [method, setMethod] = useState('name');
+    const [method, setMethod] = useState<'name' | 'ELO' | 'title'>('name');
 
-    const sort = (a, b) => {
+    const sort = (a: Player, b: Player) => {
         const titleSort = [
             'GM',
             'WGM',
@@ -19,17 +24,21 @@ export const Players = ({ pgnSumm }) => {
         ];
 
         if (method === 'name') return a.name.localeCompare(b.name);
-        if (method === 'ELO')
-            return parseInt(b.elo ?? 0) - parseInt(a.elo ?? 0);
+        if (method === 'ELO') {
+            const bElo = typeof b.elo === 'number' ? b.elo : parseInt(b.elo ?? '0');
+            const aElo = typeof a.elo === 'number' ? a.elo : parseInt(a.elo ?? '0');
+            return bElo - aElo;
+        }
         if (method === 'title') {
             return (
                 titleSort.indexOf(a.title ?? '') -
                 titleSort.indexOf(b.title ?? '')
             );
         }
+        return 0;
     };
 
-    const onChange = (e) => setMethod(e.target.value);
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => setMethod(e.target.value as 'name' | 'ELO' | 'title');
 
     return (
         <>
@@ -40,7 +49,7 @@ export const Players = ({ pgnSumm }) => {
                         type="radio"
                         name="sortBy"
                         value="name"
-                        defaultChecked="true"
+                        defaultChecked={true}
                         onChange={onChange}
                     />
                     Player name

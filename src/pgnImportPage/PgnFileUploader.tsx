@@ -1,11 +1,23 @@
-export const PgnFileUploader = ({ setLink }) => {
-    const handler = (e) => {
-        const listener = (e) => {
-            setLink({ pgn: reader.result });
-        };
+interface PgnLink {
+    url?: string;
+    pgn?: string;
+}
+
+interface PgnFileUploaderProps {
+    setLink: (link: PgnLink) => void;
+}
+
+export const PgnFileUploader = ({ setLink }: PgnFileUploaderProps) => {
+    const handler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
         const reader = new FileReader();
+        const listener = () => {
+            setLink({ pgn: reader.result as string });
+        };
         reader.addEventListener('load', listener);
-        reader.readAsText(e.target.files[0]);
+        reader.readAsText(file);
     };
 
     return (

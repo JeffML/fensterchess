@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { MutableRefObject, useState } from 'react';
 import PliesAryToMovesStringSpan from '../../../common/PliesAryToMovesStringSpan';
 
-export const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
+interface MovesProps {
+    openingPliesRef: MutableRefObject<string[]>;
+    gamePliesRef: MutableRefObject<string[]>;
+    plyIndex: number;
+}
+
+export const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }: MovesProps) => {
     const openingMovesStyle = {
         color: 'powderblue',
     };
@@ -12,7 +18,7 @@ export const Moves = ({ openingPliesRef, gamePliesRef, plyIndex }) => {
         setShowGameMoves(!showGameMoves);
     };
 
-    let gamePlies, gameMoves;
+    let gamePlies: string[], gameMoves;
 
     if (showGameMoves) {
         const opLen = openingPliesRef.current.length;

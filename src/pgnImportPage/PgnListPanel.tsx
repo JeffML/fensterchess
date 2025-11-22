@@ -4,9 +4,9 @@ import { INCR } from '../common/consts';
 import { TWIC_PGN_LINKS } from '../common/urlConsts';
 import { dateStringShort } from '../utils/dateStringShort';
 import { PgnLinkGrid } from './PgnLinkGrid';
-import {PgnFileUploader} from './PgnFileUploader'
+import { PgnFileUploader } from './PgnFileUploader';
 
-const getPgnLinks = async (url) => {
+const getPgnLinks = async (url: string) => {
     const response = await fetch(`/.netlify/functions/getPgnLinks?url=${url}`, {
         headers: {
             Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
@@ -16,17 +16,27 @@ const getPgnLinks = async (url) => {
     return data;
 };
 
-export const PgnListPanel = ({ link, setLink }) => {
+interface PgnLink {
+    url?: string;
+    pgn?: string;
+}
+
+interface PgnListPanelProps {
+    link: PgnLink;
+    setLink: (link: PgnLink) => void;
+}
+
+export const PgnListPanel = ({ link, setLink }: PgnListPanelProps) => {
     const { isPending, isError, data, error } = useQuery({
         queryFn: () => getPgnLinks(TWIC_PGN_LINKS),
         queryKey: ['pgnLinks', TWIC_PGN_LINKS, dateStringShort()],
     });
     const [end, setEnd] = useState(INCR);
-    const [pgnMode, setPgnMode] = useState('twic');
+    const [pgnMode, setPgnMode] = useState<'twic' | 'local'>('twic');
 
-    const handlePgnMode = (e) => {
+    const handlePgnMode = (e: React.ChangeEvent<HTMLInputElement>) => {
         setLink({});
-        setPgnMode(e.target.value);
+        setPgnMode(e.target.value as 'twic' | 'local');
     };
 
     return (

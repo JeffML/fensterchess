@@ -2,11 +2,19 @@ import { Fragment } from 'react/jsx-runtime';
 import { sleep } from '../../../utils/sleep';
 import { blueBoldStyle } from '../PgnSummaryTab';
 
-export const Openings = ({ openings, setFlash, filter, setFilter }) => {
+interface OpeningsProps {
+    openings: Set<string>;
+    setFlash: (value: boolean) => void;
+    filter: string[];
+    setFilter: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+export const Openings = ({ openings, setFlash, filter, setFilter }: OpeningsProps) => {
 
     const sleepTime = 300;
 
-    const handler = async ({ target }) => {
+    const handler = async ({ target }: React.MouseEvent<HTMLInputElement>) => {
+        const checkbox = target as HTMLInputElement;
         setFlash(true);
         await sleep(sleepTime);
         setFlash(false);
@@ -19,16 +27,16 @@ export const Openings = ({ openings, setFlash, filter, setFilter }) => {
         await sleep(sleepTime);
         setFlash(false);
 
-        if (target.checked)
+        if (checkbox.checked)
             setFilter((prev) => {
-                prev.push(target.value);
+                prev.push(checkbox.value);
                 return prev;
             });
-        else setFilter((prev) => prev.filter((f) => f !== target.value));
+        else setFilter((prev) => prev.filter((f) => f !== checkbox.value));
     };
 
     return (
-        <div  className="scrollableY white openings-grid">
+        <div className="scrollableY white openings-grid">
             <span
                 className="font-cinzel left"
                 style={{ ...blueBoldStyle, gridColumn: 'span 2' }}
