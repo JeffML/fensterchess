@@ -1,6 +1,6 @@
 import DOMPurify from 'dompurify';
 import { WIKI_THEORY_API, WIKI_THEORY_API_QS } from '../common/urlConsts.js';
-import { movesStringToPliesAry } from '../utils/openings.js'
+import { movesStringToPliesAry } from '../utils/openings';
 
 const xformWikibooksUrl = (url) => {
     // original: https://en.wikibooks.org/w/api.php?titles=Chess_Opening_Theory/1._d4/1...Nf6&amp;redirects&amp;origin=*&amp;action=query&amp;prop=extracts&amp;formatversion=2&amp;format=json&amp;exchars=1200

@@ -1,6 +1,6 @@
 import { FENEX } from "../common/consts";
 import "../stylesheets/textarea.css";
-import { pgnMovesOnly } from "../utils/chessTools.js";
+import { pgnMovesOnly } from "../utils/chessTools";
 import { sanitizeInput } from "../utils/sanitizeInput.js";
 
 const FenOrPgn = ({

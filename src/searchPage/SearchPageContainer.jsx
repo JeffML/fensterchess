@@ -8,7 +8,7 @@ import {
   findOpening,
   getFromTosForFen,
   getScoresForFens,
-} from "../datasource/findOpening.js";
+} from "../datasource/findOpening";
 
 const loadMoves = (moves, chess) => {
   let fen = "";

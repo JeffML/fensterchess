@@ -2,7 +2,7 @@ import { ChessPGN } from "@chess-pgn/chess-pgn";
 import { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-import { parseMoves, toPlay } from "../utils/chessTools.js";
+import { parseMoves, toPlay } from "../utils/chessTools";
 import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional.jsx";
 import { SimilarOpenings } from "./SimilarOpenings.jsx";
 import { NextOpenings } from "./nextOpeningsEtc/NextOpenings.jsx";

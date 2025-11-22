@@ -1,6 +1,6 @@
-import '../stylesheets/grid.css';
-import { CSSProperties } from 'react';
-import type { GamePercentages } from '../types';
+import "../stylesheets/grid.css";
+import { CSSProperties } from "react";
+import type { GamePercentages } from "../types";
 
 interface StackedBarChartProps {
   pctgs: GamePercentages;

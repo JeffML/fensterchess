@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode } from 'react';
+import { createContext, useState, ReactNode } from "react";
 
 let selectedSites: string[] = localStorage.sites
   ? JSON.parse(localStorage.sites)
