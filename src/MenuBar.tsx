@@ -1,7 +1,12 @@
-import { modes } from "./common/consts";
-import Sites from "./Sites.jsx";
+import { modes, Modes } from "./common/consts";
+import Sites from "./Sites";
 
-const MenuBar = ({ mode, setMode }) => {
+interface MenuBarProps {
+  mode: Modes;
+  setMode: (mode: Modes) => void;
+}
+
+const MenuBar = ({ mode, setMode }: MenuBarProps) => {
   return (
     <div className="row menubar">
       <div

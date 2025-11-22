@@ -1,6 +1,5 @@
-import { APP_NAME } from "./common/consts";
-import MenuBar from "./MenuBar.jsx";
-import { Modes } from "./common/consts";
+import { APP_NAME, Modes } from "./common/consts";
+import MenuBar from "./MenuBar";
 
 interface PageHeaderProps {
   subheading: string;

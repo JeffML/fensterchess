@@ -1,8 +1,8 @@
-import { useContext } from "react";
+import { useContext, MouseEvent } from "react";
 import { sites, siteUrls } from "./common/consts";
 import { SelectedSitesContext } from "./contexts/SelectedSitesContext";
 
-const siteTab = (_, s) => {
+const siteTab = (_: MouseEvent, s: keyof typeof siteUrls) => {
   window.open(siteUrls[s], "_blank");
 };
 
@@ -19,8 +19,8 @@ const Sites2 = () => {
             value={s}
             defaultChecked={selectedSites.get().includes(s)}
             onClick={({ target }) => {
-              if (target.checked) selectedSites.add(target.value);
-              else selectedSites.remove(target.value);
+              if ((target as HTMLInputElement).checked) selectedSites.add((target as HTMLInputElement).value);
+              else selectedSites.remove((target as HTMLInputElement).value);
             }}
           ></input>
           <label
