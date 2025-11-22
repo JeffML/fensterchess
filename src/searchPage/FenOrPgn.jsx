@@ -1,4 +1,4 @@
-import { FENEX } from "../common/consts.js";
+import { FENEX } from "../common/consts";
 import "../stylesheets/textarea.css";
 import { pgnMovesOnly } from "../utils/chessTools.js";
 import { sanitizeInput } from "../utils/sanitizeInput.js";

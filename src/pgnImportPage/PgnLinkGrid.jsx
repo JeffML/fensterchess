@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { ActionButton } from '../common/Buttons.jsx';
-import { INCR } from '../common/consts.js';
+import { ActionButton } from '../common/Buttons';
+import { INCR } from '../common/consts';
 import { dateStringShort } from '../utils/dateStringShort.js';
 
 function PgnMetaRow({ link, setLink }) {

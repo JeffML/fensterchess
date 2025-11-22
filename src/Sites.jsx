@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { sites, siteUrls } from "./common/consts.js";
+import { sites, siteUrls } from "./common/consts";
 import { SelectedSitesContext } from "./contexts/SelectedSitesContext.jsx";
 
 const siteTab = (_, s) => {

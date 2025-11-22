@@ -1,5 +1,5 @@
 import './App.css';
-import { VERSION } from './common/consts.js';
+import { VERSION } from './common/consts';
 import {
     CHESS_DATA,
     DISCUSSION,

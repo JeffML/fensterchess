@@ -1,4 +1,4 @@
-import { APP_NAME } from "./common/consts.js";
+import { APP_NAME } from "./common/consts";
 import MenuBar from "./MenuBar.jsx";
 
 const PageHeader = ({ subheading, mode, setMode }) => {

@@ -1,5 +1,5 @@
 import HeatMap from "jsheatmap";
-import { RANKS as ordinals, FILES as files } from "../common/consts.js";
+import { RANKS as ordinals, FILES as files } from "../common/consts";
 import { Fragment } from "react";
 
 // eslint-disable-next-line no-unused-vars

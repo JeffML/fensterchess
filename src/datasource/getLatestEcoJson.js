@@ -1,4 +1,4 @@
-import { ECO_JSON_RAW } from '../common/urlConsts.js';
+import { ECO_JSON_RAW } from '../common/urlConsts';
 
 let openingsByCat = { initialized: false };
 

@@ -1,4 +1,4 @@
-import { modes } from "./common/consts.js";
+import { modes } from "./common/consts";
 import Sites from "./Sites.jsx";
 
 const MenuBar = ({ mode, setMode }) => {

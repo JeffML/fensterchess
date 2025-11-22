@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getOpeningsForEcoCode } from "../datasource/getOpeningsForEcoCode.js";
 import p5 from "p5";
 import getColorForValue from "./colorGradient.js";
-import { FILES, RANKS } from "../common/consts.js";
+import { FILES, RANKS } from "../common/consts";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
 
 const squareColors = FILES.map((file, fileNo) =>

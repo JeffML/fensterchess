@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useContext } from 'react';
-import StackedBarChart from '../common/StackedBarChart.jsx';
+import StackedBarChart from '../common/StackedBarChart';
 import { SelectedSitesContext } from '../contexts/SelectedSitesContext.jsx';
 import { externalOpeningStats } from '../datasource/externalOpeningStats.js';
 import { dateStringShort } from '../utils/dateStringShort.js';

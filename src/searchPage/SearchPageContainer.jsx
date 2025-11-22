@@ -1,6 +1,6 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
 import { useContext, useRef, useState, useEffect } from "react";
-import { FENEX } from "../common/consts.js";
+import { FENEX } from "../common/consts";
 import { OpeningBookContext } from "../contexts/OpeningBookContext.jsx";
 import SearchPage from "./SearchPage.jsx";
 import { useQuery } from "@tanstack/react-query";

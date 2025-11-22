@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActionButton } from "../common/Buttons.jsx";
+import { ActionButton } from "../common/Buttons";
 import { NO_ENTRY_FOUND } from "../common/consts";
 import "../stylesheets/search.css";
 import { FenOrPgn } from "./FenOrPgn.jsx";
