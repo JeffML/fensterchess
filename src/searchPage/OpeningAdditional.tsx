@@ -5,11 +5,25 @@ import { SelectedSitesContext } from "../contexts/SelectedSitesContext";
 import { externalOpeningStats } from "../datasource/externalOpeningStats";
 import { dateStringShort } from "../utils/dateStringShort.js";
 import { winsAsPercentages } from "../utils/winsAsPercentages.js";
+import { FEN } from "../types";
 
-export const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
+interface ExternalSiteData {
+  alsoKnownAs: string;
+  wins: {
+    w: number;
+    d: number;
+    b: number;
+  };
+}
+
+interface ExternalStatsResponse {
+  [site: string]: ExternalSiteData;
+}
+
+export const OpeningAdditionalWithBarChartGrid = ({ fen }: { fen: FEN }) => {
   const { selectedSites: sites } = useContext(SelectedSitesContext);
 
-  const { isError, error, data, isPending } = useQuery({
+  const { isError, error, data, isPending } = useQuery<ExternalStatsResponse>({
     queryKey: [fen, sites, dateStringShort()],
     queryFn: async () => externalOpeningStats(fen, sites),
   });
@@ -26,8 +40,8 @@ export const OpeningAdditionalWithBarChartGrid = ({ fen }) => {
   if (data) {
     return (
       <div style={{ marginTop: "1em" }}>
-        {Object.entries(data).map(([site, data]) => {
-          const { alsoKnownAs, wins } = data;
+        {Object.entries(data).map(([site, siteData]) => {
+          const { alsoKnownAs, wins } = siteData;
           const games = wins.w + wins.d + wins.b;
           return (
             <div

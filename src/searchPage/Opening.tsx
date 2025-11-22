@@ -1,6 +1,16 @@
 import { useContext, useEffect } from "react";
 import { SelectedSitesContext } from "../contexts/SelectedSitesContext";
 import { OpeningTabs } from "./OpeningTabs.jsx";
+import { BoardState, Opening as OpeningType } from "../types";
+
+interface OpeningProps {
+  boardState: BoardState;
+  setBoardState: (state: BoardState) => void;
+  handleMovePlayed: (move: string) => void;
+  data: OpeningType | null;
+  lastKnownOpening: Partial<OpeningType>;
+  setLastKnownOpening: (opening: Partial<OpeningType>) => void;
+}
 
 const Opening = ({
   boardState,
@@ -9,7 +19,7 @@ const Opening = ({
   data,
   lastKnownOpening,
   setLastKnownOpening,
-}) => {
+}: OpeningProps) => {
   const sites = useContext(SelectedSitesContext);
 
   useEffect(() => {
@@ -58,8 +68,13 @@ const Opening = ({
           {...{
             boardState,
             setBoardState,
+            variations: undefined,
+            currentMoves: undefined,
             handleMovePlayed,
             sites,
+            eco,
+            name,
+            from: undefined,
             lastKnownOpening,
           }}
         />
@@ -70,7 +85,7 @@ const Opening = ({
 
 export { Opening };
 
-const Eval = ({ score }) => (
+const Eval = ({ score }: { score?: number }) => (
   <span
     className="white"
     style={{
@@ -82,7 +97,14 @@ const Eval = ({ score }) => (
   </span>
 );
 
-const OpeningName = ({ eco, src, name, score }) => {
+interface OpeningNameProps {
+  eco?: string;
+  src?: string;
+  name?: string;
+  score?: number;
+}
+
+const OpeningName = ({ eco, src, name, score }: OpeningNameProps) => {
   return (
     <span
       className="font-cinzel"
@@ -98,12 +120,10 @@ const OpeningName = ({ eco, src, name, score }) => {
             {name} <Eval {...{ score }}></Eval>
           </i>
         ) : (
-          (
-            <span>
-              {name}
-              <Eval {...{ score }}></Eval>
-            </span>
-          ) || "Unknown"
+          <span>
+            {name || "Unknown"}
+            {name && <Eval {...{ score }}></Eval>}
+          </span>
         )}
       </span>
     </span>

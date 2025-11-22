@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { parseMoves, toPlay } from "../utils/chessTools";
-import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional.jsx";
+import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional";
 import { SimilarOpenings } from "./SimilarOpenings.jsx";
 import { NextOpenings } from "./nextOpeningsEtc/NextOpenings.jsx";
 import { Roots } from "./nextOpeningsEtc/Roots.jsx";

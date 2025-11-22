@@ -2,13 +2,13 @@ import { useState } from "react";
 import { ActionButton } from "../common/Buttons";
 import { NO_ENTRY_FOUND } from "../common/consts";
 import "../stylesheets/search.css";
-import { FenOrPgn } from "./FenOrPgn.jsx";
+import { FenOrPgn } from "./FenOrPgn";
 
 import { lazy, Suspense } from "react";
 
 // Lazy load heavy components
 const Opening = lazy(() =>
-  import("./Opening.jsx").then((m) => ({ default: m.Opening }))
+  import("./Opening").then((m) => ({ default: m.Opening }))
 );
 const Chessboard = lazy(() =>
   import("kokopu-react").then((m) => ({ default: m.Chessboard }))
