@@ -73,29 +73,26 @@ const SearchPageContainer = () => {
   });
 
   const chess = useRef(new ChessPGN());
+  const initializedFromUrl = useRef(false);
 
   // Read URL parameters on mount
   useEffect(() => {
-    const url = new URLSearchParams(window.location.search);
-    const { fen, moves } = readParams(url, chess);
-    // Only update if different from current state
-    if (fen !== boardState.fen || moves !== boardState.moves) {
-      setBoardState({ fen, moves });
+    if (!initializedFromUrl.current) {
+      const url = new URLSearchParams(window.location.search);
+      const { fen, moves } = readParams(url, chess);
+      // Only update if different from initial state
+      if (fen !== "start" || moves !== "") {
+        setBoardState({ fen, moves });
+      }
+      initializedFromUrl.current = true;
     }
   }, []); // Empty dependency array - only run on mount
 
   const { fen } = boardState;
   const context = useContext(OpeningBookContext);
+  const { openingBook, positionBook } = context || {};
 
-  if (!context) return <div>Loading...</div>;
-
-  const { openingBook, positionBook } = context;
-
-  // Wait for books to load before proceeding
-  if (!openingBook || !positionBook) {
-    return <div>Loading opening database...</div>;
-  }
-
+  // Call all hooks unconditionally before any early returns
   const { data: fromTosForFen } = useQuery({
     queryKey: ["fromTosForFen", fen],
     queryFn: async () => getFromTosForFen(fen),
@@ -107,28 +104,42 @@ const SearchPageContainer = () => {
   });
 
   const { data: scoresForFens } = useQuery({
-    queryKey: ["scoresForFens", fen, fromTosForFen?.next, fromTosForFen?.from],
+    queryKey: ["scoresForFens", fen],
     queryFn: async () =>
       getScoresForFens({
         fen,
         next: fromTosForFen?.next || [],
         from: fromTosForFen?.from || [],
       }),
-    enabled: fromTosForFen != null,
+    enabled: fromTosForFen != null && openingBook != null,
   });
 
   const opening = useMemo(
     () =>
-      findOpening(
-        openingBook,
-        fen,
-        positionBook,
-        fromTosForFen || null,
-        scoresForFens || null,
-        chess
-      ),
-    [openingBook, fen, positionBook, fromTosForFen, scoresForFens, chess]
+      openingBook && positionBook
+        ? findOpening(
+            openingBook,
+            fen,
+            positionBook,
+            fromTosForFen || null,
+            scoresForFens || null
+          )
+        : undefined,
+    [openingBook, fen, positionBook, fromTosForFen, scoresForFens]
   );
+
+  // Update chess engine when opening changes
+  useEffect(() => {
+    if (opening && fromTosForFen && scoresForFens) {
+      chess.current.loadPgn(opening.moves);
+    }
+  }, [opening, fromTosForFen, scoresForFens, chess]);
+
+  // Early returns AFTER all hooks
+  if (!context) return <div>Loading...</div>;
+  if (!openingBook || !positionBook) {
+    return <div>Loading opening database...</div>;
+  }
 
   return (
     <SearchPage {...{ chess, boardState, setBoardState, data: opening }} />

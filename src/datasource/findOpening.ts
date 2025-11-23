@@ -3,7 +3,6 @@ import type {
   Opening,
   OpeningBook,
   PositionBook,
-  ChessRef,
   FromTosResponse,
   ScoresResponse,
   ScoresRequest,
@@ -14,8 +13,7 @@ export function findOpening(
   fen: FEN | "start",
   positionBook: PositionBook,
   fromTosForFen: FromTosResponse | null,
-  scoresForFens: ScoresResponse | null,
-  chess: ChessRef
+  scoresForFens: ScoresResponse | null
 ): Opening | undefined {
   let opening = openingBook[fen as FEN];
   if (!opening && fen !== "start") {
@@ -48,7 +46,7 @@ export function findOpening(
       });
     }
 
-    chess.current.loadPgn(opening.moves);
+    // chess.current.loadPgn(opening.moves);  // handled by useEffect in SearchPageContainer
   }
   return opening;
 }
