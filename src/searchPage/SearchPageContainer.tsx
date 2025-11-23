@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
   useEffect,
+  useMemo,
   MutableRefObject,
 } from "react";
 import { FENEX } from "../common/consts";
@@ -105,7 +106,7 @@ const SearchPageContainer = () => {
   });
 
   const { data: scoresForFens } = useQuery({
-    queryKey: ["scoresForFens", fen],
+    queryKey: ["scoresForFens", fen, fromTosForFen?.next, fromTosForFen?.from],
     queryFn: async () =>
       getScoresForFens({
         fen,
@@ -115,13 +116,17 @@ const SearchPageContainer = () => {
     enabled: fromTosForFen != null,
   });
 
-  let opening = findOpening(
-    openingBook,
-    fen,
-    positionBook,
-    fromTosForFen || null,
-    scoresForFens || null,
-    chess
+  const opening = useMemo(
+    () =>
+      findOpening(
+        openingBook,
+        fen,
+        positionBook,
+        fromTosForFen || null,
+        scoresForFens || null,
+        chess
+      ),
+    [openingBook, fen, positionBook, fromTosForFen, scoresForFens, chess]
   );
 
   return (
