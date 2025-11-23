@@ -2,7 +2,7 @@ import { lazy, MutableRefObject, Suspense, useState } from "react";
 import { ActionButton } from "../common/Buttons";
 import { NO_ENTRY_FOUND } from "../common/consts";
 import "../stylesheets/search.css";
-import { FenOrPgn } from "./FenOrPgn";
+import { FenAndMovesInputs } from "./FenAndMovesInputs";
 import { BoardState, Opening as OpeningType } from "../types";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
 
@@ -82,11 +82,8 @@ const SearchPage = ({
 
         <div className="row">
           <div className="column">
-            <div className="row" style={{ marginBottom: "10px" }}>
-              Drag pieces above, or paste a move sequence or FEN below:
-            </div>
             <div className="row">
-              <FenOrPgn
+              <FenAndMovesInputs
                 {...{
                   boardState,
                   setBoardState,

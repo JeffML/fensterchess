@@ -22,14 +22,16 @@ const SortBy = ({ setSortBy }: SortByProps) => {
     <span id="sortBy">
       Sort By:{" "}
       <select onChange={(e) => setSortBy(parseInt(e.target.value))}>
-        {Object.keys(sortEnum).map((option) => (
-          <option
-            key={option}
-            value={sortEnum[option as keyof typeof sortEnum]}
-          >
-            {option}
-          </option>
-        ))}
+        {Object.keys(sortEnum)
+          .filter((key) => isNaN(Number(key)))
+          .map((option) => (
+            <option
+              key={option}
+              value={sortEnum[option as keyof typeof sortEnum]}
+            >
+              {option}
+            </option>
+          ))}
       </select>
     </span>
   );

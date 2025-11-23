@@ -128,10 +128,15 @@ const SearchPageContainer = () => {
     [openingBook, fen, positionBook, fromTosForFen, scoresForFens]
   );
 
-  // Update chess engine when opening changes
+  // Update chess engine and boardState moves when opening changes
   useEffect(() => {
     if (opening && fromTosForFen && scoresForFens) {
       chess.current.loadPgn(opening.moves);
+      // Update boardState to show the opening's moves
+      setBoardState((prev) => ({
+        ...prev,
+        moves: opening.moves,
+      }));
     }
   }, [opening, fromTosForFen, scoresForFens, chess]);
 

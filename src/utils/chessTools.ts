@@ -62,7 +62,9 @@ export const pos = (fen: FEN): string => fen.split(" ")[0];
 
 export function pgnMovesOnly(pgn: PGN): string {
   const i = pgn.lastIndexOf("]");
-  return pgn.slice(i + 2);
+  if (i === -1) return pgn; // No headers, return as-is
+  // Skip past the closing bracket and any whitespace/newlines
+  return pgn.slice(i + 1).trim();
 }
 
 /**
