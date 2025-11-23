@@ -72,7 +72,7 @@ export const OpeningsForEcoCat = ({
                 }`}
                 onClick={() =>
                   window.open(
-                    `https://fensterchess.com/?fen=${encodeURIComponent(
+                    `${window.location.origin}/?fen=${encodeURIComponent(
                       rootFen
                     )}`,
                     "_blank"
@@ -104,7 +104,7 @@ export const OpeningsForEcoCat = ({
                   onMouseLeave={() => setPopupFen(null)}
                   onClick={() =>
                     window.open(
-                      `https://fensterchess.com/?fen=${encodeURIComponent(
+                      `${window.location.origin}/?fen=${encodeURIComponent(
                         c.fen
                       )}`,
                       "_blank"
