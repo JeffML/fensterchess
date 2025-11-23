@@ -115,9 +115,6 @@ const SearchPageContainer = () => {
     enabled: fromTosForFen != null,
   });
 
-  // Get the current moves BEFORE calling findOpening (which may overwrite the chess instance)
-  const moves = chess.current.pgn();
-
   let opening = findOpening(
     openingBook,
     fen,
@@ -126,10 +123,6 @@ const SearchPageContainer = () => {
     scoresForFens || null,
     chess
   );
-
-  if (fen !== boardState.fen || moves !== boardState.moves) {
-    setBoardState({ fen, moves });
-  }
 
   return (
     <SearchPage {...{ chess, boardState, setBoardState, data: opening }} />
