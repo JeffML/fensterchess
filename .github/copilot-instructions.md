@@ -108,6 +108,14 @@ npm run type-check  # Check types without building
 npm run build      # Type-check + bundle to dist/
 ```
 
+**CRITICAL - Deployment Policy:**
+
+- **NEVER run production deployments** (`netlify deploy --prod` or similar)
+- Agent can suggest draft/preview deployments (`netlify deploy` without --prod flag)
+- Agent should only assist with local development, testing, and building
+- Production deployments are exclusively handled by the project maintainer
+- Agent can run `npm run build` to verify build succeeds
+
 **TypeScript Migration:**
 
 - In progress: piecemeal conversion from .jsx to .tsx

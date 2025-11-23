@@ -89,6 +89,11 @@ const SearchPageContainer = () => {
 
   const { openingBook, positionBook } = context;
 
+  // Wait for books to load before proceeding
+  if (!openingBook || !positionBook) {
+    return <div>Loading opening database...</div>;
+  }
+
   const { data: fromTosForFen } = useQuery({
     queryKey: ["fromTosForFen", fen],
     queryFn: async () => getFromTosForFen(fen),
@@ -114,9 +119,9 @@ const SearchPageContainer = () => {
   const moves = chess.current.pgn();
 
   let opening = findOpening(
-    openingBook!,
+    openingBook,
     fen,
-    positionBook!,
+    positionBook,
     fromTosForFen || null,
     scoresForFens || null,
     chess
