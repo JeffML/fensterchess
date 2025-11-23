@@ -67,11 +67,12 @@ const EcoCodes = ({ setCode, cat }: EcoCodesProps) => {
             setCode(target.value);
           }}
         >
-          {ecoCodes && Object.entries(ecoCodes).map(([, { name, eco, moves }]) => (
-            <option value={eco} key={eco} title={name}>
-              {eco} {name}, {moves.substring(0, 30)}
-            </option>
-          ))}
+          {ecoCodes &&
+            Object.entries(ecoCodes).map(([, { name, eco, moves }]) => (
+              <option value={eco} key={eco} title={name}>
+                {eco} {name}, {moves.substring(0, 30)}
+              </option>
+            ))}
         </select>
       </div>
     </>

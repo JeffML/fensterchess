@@ -1,5 +1,9 @@
 import { useQuery as useQueryRQ } from "@tanstack/react-query";
-import { indexPgnGames, CursorImpl, type Game as ChessPGNGame } from "@chess-pgn/chess-pgn";
+import {
+  indexPgnGames,
+  CursorImpl,
+  type Game as ChessPGNGame,
+} from "@chess-pgn/chess-pgn";
 import { GameAdapter } from "../utils/gameAdapter";
 import { useState } from "react";
 import "react-tabs/style/react-tabs.css";

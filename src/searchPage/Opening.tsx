@@ -85,7 +85,7 @@ const Opening = ({
 
 export { Opening };
 
-const Eval = ({ score }: { score?: number }) => (
+const Eval = ({ score }: { score?: number | null }) => (
   <span
     className="white"
     style={{
@@ -101,7 +101,7 @@ interface OpeningNameProps {
   eco?: string;
   src?: string;
   name?: string;
-  score?: number;
+  score?: number | null;
 }
 
 const OpeningName = ({ eco, src, name, score }: OpeningNameProps) => {

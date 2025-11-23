@@ -27,20 +27,26 @@ export function findOpening(
     const { score, nextScores, fromScores } = scoresForFens;
     opening.score = score;
 
-    opening.next = fromTosForFen.next.map((fen, i) => {
-      const variation: Opening = {
-        ...openingBook[fen],
-        score: nextScores?.[i],
-      };
-      return variation;
-    });
-    opening.from = fromTosForFen.from.map((fen, i) => {
-      const variation: Opening = {
-        ...openingBook[fen],
-        score: fromScores?.[i],
-      };
-      return variation;
-    });
+    // Only map if next/from arrays exist (API call succeeded)
+    if (fromTosForFen.next && Array.isArray(fromTosForFen.next)) {
+      opening.next = fromTosForFen.next.map((fen, i) => {
+        const variation: Opening = {
+          ...openingBook[fen],
+          score: nextScores?.[i],
+        };
+        return variation;
+      });
+    }
+
+    if (fromTosForFen.from && Array.isArray(fromTosForFen.from)) {
+      opening.from = fromTosForFen.from.map((fen, i) => {
+        const variation: Opening = {
+          ...openingBook[fen],
+          score: fromScores?.[i],
+        };
+        return variation;
+      });
+    }
 
     chess.current.loadPgn(opening.moves);
   }
@@ -48,7 +54,7 @@ export function findOpening(
 }
 
 export const getFromTosForFen = async (fen: FEN): Promise<FromTosResponse> => {
-  const fromTos = await fetch(
+  const response = await fetch(
     "/.netlify/functions/getFromTosForFen?fen=" + fen,
     {
       headers: {
@@ -56,7 +62,16 @@ export const getFromTosForFen = async (fen: FEN): Promise<FromTosResponse> => {
       },
     }
   );
-  return await fromTos.json();
+
+  if (!response.ok) {
+    console.error(
+      `Failed to fetch fromTos for FEN: ${response.status} ${response.statusText}`
+    );
+    // Return empty arrays instead of throwing, so the app continues to work
+    return { next: [], from: [] };
+  }
+
+  return await response.json();
 };
 
 export const getScoresForFens = async (
@@ -70,6 +85,14 @@ export const getScoresForFens = async (
     },
     body: JSON.stringify(json),
   });
+
+  if (!response.ok) {
+    console.error(
+      `Failed to fetch scores: ${response.status} ${response.statusText}`
+    );
+    // Return null scores instead of throwing, so the app continues to work
+    return { score: null, nextScores: [], fromScores: [] };
+  }
 
   const data = await response.json();
   return data;

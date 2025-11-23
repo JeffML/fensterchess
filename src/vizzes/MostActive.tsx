@@ -95,8 +95,12 @@ const MostActiveSquaresByEco = ({ cat, code }: MostActiveSquaresByEcoProps) => {
   else if (processedCode) processedCode = processedCode.substr(1, 2);
 
   const { isError, isPending, error, data } = useQuery<Record<string, number>>({
-    queryFn: async () => getMostActiveSquaresByEco((cat ?? '') + (processedCode ?? '')),
-    queryKey: ["getMostActiveSquaresByEco", (cat ?? '') + (processedCode ?? '')],
+    queryFn: async () =>
+      getMostActiveSquaresByEco((cat ?? "") + (processedCode ?? "")),
+    queryKey: [
+      "getMostActiveSquaresByEco",
+      (cat ?? "") + (processedCode ?? ""),
+    ],
     enabled: processedCode != null,
   });
 
@@ -110,16 +114,24 @@ const MostActiveSquaresByEco = ({ cat, code }: MostActiveSquaresByEcoProps) => {
   return null;
 };
 
-const MostActiveByPiece = ({ cat, code, colors, piece }: MostActiveByPieceProps) => {
+const MostActiveByPiece = ({
+  cat,
+  code,
+  colors,
+  piece,
+}: MostActiveByPieceProps) => {
   const [type, setType] = useState<string | undefined>();
 
   let processedCode = code;
   if (processedCode === "all") processedCode = undefined;
   else if (processedCode) processedCode = processedCode.substr(1, 2);
 
-  const { isError, isPending, error, data } = useQuery<Record<string, DetailedSquareData>>({
-    queryKey: ["mostActiveDetailed", (cat ?? '') + (processedCode ?? '')],
-    queryFn: async () => getMostActiveSquaresByEcoDetailed((cat ?? '') + (processedCode ?? '')),
+  const { isError, isPending, error, data } = useQuery<
+    Record<string, DetailedSquareData>
+  >({
+    queryKey: ["mostActiveDetailed", (cat ?? "") + (processedCode ?? "")],
+    queryFn: async () =>
+      getMostActiveSquaresByEcoDetailed((cat ?? "") + (processedCode ?? "")),
     enabled: processedCode != null,
   });
 

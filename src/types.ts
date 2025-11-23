@@ -35,8 +35,8 @@ export interface Opening {
   moves: string;
   /** ECO classification code */
   eco: EcoCode;
-  /** Optional evaluation score */
-  score?: number;
+  /** Optional evaluation score (null if evaluation failed) */
+  score?: number | null;
   /** Next possible positions (added by serverless functions) */
   next?: Opening[];
   /** Previous positions leading to this one (added by serverless functions) */
@@ -91,8 +91,8 @@ export interface FromTosResponse {
  * Response from scoresForFens serverless function
  */
 export interface ScoresResponse {
-  /** Current position score */
-  score: number;
+  /** Current position score (null if fetch failed) */
+  score: number | null;
   /** Scores for next positions */
   nextScores?: number[];
   /** Scores for previous positions */
