@@ -78,7 +78,8 @@ const SearchPageContainer = () => {
   useEffect(() => {
     const url = new URLSearchParams(window.location.search);
     const { fen, moves } = readParams(url, chess);
-    if (fen !== "start" || moves !== "") {
+    // Only update if different from current state
+    if (fen !== boardState.fen || moves !== boardState.moves) {
       setBoardState({ fen, moves });
     }
   }, []); // Empty dependency array - only run on mount
