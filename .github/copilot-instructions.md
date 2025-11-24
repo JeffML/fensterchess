@@ -50,6 +50,14 @@ fensterchess consumes chessPGN as a dependency and fetches chess opening data fr
 - Instantiate: `const chess = useRef(new ChessPGN())` (use ref to persist across renders)
 - Display boards with `kokopu-react` components
 
+**UI Styling Guidelines:**
+
+- **Background**: Main page background is dark gray
+- **Text Color**: Always use light colors (white, light gray) or explicitly set dark colors for light backgrounds
+- **When adding new content**: Ensure text color contrasts with the dark gray background
+- **Example**: Use `color: "#fff"` or `color: "#000"` explicitly rather than relying on default text colors
+- **Testing**: Check visibility against dark backgrounds before committing UI changes
+
 **CRITICAL - Game Type Usage:**
 
 - **NEVER import `Game` from `kokopu`** in src/ files - kokopu is only in devDependencies for testing
