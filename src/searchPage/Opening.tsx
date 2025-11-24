@@ -1,9 +1,11 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, MutableRefObject } from "react";
 import { SelectedSitesContext } from "../contexts/SelectedSitesContext";
 import { OpeningTabs } from "./OpeningTabs";
 import { BoardState, Opening as OpeningType } from "../types";
+import { ChessPGN } from "@chess-pgn/chess-pgn";
 
 interface OpeningProps {
+  chess: MutableRefObject<ChessPGN>;
   boardState: BoardState;
   setBoardState: (state: BoardState) => void;
   handleMovePlayed: (move: string) => void;
@@ -14,6 +16,7 @@ interface OpeningProps {
 }
 
 const Opening = ({
+  chess,
   boardState,
   setBoardState,
   handleMovePlayed,
@@ -62,6 +65,7 @@ const Opening = ({
 
         <OpeningTabs
           {...{
+            chess,
             boardState,
             setBoardState,
             variations,
@@ -83,6 +87,7 @@ const Opening = ({
         <OpeningName {...{ eco, name, src, score }} />
         <OpeningTabs
           {...{
+            chess,
             boardState,
             setBoardState,
             variations: undefined,

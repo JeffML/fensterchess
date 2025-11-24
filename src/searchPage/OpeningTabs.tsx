@@ -1,5 +1,5 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { parseMoves, toPlay } from "../utils/chessTools";
@@ -66,6 +66,7 @@ const legalMove = (moves: string, variation: Opening): Variation | null => {
 };
 
 interface OpeningTabsProps {
+  chess: MutableRefObject<ChessPGN>;
   boardState: BoardState;
   setBoardState: (state: BoardState) => void;
   variations?: Opening[];
@@ -79,6 +80,7 @@ interface OpeningTabsProps {
 }
 
 const OpeningTabs = ({
+  chess: chessRef,
   boardState,
   setBoardState,
   variations,
@@ -158,7 +160,7 @@ const OpeningTabs = ({
         )}
         {searchable && (
           <TabPanel>
-            <SimilarOpenings {...{ setBoardState, boardState }} />
+            <SimilarOpenings {...{ chess: chessRef, setBoardState, boardState }} />
           </TabPanel>
         )}
       </div>

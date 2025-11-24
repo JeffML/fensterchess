@@ -124,6 +124,7 @@ const SearchPage = ({
             <Suspense fallback={<div>Loading opening data...</div>}>
               <Opening
                 {...{
+                  chess,
                   boardState,
                   setBoardState,
                   handleMovePlayed,

@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Chessboard } from "kokopu-react";
-import { useContext } from "react";
+import { MutableRefObject, useContext } from "react";
 import { OpeningBookContext } from "../contexts/OpeningBookContext";
 import "../stylesheets/similar.css";
 import { BoardState, FEN } from "../types";
+import { ChessPGN } from "@chess-pgn/chess-pgn";
 
 interface SimilarResponse {
   similar: FEN[];
@@ -23,15 +24,17 @@ const getSimilar = async (fen: FEN): Promise<SimilarResponse> => {
 };
 
 interface SimilarOpeningsProps {
+  chess: MutableRefObject<ChessPGN>;
   boardState: BoardState;
   setBoardState: (state: BoardState) => void;
 }
 
 const SimilarOpenings = ({
+  chess,
   boardState,
   setBoardState,
 }: SimilarOpeningsProps) => {
-  const { fen, moves } = boardState;
+  const { fen } = boardState;
   const context = useContext(OpeningBookContext);
 
   if (!context) {
@@ -79,7 +82,15 @@ const SimilarOpenings = ({
           <span
             style={{ paddingBottom: "3px" }}
             className="fakeLink"
-            onClick={() => setBoardState({ fen: sim.fen, moves })}
+            onClick={() => {
+              // Sync chess instance with the similar opening
+              chess.current.reset();
+              if (sim.moves) {
+                chess.current.loadPgn(sim.moves);
+              }
+              // Update board state with similar opening's FEN and moves
+              setBoardState({ fen: sim.fen, moves: sim.moves });
+            }}
           >
             {sim.name}
           </span>
