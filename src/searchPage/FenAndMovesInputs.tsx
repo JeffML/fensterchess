@@ -1,10 +1,63 @@
-import { ClipboardEvent, MutableRefObject } from "react";
+import { ClipboardEvent, MutableRefObject, useState, useEffect, useCallback, useMemo } from "react";
 import { FENEX, POSITION_ONLY_FEN_REGEX } from "../common/consts";
 import "../stylesheets/textarea.css";
 import { pgnMovesOnly } from "../utils/chessTools";
 import { sanitizeInput } from "../utils/sanitizeInput.js";
 import { BoardState, Opening, OpeningBook, PositionBook } from "../types";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
+
+type SearchMode = "position" | "name";
+
+const OPENING_ALIASES: Record<string, string[]> = {
+  'petrov': ['petroff', 'petrov defense', 'petroff defense'],
+  'petroff': ['petrov', 'petrov defense', 'petroff defense'],
+  'caro': ['caro-kann', 'carokann'],
+  'kann': ['caro-kann', 'carokann'],
+  'ruy': ['ruy lopez', 'spanish'],
+  'spanish': ['ruy lopez', 'ruy'],
+  'kings': ['king'],
+  'scotch': ['scottish'],
+};
+
+function filterOpenings(searchTerm: string, openingBook: OpeningBook | undefined): Array<[string, Opening]> {
+  if (!searchTerm.trim() || !openingBook) return [];
+  
+  // Normalize search term
+  const normalized = searchTerm
+    .toLowerCase()
+    .replace(/['']/g, '')  // Remove apostrophes
+    .replace(/[-,]/g, ' ')  // Replace punctuation with space
+    .trim();
+  
+  const words = normalized.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [];
+  
+  const results = Object.entries(openingBook)
+    .filter(([_fen, opening]) => {
+      const name = opening.name
+        .toLowerCase()
+        .replace(/['']/g, '')
+        .replace(/[-,]/g, ' ');
+      
+      // All original words must appear (or their aliases)
+      return words.every(word => {
+        const variants = OPENING_ALIASES[word] || [];
+        return [word, ...variants].some(variant => name.includes(variant));
+      });
+    });
+  
+  // Deduplicate by name, keeping only the shortest move sequence
+  const nameMap = new Map<string, [string, Opening]>();
+  
+  for (const [fen, opening] of results) {
+    const existing = nameMap.get(opening.name);
+    if (!existing || opening.moves.length < existing[1].moves.length) {
+      nameMap.set(opening.name, [fen, opening]);
+    }
+  }
+  
+  return Array.from(nameMap.values()).slice(0, 20);  // Limit results
+}
 
 interface FenAndMovesInputsProps {
   boardState: BoardState;
@@ -24,6 +77,9 @@ const FenAndMovesInputs = ({
   positionBook,
 }: FenAndMovesInputsProps) => {
   const { fen, moves } = boardState;
+  const [searchMode, setSearchMode] = useState<SearchMode>("position");
+  const [nameSearchTerm, setNameSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   const handleFenPaste = (
     e: ClipboardEvent<HTMLDivElement | HTMLTextAreaElement>
@@ -107,6 +163,35 @@ const FenAndMovesInputs = ({
     }
   };
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(nameSearchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [nameSearchTerm]);
+
+  // Filter openings based on debounced search term
+  const filteredOpenings = useMemo(
+    () => filterOpenings(debouncedSearchTerm, openingBook),
+    [debouncedSearchTerm, openingBook]
+  );
+
+  const handleOpeningClick = useCallback((opening: Opening) => {
+    try {
+      chess.current.reset();
+      chess.current.loadPgn(opening.moves);
+      const resultingFen = chess.current.fen();
+      const validatedMoves = chess.current.pgn();
+      setBoardState({ fen: resultingFen, moves: validatedMoves });
+      setLastKnownOpening(opening);
+      setNameSearchTerm(""); // Clear search after selection
+      setSearchMode("position"); // Switch to position tab to show FEN and moves
+    } catch (ex) {
+      alert(`Error loading opening: ${(ex as Error).message}`);
+    }
+  }, [chess, setBoardState, setLastKnownOpening]);
+
   const fenDisplay =
     fen === "start"
       ? "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -119,60 +204,182 @@ const FenAndMovesInputs = ({
         flexDirection: "column",
         gap: "6px",
         width: "100%",
+        marginTop: "-10px",
       }}
     >
-      <div>
-        <label
-          style={{ display: "block", marginBottom: "2px", fontSize: "11px" }}
-        >
-          Position (FEN):
-        </label>
-        <div
-          contentEditable
-          suppressContentEditableWarning
-          spellCheck="false"
-          onPaste={handleFenPaste}
+      {/* Tab Controls */}
+      <div
+        style={{
+          display: "flex",
+          borderBottom: "1px solid #ccc",
+          marginBottom: "4px",
+        }}
+      >
+        <button
+          onClick={() => setSearchMode("position")}
           style={{
-            fontFamily: "monospace",
-            fontSize: "11px",
-            width: "100%",
-            minHeight: "20px",
-            padding: "4px",
-            border: "1px solid #ccc",
-            borderRadius: "3px",
-            backgroundColor: "#fff",
-            color: "#000",
-            overflowWrap: "break-word",
-            cursor: "text",
+            padding: "6px 16px",
+            border: "none",
+            borderBottom:
+              searchMode === "position"
+                ? "2px solid #007acc"
+                : "2px solid transparent",
+            backgroundColor: "transparent",
+            cursor: "pointer",
+            fontSize: "12px",
+            fontWeight: "bold",
+            color: searchMode === "position" ? "#000" : "#222",
           }}
         >
-          {fenDisplay}
-        </div>
+          {searchMode === "position" ? "▶ " : ""}By Position
+        </button>
+        <button
+          onClick={() => setSearchMode("name")}
+          style={{
+            padding: "6px 16px",
+            border: "none",
+            borderBottom:
+              searchMode === "name"
+                ? "2px solid #007acc"
+                : "2px solid transparent",
+            backgroundColor: "transparent",
+            cursor: "pointer",
+            fontSize: "12px",
+            fontWeight: "bold",
+            color: searchMode === "name" ? "#000" : "#222",
+          }}
+        >
+          {searchMode === "name" ? "▶ " : ""}By Name
+        </button>
       </div>
 
-      <div>
-        <label
-          htmlFor="moves-input"
-          style={{ display: "block", marginBottom: "2px", fontSize: "11px" }}
-        >
-          Move Sequence:
-        </label>
-        <textarea
-          id="moves-input"
-          spellCheck="false"
-          placeholder="Paste moves or PGN here"
-          onChange={() => {}}
-          onPaste={handleMovesPaste}
-          value={pgnMovesOnly(moves)}
-          style={{
-            fontFamily: "monospace",
-            fontSize: "11px",
-            width: "100%",
-            minHeight: "55px",
-            padding: "4px",
-          }}
-        />
-      </div>
+      {searchMode === "position" ? (
+        <>
+          <div>
+            <label
+              style={{ display: "block", marginBottom: "2px", fontSize: "11px" }}
+            >
+              Position (FEN) - Paste here:
+            </label>
+            <div
+              contentEditable
+              suppressContentEditableWarning
+              spellCheck="false"
+              onPaste={handleFenPaste}
+              style={{
+                fontFamily: "monospace",
+                fontSize: "11px",
+                width: "100%",
+                minHeight: "20px",
+                padding: "4px",
+                border: "1px solid #ccc",
+                borderRadius: "3px",
+                backgroundColor: "#fff",
+                color: "#000",
+                overflowWrap: "break-word",
+                cursor: "text",
+              }}
+            >
+              {fenDisplay}
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="moves-input"
+              style={{ display: "block", marginBottom: "2px", fontSize: "11px" }}
+            >
+              Move Sequence:
+            </label>
+            <textarea
+              id="moves-input"
+              spellCheck="false"
+              placeholder="Paste moves or PGN here"
+              onChange={() => {}}
+              onPaste={handleMovesPaste}
+              value={pgnMovesOnly(moves)}
+              style={{
+                fontFamily: "monospace",
+                fontSize: "11px",
+                width: "100%",
+                minHeight: "55px",
+                padding: "4px",
+              }}
+            />
+          </div>
+        </>
+      ) : (
+        <div>
+          <label
+            htmlFor="name-input"
+            style={{ display: "block", marginBottom: "2px", fontSize: "11px" }}
+          >
+            Opening Name:
+          </label>
+          <input
+            id="name-input"
+            type="text"
+            spellCheck="false"
+            placeholder="Type opening name to search..."
+            value={nameSearchTerm}
+            onChange={(e) => setNameSearchTerm(e.target.value)}
+            style={{
+              fontFamily: "sans-serif",
+              fontSize: "12px",
+              width: "100%",
+              padding: "6px",
+              border: "1px solid #ccc",
+              borderRadius: "3px",
+            }}
+          />
+          {filteredOpenings.length > 0 && (
+            <div
+              style={{
+                marginTop: "4px",
+                border: "1px solid #ccc",
+                borderRadius: "3px",
+                maxHeight: "300px",
+                overflowY: "auto",
+                backgroundColor: "#fff",
+              }}
+            >
+              {filteredOpenings.map(([fen, opening]) => (
+                <div
+                  key={fen}
+                  onClick={() => handleOpeningClick(opening)}
+                  style={{
+                    padding: "4px 8px",
+                    cursor: "pointer",
+                    borderBottom: "1px solid #eee",
+                    fontSize: "12px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f0f0f0";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#fff";
+                  }}
+                >
+                  <div style={{ fontWeight: "500", color: "#000" }}>{opening.name}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          {debouncedSearchTerm && filteredOpenings.length === 0 && (
+            <div
+              style={{
+                marginTop: "4px",
+                padding: "8px",
+                fontSize: "12px",
+                color: "#666",
+                fontStyle: "italic",
+              }}
+            >
+              No openings found matching "{debouncedSearchTerm}"
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

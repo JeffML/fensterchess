@@ -60,9 +60,7 @@ describe("SimilarOpenings - Back Button Fix", () => {
           <OpeningBookContext.Provider
             value={{ openingBook: mockOpeningBook, positionBook: {} }}
           >
-            <SimilarOpenings
-              {...{ chess, boardState, setBoardState }}
-            />
+            <SimilarOpenings {...{ chess, boardState, setBoardState }} />
           </OpeningBookContext.Provider>
         </QueryClientProvider>
       );
@@ -85,7 +83,9 @@ describe("SimilarOpenings - Back Button Fix", () => {
     global.fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        similar: ["r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 2 2"],
+        similar: [
+          "r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 2 2",
+        ],
       }),
     });
 
@@ -102,9 +102,7 @@ describe("SimilarOpenings - Back Button Fix", () => {
           <OpeningBookContext.Provider
             value={{ openingBook: mockOpeningBook, positionBook: {} }}
           >
-            <SimilarOpenings
-              {...{ chess, boardState, setBoardState }}
-            />
+            <SimilarOpenings {...{ chess, boardState, setBoardState }} />
           </OpeningBookContext.Provider>
         </QueryClientProvider>
       );
@@ -136,7 +134,9 @@ describe("SimilarOpenings - Back Button Fix", () => {
     global.fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        similar: ["r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 2 2"],
+        similar: [
+          "r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 2 2",
+        ],
       }),
     });
 
@@ -144,10 +144,10 @@ describe("SimilarOpenings - Back Button Fix", () => {
     const TestComponent = () => {
       const chess = useRef(new ChessPGN());
       chessInstance = chess.current;
-      
+
       // Load original position
       chess.current.loadPgn("1. e4");
-      
+
       const boardState = {
         fen: chess.current.fen(),
         moves: "1. e4",
@@ -165,9 +165,7 @@ describe("SimilarOpenings - Back Button Fix", () => {
           <OpeningBookContext.Provider
             value={{ openingBook: mockOpeningBook, positionBook: {} }}
           >
-            <SimilarOpenings
-              {...{ chess, boardState, setBoardState }}
-            />
+            <SimilarOpenings {...{ chess, boardState, setBoardState }} />
           </OpeningBookContext.Provider>
         </QueryClientProvider>
       );

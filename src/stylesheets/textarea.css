@@ -11,6 +11,15 @@
     display: block;
 }
 
+/* Placeholder for data-placeholder attribute */
+[contenteditable][data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    color: #999;
+    pointer-events: none;
+    display: block;
+    font-style: italic;
+}
+
 /* example:
 // <div id="pgnfen" className="fake-textarea" 
 //     contentEditable="true"
