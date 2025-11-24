@@ -124,6 +124,14 @@ npm run build      # Type-check + bundle to dist/
 - See `src/TYPES.md` for type usage examples
 - `allowJs: true` in tsconfig enables gradual migration
 
+**CRITICAL - TypeScript File Types:**
+
+- **This is a TypeScript project** - All new code files in `src/` MUST be `.ts` or `.tsx`
+- **NEVER create `.js` or `.jsx` files** in the `src/` directory
+- When editing existing files, always edit the `.tsx`/`.ts` version, not `.jsx`/`.js`
+- Test files in `test/` directory can remain `.js`/`.jsx` (acceptable convention)
+- If you see import statements referencing `.jsx` in TypeScript files, the actual source files are `.tsx`
+
 **Environment Variables:**
 
 - Set `VITE_API_SECRET_TOKEN` in Netlify dashboard or `.env` for serverless function auth

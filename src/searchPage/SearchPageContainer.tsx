@@ -4,7 +4,6 @@ import {
   useRef,
   useState,
   useEffect,
-  useMemo,
   MutableRefObject,
 } from "react";
 import { FENEX } from "../common/consts";
@@ -13,6 +12,7 @@ import SearchPage from "./SearchPage";
 import { useQuery } from "@tanstack/react-query";
 import {
   findOpening,
+  findNearestOpening,
   getFromTosForFen,
   getScoresForFens,
 } from "../datasource/findOpening";
@@ -71,6 +71,10 @@ const SearchPageContainer = () => {
     fen: "start",
     moves: "",
   });
+  const [nearestOpeningInfo, setNearestOpeningInfo] = useState<{
+    fen: string;
+    movesBack: number;
+  } | null>(null);
 
   const chess = useRef(new ChessPGN());
   const initializedFromUrl = useRef(false);
@@ -114,31 +118,50 @@ const SearchPageContainer = () => {
     enabled: fromTosForFen != null && openingBook != null,
   });
 
-  const opening = useMemo(
-    () =>
-      openingBook && positionBook
-        ? findOpening(
-            openingBook,
-            fen,
-            positionBook,
-            fromTosForFen || null,
-            scoresForFens || null
-          )
-        : undefined,
-    [openingBook, fen, positionBook, fromTosForFen, scoresForFens]
-  );
+  // Get the current moves BEFORE calling findOpening (which may overwrite the chess instance)
+  const moves = chess.current.pgn();
 
-  // Update chess engine and boardState moves when opening changes
-  useEffect(() => {
-    if (opening && fromTosForFen && scoresForFens) {
-      chess.current.loadPgn(opening.moves);
-      // Update boardState to show the opening's moves
-      setBoardState((prev) => ({
-        ...prev,
-        moves: opening.moves,
-      }));
+  let opening =
+    openingBook && positionBook
+      ? findOpening(
+          openingBook,
+          fen,
+          positionBook,
+          fromTosForFen || null,
+          scoresForFens || null
+        )
+      : undefined;
+
+  // If no opening found and we have moves, search backward for nearest opening
+  if (!opening && moves && moves.trim() !== "" && openingBook && positionBook) {
+    const { opening: nearestOpening, movesBack } = findNearestOpening(
+      moves,
+      openingBook,
+      positionBook
+    );
+
+    if (nearestOpening && movesBack > 0) {
+      opening = nearestOpening;
+      // Store info about how far back we found the opening
+      if (
+        !nearestOpeningInfo ||
+        nearestOpeningInfo.fen !== fen ||
+        nearestOpeningInfo.movesBack !== movesBack
+      ) {
+        setNearestOpeningInfo({ fen, movesBack });
+      }
+    } else {
+      // Clear nearest opening info if we're at a known position
+      if (nearestOpeningInfo) {
+        setNearestOpeningInfo(null);
+      }
     }
-  }, [opening, fromTosForFen, scoresForFens, chess]);
+  } else {
+    // Clear nearest opening info if we found an exact match
+    if (nearestOpeningInfo) {
+      setNearestOpeningInfo(null);
+    }
+  }
 
   // Early returns AFTER all hooks
   if (!context) return <div>Loading...</div>;
@@ -147,7 +170,15 @@ const SearchPageContainer = () => {
   }
 
   return (
-    <SearchPage {...{ chess, boardState, setBoardState, data: opening }} />
+    <SearchPage
+      {...{
+        chess,
+        boardState,
+        setBoardState,
+        data: opening,
+        nearestOpeningInfo,
+      }}
+    />
   );
 };
 

@@ -21,6 +21,7 @@ interface SearchPageProps {
   loading?: boolean;
   error?: Error | null;
   data?: OpeningType | null;
+  nearestOpeningInfo?: { fen: string; movesBack: number } | null;
 }
 
 const SearchPage = ({
@@ -30,6 +31,7 @@ const SearchPage = ({
   loading,
   error,
   data,
+  nearestOpeningInfo,
 }: SearchPageProps) => {
   const [lastKnownOpening, setLastKnownOpening] = useState<
     Partial<OpeningType>
@@ -117,6 +119,7 @@ const SearchPage = ({
                   data,
                   lastKnownOpening,
                   setLastKnownOpening,
+                  nearestOpeningInfo,
                 }}
               />
             </Suspense>

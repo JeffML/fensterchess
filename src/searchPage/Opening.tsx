@@ -10,6 +10,7 @@ interface OpeningProps {
   data: OpeningType | null;
   lastKnownOpening: Partial<OpeningType>;
   setLastKnownOpening: (opening: Partial<OpeningType>) => void;
+  nearestOpeningInfo?: { fen: string; movesBack: number } | null;
 }
 
 const Opening = ({
@@ -19,6 +20,7 @@ const Opening = ({
   data,
   lastKnownOpening,
   setLastKnownOpening,
+  nearestOpeningInfo,
 }: OpeningProps) => {
   const sites = useContext(SelectedSitesContext);
 
@@ -42,6 +44,21 @@ const Opening = ({
     return (
       <div className="double-column left">
         <OpeningName {...{ eco, src, name, score }} />
+
+        {nearestOpeningInfo && (
+          <div
+            style={{
+              color: "yellow",
+              marginBottom: "10px",
+              marginTop: "5px",
+              fontSize: "0.9em",
+              fontStyle: "italic",
+            }}
+          >
+            Nearest known opening found {nearestOpeningInfo.movesBack} move
+            {nearestOpeningInfo.movesBack !== 1 ? "s" : ""} back
+          </div>
+        )}
 
         <OpeningTabs
           {...{

@@ -14,8 +14,9 @@ vi.mock("../src/contexts/OpeningBookContext", async () => {
 });
 
 // Mock the data fetch functions
-vi.mock("../src/datasource/findOpening.js", () => ({
+vi.mock("../src/datasource/findOpening.ts", () => ({
   findOpening: vi.fn((openingBook, fen) => openingBook[fen]),
+  findNearestOpening: vi.fn(() => ({ opening: undefined, movesBack: 0 })),
   getFromTosForFen: vi.fn(() => Promise.resolve({ next: [], from: [] })),
   getScoresForFens: vi.fn(() =>
     Promise.resolve({ score: null, nextScores: [], fromScores: [] })
@@ -256,7 +257,7 @@ describe("SearchPageContainer with query parameters", () => {
         const fenDisplay = container.querySelector("div[contenteditable]");
         expect(fenDisplay).toBeTruthy();
         expect(fenDisplay.textContent).toContain(fen);
-        
+
         const movesInput = container.querySelector("#moves-input");
         expect(movesInput).toBeTruthy();
         // Wait for moves to be populated
@@ -276,7 +277,8 @@ describe("SearchPageContainer with query parameters", () => {
 
   it("should display correct FEN when French Defense moves are provided", async () => {
     const moves = "1. e4 e6 2. d4 d5 3. exd5";
-    const expectedFen = "rnbqkbnr/ppp2ppp/4p3/3P4/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3";
+    const expectedFen =
+      "rnbqkbnr/ppp2ppp/4p3/3P4/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3";
     const searchParams = new URLSearchParams({ moves });
 
     delete window.location;
@@ -312,5 +314,142 @@ describe("SearchPageContainer with query parameters", () => {
     expect(movesInput.value).toContain("e6");
     expect(movesInput.value).toContain("exd5");
   });
-});
 
+  it("should find nearest opening when current position is not in opening book", async () => {
+    const { findNearestOpening } = await import(
+      "../src/datasource/findOpening.ts"
+    );
+
+    // Set up findNearestOpening to return a known opening
+    findNearestOpening.mockReturnValue({
+      opening: {
+        name: "King's Knight Opening: Normal Variation",
+        eco: "C44",
+        moves: "1. e4 e5 2. Nf3 Nc6",
+        fen: "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3",
+      },
+      movesBack: 1,
+    });
+
+    // Moves that extend beyond the opening book
+    const moves = "1. e4 e5 2. Nf3 Nc6 3. Bc4";
+    const searchParams = new URLSearchParams({ moves });
+
+    delete window.location;
+    window.location = { search: `?${searchParams.toString()}` };
+
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <OpeningBookContext.Provider
+          value={{
+            openingBook: mockOpeningBook,
+            positionBook: mockPositionBook,
+          }}
+        >
+          <SearchPageContainer />
+        </OpeningBookContext.Provider>
+      </QueryClientProvider>
+    );
+
+    // Wait for the component to render
+    await waitFor(() => {
+      const movesInput = container.querySelector("#moves-input");
+      expect(movesInput).toBeTruthy();
+    });
+
+    // Should display "1 move" (singular)
+    await waitFor(() => {
+      const nearestMsg = container.querySelector('[style*="color: yellow"]');
+      expect(nearestMsg).toBeTruthy();
+      expect(nearestMsg.textContent).toContain(
+        "Nearest known opening found 1 move back"
+      );
+    });
+  });
+
+  it("should display correct plural for multiple moves back", async () => {
+    const { findNearestOpening } = await import(
+      "../src/datasource/findOpening.ts"
+    );
+
+    findNearestOpening.mockReturnValue({
+      opening: {
+        name: "King's Knight Opening",
+        eco: "C40",
+        moves: "1. e4 e5 2. Nf3",
+        fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+      },
+      movesBack: 3,
+    });
+
+    const moves = "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5";
+    const searchParams = new URLSearchParams({ moves });
+
+    delete window.location;
+    window.location = { search: `?${searchParams.toString()}` };
+
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <OpeningBookContext.Provider
+          value={{
+            openingBook: mockOpeningBook,
+            positionBook: mockPositionBook,
+          }}
+        >
+          <SearchPageContainer />
+        </OpeningBookContext.Provider>
+      </QueryClientProvider>
+    );
+
+    await waitFor(() => {
+      const movesInput = container.querySelector("#moves-input");
+      expect(movesInput).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      const nearestMsg = container.querySelector('[style*="color: yellow"]');
+      expect(nearestMsg).toBeTruthy();
+      expect(nearestMsg.textContent).toContain(
+        "Nearest known opening found 3 moves back"
+      );
+    });
+  });
+
+  it("should not display nearest opening message when exact match found", async () => {
+    const moves = "1. e4 e5 2. Nf3 Nc6";
+    const searchParams = new URLSearchParams({ moves });
+
+    delete window.location;
+    window.location = { search: `?${searchParams.toString()}` };
+
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <OpeningBookContext.Provider
+          value={{
+            openingBook: {
+              ...mockOpeningBook,
+              "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3":
+                {
+                  name: "King's Knight Opening: Normal Variation",
+                  eco: "C44",
+                  moves: "1. e4 e5 2. Nf3 Nc6",
+                },
+            },
+            positionBook: mockPositionBook,
+          }}
+        >
+          <SearchPageContainer />
+        </OpeningBookContext.Provider>
+      </QueryClientProvider>
+    );
+
+    await waitFor(() => {
+      const movesInput = container.querySelector("#moves-input");
+      expect(movesInput).toBeTruthy();
+    });
+
+    // Should NOT display "nearest opening" message
+    const nearestMsg = container.querySelector('[style*="color: yellow"]');
+    expect(nearestMsg).toBeNull();
+  });
+});

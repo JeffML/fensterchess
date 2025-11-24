@@ -11,7 +11,7 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@chess-pgn/chess-pgn@~0.1.0-beta.4",
+        "npm:@chess-pgn/chess-pgn@1",
         "npm:@netlify/vite-plugin@^2.5.4",
         "npm:@tanstack/react-query@^5.83.0",
         "npm:@testing-library/jest-dom@^6.6.3",
@@ -20,6 +20,7 @@
         "npm:@types/react-dom@^19.2.3",
         "npm:@types/react@^19.2.6",
         "npm:@vitejs/plugin-react@^4.7.0",
+        "npm:@vitest/coverage-v8@^2.1.9",
         "npm:@vitest/ui@^2.1.8",
         "npm:dompurify@^3.2.6",
         "npm:fast-xml-parser@^4.5.3",
