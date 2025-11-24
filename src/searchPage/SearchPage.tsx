@@ -3,7 +3,12 @@ import { ActionButton } from "../common/Buttons";
 import { NO_ENTRY_FOUND } from "../common/consts";
 import "../stylesheets/search.css";
 import { FenAndMovesInputs } from "./FenAndMovesInputs";
-import { BoardState, Opening as OpeningType } from "../types";
+import {
+  BoardState,
+  Opening as OpeningType,
+  OpeningBook,
+  PositionBook,
+} from "../types";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
 
 // Lazy load heavy components
@@ -22,6 +27,8 @@ interface SearchPageProps {
   error?: Error | null;
   data?: OpeningType | null;
   nearestOpeningInfo?: { fen: string; movesBack: number } | null;
+  openingBook?: OpeningBook;
+  positionBook?: PositionBook;
 }
 
 const SearchPage = ({
@@ -32,6 +39,8 @@ const SearchPage = ({
   error,
   data,
   nearestOpeningInfo,
+  openingBook,
+  positionBook,
 }: SearchPageProps) => {
   const [lastKnownOpening, setLastKnownOpening] = useState<
     Partial<OpeningType>
@@ -91,6 +100,8 @@ const SearchPage = ({
                   setBoardState,
                   chess,
                   setLastKnownOpening,
+                  openingBook,
+                  positionBook,
                 }}
               />
             </div>

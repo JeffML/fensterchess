@@ -3,7 +3,7 @@ import { FENEX, POSITION_ONLY_FEN_REGEX } from "../common/consts";
 import "../stylesheets/textarea.css";
 import { pgnMovesOnly } from "../utils/chessTools";
 import { sanitizeInput } from "../utils/sanitizeInput.js";
-import { BoardState, Opening } from "../types";
+import { BoardState, Opening, OpeningBook, PositionBook } from "../types";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
 
 interface FenAndMovesInputsProps {
@@ -11,6 +11,8 @@ interface FenAndMovesInputsProps {
   setBoardState: (state: BoardState) => void;
   chess: MutableRefObject<ChessPGN>;
   setLastKnownOpening: (opening: Partial<Opening>) => void;
+  openingBook: OpeningBook | undefined;
+  positionBook: PositionBook | undefined;
 }
 
 const FenAndMovesInputs = ({
@@ -18,6 +20,8 @@ const FenAndMovesInputs = ({
   setBoardState,
   chess,
   setLastKnownOpening,
+  openingBook,
+  positionBook,
 }: FenAndMovesInputsProps) => {
   const { fen, moves } = boardState;
 
@@ -27,24 +31,58 @@ const FenAndMovesInputs = ({
     e.preventDefault();
     let input = e.clipboardData.getData("text");
     input = sanitizeInput(input);
-    
-    // Check if position-only FEN (no spaces, just piece positions)
-    if (POSITION_ONLY_FEN_REGEX.test(input)) {
-      // Append default game state: white to move, all castling available
-      input = `${input} w KQkq - 0 1`;
-    }
-    
+
+    const isPositionOnly = POSITION_ONLY_FEN_REGEX.test(input);
     const stubFen = input.split(" ")[0];
 
-    // Validate FEN
+    // Validate FEN position part
     if (!FENEX.test(stubFen)) {
       alert("Invalid FEN format");
       return;
     }
 
+    // If position-only FEN, try to look it up in opening book
+    if (isPositionOnly) {
+      if (!openingBook || !positionBook) {
+        alert("Opening database not loaded yet. Please wait and try again.");
+        return;
+      }
+
+      // Look up the position in the position book
+      const posEntry = positionBook[stubFen];
+      if (!posEntry || posEntry.length === 0) {
+        alert(
+          "Position not found in opening database. Please enter a full FEN or a position from the opening book."
+        );
+        return;
+      }
+
+      // Get the first matching opening FEN
+      const openingFen = posEntry[0];
+      const opening = openingBook[openingFen];
+
+      if (!opening) {
+        alert("Position not found in opening database.");
+        return;
+      }
+
+      // Success! Load the opening's moves and update state
+      try {
+        chess.current.loadPgn(opening.moves);
+        const resultingFen = chess.current.fen();
+        const validatedMoves = chess.current.pgn();
+        setBoardState({ fen: resultingFen, moves: validatedMoves });
+        setLastKnownOpening(opening);
+      } catch (ex) {
+        alert(`Error loading opening: ${(ex as Error).message}`);
+      }
+      return;
+    }
+
+    // Full FEN provided - validate and load it
     try {
       chess.current.load(input);
-      const validatedFen = chess.current.fen(); // scrubs e.p. falsities
+      const validatedFen = chess.current.fen();
       setBoardState({ fen: validatedFen, moves: "" });
       setLastKnownOpening({});
     } catch (ex) {

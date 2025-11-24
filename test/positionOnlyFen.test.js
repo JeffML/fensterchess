@@ -5,17 +5,23 @@ describe("Position-only FEN handling", () => {
   it("should match valid position-only FEN strings", () => {
     // Starting position
     expect(
-      POSITION_ONLY_FEN_REGEX.test("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
+      POSITION_ONLY_FEN_REGEX.test(
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+      )
     ).toBe(true);
 
     // After 1. e4
     expect(
-      POSITION_ONLY_FEN_REGEX.test("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR")
+      POSITION_ONLY_FEN_REGEX.test(
+        "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR"
+      )
     ).toBe(true);
 
     // Complex position
     expect(
-      POSITION_ONLY_FEN_REGEX.test("r1bqkb1r/pppn1ppp/5n2/3p4/3P4/2N2N2/PP2PPPP/R1BQKB1R")
+      POSITION_ONLY_FEN_REGEX.test(
+        "r1bqkb1r/pppn1ppp/5n2/3p4/3P4/2N2N2/PP2PPPP/R1BQKB1R"
+      )
     ).toBe(true);
   });
 
@@ -29,15 +35,17 @@ describe("Position-only FEN handling", () => {
 
     // Partial FEN with turn
     expect(
-      POSITION_ONLY_FEN_REGEX.test("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w")
+      POSITION_ONLY_FEN_REGEX.test(
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w"
+      )
     ).toBe(false);
   });
 
   it("should not match invalid FEN strings", () => {
     // Too few ranks
-    expect(POSITION_ONLY_FEN_REGEX.test("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP")).toBe(
-      false
-    );
+    expect(
+      POSITION_ONLY_FEN_REGEX.test("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP")
+    ).toBe(false);
 
     // Too many ranks
     expect(
@@ -48,7 +56,9 @@ describe("Position-only FEN handling", () => {
 
     // Invalid characters
     expect(
-      POSITION_ONLY_FEN_REGEX.test("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNX")
+      POSITION_ONLY_FEN_REGEX.test(
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNX"
+      )
     ).toBe(false);
 
     // Empty string

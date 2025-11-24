@@ -59,7 +59,7 @@ function readParams(
       if (POSITION_ONLY_FEN_REGEX.test(qfen)) {
         qfen = `${qfen} w KQkq - 0 1`;
       }
-      
+
       if (!FENEX.test(qfen.split(" ")[0])) {
         qfen = "start";
       }
@@ -182,6 +182,8 @@ const SearchPageContainer = () => {
         setBoardState,
         data: opening,
         nearestOpeningInfo,
+        openingBook,
+        positionBook,
       }}
     />
   );

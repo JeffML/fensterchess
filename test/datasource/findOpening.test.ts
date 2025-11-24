@@ -38,7 +38,13 @@ describe("findOpening", () => {
 
   it("should find opening by exact FEN match", () => {
     const fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-    const opening = findOpening(mockOpeningBook, fen, mockPositionBook, null, null);
+    const opening = findOpening(
+      mockOpeningBook,
+      fen,
+      mockPositionBook,
+      null,
+      null
+    );
 
     expect(opening).toBeDefined();
     expect(opening?.name).toBe("King's Pawn Opening");
@@ -47,7 +53,13 @@ describe("findOpening", () => {
 
   it("should find opening by position-only FEN (ignoring turn/castling)", () => {
     const fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 5 3";
-    const opening = findOpening(mockOpeningBook, fen, mockPositionBook, null, null);
+    const opening = findOpening(
+      mockOpeningBook,
+      fen,
+      mockPositionBook,
+      null,
+      null
+    );
 
     expect(opening).toBeDefined();
     expect(opening?.name).toBe("King's Pawn Opening");
@@ -55,7 +67,13 @@ describe("findOpening", () => {
 
   it("should return undefined for unknown position", () => {
     const fen = "8/8/8/8/8/8/8/8 w - - 0 1";
-    const opening = findOpening(mockOpeningBook, fen, mockPositionBook, null, null);
+    const opening = findOpening(
+      mockOpeningBook,
+      fen,
+      mockPositionBook,
+      null,
+      null
+    );
 
     expect(opening).toBeUndefined();
   });
@@ -100,7 +118,13 @@ describe("findOpening", () => {
       },
     };
     const fen = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
-    const opening = findOpening(freshOpeningBook, fen, mockPositionBook, null, null);
+    const opening = findOpening(
+      freshOpeningBook,
+      fen,
+      mockPositionBook,
+      null,
+      null
+    );
 
     expect(opening).toBeDefined();
     expect(opening?.score).toBeUndefined();
@@ -246,7 +270,8 @@ describe("getScoresForFens API", () => {
     global.fetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ score: null, nextScores: [], fromScores: [] }),
+        json: () =>
+          Promise.resolve({ score: null, nextScores: [], fromScores: [] }),
       } as Response)
     );
 
