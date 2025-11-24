@@ -1,5 +1,5 @@
 import { ClipboardEvent, MutableRefObject } from "react";
-import { FENEX } from "../common/consts";
+import { FENEX, POSITION_ONLY_FEN_REGEX } from "../common/consts";
 import "../stylesheets/textarea.css";
 import { pgnMovesOnly } from "../utils/chessTools";
 import { sanitizeInput } from "../utils/sanitizeInput.js";
@@ -27,6 +27,13 @@ const FenAndMovesInputs = ({
     e.preventDefault();
     let input = e.clipboardData.getData("text");
     input = sanitizeInput(input);
+    
+    // Check if position-only FEN (no spaces, just piece positions)
+    if (POSITION_ONLY_FEN_REGEX.test(input)) {
+      // Append default game state: white to move, all castling available
+      input = `${input} w KQkq - 0 1`;
+    }
+    
     const stubFen = input.split(" ")[0];
 
     // Validate FEN

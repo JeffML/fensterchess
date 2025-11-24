@@ -54,6 +54,9 @@ export const sites = Object.keys(siteUrls) as Array<keyof typeof siteUrls>;
 
 export const FENEX = /(?!.*\d{2,}.*)^([1-8PNBRQK]+\/){7}[1-8PNBRQK]+$/im;
 
+// Regex for position-only FEN (just piece positions, no game state)
+export const POSITION_ONLY_FEN_REGEX = /^([rnbqkpRNBQKP1-8]+\/){7}[rnbqkpRNBQKP1-8]+$/;
+
 export const token = import.meta.env.VITE_APP_QUOTE as string | undefined;
 export const isTestMode = import.meta.env.VITE_APP_TEST_MODE === "flum";
 

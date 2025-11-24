@@ -6,7 +6,7 @@ import {
   useEffect,
   MutableRefObject,
 } from "react";
-import { FENEX } from "../common/consts";
+import { FENEX, POSITION_ONLY_FEN_REGEX } from "../common/consts";
 import { OpeningBookContext } from "../contexts/OpeningBookContext";
 import SearchPage from "./SearchPage";
 import { useQuery } from "@tanstack/react-query";
@@ -55,6 +55,11 @@ function readParams(
     url.delete("fen");
 
     if (qfen) {
+      // Check if position-only FEN and normalize it
+      if (POSITION_ONLY_FEN_REGEX.test(qfen)) {
+        qfen = `${qfen} w KQkq - 0 1`;
+      }
+      
       if (!FENEX.test(qfen.split(" ")[0])) {
         qfen = "start";
       }
