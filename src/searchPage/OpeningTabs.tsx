@@ -106,7 +106,7 @@ const OpeningTabs = ({
 
   useEffect(() => {
     if (currentMoves) theoryRequest(currentMoves, setHtml);
-  }, [currentMoves]);
+  }, [currentMoves, fen]);
 
   const hasLastMove = Object.keys(lastKnownOpening).length !== 0;
 
