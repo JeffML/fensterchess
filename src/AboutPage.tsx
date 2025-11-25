@@ -37,12 +37,51 @@ const About = () => (
       </ul>
       <h2>The Search Page</h2>
       <p>
-        The Search Page can be used to search openings by entering moves on the
-        board, or by pasting FEN or PGN text in the box below the board. If an
-        opening is found in the database, information will be displayed on the
-        right.
+        The Search Page offers two ways to find openings: by position or by
+        name. Use the tabs above the input fields to switch between search
+        modes.
       </p>
       <img src="resources/SearchPage.png" className="image" alt="Search Page" />
+      <h3>Search by Position</h3>
+      <p>
+        Search openings by entering moves on the board, or by pasting FEN or PGN
+        text in the separate Position (FEN) and Move Sequence input fields. If
+        an opening is found in the database, information will be displayed on
+        the right.
+      </p>
+      <p>
+        <b>Position-only FEN:</b> You can paste just the board position part of
+        a FEN string (without turn, castling, or en passant info). Fenster will
+        look it up in the opening book and load the matching opening
+        automatically.
+      </p>
+      <p>
+        <b>Nearest Opening:</b> When you enter moves that don't match any known
+        opening exactly, Fenster will search backward through your move history
+        to find the nearest opening in the database. A yellow banner will
+        indicate how many moves back the nearest match was found (e.g., "Nearest
+        known opening is 2 moves back").
+      </p>
+      <h3>Search by Name</h3>
+      <p>
+        Click the "By Name" tab to search for openings by typing their name. The
+        search is fuzzy and supports:
+      </p>
+      <ul style={{ marginLeft: "inherit" }}>
+        <li>
+          Case-insensitive matching (e.g., "sicilian" finds "Sicilian Defense")
+        </li>
+        <li>
+          Multi-word search in any order (e.g., "indian king" finds "King's
+          Indian Defense")
+        </li>
+        <li>Common aliases (e.g., "petrov" also finds "Petroff Defense")</li>
+      </ul>
+      <p>
+        Results appear as you type, showing up to 20 matching openings.
+        Duplicate names are filtered to show only the shortest variation. Click
+        any result to load that opening on the board.
+      </p>
       <p>
         At the top of the right column is the opening name, along with its{" "}
         <a href={WIKI_ECO}>ECO code</a>. Directly below that are variations.

@@ -160,7 +160,9 @@ const OpeningTabs = ({
         )}
         {searchable && (
           <TabPanel>
-            <SimilarOpenings {...{ chess: chessRef, setBoardState, boardState }} />
+            <SimilarOpenings
+              {...{ chess: chessRef, setBoardState, boardState }}
+            />
           </TabPanel>
         )}
       </div>

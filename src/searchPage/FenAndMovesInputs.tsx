@@ -1,4 +1,11 @@
-import { ClipboardEvent, MutableRefObject, useState, useEffect, useCallback, useMemo } from "react";
+import {
+  ClipboardEvent,
+  MutableRefObject,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import { FENEX, POSITION_ONLY_FEN_REGEX } from "../common/consts";
 import "../stylesheets/textarea.css";
 import { pgnMovesOnly } from "../utils/chessTools";
@@ -9,54 +16,56 @@ import { ChessPGN } from "@chess-pgn/chess-pgn";
 type SearchMode = "position" | "name";
 
 const OPENING_ALIASES: Record<string, string[]> = {
-  'petrov': ['petroff', 'petrov defense', 'petroff defense'],
-  'petroff': ['petrov', 'petrov defense', 'petroff defense'],
-  'caro': ['caro-kann', 'carokann'],
-  'kann': ['caro-kann', 'carokann'],
-  'ruy': ['ruy lopez', 'spanish'],
-  'spanish': ['ruy lopez', 'ruy'],
-  'kings': ['king'],
-  'scotch': ['scottish'],
+  petrov: ["petroff", "petrov defense", "petroff defense"],
+  petroff: ["petrov", "petrov defense", "petroff defense"],
+  caro: ["caro-kann", "carokann"],
+  kann: ["caro-kann", "carokann"],
+  ruy: ["ruy lopez", "spanish"],
+  spanish: ["ruy lopez", "ruy"],
+  kings: ["king"],
+  scotch: ["scottish"],
 };
 
-function filterOpenings(searchTerm: string, openingBook: OpeningBook | undefined): Array<[string, Opening]> {
+function filterOpenings(
+  searchTerm: string,
+  openingBook: OpeningBook | undefined
+): Array<[string, Opening]> {
   if (!searchTerm.trim() || !openingBook) return [];
-  
+
   // Normalize search term
   const normalized = searchTerm
     .toLowerCase()
-    .replace(/['']/g, '')  // Remove apostrophes
-    .replace(/[-,]/g, ' ')  // Replace punctuation with space
+    .replace(/['']/g, "") // Remove apostrophes
+    .replace(/[-,]/g, " ") // Replace punctuation with space
     .trim();
-  
+
   const words = normalized.split(/\s+/).filter(Boolean);
   if (words.length === 0) return [];
-  
-  const results = Object.entries(openingBook)
-    .filter(([_fen, opening]) => {
-      const name = opening.name
-        .toLowerCase()
-        .replace(/['']/g, '')
-        .replace(/[-,]/g, ' ');
-      
-      // All original words must appear (or their aliases)
-      return words.every(word => {
-        const variants = OPENING_ALIASES[word] || [];
-        return [word, ...variants].some(variant => name.includes(variant));
-      });
+
+  const results = Object.entries(openingBook).filter(([_fen, opening]) => {
+    const name = opening.name
+      .toLowerCase()
+      .replace(/['']/g, "")
+      .replace(/[-,]/g, " ");
+
+    // All original words must appear (or their aliases)
+    return words.every((word) => {
+      const variants = OPENING_ALIASES[word] || [];
+      return [word, ...variants].some((variant) => name.includes(variant));
     });
-  
+  });
+
   // Deduplicate by name, keeping only the shortest move sequence
   const nameMap = new Map<string, [string, Opening]>();
-  
+
   for (const [fen, opening] of results) {
     const existing = nameMap.get(opening.name);
     if (!existing || opening.moves.length < existing[1].moves.length) {
       nameMap.set(opening.name, [fen, opening]);
     }
   }
-  
-  return Array.from(nameMap.values()).slice(0, 20);  // Limit results
+
+  return Array.from(nameMap.values()).slice(0, 20); // Limit results
 }
 
 interface FenAndMovesInputsProps {
@@ -177,20 +186,23 @@ const FenAndMovesInputs = ({
     [debouncedSearchTerm, openingBook]
   );
 
-  const handleOpeningClick = useCallback((opening: Opening) => {
-    try {
-      chess.current.reset();
-      chess.current.loadPgn(opening.moves);
-      const resultingFen = chess.current.fen();
-      const validatedMoves = chess.current.pgn();
-      setBoardState({ fen: resultingFen, moves: validatedMoves });
-      setLastKnownOpening(opening);
-      setNameSearchTerm(""); // Clear search after selection
-      setSearchMode("position"); // Switch to position tab to show FEN and moves
-    } catch (ex) {
-      alert(`Error loading opening: ${(ex as Error).message}`);
-    }
-  }, [chess, setBoardState, setLastKnownOpening]);
+  const handleOpeningClick = useCallback(
+    (opening: Opening) => {
+      try {
+        chess.current.reset();
+        chess.current.loadPgn(opening.moves);
+        const resultingFen = chess.current.fen();
+        const validatedMoves = chess.current.pgn();
+        setBoardState({ fen: resultingFen, moves: validatedMoves });
+        setLastKnownOpening(opening);
+        setNameSearchTerm(""); // Clear search after selection
+        setSearchMode("position"); // Switch to position tab to show FEN and moves
+      } catch (ex) {
+        alert(`Error loading opening: ${(ex as Error).message}`);
+      }
+    },
+    [chess, setBoardState, setLastKnownOpening]
+  );
 
   const fenDisplay =
     fen === "start"
@@ -257,7 +269,11 @@ const FenAndMovesInputs = ({
         <>
           <div>
             <label
-              style={{ display: "block", marginBottom: "2px", fontSize: "11px" }}
+              style={{
+                display: "block",
+                marginBottom: "2px",
+                fontSize: "11px",
+              }}
             >
               Position (FEN) - Paste here:
             </label>
@@ -287,7 +303,11 @@ const FenAndMovesInputs = ({
           <div>
             <label
               htmlFor="moves-input"
-              style={{ display: "block", marginBottom: "2px", fontSize: "11px" }}
+              style={{
+                display: "block",
+                marginBottom: "2px",
+                fontSize: "11px",
+              }}
             >
               Move Sequence:
             </label>
@@ -360,7 +380,9 @@ const FenAndMovesInputs = ({
                     e.currentTarget.style.backgroundColor = "#fff";
                   }}
                 >
-                  <div style={{ fontWeight: "500", color: "#000" }}>{opening.name}</div>
+                  <div style={{ fontWeight: "500", color: "#000" }}>
+                    {opening.name}
+                  </div>
                 </div>
               ))}
             </div>

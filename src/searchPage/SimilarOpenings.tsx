@@ -76,7 +76,7 @@ const SimilarOpenings = ({
       );
 
     //   if (!openingBook) return <div>Loading...</div>;
-    
+
     // Show "None found" message if no similar openings
     if (fullSimInfo.length === 0) {
       return (
@@ -85,7 +85,7 @@ const SimilarOpenings = ({
         </div>
       );
     }
-    
+
     const sims = fullSimInfo.map((sim) => {
       return (
         <div id="similar-opening" key={sim.fen} className="similar-opening">
