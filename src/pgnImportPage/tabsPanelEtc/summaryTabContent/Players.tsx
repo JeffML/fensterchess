@@ -64,6 +64,18 @@ export const Players = ({ pgnSumm }: PlayersProps) => {
         </label>
       </div>
       <div className="column scrollableY">
+        <div
+          className="left player"
+          style={{
+            fontWeight: "bold",
+            color: "var(--color-accent-green)",
+            marginBottom: "0.5em",
+          }}
+        >
+          <span className="left">Title</span>
+          <span className="left">Name</span>
+          <span>ELO</span>
+        </div>
         {Object.values(players)
           .sort(sort)
           .map(({ name, elo, title }, i) => (

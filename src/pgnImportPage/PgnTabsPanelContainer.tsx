@@ -19,6 +19,8 @@ interface PgnFileRequest {
 export interface GameDatabase {
   gameCount: () => number;
   games: (startIndex?: number) => AsyncGenerator<GameAdapter, void, unknown>;
+  indices: { headers?: Record<string, string> }[];
+  parseGameAtIndex: (index: number) => GameAdapter;
 }
 
 export interface Player {
@@ -72,10 +74,12 @@ export const getPgnSummary = async (pgn: string): Promise<PgnSummary> => {
     const white: Player = {
       name: headers.White || "?",
       elo: parseInt(headers.WhiteElo) || undefined,
+      title: headers.WhiteTitle || undefined,
     };
     const black: Player = {
       name: headers.Black || "?",
       elo: parseInt(headers.BlackElo) || undefined,
+      title: headers.BlackTitle || undefined,
     };
     const opening = headers.Opening || undefined;
     const event = headers.Event || "?";
@@ -83,8 +87,32 @@ export const getPgnSummary = async (pgn: string): Promise<PgnSummary> => {
     mainEvent ??= event;
     if (event !== mainEvent && !mainEvent.endsWith(ETC)) mainEvent += ETC;
 
-    players[white.name] = white;
-    players[black.name] = black;
+    // Store or update player info - prefer entries with more complete data
+    if (!players[white.name]) {
+      players[white.name] = white;
+    } else {
+      // Update with title if current entry doesn't have one
+      if (white.title && !players[white.name].title) {
+        players[white.name].title = white.title;
+      }
+      // Update with ELO if current entry doesn't have one
+      if (white.elo && !players[white.name].elo) {
+        players[white.name].elo = white.elo;
+      }
+    }
+    
+    if (!players[black.name]) {
+      players[black.name] = black;
+    } else {
+      // Update with title if current entry doesn't have one
+      if (black.title && !players[black.name].title) {
+        players[black.name].title = black.title;
+      }
+      // Update with ELO if current entry doesn't have one
+      if (black.elo && !players[black.name].elo) {
+        players[black.name].elo = black.elo;
+      }
+    }
 
     if (opening) openings.add(opening);
 
@@ -98,6 +126,16 @@ export const getPgnSummary = async (pgn: string): Promise<PgnSummary> => {
 
   avg = avg / gmCt / 2;
 
+  // Helper to parse a single game on-demand
+  const parseGameAtIndex = (index: number): GameAdapter => {
+    const gameCursor = new CursorImpl(pgn, indices, { start: index, length: 1 });
+    const game = gameCursor.next();
+    if (!game) {
+      throw new Error(`Failed to parse game at index ${index}`);
+    }
+    return new GameAdapter(game as ChessPGNGame);
+  };
+
   // Create a wrapper that provides kokopu-like db.games() iterator
   // Games are parsed lazily only when actually iterated
   const db: GameDatabase = {
@@ -109,6 +147,8 @@ export const getPgnSummary = async (pgn: string): Promise<PgnSummary> => {
         yield new GameAdapter(game as ChessPGNGame);
       }
     },
+    indices,
+    parseGameAtIndex,
   };
 
   return {
