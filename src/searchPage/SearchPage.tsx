@@ -45,10 +45,12 @@ const SearchPage = ({
   const [lastKnownOpening, setLastKnownOpening] = useState<
     Partial<OpeningType>
   >({});
+  const [undoStack, setUndoStack] = useState<string[]>([]);
 
   const reset = () => {
     setBoardState({ fen: "start", moves: "" });
     chess.current.reset();
+    setUndoStack([]);
   };
 
   /*
@@ -57,6 +59,7 @@ const SearchPage = ({
     The code below handles this case.
     */
   const handleMovePlayed = (move: string) => {
+    setUndoStack([]); // Clear forward history when new move is made
     chess.current.move(move);
     const fen = chess.current.fen();
     let moves = chess.current.pgn();
@@ -68,7 +71,30 @@ const SearchPage = ({
   };
 
   const back = () => {
+    const history = chess.current.history();
+    if (history.length === 0) return;
+    
+    const lastMove = history[history.length - 1];
     chess.current.undo();
+    
+    // Save the undone move to undo stack for potential forward action
+    setUndoStack([...undoStack, lastMove]);
+    
+    const fen = chess.current.fen();
+    const moves = chess.current.pgn();
+    setBoardState({ fen, moves });
+  };
+
+  const forward = () => {
+    if (undoStack.length === 0) return;
+    
+    // Get the last undone move and replay it
+    const moveToReplay = undoStack[undoStack.length - 1];
+    chess.current.move(moveToReplay);
+    
+    // Remove the move from undo stack
+    setUndoStack(undoStack.slice(0, -1));
+    
     const fen = chess.current.fen();
     const moves = chess.current.pgn();
     setBoardState({ fen, moves });
@@ -94,8 +120,15 @@ const SearchPage = ({
             marginLeft: "-20px",
           }}
         >
-          <ActionButton {...{ onClick: () => back(), text: "<< Back" }} />
+          <ActionButton {...{ onClick: () => back(), text: "<<" }} />
           <ActionButton {...{ onClick: () => reset(), text: "Reset" }} />
+          <ActionButton
+            {...{
+              onClick: () => forward(),
+              text: ">>",
+              disabled: undoStack.length === 0,
+            }}
+          />
         </div>
 
         <div className="row">
