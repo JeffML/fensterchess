@@ -80,7 +80,7 @@ const SimilarOpenings = ({
     // Show "None found" message if no similar openings
     if (fullSimInfo.length === 0) {
       return (
-        <div style={{ padding: "1em", color: "#fff", fontStyle: "italic" }}>
+        <div className="padding-1 text-white" style={{ fontStyle: "italic" }}>
           No similar openings found.
         </div>
       );

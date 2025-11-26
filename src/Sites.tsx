@@ -26,13 +26,7 @@ const Sites2 = () => {
           ></input>
           <label
             htmlFor={s}
-            style={{
-              color: "#2ea44f",
-              textDecoration: "underline",
-              padding: "0.3em",
-              paddingRight: "0.8em",
-              cursor: "pointer",
-            }}
+            className="site-link"
             onClick={(e) => siteTab(e, s)}
           >
             {s}

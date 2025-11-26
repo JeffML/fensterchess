@@ -223,7 +223,7 @@ const FenAndMovesInputs = ({
       <div
         style={{
           display: "flex",
-          borderBottom: "1px solid #ccc",
+          borderBottom: "1px solid var(--color-bg-menu-item)",
           marginBottom: "4px",
         }}
       >
@@ -234,13 +234,20 @@ const FenAndMovesInputs = ({
             border: "none",
             borderBottom:
               searchMode === "position"
-                ? "2px solid #007acc"
-                : "2px solid transparent",
-            backgroundColor: "transparent",
+                ? "3px solid var(--color-accent-green)"
+                : "3px solid transparent",
+            backgroundColor:
+              searchMode === "position"
+                ? "var(--color-bg-menu-item)"
+                : "transparent",
             cursor: "pointer",
             fontSize: "12px",
             fontWeight: "bold",
-            color: searchMode === "position" ? "#000" : "#222",
+            color:
+              searchMode === "position"
+                ? "var(--color-accent-green)"
+                : "var(--color-text-muted)",
+            transition: "all 0.2s ease",
           }}
         >
           {searchMode === "position" ? "▶ " : ""}By Position
@@ -252,13 +259,20 @@ const FenAndMovesInputs = ({
             border: "none",
             borderBottom:
               searchMode === "name"
-                ? "2px solid #007acc"
-                : "2px solid transparent",
-            backgroundColor: "transparent",
+                ? "3px solid var(--color-accent-green)"
+                : "3px solid transparent",
+            backgroundColor:
+              searchMode === "name"
+                ? "var(--color-bg-menu-item)"
+                : "transparent",
             cursor: "pointer",
             fontSize: "12px",
             fontWeight: "bold",
-            color: searchMode === "name" ? "#000" : "#222",
+            color:
+              searchMode === "name"
+                ? "var(--color-accent-green)"
+                : "var(--color-text-muted)",
+            transition: "all 0.2s ease",
           }}
         >
           {searchMode === "name" ? "▶ " : ""}By Name

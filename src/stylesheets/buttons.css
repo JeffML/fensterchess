@@ -1,12 +1,12 @@
 /* CSS */
 .button-3 {
   appearance: none;
-  background-color: #2ea44f;
+  background-color: var(--color-accent-green);
   border: 1px solid rgba(27, 31, 35, 0.2);
   border-radius: 4px;
   box-shadow: rgba(0, 0, 0, 0.08) 0 1px 2px;
   box-sizing: border-box;
-  color: #fff;
+  color: var(--color-text-primary);
   cursor: pointer;
   display: inline-block;
   font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial,
@@ -33,7 +33,7 @@
 }
 
 .button-3:hover {
-  background-color: #2c974b;
+  background-color: var(--color-accent-green-hover);
   box-shadow: rgba(0, 0, 0, 0.12) 0 2px 4px;
   transform: translateY(-1px);
 }
@@ -51,7 +51,7 @@
 }
 
 .button-3:active {
-  background-color: #298e46;
+  background-color: var(--color-accent-green-active);
   box-shadow: rgba(0, 0, 0, 0.1) 0 1px 2px inset;
   transform: translateY(0);
 }

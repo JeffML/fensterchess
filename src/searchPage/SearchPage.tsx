@@ -77,7 +77,7 @@ const SearchPage = ({
   const { fen } = boardState;
 
   return (
-    <div className="row" style={{ color: "white" }}>
+    <div className="row text-white">
       <div className="column" style={{ alignItems: "center" }}>
         <Suspense fallback={<div>Loading chessboard...</div>}>
           <Chessboard
@@ -118,13 +118,13 @@ const SearchPage = ({
 
       <div className="double-column left">
         <div className="row" style={{ marginTop: "0px" }}>
-          {loading && <span style={{ color: "lightgreen" }}>Searching...</span>}
+          {loading && <span className="text-success">Searching...</span>}
 
           {error &&
             (error.message.startsWith("not_found") ? (
               NO_ENTRY_FOUND
             ) : (
-              <span style={{ color: "red" }}>{error.toString()}</span>
+              <span className="text-error">{error.toString()}</span>
             ))}
 
           {data && (
