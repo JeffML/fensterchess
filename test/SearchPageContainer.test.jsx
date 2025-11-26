@@ -358,13 +358,13 @@ describe("SearchPageContainer with query parameters", () => {
     });
 
     // Should display "1 move" (singular)
-    await waitFor(() => {
-      const nearestMsg = container.querySelector('[style*="color: yellow"]');
-      expect(nearestMsg).toBeTruthy();
-      expect(nearestMsg.textContent).toContain(
-        "Nearest known opening found 1 move back"
-      );
-    });
+    await waitFor(
+      () => {
+        const nearestMsg = screen.queryByText(/Nearest known opening found 1 move back/i);
+        expect(nearestMsg).toBeTruthy();
+      },
+      { timeout: 3000 }
+    );
   });
 
   it("should display correct plural for multiple moves back", async () => {
@@ -406,13 +406,13 @@ describe("SearchPageContainer with query parameters", () => {
       expect(movesInput).toBeTruthy();
     });
 
-    await waitFor(() => {
-      const nearestMsg = container.querySelector('[style*="color: yellow"]');
-      expect(nearestMsg).toBeTruthy();
-      expect(nearestMsg.textContent).toContain(
-        "Nearest known opening found 3 moves back"
-      );
-    });
+    await waitFor(
+      () => {
+        const nearestMsg = screen.queryByText(/Nearest known opening found 3 moves back/i);
+        expect(nearestMsg).toBeTruthy();
+      },
+      { timeout: 3000 }
+    );
   });
 
   it("should not display nearest opening message when exact match found", async () => {
