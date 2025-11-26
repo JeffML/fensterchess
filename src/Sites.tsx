@@ -27,10 +27,11 @@ const Sites2 = () => {
           <label
             htmlFor={s}
             style={{
-              color: "limegreen",
+              color: "#2ea44f",
               textDecoration: "underline",
               padding: "0.3em",
               paddingRight: "0.8em",
+              cursor: "pointer",
             }}
             onClick={(e) => siteTab(e, s)}
           >
