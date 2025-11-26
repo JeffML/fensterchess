@@ -29,8 +29,8 @@ const Sites2 = () => {
             style={{
               color: "limegreen",
               textDecoration: "underline",
-              padding: "0.7em",
-              paddingRight: "1.5em",
+              padding: "0.3em",
+              paddingRight: "0.8em",
             }}
             onClick={(e) => siteTab(e, s)}
           >

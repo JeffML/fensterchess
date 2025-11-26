@@ -86,7 +86,14 @@ const SearchPage = ({
             onMovePlayed={(move: string) => handleMovePlayed(move)}
           />
         </Suspense>
-        <div className="row centered">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
+            marginLeft: "-20px",
+          }}
+        >
           <ActionButton {...{ onClick: () => back(), text: "<< Back" }} />
           <ActionButton {...{ onClick: () => reset(), text: "Reset" }} />
         </div>
