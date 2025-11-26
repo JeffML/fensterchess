@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { Fragment } from "react/jsx-runtime";
 import { GameAdapter } from "../../utils/gameAdapter";
 import type { GameDatabase } from "../PgnTabsPanelContainer";
+import { OpeningBookContext } from "../../contexts/OpeningBookContext";
+import { findOpeningFromPgnText } from "../../utils/openings";
 
 interface GameListItem {
   index: number;
@@ -11,6 +13,8 @@ interface GameListItem {
   black: string;
   opening: string;
   result: string;
+  pgnText: string;
+  fensterOpening?: string; // Lazily computed
 }
 
 interface GamesTabProps {
@@ -33,9 +37,14 @@ export const GamesTab = ({
   const [hasMore, setHasMore] = useState(true);
   const totalGames = db.gameCount();
   const BATCH_SIZE = 25;
+  const context = useContext(OpeningBookContext);
+  const openingBook = context?.openingBook;
+  const positionBook = context?.positionBook;
 
   // Track the current position in the game list
   const currentPositionRef = useRef(0);
+  // Cache for computed Fenster openings (index -> opening name)
+  const fensterOpeningsCache = useRef<Map<number, string>>(new Map());
 
   // Load games progressively
   useEffect(() => {
@@ -72,6 +81,7 @@ export const GamesTab = ({
             black: headers.Black || "?",
             opening,
             result: headers.Result || "*",
+            pgnText: db.indices[i].pgnText || "",
           });
           matchingCount++;
         }
@@ -120,6 +130,7 @@ export const GamesTab = ({
             black: headers.Black || "?",
             opening,
             result: headers.Result || "*",
+            pgnText: db.indices[i].pgnText || "",
           });
           matchingCount++;
         }
@@ -144,6 +155,21 @@ export const GamesTab = ({
     const fullGame = db.parseGameAtIndex(item.index);
     setGame(fullGame);
     setTabIndex(2);
+  };
+
+  // Get Fenster opening name with caching
+  const getFensterOpening = (item: GameListItem): string => {
+    if (!openingBook || !positionBook) return "Loading...";
+    
+    // Check cache first
+    const cached = fensterOpeningsCache.current.get(item.index);
+    if (cached !== undefined) return cached;
+    
+    // Compute and cache
+    const opening = findOpeningFromPgnText(item.pgnText, openingBook, positionBook);
+    const name = opening?.name || "N/A";
+    fensterOpeningsCache.current.set(item.index, name);
+    return name;
   };
 
   return (
@@ -174,10 +200,10 @@ export const GamesTab = ({
               checked={openingSrc === "fenster"}
               readOnly={true}
               onClick={() => setOpeningSrc("fenster")}
-              disabled={true}
-              title="Fenster openings disabled for performance"
+              disabled={!openingBook}
+              title={openingBook ? "Fenster openings from eco.json" : "Loading opening book..."}
             ></input>
-            Fenster (disabled)
+            Fenster
           </span>
         </span>
         <span>Result</span>
@@ -200,7 +226,7 @@ export const GamesTab = ({
                 <span>{item.white}</span>
                 <span>{item.black}</span>
                 <span className="fakeLink" onClick={() => clickHandler(item)}>
-                  {item.opening || "N/A"}
+                  {openingSrc === "pgn" ? (item.opening || "N/A") : getFensterOpening(item)}
                 </span>
                 <span>{item.result}</span>
               </Fragment>

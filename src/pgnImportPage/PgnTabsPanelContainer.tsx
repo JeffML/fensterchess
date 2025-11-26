@@ -19,7 +19,7 @@ interface PgnFileRequest {
 export interface GameDatabase {
   gameCount: () => number;
   games: (startIndex?: number) => AsyncGenerator<GameAdapter, void, unknown>;
-  indices: { headers?: Record<string, string> }[];
+  indices: { headers?: Record<string, string>; pgnText?: string }[];
   parseGameAtIndex: (index: number) => GameAdapter;
 }
 
@@ -59,6 +59,12 @@ export const getPgnSummary = async (pgn: string): Promise<PgnSummary> => {
   const indices = indexPgnGames(pgn);
   const gmCt = indices.length;
 
+  // Extract raw PGN text for each game using offsets
+  const indicesWithPgn = indices.map(index => ({
+    ...index,
+    pgnText: pgn.substring(index.startOffset, index.endOffset),
+  }));
+
   // iterate through game HEADERS only (fast!), gathering stats
   let high = 0,
     low = 9999,
@@ -68,7 +74,7 @@ export const getPgnSummary = async (pgn: string): Promise<PgnSummary> => {
   let mainEvent: string | null = null;
 
   // Use headers from indices instead of parsing full games
-  for (const index of indices) {
+  for (const index of indicesWithPgn) {
     const headers = index.headers || {};
 
     const white: Player = {
@@ -147,7 +153,7 @@ export const getPgnSummary = async (pgn: string): Promise<PgnSummary> => {
         yield new GameAdapter(game as ChessPGNGame);
       }
     },
-    indices,
+    indices: indicesWithPgn,
     parseGameAtIndex,
   };
 

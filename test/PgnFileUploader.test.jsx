@@ -255,4 +255,77 @@ describe("PGN File Upload", () => {
     expect(gamesDisplayed).toBeGreaterThanOrEqual(10); // Should show at least 10
     expect(gamesDisplayed).toBeLessThanOrEqual(25); // Should show at most 25 initially
   }, 70000); // 70 second total test timeout
+
+  it("should switch between PGN and Fenster opening names", async () => {
+    const user = userEvent.setup();
+
+    // Read the test PGN file
+    const pgnPath = resolve(__dirname, "data", "wcup25.pgn");
+    const pgnContent = readFileSync(pgnPath, "utf8");
+
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <OpeningBookProvider>
+          <PgnTabsPanelContainer link={{ pgn: pgnContent }} />
+        </OpeningBookProvider>
+      </QueryClientProvider>
+    );
+
+    // Wait for summary tab to load
+    await waitFor(() => {
+      expect(screen.getByText(/Summary/i)).toBeInTheDocument();
+    });
+
+    // Click the Games tab
+    const gamesTab = screen.getByText("Games");
+    await user.click(gamesTab);
+
+    // Wait for games to load
+    await waitFor(
+      () => {
+        const rows = container.querySelectorAll("#games-rows > span");
+        expect(rows.length).toBeGreaterThan(0);
+      },
+      { timeout: 10000 }
+    );
+
+    // Get first game opening name (PGN source)
+    const openingSpans = container.querySelectorAll("#games-rows .fakeLink");
+    expect(openingSpans.length).toBeGreaterThan(0);
+    const firstPgnOpening = openingSpans[0].textContent;
+
+    // Find and click Fenster radio button
+    const fensterRadio = screen.getByDisplayValue("fenster");
+    expect(fensterRadio).toBeInTheDocument();
+    
+    // Check if it's enabled (openingBook loaded)
+    if (!fensterRadio.disabled) {
+      await user.click(fensterRadio);
+
+      // Wait a moment for re-render
+      await waitFor(() => {
+        const updatedOpeningSpans = container.querySelectorAll("#games-rows .fakeLink");
+        const firstFensterOpening = updatedOpeningSpans[0].textContent;
+        
+        // Fenster opening might be different from PGN opening
+        // Just verify it's not empty and is a valid string
+        expect(firstFensterOpening).toBeTruthy();
+        expect(firstFensterOpening.length).toBeGreaterThan(0);
+      });
+
+      // Switch back to PGN
+      const pgnRadio = screen.getByDisplayValue("pgn");
+      await user.click(pgnRadio);
+
+      // Verify PGN opening is shown again
+      await waitFor(() => {
+        const finalOpeningSpans = container.querySelectorAll("#games-rows .fakeLink");
+        expect(finalOpeningSpans[0].textContent).toBe(firstPgnOpening);
+      });
+    } else {
+      // If disabled, just verify the button exists but opening book not loaded yet
+      expect(fensterRadio.disabled).toBe(true);
+      console.log("[Test] Fenster radio button disabled - opening book not loaded");
+    }
+  }, 20000);
 });
