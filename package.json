@@ -1,9 +1,26 @@
 {
   "name": "fenster",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "license": "MIT",
   "private": false,
   "type": "module",
+  "keywords": [
+    "chess",
+    "chess-openings",
+    "chess-database",
+    "pgn",
+    "pgn-parser",
+    "fen",
+    "opening-book",
+    "chess-analysis",
+    "eco",
+    "chess-viewer",
+    "react",
+    "chess-explorer",
+    "opening-explorer",
+    "chess-study",
+    "chess-training"
+  ],
   "dependencies": {
     "@chess-pgn/chess-pgn": "^1.0.0",
     "@netlify/vite-plugin": "^2.5.4",
