@@ -73,13 +73,13 @@ const SearchPage = ({
   const back = () => {
     const history = chess.current.history();
     if (history.length === 0) return;
-    
+
     const lastMove = history[history.length - 1];
     chess.current.undo();
-    
+
     // Save the undone move to undo stack for potential forward action
     setUndoStack([...undoStack, lastMove]);
-    
+
     const fen = chess.current.fen();
     const moves = chess.current.pgn();
     setBoardState({ fen, moves });
@@ -87,14 +87,14 @@ const SearchPage = ({
 
   const forward = () => {
     if (undoStack.length === 0) return;
-    
+
     // Get the last undone move and replay it
     const moveToReplay = undoStack[undoStack.length - 1];
     chess.current.move(moveToReplay);
-    
+
     // Remove the move from undo stack
     setUndoStack(undoStack.slice(0, -1));
-    
+
     const fen = chess.current.fen();
     const moves = chess.current.pgn();
     setBoardState({ fen, moves });

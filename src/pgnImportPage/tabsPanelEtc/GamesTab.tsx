@@ -57,14 +57,18 @@ export const GamesTab = ({
 
     const loadGames = async () => {
       // Allow React to render the UI first
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
       const gamesList: GameListItem[] = [];
       let matchingCount = 0;
       let totalScanned = 0;
 
       // Iterate through indices (headers only, no full parsing)
-      for (let i = 0; i < db.indices.length && matchingCount < BATCH_SIZE; i++) {
+      for (
+        let i = 0;
+        i < db.indices.length && matchingCount < BATCH_SIZE;
+        i++
+      ) {
         if (!mounted) break;
         totalScanned++;
 
@@ -114,7 +118,11 @@ export const GamesTab = ({
     try {
       // Continue from our current position
       const startIndex = currentPositionRef.current;
-      for (let i = startIndex; i < db.indices.length && matchingCount < BATCH_SIZE; i++) {
+      for (
+        let i = startIndex;
+        i < db.indices.length && matchingCount < BATCH_SIZE;
+        i++
+      ) {
         totalScanned++;
 
         const headers = db.indices[i].headers || {};
@@ -160,13 +168,17 @@ export const GamesTab = ({
   // Get Fenster opening name with caching
   const getFensterOpening = (item: GameListItem): string => {
     if (!openingBook || !positionBook) return "Loading...";
-    
+
     // Check cache first
     const cached = fensterOpeningsCache.current.get(item.index);
     if (cached !== undefined) return cached;
-    
+
     // Compute and cache
-    const opening = findOpeningFromPgnText(item.pgnText, openingBook, positionBook);
+    const opening = findOpeningFromPgnText(
+      item.pgnText,
+      openingBook,
+      positionBook
+    );
     const name = opening?.name || "N/A";
     fensterOpeningsCache.current.set(item.index, name);
     return name;
@@ -201,7 +213,11 @@ export const GamesTab = ({
               readOnly={true}
               onClick={() => setOpeningSrc("fenster")}
               disabled={!openingBook}
-              title={openingBook ? "Fenster openings from eco.json" : "Loading opening book..."}
+              title={
+                openingBook
+                  ? "Fenster openings from eco.json"
+                  : "Loading opening book..."
+              }
             ></input>
             Fenster
           </span>
@@ -226,7 +242,9 @@ export const GamesTab = ({
                 <span>{item.white}</span>
                 <span>{item.black}</span>
                 <span className="fakeLink" onClick={() => clickHandler(item)}>
-                  {openingSrc === "pgn" ? (item.opening || "N/A") : getFensterOpening(item)}
+                  {openingSrc === "pgn"
+                    ? item.opening || "N/A"
+                    : getFensterOpening(item)}
                 </span>
                 <span>{item.result}</span>
               </Fragment>

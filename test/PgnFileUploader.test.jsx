@@ -297,16 +297,18 @@ describe("PGN File Upload", () => {
     // Find and click Fenster radio button
     const fensterRadio = screen.getByDisplayValue("fenster");
     expect(fensterRadio).toBeInTheDocument();
-    
+
     // Check if it's enabled (openingBook loaded)
     if (!fensterRadio.disabled) {
       await user.click(fensterRadio);
 
       // Wait a moment for re-render
       await waitFor(() => {
-        const updatedOpeningSpans = container.querySelectorAll("#games-rows .fakeLink");
+        const updatedOpeningSpans = container.querySelectorAll(
+          "#games-rows .fakeLink"
+        );
         const firstFensterOpening = updatedOpeningSpans[0].textContent;
-        
+
         // Fenster opening might be different from PGN opening
         // Just verify it's not empty and is a valid string
         expect(firstFensterOpening).toBeTruthy();
@@ -319,13 +321,17 @@ describe("PGN File Upload", () => {
 
       // Verify PGN opening is shown again
       await waitFor(() => {
-        const finalOpeningSpans = container.querySelectorAll("#games-rows .fakeLink");
+        const finalOpeningSpans = container.querySelectorAll(
+          "#games-rows .fakeLink"
+        );
         expect(finalOpeningSpans[0].textContent).toBe(firstPgnOpening);
       });
     } else {
       // If disabled, just verify the button exists but opening book not loaded yet
       expect(fensterRadio.disabled).toBe(true);
-      console.log("[Test] Fenster radio button disabled - opening book not loaded");
+      console.log(
+        "[Test] Fenster radio button disabled - opening book not loaded"
+      );
     }
   }, 20000);
 });

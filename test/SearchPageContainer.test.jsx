@@ -360,7 +360,9 @@ describe("SearchPageContainer with query parameters", () => {
     // Should display "1 move" (singular)
     await waitFor(
       () => {
-        const nearestMsg = screen.queryByText(/Nearest known opening found 1 move back/i);
+        const nearestMsg = screen.queryByText(
+          /Nearest known opening found 1 move back/i
+        );
         expect(nearestMsg).toBeTruthy();
       },
       { timeout: 3000 }
@@ -408,7 +410,9 @@ describe("SearchPageContainer with query parameters", () => {
 
     await waitFor(
       () => {
-        const nearestMsg = screen.queryByText(/Nearest known opening found 3 moves back/i);
+        const nearestMsg = screen.queryByText(
+          /Nearest known opening found 3 moves back/i
+        );
         expect(nearestMsg).toBeTruthy();
       },
       { timeout: 3000 }

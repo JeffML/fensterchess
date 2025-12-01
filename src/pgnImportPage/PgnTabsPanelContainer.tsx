@@ -60,7 +60,7 @@ export const getPgnSummary = async (pgn: string): Promise<PgnSummary> => {
   const gmCt = indices.length;
 
   // Extract raw PGN text for each game using offsets
-  const indicesWithPgn = indices.map(index => ({
+  const indicesWithPgn = indices.map((index) => ({
     ...index,
     pgnText: pgn.substring(index.startOffset, index.endOffset),
   }));
@@ -106,7 +106,7 @@ export const getPgnSummary = async (pgn: string): Promise<PgnSummary> => {
         players[white.name].elo = white.elo;
       }
     }
-    
+
     if (!players[black.name]) {
       players[black.name] = black;
     } else {
@@ -134,7 +134,10 @@ export const getPgnSummary = async (pgn: string): Promise<PgnSummary> => {
 
   // Helper to parse a single game on-demand
   const parseGameAtIndex = (index: number): GameAdapter => {
-    const gameCursor = new CursorImpl(pgn, indices, { start: index, length: 1 });
+    const gameCursor = new CursorImpl(pgn, indices, {
+      start: index,
+      length: 1,
+    });
     const game = gameCursor.next();
     if (!game) {
       throw new Error(`Failed to parse game at index ${index}`);

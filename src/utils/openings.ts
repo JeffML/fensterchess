@@ -79,21 +79,21 @@ export const findOpeningFromPgnText = (
   try {
     const chess = new ChessPGN();
     chess.loadPgn(pgnText);
-    
+
     // Get all positions from the game
     const history = chess.history();
     chess.reset();
-    
+
     const fens: FEN[] = [];
     for (const move of history) {
       chess.move(move);
       fens.push(chess.fen());
     }
-    
+
     // Walk backward through positions to find first match
     for (const fen of fens.reverse()) {
       let opening = openingBook[fen];
-      
+
       // Try position book fallback if provided
       if (!opening && positionBook) {
         const posEntry = positionBook[fen.split(" ")[0]];
@@ -101,12 +101,12 @@ export const findOpeningFromPgnText = (
           opening = openingBook[posEntry[0]];
         }
       }
-      
+
       if (opening) {
         return { ...opening, fen };
       }
     }
-    
+
     return undefined;
   } catch (e) {
     console.error("Error finding opening from PGN text:", e);
