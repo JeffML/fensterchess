@@ -77,7 +77,7 @@ export const PgnTabsPanel = ({
           <PgnSummaryTab {...{ pgnSumm, setFlash, filter, setFilter }} />
         </TabPanel>
         <TabPanel>
-          <GamesTab {...{ db: pgnSumm.db, filter, setGame, setTabIndex }} />
+          <GamesTab {...{ db: pgnSumm.db, filter, setGame, setTabIndex, tabIndex }} />
         </TabPanel>
         <TabPanel>
           <OpeningTab {...{ game }} />

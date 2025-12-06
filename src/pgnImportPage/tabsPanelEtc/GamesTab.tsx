@@ -22,6 +22,7 @@ interface GamesTabProps {
   filter: string[];
   setGame: (game: GameAdapter) => void;
   setTabIndex: (index: number) => void;
+  tabIndex: number;
 }
 
 export const GamesTab = ({
@@ -29,6 +30,7 @@ export const GamesTab = ({
   filter,
   setGame,
   setTabIndex,
+  tabIndex,
 }: GamesTabProps) => {
   const [openingSrc, setOpeningSrc] = useState<"pgn" | "fenster">("pgn");
   const [games, setGames] = useState<GameListItem[]>([]);
@@ -48,12 +50,18 @@ export const GamesTab = ({
 
   // Load games progressively
   useEffect(() => {
+    // Only load games when Games tab is active (tabIndex === 1)
+    if (tabIndex !== 1) {
+      return;
+    }
+
     let mounted = true;
 
     // Reset state when filter changes
     setIsLoading(true);
     setGames([]);
     currentPositionRef.current = 0;
+    fensterOpeningsCache.current.clear();
 
     const loadGames = async () => {
       // Allow React to render the UI first
@@ -105,7 +113,7 @@ export const GamesTab = ({
     return () => {
       mounted = false;
     };
-  }, [db, totalGames, filter]);
+  }, [db, totalGames, filter, tabIndex]);
 
   const loadMore = async () => {
     if (isLoadingMore) return;
