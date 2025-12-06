@@ -1,5 +1,8 @@
 .games-tab-grid>span {
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #games-chart {
