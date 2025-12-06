@@ -3,6 +3,7 @@ temp
 *scidTest.eco
 TestComponent.js
 *.code-workspace
+RELEASE*.md
 
 # Backups
 *.gz

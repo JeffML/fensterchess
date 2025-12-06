@@ -245,7 +245,7 @@ const FenAndMovesInputs = ({
             fontWeight: "bold",
             color:
               searchMode === "position"
-                ? "var(--color-accent-green)"
+                ? "var(--color-link)"
                 : "var(--color-text-muted)",
             transition: "all 0.2s ease",
           }}
@@ -270,7 +270,7 @@ const FenAndMovesInputs = ({
             fontWeight: "bold",
             color:
               searchMode === "name"
-                ? "var(--color-accent-green)"
+                ? "var(--color-link)"
                 : "var(--color-text-muted)",
             transition: "all 0.2s ease",
           }}
