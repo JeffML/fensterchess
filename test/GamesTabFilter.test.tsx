@@ -14,7 +14,9 @@ describe("GamesTab Filter Synchronization", () => {
   const mockOpeningBook = {};
   const mockPositionBook = {};
 
-  const createMockDatabase = (games: Array<{ opening: string }>): GameDatabase => {
+  const createMockDatabase = (
+    games: Array<{ opening: string }>
+  ): GameDatabase => {
     return {
       gameCount: () => games.length,
       games: async function* () {
@@ -29,7 +31,7 @@ describe("GamesTab Filter Synchronization", () => {
           Round: "1",
           Date: "2025.12.06",
         },
-        pgnText: "[Event \"Test\"]\n1. e4 e5",
+        pgnText: '[Event "Test"]\n1. e4 e5',
       })),
       parseGameAtIndex: vi.fn(),
     };
@@ -58,8 +60,6 @@ describe("GamesTab Filter Synchronization", () => {
         value={{
           openingBook: mockOpeningBook,
           positionBook: mockPositionBook,
-          
-          
         }}
       >
         <GamesTab
@@ -78,8 +78,6 @@ describe("GamesTab Filter Synchronization", () => {
         value={{
           openingBook: mockOpeningBook,
           positionBook: mockPositionBook,
-          
-          
         }}
       >
         <GamesTab
@@ -118,8 +116,6 @@ describe("GamesTab Filter Synchronization", () => {
         value={{
           openingBook: mockOpeningBook,
           positionBook: mockPositionBook,
-          
-          
         }}
       >
         <GamesTab
@@ -144,8 +140,6 @@ describe("GamesTab Filter Synchronization", () => {
         value={{
           openingBook: mockOpeningBook,
           positionBook: mockPositionBook,
-          
-          
         }}
       >
         <GamesTab
@@ -180,8 +174,6 @@ describe("GamesTab Filter Synchronization", () => {
         value={{
           openingBook: mockOpeningBook,
           positionBook: mockPositionBook,
-          
-          
         }}
       >
         <GamesTab
@@ -200,8 +192,6 @@ describe("GamesTab Filter Synchronization", () => {
         value={{
           openingBook: mockOpeningBook,
           positionBook: mockPositionBook,
-          
-          
         }}
       >
         <GamesTab

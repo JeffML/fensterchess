@@ -1,49 +1,48 @@
-.games-tab-grid>span {
-    text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.games-tab-grid > span {
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #games-chart {
-    border: 2px solid white;
-    border-radius: 10px;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: repeat(100, 1fr);
-    min-width: 20em;
+  border: 2px solid white;
+  border-radius: 10px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(100, 1fr);
+  min-width: 20em;
 }
 
 #games-chart div {
-    font-family: sans-serif;
-    font-weight: bold;
-    font-size: 12px;
-    line-height: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #white {
-    color: black;
-    background: white;
+  color: black;
+  background: white;
 }
 
 #black {
-    color:white;
-    background: black;
+  color: white;
+  background: black;
 }
 
 #draw {
-    color: lightgrey;
-    background: grey;
+  color: lightgrey;
+  background: grey;
 }
 
-div#game-details span:nth-child(odd){
-    color: lightgreen    
+div#game-details span:nth-child(odd) {
+  color: lightgreen;
 }
 
-div#game-details span:nth-child(even){
-    color: white    
+div#game-details span:nth-child(even) {
+  color: white;
 }
-

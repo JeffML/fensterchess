@@ -31,8 +31,7 @@ export const Openings = ({
     await sleep(sleepTime);
     setFlash(false);
 
-    if (checkbox.checked)
-      setFilter((prev) => [...prev, checkbox.value]);
+    if (checkbox.checked) setFilter((prev) => [...prev, checkbox.value]);
     else setFilter((prev) => prev.filter((f) => f !== checkbox.value));
   };
 
