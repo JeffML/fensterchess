@@ -2,7 +2,7 @@
   "short_name": "Fenster",
   "name": "Fenster",
   "description": "Chess opening explorer and study tool with enhanced PGN support.",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
