@@ -23,8 +23,12 @@ export function findOpening(
   scoresForFens: ScoresResponse | null
 ): Opening | undefined {
   // Use eco.json's findOpening for base lookup (cast to handle type compatibility)
-  const baseOpening = ecoFindOpening(openingBook as any, fen === "start" ? "start" : fen, positionBook);
-  
+  const baseOpening = ecoFindOpening(
+    openingBook as any,
+    fen === "start" ? "start" : fen,
+    positionBook
+  );
+
   if (!baseOpening) {
     return undefined;
   }
