@@ -1,4 +1,4 @@
-import { openingBook } from "@chess-openings/eco.json";
+import { getEcoRoots, openingBook } from "@chess-openings/eco.json";
 import { Opening, FEN } from "../types";
 
 interface EcoRoot {
@@ -17,11 +17,11 @@ const A00Root: EcoRoot = {
 };
 
 export const getEcoRootsForCat = async (cat: string): Promise<EcoRoot> => {
-  const book = await openingBook();
+  const allRoots = await getEcoRoots();
 
-  // Find all eco roots for this category
-  let roots = Object.entries(book)
-    .filter(([, opening]) => opening.eco?.startsWith(cat) && (opening as any).isEcoRoot)
+  // Filter roots for this category
+  let roots = Object.entries(allRoots)
+    .filter(([, opening]) => opening.eco?.startsWith(cat))
     .reduce((acc, [fen, opening]) => {
       acc[fen as FEN] = opening as Opening & { isEcoRoot: true };
       return acc;

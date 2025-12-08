@@ -1,4 +1,5 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
+import { findOpening as ecoFindOpening } from "@chess-openings/eco.json";
 import type {
   FEN,
   Opening,
@@ -21,13 +22,18 @@ export function findOpening(
   fromTosForFen: FromTosResponse | null,
   scoresForFens: ScoresResponse | null
 ): Opening | undefined {
-  let opening = openingBook[fen as FEN];
-  if (!opening && fen !== "start") {
-    const posEntry = positionBook[fen.split(" ")[0]];
-    if (posEntry) opening = openingBook[posEntry[0]];
+  // Use eco.json's findOpening for base lookup (cast to handle type compatibility)
+  const baseOpening = ecoFindOpening(openingBook as any, fen === "start" ? "start" : fen, positionBook);
+  
+  if (!baseOpening) {
+    return undefined;
   }
 
-  if (fromTosForFen && scoresForFens && opening) {
+  // Create enriched opening with fensterchess-specific fields
+  let opening: Opening = { ...baseOpening };
+
+  // Enrich with scores and transitions (fensterchess-specific)
+  if (fromTosForFen && scoresForFens) {
     const { score, nextScores, fromScores } = scoresForFens;
     opening.score = score;
 
