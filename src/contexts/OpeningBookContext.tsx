@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
-import { openingBook } from "../datasource/getLatestEcoJson";
-import { getPositionBook } from "../datasource/positionBook";
+import { openingBook, getPositionBook } from "@chess-openings/eco.json";
 import type { OpeningBookContextValue } from "../types";
 
 const OpeningBookContext = createContext<OpeningBookContextValue | null>(null);

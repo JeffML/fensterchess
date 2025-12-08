@@ -1,4 +1,4 @@
-import { getLatestEcoJson } from "./getLatestEcoJson";
+import { openingBook } from "@chess-openings/eco.json";
 import { Opening, FEN } from "../types";
 
 interface EcoRoot {
@@ -17,16 +17,11 @@ const A00Root: EcoRoot = {
 };
 
 export const getEcoRootsForCat = async (cat: string): Promise<EcoRoot> => {
-  const data = await getLatestEcoJson();
+  const book = await openingBook();
 
-  const openings = data[cat as keyof Omit<typeof data, "initialized">]?.json;
-  if (!openings) {
-    throw new Error(`Invalid ECO category: ${cat}`);
-  }
-
-  // Find all eco roots
-  let roots = Object.entries(openings)
-    .filter(([, opening]) => (opening as any).isEcoRoot)
+  // Find all eco roots for this category
+  let roots = Object.entries(book)
+    .filter(([, opening]) => opening.eco?.startsWith(cat) && (opening as any).isEcoRoot)
     .reduce((acc, [fen, opening]) => {
       acc[fen as FEN] = opening as Opening & { isEcoRoot: true };
       return acc;
@@ -55,18 +50,13 @@ export const getOpeningsForEcoCat = async (
   cat: string
 ): Promise<RootWithOpenings[]> => {
   const roots = await getEcoRootsForCat(cat);
-  const json = await getLatestEcoJson();
-  const openingsForCat = json[cat as keyof Omit<typeof json, "initialized">];
-
-  if (!openingsForCat) {
-    throw new Error(`Invalid ECO category: ${cat}`);
-  }
+  const book = await openingBook();
 
   // For each root, find all openings that start with the root's move sequence
   const rootsWithOpenings = Object.entries(roots).map(
     ([rootFen, rootOpening]) => {
       // Find all openings under this root
-      const children = Object.entries(openingsForCat.json || {})
+      const children = Object.entries(book)
         .filter(
           ([, opening]) =>
             opening.eco === rootOpening.eco && !(opening as any).isEcoRoot

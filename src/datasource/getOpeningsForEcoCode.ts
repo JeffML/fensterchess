@@ -1,18 +1,13 @@
-import { getLatestEcoJson } from "./getLatestEcoJson";
+import { openingBook } from "@chess-openings/eco.json";
 import { Opening } from "../types";
 
 export const getOpeningsForEcoCode = async (
   eco: string
 ): Promise<Opening[]> => {
-  const json = await getLatestEcoJson();
-  const openingsForCat = json[eco[0] as keyof Omit<typeof json, "initialized">];
+  const book = await openingBook();
 
-  if (!openingsForCat) {
-    throw new Error(`Invalid ECO category: ${eco[0]}`);
-  }
-
-  const openingsForEco = Object.values(openingsForCat.json || {}).filter(
-    (ofc) => ofc.eco === eco
+  const openingsForEco = Object.values(book).filter(
+    (opening) => opening.eco === eco
   );
   return openingsForEco;
 };
