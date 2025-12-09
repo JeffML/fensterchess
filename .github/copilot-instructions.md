@@ -20,6 +20,13 @@ fensterchess consumes chessPGN as a dependency and fetches chess opening data fr
 - Build Command: `npm run build` (TypeScript check + Vite build)
 - Service Worker: Auto-generated via vite-plugin-pwa
 
+**Local Development:**
+
+- Use `netlify dev` (not `npm run preview`) to test serverless functions locally
+- Netlify CLI automatically injects environment variables from `.env` and Netlify dashboard
+- Runs on `localhost:8888` (or similar) with full serverless function support
+- `npm run preview` only serves static files - serverless functions won't work (CONNECTION_REFUSED errors)
+
 ## Architecture
 
 ### fensterchess (React App)

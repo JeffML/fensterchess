@@ -194,46 +194,47 @@ export const GamesTab = ({
 
   return (
     <>
-      <div id="games-header" className="font-cinzel games-tab-grid">
-        <span>Rnd</span>
-        <span>Date</span>
-        <span>White</span>
-        <span>Black</span>
-        <span className="openingHeading">
-          Opening
-          <span>
-            <input
-              type="radio"
-              name="source"
-              value="pgn"
-              checked={openingSrc === "pgn"}
-              onClick={() => setOpeningSrc("pgn")}
-              readOnly={true}
-            ></input>
-            PGN
+      <div className="games-container">
+        <div id="games-header" className="font-cinzel games-tab-grid">
+          <span>Rnd</span>
+          <span>Date</span>
+          <span>White</span>
+          <span>Black</span>
+          <span className="openingHeading">
+            Opening
+            <span>
+              <input
+                type="radio"
+                name="source"
+                value="pgn"
+                checked={openingSrc === "pgn"}
+                onClick={() => setOpeningSrc("pgn")}
+                readOnly={true}
+              ></input>
+              PGN
+            </span>
+            <span>
+              <input
+                type="radio"
+                name="source"
+                value="fenster"
+                checked={openingSrc === "fenster"}
+                readOnly={true}
+                onClick={() => setOpeningSrc("fenster")}
+                disabled={!openingBook}
+                title={
+                  openingBook
+                    ? "Fenster openings from eco.json"
+                    : "Loading opening book..."
+                }
+              ></input>
+              Fenster
+            </span>
           </span>
-          <span>
-            <input
-              type="radio"
-              name="source"
-              value="fenster"
-              checked={openingSrc === "fenster"}
-              readOnly={true}
-              onClick={() => setOpeningSrc("fenster")}
-              disabled={!openingBook}
-              title={
-                openingBook
-                  ? "Fenster openings from eco.json"
-                  : "Loading opening book..."
-              }
-            ></input>
-            Fenster
-          </span>
-        </span>
-        <span>Result</span>
-      </div>
-      <hr />
-      <div id="games-rows" className="white games-tab-grid">
+          <span>Result</span>
+        </div>
+        <hr />
+        <div id="games-rows" className="white games-tab-grid">
         {isLoading ? (
           <div style={{ gridColumn: "1 / -1", padding: "20px" }}>
             Loading games...
@@ -281,6 +282,7 @@ export const GamesTab = ({
           </button>
         </div>
       )}
+      </div>
     </>
   );
 };

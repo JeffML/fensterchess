@@ -8,17 +8,19 @@
 
 .news {
   font-size: smaller;
-  mask-image: linear-gradient(180deg, black 20%, transparent);
-  padding-right: 3em;
+  padding-right: 1em;
   padding-left: 1em;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .games-tab-grid {
   display: grid;
-  grid-template-columns: 0.2fr 1fr 2fr 2fr 4fr 0.5fr;
+  grid-template-columns: minmax(40px, 0.2fr) minmax(80px, 1fr) minmax(120px, 2fr) minmax(120px, 2fr) minmax(150px, 4fr) minmax(60px, 0.5fr);
   max-height: 250px;
   gap: 3px;
-  grid-column-gap: 2em;
+  grid-column-gap: 1em;
+  min-width: max-content;
 }
 
 #games-header {
@@ -32,6 +34,11 @@
 
 #games-rows {
   overflow-y: scroll;
+}
+
+.games-container {
+  overflow-x: auto;
+  width: 100%;
 }
 
 .additional-details-loading {
@@ -83,10 +90,10 @@
   display: grid;
   grid-template: 1fr 2fr;
   max-height: 250px;
-  min-width: fit-content;
+  min-width: 0;
   max-width: 100%;
   margin-top: 1em;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 .players {
@@ -106,6 +113,29 @@
   grid-template-columns: repeat(2, 1fr);
   height: 50%;
   overflow-y: scroll;
+  gap: 1em;
+}
+
+.grid-style-top-panel > div {
+  min-width: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .grid-style-top-panel {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow-y: visible;
+  }
+  
+  .grid-style-top-panel > div {
+    overflow: visible;
+  }
+  
+  /* Hide RSS feed on mobile - show only PGN list */
+  .grid-style-top-panel > div:nth-child(2) {
+    display: none;
+  }
 }
 
 .link-grid {
