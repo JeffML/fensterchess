@@ -4,10 +4,20 @@
 
 This workspace contains two related chess projects:
 
-1. **fensterchess** - React web app for chess opening research hosted on Netlify
+1. **fensterchess** - React web app for chess opening research **hosted on Netlify**
 2. **chessPGN** - TypeScript chess library with enhanced PGN parsing (npm package `@chess-pgn/chess-pgn`)
 
 fensterchess consumes chessPGN as a dependency and fetches chess opening data from the [eco.json](https://github.com/hayatbiralem/eco.json) GitHub repository.
+
+## Deployment
+
+**fensterchess is deployed on Netlify:**
+- Production: Automatic deployment from `main` branch
+- Preview: Draft deployments for testing (never deploy to production via CLI)
+- Serverless Functions: Netlify Functions for API endpoints
+- Environment Variables: Set in Netlify dashboard (e.g., `VITE_API_SECRET_TOKEN`)
+- Build Command: `npm run build` (TypeScript check + Vite build)
+- Service Worker: Auto-generated via vite-plugin-pwa
 
 ## Architecture
 
