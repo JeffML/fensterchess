@@ -16,7 +16,10 @@
 
 .games-tab-grid {
   display: grid;
-  grid-template-columns: minmax(40px, 0.2fr) minmax(80px, 1fr) minmax(120px, 2fr) minmax(120px, 2fr) minmax(150px, 4fr) minmax(60px, 0.5fr);
+  grid-template-columns: minmax(40px, 0.2fr) minmax(80px, 1fr) minmax(
+      120px,
+      2fr
+    ) minmax(120px, 2fr) minmax(150px, 4fr) minmax(60px, 0.5fr);
   max-height: 250px;
   gap: 3px;
   grid-column-gap: 1em;
@@ -127,11 +130,11 @@
     height: auto;
     overflow-y: visible;
   }
-  
+
   .grid-style-top-panel > div {
     overflow: visible;
   }
-  
+
   /* Hide RSS feed on mobile - show only PGN list */
   .grid-style-top-panel > div:nth-child(2) {
     display: none;

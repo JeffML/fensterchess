@@ -235,53 +235,53 @@ export const GamesTab = ({
         </div>
         <hr />
         <div id="games-rows" className="white games-tab-grid">
-        {isLoading ? (
-          <div style={{ gridColumn: "1 / -1", padding: "20px" }}>
-            Loading games...
-          </div>
-        ) : (
-          games.map((item, i) => {
-            // Create unique key from game properties
-            const key = `${item.white}-${item.black}-${item.date}-${item.round}-${i}`;
+          {isLoading ? (
+            <div style={{ gridColumn: "1 / -1", padding: "20px" }}>
+              Loading games...
+            </div>
+          ) : (
+            games.map((item, i) => {
+              // Create unique key from game properties
+              const key = `${item.white}-${item.black}-${item.date}-${item.round}-${i}`;
 
-            return (
-              <Fragment key={key}>
-                <span style={{ marginLeft: "15px" }}>{item.round}</span>
-                <span>{item.date}</span>
-                <span>{item.white}</span>
-                <span>{item.black}</span>
-                <span className="fakeLink" onClick={() => clickHandler(item)}>
-                  {openingSrc === "pgn"
-                    ? item.opening || "N/A"
-                    : getFensterOpening(item)}
-                </span>
-                <span>{item.result}</span>
-              </Fragment>
-            );
-          })
-        )}
-      </div>
-      {hasMore && (
-        <div style={{ textAlign: "center", padding: "20px" }}>
-          <button
-            onClick={loadMore}
-            disabled={isLoadingMore}
-            style={{
-              padding: "10px 20px",
-              fontSize: "16px",
-              cursor: isLoadingMore ? "wait" : "pointer",
-              backgroundColor: isLoadingMore ? "#ccc" : "#4CAF50",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-            }}
-          >
-            {isLoadingMore
-              ? "Loading..."
-              : `Load Next ${BATCH_SIZE} (showing ${games.length} of ${totalGames})`}
-          </button>
+              return (
+                <Fragment key={key}>
+                  <span style={{ marginLeft: "15px" }}>{item.round}</span>
+                  <span>{item.date}</span>
+                  <span>{item.white}</span>
+                  <span>{item.black}</span>
+                  <span className="fakeLink" onClick={() => clickHandler(item)}>
+                    {openingSrc === "pgn"
+                      ? item.opening || "N/A"
+                      : getFensterOpening(item)}
+                  </span>
+                  <span>{item.result}</span>
+                </Fragment>
+              );
+            })
+          )}
         </div>
-      )}
+        {hasMore && (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <button
+              onClick={loadMore}
+              disabled={isLoadingMore}
+              style={{
+                padding: "10px 20px",
+                fontSize: "16px",
+                cursor: isLoadingMore ? "wait" : "pointer",
+                backgroundColor: isLoadingMore ? "#ccc" : "#4CAF50",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+              }}
+            >
+              {isLoadingMore
+                ? "Loading..."
+                : `Load Next ${BATCH_SIZE} (showing ${games.length} of ${totalGames})`}
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

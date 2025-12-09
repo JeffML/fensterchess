@@ -11,7 +11,6 @@ const xformWikibooksUrl = (url: string): string => {
   let wanted = url.slice(0, ampIndex);
   wanted = wanted.replace("/w/", "/wiki/");
   wanted = wanted.replace("api.php?titles=", "");
-  console.log({ wanted });
   return wanted;
 };
 
