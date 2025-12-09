@@ -84,8 +84,9 @@
     grid-template: 1fr 2fr;
     max-height: 250px;
     min-width: fit-content;
+    max-width: 100%;
     margin-top: 1em;
-    overflow-x: visible;
+    overflow-x: hidden;
 }
 
 .players {
