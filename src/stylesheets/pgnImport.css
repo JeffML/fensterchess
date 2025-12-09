@@ -1,125 +1,125 @@
 .radio-style {
-    display: flex;
-    padding-top: 2em;
-    padding-bottom: 2em;
-    margin-left: 2em;
-    gap: 1em;
+  display: flex;
+  padding-top: 2em;
+  padding-bottom: 2em;
+  margin-left: 2em;
+  gap: 1em;
 }
 
 .news {
-    font-size: smaller;
-    mask-image: linear-gradient(180deg, black 20%, transparent);
-    padding-right: 3em;
-    padding-left: 1em;
+  font-size: smaller;
+  mask-image: linear-gradient(180deg, black 20%, transparent);
+  padding-right: 3em;
+  padding-left: 1em;
 }
 
 .games-tab-grid {
-    display: grid;
-    grid-template-columns: 0.2fr 1fr 2fr 2fr 4fr 0.5fr;
-    max-height: 250px;
-    gap: 3px;
-    grid-column-gap: 2em;
+  display: grid;
+  grid-template-columns: 0.2fr 1fr 2fr 2fr 4fr 0.5fr;
+  max-height: 250px;
+  gap: 3px;
+  grid-column-gap: 2em;
 }
 
 #games-header {
-    margin-top: 10px;
-    color: antiquewhite;
+  margin-top: 10px;
+  color: antiquewhite;
 }
-#games-header>span>span{
-    font-size: small;
-    margin-left: 1em;
+#games-header > span > span {
+  font-size: small;
+  margin-left: 1em;
 }
 
 #games-rows {
-    overflow-y: scroll;
+  overflow-y: scroll;
 }
 
 .additional-details-loading {
-    display: grid;
-    grid-template-columns: auto;
-    grid-column-start: 2;
-    grid-column-end: auto;
+  display: grid;
+  grid-template-columns: auto;
+  grid-column-start: 2;
+  grid-column-end: auto;
 }
 
 .additional-details {
-    display: contents;
-    grid-column-start: 1;
-    text-align: left;
-    color: white;
+  display: contents;
+  grid-column-start: 1;
+  text-align: left;
+  color: white;
 }
 
 .ellipses {
-    border: solid 1px darkgray;
-    font-size: 16pt;
-    color: limegreen;
-    display: inline-block;
-    line-height: 0px;
-    border-radius: 3px;
-    height: 12px;
+  border: solid 1px darkgray;
+  font-size: 16pt;
+  color: limegreen;
+  display: inline-block;
+  line-height: 0px;
+  border-radius: 3px;
+  height: 12px;
 }
 
 .hover-effect:hover {
-    background-color: deeppink;
-    cursor: pointer
+  background-color: deeppink;
+  cursor: pointer;
 }
 
 .opening-details {
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    margin-top: 1em;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  margin-top: 1em;
 }
 
 .game-details {
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    text-align: left;
-    grid-auto-rows: minContent;
-    grid-auto-columns: minContent;
-    margin-left: .6em;
-    color: mintcream;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  text-align: left;
+  grid-auto-rows: minContent;
+  grid-auto-columns: minContent;
+  margin-left: 0.6em;
+  color: mintcream;
 }
 
 .openings-grid {
-    display: grid;
-    grid-template: 1fr 2fr;
-    max-height: 250px;
-    min-width: fit-content;
-    max-width: 100%;
-    margin-top: 1em;
-    overflow-x: hidden;
+  display: grid;
+  grid-template: 1fr 2fr;
+  max-height: 250px;
+  min-width: fit-content;
+  max-width: 100%;
+  margin-top: 1em;
+  overflow-x: hidden;
 }
 
 .players {
-    white-space: nowrap;
-    color: powderblue;
-    justify-content: space-evenly;
+  white-space: nowrap;
+  color: powderblue;
+  justify-content: space-evenly;
 }
 
 .player {
-    display: grid;
-    grid-template-columns: 1fr 3fr 1fr;
-    gap: 2em;
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  gap: 2em;
 }
 
 .grid-style-top-panel {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    height: 50%;
-    overflow-y: scroll;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  height: 50%;
+  overflow-y: scroll;
 }
 
 .link-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    padding: 3px;
-    grid-column-gap: 2em;
-    margin-left: 2em;
-    max-height: 0;
-    text-align: start;
-    color: white;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 3px;
+  grid-column-gap: 2em;
+  margin-left: 2em;
+  max-height: 0;
+  text-align: start;
+  color: white;
 }
 
 .pgn-tabs-panel {
-    position: relative; 
-    background-color: #3F3F3F;
+  position: relative;
+  background-color: #3f3f3f;
 }

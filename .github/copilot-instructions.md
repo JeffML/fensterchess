@@ -12,6 +12,7 @@ fensterchess consumes chessPGN as a dependency and fetches chess opening data fr
 ## Deployment
 
 **fensterchess is deployed on Netlify:**
+
 - Production: Automatic deployment from `main` branch
 - Preview: Draft deployments for testing (never deploy to production via CLI)
 - Serverless Functions: Netlify Functions for API endpoints
