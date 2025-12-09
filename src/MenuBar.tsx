@@ -27,7 +27,7 @@ const MenuBar = ({ mode, setMode }: MenuBarProps) => {
       </div>
       <div
         className={
-          "column menuitem " + (mode === modes.visualization ? "selected" : "")
+          "column menuitem viz-only " + (mode === modes.visualization ? "selected" : "")
         }
         onClick={() => setMode(modes.visualization)}
       >
