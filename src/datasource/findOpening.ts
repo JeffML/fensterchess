@@ -1,8 +1,8 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
-import { 
+import {
   findOpening as ecoFindOpening,
   lookupByMoves,
-  getPositionBook
+  getPositionBook,
 } from "@chess-openings/eco.json";
 import type {
   FEN,
@@ -101,11 +101,13 @@ export function findNearestOpening(
   // Use eco.json's optimized lookupByMoves
   // Note: Type cast needed because fensterchess Opening.src is optional
   const posBook = getPositionBook(openingBook as any);
-  const result = lookupByMoves(tempChess, openingBook as any, { positionBook: posBook });
-  
+  const result = lookupByMoves(tempChess, openingBook as any, {
+    positionBook: posBook,
+  });
+
   return {
     opening: result.opening as Opening | undefined,
-    movesBack: result.movesBack
+    movesBack: result.movesBack,
   };
 }
 
