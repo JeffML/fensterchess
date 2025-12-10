@@ -1,5 +1,9 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
-import { findOpening as ecoFindOpening } from "@chess-openings/eco.json";
+import { 
+  findOpening as ecoFindOpening,
+  lookupByMoves,
+  getPositionBook
+} from "@chess-openings/eco.json";
 import type {
   FEN,
   Opening,
@@ -78,8 +82,7 @@ export function findOpening(
  */
 export function findNearestOpening(
   moves: string,
-  openingBook: OpeningBook,
-  positionBook: PositionBook
+  openingBook: OpeningBook
 ): NearestOpeningResult {
   if (!moves || moves.trim() === "") {
     return { opening: undefined, movesBack: 0 };
@@ -95,35 +98,15 @@ export function findNearestOpening(
     return { opening: undefined, movesBack: 0 };
   }
 
-  const history = tempChess.history();
-  if (history.length === 0) {
-    return { opening: undefined, movesBack: 0 };
-  }
-
-  // Walk backward from current position
-  let movesBack = 0;
-  while (history.length > 0) {
-    const fen = tempChess.fen();
-    let opening = openingBook[fen];
-
-    // Try position book if not found
-    if (!opening) {
-      const posEntry = positionBook[fen.split(" ")[0]];
-      if (posEntry) {
-        opening = openingBook[posEntry[0]];
-      }
-    }
-
-    if (opening) {
-      return { opening, movesBack };
-    }
-
-    // Undo one move and try again
-    tempChess.undo();
-    movesBack++;
-  }
-
-  return { opening: undefined, movesBack: 0 };
+  // Use eco.json's optimized lookupByMoves
+  // Note: Type cast needed because fensterchess Opening.src is optional
+  const posBook = getPositionBook(openingBook as any);
+  const result = lookupByMoves(tempChess, openingBook as any, { positionBook: posBook });
+  
+  return {
+    opening: result.opening as Opening | undefined,
+    movesBack: result.movesBack
+  };
 }
 
 export const getFromTosForFen = async (fen: FEN): Promise<FromTosResponse> => {

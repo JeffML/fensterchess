@@ -22,7 +22,7 @@
     "chess-training"
   ],
   "dependencies": {
-    "@chess-openings/eco.json": "^1.0.2",
+    "@chess-openings/eco.json": "^1.1.0",
     "@chess-pgn/chess-pgn": "^1.0.0",
     "@netlify/vite-plugin": "^2.5.4",
     "@tanstack/react-query": "^5.83.0",

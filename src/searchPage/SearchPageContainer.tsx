@@ -138,11 +138,10 @@ const SearchPageContainer = () => {
       : undefined;
 
   // If no opening found and we have moves, search backward for nearest opening
-  if (!opening && moves && moves.trim() !== "" && openingBook && positionBook) {
+  if (!opening && moves && moves.trim() !== "" && openingBook) {
     const { opening: nearestOpening, movesBack } = findNearestOpening(
       moves,
-      openingBook,
-      positionBook
+      openingBook
     );
 
     if (nearestOpening && movesBack > 0) {
