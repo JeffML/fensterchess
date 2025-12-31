@@ -5,6 +5,10 @@ TestComponent.js
 *.code-workspace
 RELEASE*.md
 
+# Master game database files (generated/downloaded)
+data/pgn-downloads/
+data/indexes/
+
 # Backups
 *.gz
 
