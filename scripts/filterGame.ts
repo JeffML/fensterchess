@@ -14,9 +14,10 @@ import type { IChessGame } from "@chess-pgn/chess-pgn";
  */
 export function shouldImportGame(game: IChessGame | any): boolean {
   // Handle both IChessGame (with header() method) and metadata objects (with .headers property)
-  const header = typeof (game as any).header === 'function' 
-    ? (game as IChessGame).header() 
-    : (game as any).headers || {};
+  const header =
+    typeof (game as any).header === "function"
+      ? (game as IChessGame).header()
+      : (game as any).headers || {};
 
   // Reject variants (only standard chess)
   if (header.Variant && header.Variant !== "Standard") {
@@ -70,7 +71,7 @@ export function stripAnnotations(pgn: string): string {
 /**
  * Recursively removes nested parentheses (variations)
  * Handles arbitrarily deep nesting
- * 
+ *
  * @deprecated Use stripAnnotations directly (optimized version)
  * @param text - Text containing nested parentheses
  * @returns Text with all parentheses removed

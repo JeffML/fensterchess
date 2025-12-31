@@ -25,6 +25,7 @@ const OUTPUT_DIR = "./data/indexes";
 interface ProcessedData {
   games: GameMetadata[];
   deduplicationIndex: DeduplicationIndex;
+  sourceTracking: SourceTracking;
 }
 
 function buildGameChunks(games: GameMetadata[]): {
@@ -216,29 +217,6 @@ function buildDateIndex(games: GameMetadata[]): DateIndex {
   return index;
 }
 
-function buildSourceTracking(): SourceTracking {
-  console.log("\n📋 Building Source tracking...");
-
-  // For Phase 1, we only track pgnmentor sources
-  const tracking: SourceTracking = {
-    sources: {},
-  };
-
-  const MASTERS = ["Carlsen", "Kasparov", "Nakamura", "Anand", "Fischer"];
-
-  for (const master of MASTERS) {
-    const filename = `${master}.zip`;
-    tracking.sources[filename] = {
-      url: `https://www.pgnmentor.com/players/${filename}`,
-      lastChecked: new Date().toISOString(),
-      gameCount: 0, // Will be filled during processing
-    };
-  }
-
-  console.log(`  ✅ Tracked ${Object.keys(tracking.sources).length} sources`);
-  return tracking;
-}
-
 async function buildIndexes(): Promise<void> {
   console.log("🔨 Phase 1: Building search indexes\n");
 
@@ -260,7 +238,7 @@ async function buildIndexes(): Promise<void> {
   const playerIndex = buildPlayerIndex(data.games);
   const eventIndex = buildEventIndex(data.games);
   const dateIndex = buildDateIndex(data.games);
-  const sourceTracking = buildSourceTracking();
+  const sourceTracking = data.sourceTracking; // Read from processed data
 
   // Save indexes
   console.log("\n💾 Saving indexes...");
@@ -311,9 +289,21 @@ async function buildIndexes(): Promise<void> {
     return sum + fs.statSync(chunkPath).size;
   }, 0);
 
-  console.log(`  ${"Total indexes:".padEnd(30)} ${(totalSize / 1024).toFixed(2).padStart(10)} KB`);
-  console.log(`  ${"Total chunks:".padEnd(30)} ${(chunkSize / 1024).toFixed(2).padStart(10)} KB`);
-  console.log(`  ${"Grand total:".padEnd(30)} ${((totalSize + chunkSize) / 1024).toFixed(2).padStart(10)} KB`);
+  console.log(
+    `  ${"Total indexes:".padEnd(30)} ${(totalSize / 1024)
+      .toFixed(2)
+      .padStart(10)} KB`
+  );
+  console.log(
+    `  ${"Total chunks:".padEnd(30)} ${(chunkSize / 1024)
+      .toFixed(2)
+      .padStart(10)} KB`
+  );
+  console.log(
+    `  ${"Grand total:".padEnd(30)} ${((totalSize + chunkSize) / 1024)
+      .toFixed(2)
+      .padStart(10)} KB`
+  );
 
   console.log("\n✅ Index building complete!");
   console.log("\nNext step: Upload to Netlify Blobs (requires netlify dev)");

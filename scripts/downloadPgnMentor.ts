@@ -7,7 +7,7 @@ import AdmZip from "adm-zip";
 import { shouldImportGame } from "./filterGame.js";
 import { hashGame } from "./hashGame.js";
 import { indexPgnGames } from "@chess-pgn/chess-pgn";
-import type { GameMetadata, DeduplicationIndex } from "./types.js";
+import type { GameMetadata, DeduplicationIndex, SourceTracking } from "./types.js";
 
 const DOWNLOAD_DIR = "./data/pgn-downloads";
 const THROTTLE_MS = 10000; // 10 seconds between downloads
@@ -26,6 +26,7 @@ const MASTERS = [
 interface ProcessedGames {
   games: GameMetadata[];
   deduplicationIndex: DeduplicationIndex;
+  sourceTracking: SourceTracking;
   stats: {
     total: number;
     accepted: number;
@@ -69,7 +70,9 @@ function extractMoves(pgnText: string): string {
  */
 function countPly(moves: string): number {
   // Count SAN moves (ignoring move numbers)
-  const sanMoves = moves.match(/[NBRQK]?[a-h]?[1-8]?x?[a-h][1-8](=[NBRQ])?[+#]?|O-O(-O)?/g);
+  const sanMoves = moves.match(
+    /[NBRQK]?[a-h]?[1-8]?x?[a-h][1-8](=[NBRQ])?[+#]?|O-O(-O)?/g
+  );
   return sanMoves ? sanMoves.length : 0;
 }
 
@@ -88,10 +91,7 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function downloadFile(
-  url: string,
-  outputPath: string
-): Promise<boolean> {
+async function downloadFile(url: string, outputPath: string): Promise<boolean> {
   try {
     console.log(`  Downloading: ${url}`);
 
@@ -146,7 +146,12 @@ async function processGames(
 ): Promise<{
   games: GameMetadata[];
   nextIndex: number;
-  stats: { total: number; accepted: number; rejected: number; duplicates: number };
+  stats: {
+    total: number;
+    accepted: number;
+    rejected: number;
+    duplicates: number;
+  };
 }> {
   const games: GameMetadata[] = [];
   const stats = {
@@ -157,11 +162,11 @@ async function processGames(
   };
 
   console.log(`  Parsing games with workers...`);
-  
+
   // Use indexPgnGames with workers for fast parallel processing
-  const cursor = indexPgnGames(pgnContent, { 
+  const cursor = indexPgnGames(pgnContent, {
     workers: 4,
-    workerBatchSize: 100 
+    workerBatchSize: 100,
   });
 
   let processed = 0;
@@ -178,7 +183,7 @@ async function processGames(
 
       try {
         const headers = game.headers;
-        
+
         // Apply filtering
         if (!shouldImportGame(game)) {
           stats.rejected++;
@@ -194,9 +199,11 @@ async function processGames(
 
         // Game is accepted - now extract moves from PGN text
         const pgnChunk = pgnContent.slice(game.startOffset, game.endOffset);
-        const movesMatch = pgnChunk.match(/\n\n(.+?)(?:\s+(?:1-0|0-1|1\/2-1\/2|\*))?$/s);
+        const movesMatch = pgnChunk.match(
+          /\n\n(.+?)(?:\s+(?:1-0|0-1|1\/2-1\/2|\*))?$/s
+        );
         const movesText = movesMatch ? movesMatch[1].trim() : "";
-        
+
         // Count moves (rough estimate based on move numbers)
         const plyCount = (movesText.match(/\d+\./g) || []).length * 2;
 
@@ -246,6 +253,7 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
 
   const allGames: GameMetadata[] = [];
   const deduplicationIndex: DeduplicationIndex = {};
+  const sourceTracking: SourceTracking = { sources: {} };
   let gameIndex = 0;
 
   const totalStats = {
@@ -254,6 +262,8 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
     rejected: 0,
     duplicates: 0,
   };
+
+  const downloadDate = new Date().toISOString();
 
   for (let i = 0; i < MASTERS.length; i++) {
     const master = MASTERS[i];
@@ -268,6 +278,9 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
       console.log(`  Skipping ${master.name} due to download failure`);
       continue;
     }
+
+    // Track source metadata
+    const zipSize = fs.statSync(zipPath).size;
 
     // Extract
     const pgnContent = extractZip(zipPath);
@@ -294,6 +307,14 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
     totalStats.rejected += stats.rejected;
     totalStats.duplicates += stats.duplicates;
 
+    // Record source tracking
+    sourceTracking.sources[master.filename] = {
+      url,
+      lastChecked: downloadDate,
+      size: zipSize,
+      gameCount: stats.accepted,
+    };
+
     console.log(`  ✅ Accepted: ${stats.accepted}`);
     console.log(`  ❌ Rejected: ${stats.rejected}`);
     console.log(`  🔁 Duplicates: ${stats.duplicates}`);
@@ -311,7 +332,12 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
   console.log("=".repeat(50));
   console.log(`Total games found: ${totalStats.total}`);
   console.log(`Accepted: ${totalStats.accepted}`);
-  console.log(`Rejected: ${totalStats.rejected} (${((totalStats.rejected / totalStats.total) * 100).toFixed(1)}%)`);
+  console.log(
+    `Rejected: ${totalStats.rejected} (${(
+      (totalStats.rejected / totalStats.total) *
+      100
+    ).toFixed(1)}%)`
+  );
   console.log(`Duplicates: ${totalStats.duplicates}`);
   console.log(`Unique games indexed: ${allGames.length}`);
   console.log("=".repeat(50) + "\n");
@@ -319,6 +345,7 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
   return {
     games: allGames,
     deduplicationIndex,
+    sourceTracking,
     stats: totalStats,
   };
 }
@@ -328,7 +355,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   downloadAndProcessMasters()
     .then((result) => {
       console.log("✅ Download and processing complete!");
-      console.log(`Processed data ready for indexing: ${result.games.length} games`);
+      console.log(
+        `Processed data ready for indexing: ${result.games.length} games`
+      );
 
       // Save to temporary file for buildIndexes script
       const outputPath = path.join(DOWNLOAD_DIR, "processed-games.json");
@@ -338,6 +367,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
           {
             games: result.games,
             deduplicationIndex: result.deduplicationIndex,
+            sourceTracking: result.sourceTracking,
           },
           null,
           2

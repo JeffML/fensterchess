@@ -17,7 +17,7 @@ const samplePgn = `[Event "Titled Tue 29th Oct Early"]
 
 async function test() {
   const cursor = indexPgnGames(samplePgn);
-  
+
   for await (const game of cursor) {
     console.log("Game type:", typeof game);
     console.log("Game constructor:", game.constructor.name);
