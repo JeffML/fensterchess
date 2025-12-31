@@ -7,7 +7,11 @@ import AdmZip from "adm-zip";
 import { shouldImportGame } from "./filterGame.js";
 import { hashGame } from "./hashGame.js";
 import { indexPgnGames } from "@chess-pgn/chess-pgn";
-import type { GameMetadata, DeduplicationIndex, SourceTracking } from "./types.js";
+import type {
+  GameMetadata,
+  DeduplicationIndex,
+  SourceTracking,
+} from "./types.js";
 
 const DOWNLOAD_DIR = "./data/pgn-downloads";
 const THROTTLE_MS = 10000; // 10 seconds between downloads
@@ -33,58 +37,6 @@ interface ProcessedGames {
     rejected: number;
     duplicates: number;
   };
-}
-
-/**
- * Parse PGN headers from text
- */
-function parseHeaders(pgnText: string): Record<string, string> {
-  const headers: Record<string, string> = {};
-  const headerRegex = /\[(\w+)\s+"([^"]*)"\]/g;
-  let match;
-  while ((match = headerRegex.exec(pgnText)) !== null) {
-    headers[match[1]] = match[2];
-  }
-  return headers;
-}
-
-/**
- * Extract moves from PGN text (after headers, before result)
- */
-function extractMoves(pgnText: string): string {
-  // Remove headers
-  let movesSection = pgnText.replace(/\[[\s\S]*?\]\s*/g, "");
-  // Remove comments and variations
-  movesSection = movesSection.replace(/\{[^}]*\}/g, "");
-  movesSection = movesSection.replace(/\([^)]*\)/g, "");
-  // Remove NAGs
-  movesSection = movesSection.replace(/\$\d+/g, "");
-  // Remove result marker
-  movesSection = movesSection.replace(/\s*(1-0|0-1|1\/2-1\/2|\*)\s*$/, "");
-  // Clean up whitespace
-  return movesSection.replace(/\s+/g, " ").trim();
-}
-
-/**
- * Count moves (ply)
- */
-function countPly(moves: string): number {
-  // Count SAN moves (ignoring move numbers)
-  const sanMoves = moves.match(
-    /[NBRQK]?[a-h]?[1-8]?x?[a-h][1-8](=[NBRQ])?[+#]?|O-O(-O)?/g
-  );
-  return sanMoves ? sanMoves.length : 0;
-}
-
-/**
- * Generate hash for deduplication (white|black|date|moves)
- */
-function generateHash(headers: Record<string, string>, moves: string): string {
-  const white = (headers.White || "").toLowerCase().trim();
-  const black = (headers.Black || "").toLowerCase().trim();
-  const date = (headers.Date || "").trim();
-  const normalized = `${white}|${black}|${date}|${moves}`;
-  return crypto.createHash("sha256").update(normalized).digest("hex");
 }
 
 async function sleep(ms: number): Promise<void> {
