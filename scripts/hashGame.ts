@@ -2,44 +2,37 @@
 // Phase 0 - Foundation
 
 import crypto from "crypto";
-import type { IChessGame } from "@chess-pgn/chess-pgn";
 
 /**
  * Normalizes game data to canonical format for hashing
- * Format: white|black|date|moves
+ * Format: event|white|black|date|round
  *
- * - Player names: lowercase, trimmed
- * - Date: as-is from header
- * - Moves: space-separated SAN sequence
+ * - Event, player names: lowercase, trimmed
+ * - Date, round: as-is from headers
  *
- * @param game - Chess game to normalize
+ * @param headers - Game headers object
  * @returns Canonical string representation
  */
-export function normalizeGameForHash(game: IChessGame): string {
-  const header = game.header();
+export function normalizeGameForHash(headers: any): string {
+  // Normalize to lowercase and trim
+  const event = (headers.Event || "").toLowerCase().trim();
+  const white = (headers.White || "").toLowerCase().trim();
+  const black = (headers.Black || "").toLowerCase().trim();
+  const date = (headers.Date || "").trim();
+  const round = (headers.Round || "").trim();
 
-  // Normalize player names (lowercase, trim)
-  const white = (header.White || "").toLowerCase().trim();
-  const black = (header.Black || "").toLowerCase().trim();
-
-  // Normalize date (YYYY.MM.DD or YYYY.??.??)
-  const date = (header.Date || "").trim();
-
-  // Get move sequence (already stripped of annotations)
-  const moves = game.history().join(" ");
-
-  // Canonical format: white|black|date|moves
-  return `${white}|${black}|${date}|${moves}`;
+  // Canonical format: event|white|black|date|round
+  return `${event}|${white}|${black}|${date}|${round}`;
 }
 
 /**
  * Generates SHA-256 hash for game deduplication
  * Deterministic: same game data always produces same hash
  *
- * @param game - Chess game to hash
+ * @param headers - Game headers object
  * @returns SHA-256 hash (64 hex characters)
  */
-export function hashGame(game: IChessGame): string {
-  const normalized = normalizeGameForHash(game);
+export function hashGame(headers: any): string {
+  const normalized = normalizeGameForHash(headers);
   return crypto.createHash("sha256").update(normalized).digest("hex");
 }

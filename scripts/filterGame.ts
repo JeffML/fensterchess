@@ -9,11 +9,14 @@ import type { IChessGame } from "@chess-pgn/chess-pgn";
  * - No FEN setups (must start from standard position)
  * - Both players must have rating > 2400
  *
- * @param game - Chess game to evaluate
+ * @param game - Chess game to evaluate (IChessGame or game metadata)
  * @returns true if game should be imported, false otherwise
  */
-export function shouldImportGame(game: IChessGame): boolean {
-  const header = game.header();
+export function shouldImportGame(game: IChessGame | any): boolean {
+  // Handle both IChessGame (with header() method) and metadata objects (with .headers property)
+  const header = typeof (game as any).header === 'function' 
+    ? (game as IChessGame).header() 
+    : (game as any).headers || {};
 
   // Reject variants (only standard chess)
   if (header.Variant && header.Variant !== "Standard") {
@@ -50,8 +53,10 @@ export function stripAnnotations(pgn: string): string {
   // Remove comments: {...}
   let clean = pgn.replace(/\{[^}]*\}/g, "");
 
-  // Remove variations (nested parentheses)
-  clean = removeNestedParentheses(clean);
+  // Remove variations - optimized version (max 10 passes to prevent infinite loops)
+  for (let i = 0; i < 10 && clean.includes("("); i++) {
+    clean = clean.replace(/\([^()]*\)/g, "");
+  }
 
   // Remove NAGs: $1, $2, etc.
   clean = clean.replace(/\$\d+/g, "");
@@ -65,7 +70,8 @@ export function stripAnnotations(pgn: string): string {
 /**
  * Recursively removes nested parentheses (variations)
  * Handles arbitrarily deep nesting
- *
+ * 
+ * @deprecated Use stripAnnotations directly (optimized version)
  * @param text - Text containing nested parentheses
  * @returns Text with all parentheses removed
  */
