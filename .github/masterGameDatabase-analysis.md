@@ -492,6 +492,571 @@ jobs:
 
 ---
 
+## Data Sources
+
+### 1. pgnmentor.com
+
+- **URL**: https://www.pgnmentor.com/files.html
+- **Focus**: Players section (~200 master files)
+- **Format**: ZIP files containing PGN
+- **Organization**: By player name
+- **File size**: ~500KB compressed, ~2MB uncompressed per master
+
+### 2. Lumbras Gigabase
+
+- **URL**: https://lumbrasgigabase.com/en/download-in-pgn-format-en/
+- **Format**: 7z compressed archives
+- **Organization**: By time period (OTB games)
+- **Total size**: ~1.4GB compressed across 12 time periods
+- **Updates**: Monthly updates with recent games
+- **Latest**: December 2025 (TWIC 1618-1621, Lichess Broadcast)
+
+---
+
+## Game Filtering and Processing
+
+### Strict Filtering Criteria
+
+**Import ONLY games meeting ALL criteria:**
+
+1. ✅ **Standard chess only** - No variants (Chess960, etc.)
+2. ✅ **No FEN field in headers** - Must start from initial position
+3. ✅ **Both players rated >2400** - Master-level games only
+4. ✅ **Strip all annotations** - Remove comments `{...}`, variations `(...)`, and NAGs `$1`, `!`, `?`, etc.
+
+### Filtering Implementation
+
+```typescript
+interface GameHeaders {
+  White?: string;
+  Black?: string;
+  WhiteElo?: string;
+  BlackElo?: string;
+  FEN?: string;
+  Variant?: string;
+  // ... other headers
+}
+
+function shouldImportGame(game: IChessGame): boolean {
+  const header = game.header();
+
+  // Must be standard chess (no variants)
+  if (header.Variant && header.Variant !== "Standard") {
+    return false;
+  }
+
+  // Must start from initial position (no FEN setup)
+  if (header.FEN) {
+    return false;
+  }
+
+  // Both players must be rated >2400
+  const whiteElo = header.WhiteElo ? parseInt(header.WhiteElo) : 0;
+  const blackElo = header.BlackElo ? parseInt(header.BlackElo) : 0;
+
+  if (whiteElo <= 2400 || blackElo <= 2400) {
+    return false;
+  }
+
+  return true;
+}
+
+function stripAnnotations(pgnContent: string): string {
+  // Remove comments: {...}
+  let cleaned = pgnContent.replace(/\{[^}]*\}/g, "");
+
+  // Remove variations: (...)
+  // More complex - need to handle nested parens
+  cleaned = removeNestedParentheses(cleaned);
+
+  // Remove NAGs: $1, $2, etc.
+  cleaned = cleaned.replace(/\$\d+/g, "");
+
+  // Remove symbolic annotations: !, !!, ?, ??, !?, ?!
+  cleaned = cleaned.replace(/[!?]+/g, "");
+
+  // Clean up extra whitespace
+  cleaned = cleaned.replace(/\s+/g, " ").trim();
+
+  return cleaned;
+}
+
+function removeNestedParentheses(text: string): string {
+  let result = text;
+  let changed = true;
+
+  // Keep removing innermost parentheses until none remain
+  while (changed) {
+    const newResult = result.replace(/\([^()]*\)/g, "");
+    changed = newResult !== result;
+    result = newResult;
+  }
+
+  return result;
+}
+```
+
+### Multiple Index Strategy
+
+**Single unified games collection** - No need to separate by source
+
+**CRITICAL: Index must be partitioned to stay under 100MB blob limit**
+
+With 800K games × 400 bytes = 320MB, we need to split into chunks:
+
+```typescript
+// Partition strategy: 200K games per index chunk = ~80MB each
+interface GameIndexChunk {
+  version: string;
+  chunkId: number; // 0, 1, 2, 3
+  totalChunks: number; // 4
+  startIdx: number; // 0, 200000, 400000, 600000
+  endIdx: number; // 199999, 399999, 599999, 799999
+  games: GameMetadata[];
+}
+
+// Master index: Points to chunks
+interface MasterIndex {
+  version: string;
+  totalGames: number;
+  totalChunks: number;
+  chunkSize: number;
+  chunks: {
+    id: number;
+    blobKey: string; // "indexes/games-chunk-0.json"
+    startIdx: number;
+    endIdx: number;
+    size: number; // bytes
+  }[];
+  byOpening: {
+    [fen: string]: number[]; // Game indices across all chunks
+  };
+  lastUpdated: string;
+}
+```
+
+**Blob organization:**
+
+```
+master-games/
+  indexes/
+    master-index.json           (~4MB: Metadata + pointers to other indexes)
+
+    # Game data chunks
+    games-chunk-0.json          (~85MB: Games 0-199,999)
+    games-chunk-1.json          (~85MB: Games 200,000-399,999)
+    games-chunk-2.json          (~85MB: Games 400,000-599,999)
+    games-chunk-3.json          (~85MB: Games 600,000-799,999)
+
+    # Search indexes (for Fenster users)
+    opening-by-fen.json         (~15MB: FEN → game indices)
+    opening-by-name.json        (~10MB: Opening name → game indices)
+    opening-by-eco.json         (~8MB: ECO code → game indices)
+    player-index.json           (~25MB: Player name → game indices)
+    event-index.json            (~20MB: Event/tournament → game indices)
+    date-index.json             (~5MB: Year/month → game indices)
+
+    # Maintenance indexes
+    deduplication.json          (~50MB: Hash → game index)
+    source-tracking.json        (~1MB: File metadata, Last-Modified, ETags)
+
+  games/
+    chunk-0.pgn                 (~100MB: Actual PGN games)
+    chunk-1.pgn                 (~100MB)
+    ...
+```
+
+## User-Facing Search Indexes
+
+### 1. Opening by FEN Index
+
+**File**: `opening-by-fen.json` (~15MB)
+
+**Purpose**: Look up all games that reached a specific position
+
+```typescript
+interface OpeningByFenIndex {
+  version: string;
+  byFen: {
+    [fen: string]: {
+      ecoOpening: string;
+      eco: string;
+      gameCount: number;
+      gameIndices: number[]; // Global game indices
+    };
+  };
+}
+
+// Example usage in Fenster:
+// User has position on board, wants to see master games
+const currentFen = chess.fen();
+const games = await findGamesByFen(currentFen);
+// Returns: "Found 1,523 master games reaching this position"
+```
+
+**Size calculation**: 10,000 unique opening positions × 1.5KB avg = ~15MB
+
+---
+
+### 2. Opening by Name Index
+
+**File**: `opening-by-name.json` (~10MB)
+
+**Purpose**: Search by opening name (text search, autocomplete)
+
+```typescript
+interface OpeningByNameIndex {
+  version: string;
+  byName: {
+    [normalizedName: string]: {
+      displayName: string;
+      eco: string;
+      variations: string[];
+      gameCount: number;
+      gameIndices: number[];
+    };
+  };
+  searchTerms: {
+    [term: string]: string[]; // "sicilian" → ["Sicilian Defense", "Sicilian Najdorf", ...]
+  };
+}
+
+// Example usage:
+// User types "najdorf" in search
+const results = await searchOpenings("najdorf");
+// Returns: ["Sicilian Defense, Najdorf", "Sicilian Defense, Najdorf, 6.Bg5", ...]
+```
+
+**Features**:
+
+- Normalized names (lowercase, no punctuation)
+- Search terms map for autocomplete
+- Handles variations and sub-variations
+
+---
+
+### 3. Opening by ECO Code Index
+
+**File**: `opening-by-eco.json` (~8MB)
+
+**Purpose**: Filter by ECO code (A00-E99)
+
+```typescript
+interface OpeningByEcoIndex {
+  version: string;
+  byEco: {
+    [eco: string]: {
+      name: string;
+      gameCount: number;
+      gameIndices: number[];
+    };
+  };
+  byCategory: {
+    A: { codes: string[]; gameCount: number };
+    B: { codes: string[]; gameCount: number };
+    C: { codes: string[]; gameCount: number };
+    D: { codes: string[]; gameCount: number };
+    E: { codes: string[]; gameCount: number };
+  };
+}
+
+// Example usage:
+// User selects ECO category "B" (semi-open games)
+const bGames = await getGamesByEcoCategory("B");
+// Or specific code
+const najdorfGames = await getGamesByEco("B90");
+```
+
+---
+
+### 4. Player Index
+
+**File**: `player-index.json` (~25MB)
+
+**Purpose**: Find all games by a specific player (white or black)
+
+```typescript
+interface PlayerIndex {
+  version: string;
+  players: {
+    [normalizedName: string]: {
+      displayName: string;
+      peakRating: number;
+      gameCount: number;
+      asWhite: number[]; // Game indices where player is white
+      asBlack: number[]; // Game indices where player is black
+      openings: {
+        [eco: string]: number; // Most played openings
+      };
+    };
+  };
+  searchTerms: {
+    [term: string]: string[]; // "carlsen" → ["Carlsen, Magnus"]
+  };
+}
+
+// Example usage:
+// User searches for "Carlsen"
+const carlsenGames = await getPlayerGames("Carlsen, Magnus");
+// Returns: 4,521 games (2,301 as white, 2,220 as black)
+
+// Or filter by color
+const carlsenWhite = await getPlayerGames("Carlsen, Magnus", "white");
+```
+
+**Features**:
+
+- Search by last name only
+- Separate indices for white/black
+- Most-played openings per player
+- Peak rating from dataset
+
+---
+
+### 5. Event Index
+
+**File**: `event-index.json` (~20MB)
+
+**Purpose**: Filter by tournament/event
+
+```typescript
+interface EventIndex {
+  version: string;
+  events: {
+    [normalizedEvent: string]: {
+      displayName: string;
+      years: number[]; // Years this event occurred
+      gameCount: number;
+      gameIndices: number[];
+      topPlayers: string[]; // Most frequent participants
+    };
+  };
+  categories: {
+    "World Championship": string[];
+    Candidates: string[];
+    Olympiad: string[];
+    "Grand Prix": string[];
+    Other: string[];
+  };
+}
+
+// Example usage:
+// User wants World Championship games
+const wcGames = await getEventGames("World Championship");
+
+// Or specific year
+const wc2021 = await getEventGamesByYear("World Championship", 2021);
+```
+
+---
+
+### 6. Date Index
+
+**File**: `date-index.json` (~5MB)
+
+**Purpose**: Filter games by time period
+
+```typescript
+interface DateIndex {
+  version: string;
+  byYear: {
+    [year: string]: {
+      gameCount: number;
+      gameIndices: number[];
+    };
+  };
+  byDecade: {
+    [decade: string]: {
+      gameCount: number;
+      years: string[];
+    };
+  };
+  statistics: {
+    earliest: string; // "1900"
+    latest: string; // "2025"
+    peakYear: string; // Year with most games
+  };
+}
+
+// Example usage:
+// User wants recent games (2020-2025)
+const recentGames = await getGamesByDateRange(2020, 2025);
+
+// Or specific year
+const games2023 = await getGamesByYear(2023);
+```
+
+---
+
+## Combined Search Queries
+
+Fenster can combine multiple indexes for powerful searches:
+
+```typescript
+// "Show me Carlsen's Najdorf games from 2020-2025"
+async function advancedSearch(criteria: {
+  player?: string;
+  opening?: string;
+  eco?: string;
+  event?: string;
+  yearFrom?: number;
+  yearTo?: number;
+}) {
+  const results: Set<number> = new Set();
+
+  // Get candidate games from each index
+  const playerGames = criteria.player
+    ? await getPlayerGames(criteria.player)
+    : null;
+  const openingGames = criteria.opening
+    ? await searchOpenings(criteria.opening)
+    : null;
+  const dateGames = criteria.yearFrom
+    ? await getGamesByDateRange(criteria.yearFrom, criteria.yearTo)
+    : null;
+
+  // Intersect sets
+  const allSets = [playerGames, openingGames, dateGames].filter(Boolean);
+  const intersection = allSets.reduce(
+    (acc, set) => new Set([...acc].filter((x) => set.has(x)))
+  );
+
+  return Array.from(intersection);
+}
+```
+
+---
+
+## Index Size Summary
+
+| Index                | Size       | Purpose                   | Update Frequency     |
+| -------------------- | ---------- | ------------------------- | -------------------- |
+| master-index.json    | 4MB        | Metadata, chunk pointers  | Every update         |
+| games-chunk-\*.json  | 85MB × 4   | Game metadata             | Every update         |
+| opening-by-fen.json  | 15MB       | Position lookup           | Every update         |
+| opening-by-name.json | 10MB       | Text search, autocomplete | Every update         |
+| opening-by-eco.json  | 8MB        | ECO code filter           | Every update         |
+| player-index.json    | 25MB       | Player search             | Every update         |
+| event-index.json     | 20MB       | Tournament filter         | Every update         |
+| date-index.json      | 5MB        | Time period filter        | Every update         |
+| deduplication.json   | 50MB       | Hash lookup               | During indexing only |
+| source-tracking.json | 1MB        | File metadata             | During indexing only |
+| **Total indexes**    | **~480MB** |                           |                      |
+| **Games PGN**        | ~1.6GB     | Actual game content       | Every update         |
+| **Grand Total**      | **~2.1GB** |                           |                      |
+
+All well within 100GB Netlify limit ✅
+
+**Source tracking** - Track last visit per source for incremental updates
+
+```json
+{
+  "version": "1.0.0",
+  "sources": {
+    "pgnmentor": {
+      "lastVisited": "2025-12-30T10:30:00Z",
+      "files": {
+        "Carlsen.zip": {
+          "url": "https://www.pgnmentor.com/players/Carlsen.zip",
+          "lastModified": "2025-07-01T00:00:00Z",
+          "etag": "\"5f8a2b3c4d5e6f7g\"",
+          "size": 524288,
+          "gamesImported": 4521
+        },
+        "Kasparov.zip": {
+          "url": "https://www.pgnmentor.com/players/Kasparov.zip",
+          "lastModified": "2025-06-15T00:00:00Z",
+          "etag": "\"1a2b3c4d5e6f7g8h\"",
+          "size": 456789,
+          "gamesImported": 3842
+        }
+      }
+    },
+    "lumbras": {
+      "lastVisited": "2025-12-30T10:45:00Z",
+      "files": {
+        "OTB-2020-2024.7z": {
+          "url": "https://lumbrasgigabase.com/...",
+          "lastModified": "2025-12-02T00:00:00Z",
+          "etag": null,
+          "size": 232898560,
+          "gamesImported": 185432,
+          "note": "Lumbras may not support HEAD requests - fallback to version tracking"
+        }
+      }
+    }
+  }
+}
+```
+
+**Update detection strategy:**
+
+```typescript
+async function checkForUpdates(
+  sourceTracking: SourceTracking
+): Promise<FileUpdate[]> {
+  const updates: FileUpdate[] = [];
+
+  for (const [source, data] of Object.entries(sourceTracking.sources)) {
+    for (const [filename, fileInfo] of Object.entries(data.files)) {
+      try {
+        // Try HEAD request first
+        const response = await fetch(fileInfo.url, { method: "HEAD" });
+
+        if (response.ok) {
+          const lastModified = response.headers.get("Last-Modified");
+          const etag = response.headers.get("ETag");
+          const contentLength = response.headers.get("Content-Length");
+
+          // Check if file changed
+          if (
+            lastModified !== fileInfo.lastModified ||
+            etag !== fileInfo.etag ||
+            parseInt(contentLength || "0") !== fileInfo.size
+          ) {
+            updates.push({
+              source,
+              filename,
+              reason: "File modified",
+              oldDate: fileInfo.lastModified,
+              newDate: lastModified,
+            });
+          }
+        }
+      } catch (error) {
+        // Lumbras or other sites may not support HEAD
+        console.warn(
+          `HEAD request failed for ${filename}, will check on next full scan`
+        );
+
+        // Fallback: Check if it's been >30 days since last visit
+        const daysSinceVisit = daysBetween(data.lastVisited, new Date());
+        if (daysSinceVisit > 30) {
+          updates.push({
+            source,
+            filename,
+            reason: "Periodic check (30+ days)",
+            note: "HEAD not supported, will download to check",
+          });
+        }
+      }
+    }
+  }
+
+  return updates;
+}
+```
+
+**Key points:**
+
+- ✅ Unified games collection (no source separation needed)
+- ✅ Track source metadata for incremental updates
+- ✅ Use HEAD requests to detect file changes (Last-Modified, ETag, size)
+- ✅ Fallback for Lumbras: Periodic 30-day re-check if HEAD not supported
+- ✅ Avoid re-downloading unchanged files
+
+---
+
 ## Implementation Components
 
 ### 1. Bulk Indexing Script (Local/CI Only)
@@ -1392,15 +1957,123 @@ import { MasterGamesTab } from "./MasterGamesTab";
 
 **Blobs Storage Limits**:
 
-- Included: 100GB
-- Additional: $0.15/GB/month
-- Bandwidth: 1TB/month included
+- **Total storage**: 100GB included
+- **Individual blob size**: 100MB max per blob
+- **Blob count**: Unlimited
+- **Additional storage**: $0.15/GB/month
+- **Bandwidth**: 1TB/month included
+
+**Critical constraint**: Individual blobs limited to **100MB each**
 
 **Current Usage**: (Before this feature)
 
 - Opening data: ~50MB
 - Other data: ~20MB
 - **Total: ~70MB**
+
+### Deduplication Strategy
+
+**Problem**: Games appear in multiple sources (same tournament in different player files, across time periods)
+
+**Solution**: Game hash index for deduplication
+
+```typescript
+interface GameHash {
+  hash: string; // SHA-256 of normalized game content
+  firstSeen: {
+    source: string; // "pgnmentor" or "lumbras"
+    file: string; // "Carlsen.pgn" or "2020-2024"
+    idx: number; // Game index in source
+  };
+  also_in: Array<{
+    // Other occurrences
+    source: string;
+    file: string;
+    idx: number;
+  }>;
+}
+
+interface DeduplicationIndex {
+  version: string;
+  totalUniqueGames: number;
+  totalDuplicates: number;
+  byHash: Record<string, GameHash>;
+}
+```
+
+**Hashing strategy for duplicates:**
+
+```typescript
+function normalizeGameForHash(game: IChessGame): string {
+  const header = game.header();
+
+  // Normalize player names (trim, lowercase)
+  const white = (header.White || "").trim().toLowerCase();
+  const black = (header.Black || "").trim().toLowerCase();
+
+  // Normalize date (handle various formats)
+  const date = (header.Date || "").replace(/\./g, "-");
+
+  // Get moves only (already stripped of annotations)
+  const moves = game.history().join(" ");
+
+  // Create canonical string
+  return `${white}|${black}|${date}|${moves}`;
+}
+
+function hashGame(game: IChessGame): string {
+  const normalized = normalizeGameForHash(game);
+  return crypto.createHash("sha256").update(normalized).digest("hex");
+}
+
+async function checkDuplicate(
+  hash: string,
+  dedupIndex: DeduplicationIndex
+): boolean {
+  return hash in dedupIndex.byHash;
+}
+```
+
+**Blob organization for size limits:**
+
+Since individual blobs are limited to 100MB:
+
+```typescript
+// DON'T: Store all games in one blob (will exceed 100MB)
+// games-all.json - TOO BIG!
+
+// DO: Partition by source and time
+netlify blobs:
+  master-games/
+    indexes/
+      pgnmentor-players.json           // <100MB: Player index only
+      lumbras-2020-2024.json          // <100MB: Time period index
+      deduplication.json               // <50MB: Hash lookup
+      combined-openings.json           // <100MB: Cross-source opening index
+
+    games/
+      pgnmentor/
+        Carlsen.pgn                    // <10MB: Individual player files
+        Kasparov.pgn
+        ...
+      lumbras/
+        2020-2024-part1.pgn            // <100MB: Split large periods
+        2020-2024-part2.pgn
+        2020-2024-part3.pgn
+```
+
+**Storage estimation with filtering:**
+
+Assuming >2400 rating filter removes ~60% of games:
+
+| Source                  | Raw Games | Filtered Games | Storage              |
+| ----------------------- | --------- | -------------- | -------------------- |
+| pgnmentor (200 players) | 800K      | 320K           | ~640MB (partitioned) |
+| Lumbras (2020-2024)     | 500K      | 200K           | ~400MB (partitioned) |
+| Lumbras (other periods) | 700K      | 280K           | ~560MB (partitioned) |
+| **Total games blob**    | **2M**    | **800K**       | **~1.6GB**           |
+| **Indexes**             | -         | -              | **~400MB**           |
+| **Grand Total**         | **2M**    | **800K**       | **~2GB**             |
 
 ### Projected Master Game Database Usage
 
