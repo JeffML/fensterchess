@@ -300,11 +300,35 @@ Located in `__tests__/` directory:
 
 **Scripts** (`scripts/` directory):
 - `types.ts` - Interfaces for GameMetadata, indexes, deduplication
-- `filterGame.ts` - Quality filters (ELO ≥2000, rejects variants/FEN setups)
+- `filterGame.ts` - Site-specific quality filters with optional title requirement
 - `hashGame.ts` - Deterministic game hashing for deduplication
-- `downloadPgnMentor.ts` - Downloads PGN files from pgnmentor.com (5 masters POC)
+- `downloadMasterGames.ts` - Downloads from multiple sources (pgnmentor + Lichess Elite)
 - `buildIndexes.ts` - Generates search indexes from processed games
-- `testBlobs.ts` - Netlify Blobs storage testing
+
+**Filtering Strategy** (site-specific in `filterGame.ts`):
+
+*Common filters (all sources):*
+- Standard chess only (no variants)
+- No FEN setups (must start from standard position)
+- Both players ELO >2400
+- Time control rapid or slower (≥600 seconds base time)
+
+*pgnmentor.com:*
+- Downloads from Players section only
+- No title requirement
+- Accepts all 2400+ rated games
+- Current: 5 masters (Carlsen, Kasparov, Nakamura, Anand, Fischer) = ~19K games
+
+*Lichess Elite Database:*
+- **Requires BOTH players to have FIDE titles** (GM, IM, FM, WGM, WIM, WFM, CM, WCM, NM, WNM)
+- Combined with common filters above
+- Expected: ~3K-5K titled player games per month
+- More restrictive filtering ensures high-quality games
+
+**Performance**:
+- Manual SAN parsing (no loadPgn overhead): ~16 games/sec
+- 19K games: ~20 minutes processing time
+- Lichess Elite processing: ~15-20 minutes per month
 
 **Data Structure** (`data/` directory):
 - `pgn-downloads/` - Downloaded ZIP files and processed-games.json
@@ -318,12 +342,13 @@ Located in `__tests__/` directory:
   - `date-index.json` - Search by date range
   - `deduplication-index.json` - Hash → game index mapping
   - `source-tracking.json` - Source metadata and checksums
-  - `chunk-*.json` - Game data chunks (100 games each)
+  - `chunk-*.json` - Game data chunks (4000 games each, <5 MB for Netlify Blobs)
 
 **Current Status**:
 - ✅ Phase 0: Foundation and filtering logic complete
 - ✅ Phase 1: Downloaded 5 masters (Carlsen, Kasparov, Nakamura, Anand, Fischer)
-- ✅ Indexes built locally (~25K games after filtering)
+- ✅ Indexes built locally (~19K games, 5 chunks)
+- ✅ Chunk size optimized for Netlify Blobs (4000 games = ~4 MB per chunk)
 - ⏳ Phase 2: UI integration (search interface and game viewer)
 - 🔜 Phase 3: Upload to Netlify Blobs and create serverless query functions
 
