@@ -9,11 +9,16 @@ import type { IChessGame } from "@chess-pgn/chess-pgn";
  * - No FEN setups (must start from standard position)
  * - Both players must have rating > 2400
  * - Time control must be rapid or slower (>= 600 seconds base time)
+ * - Optional: Both players must have FIDE titles (for Lichess)
  *
  * @param game - Chess game to evaluate (IChessGame or game metadata)
+ * @param options - Filtering options (requireTitles for Lichess)
  * @returns true if game should be imported, false otherwise
  */
-export function shouldImportGame(game: IChessGame | any): boolean {
+export function shouldImportGame(
+  game: IChessGame | any,
+  options?: { requireTitles?: boolean }
+): boolean {
   // Handle both IChessGame (with header() method) and metadata objects (with .headers property)
   const header =
     typeof (game as any).header === "function"
@@ -46,7 +51,34 @@ export function shouldImportGame(game: IChessGame | any): boolean {
     }
   }
 
+  // Optional: Require both players to have FIDE titles (Lichess filtering)
+  if (options?.requireTitles) {
+    const whiteTitle = header.WhiteTitle || "";
+    const blackTitle = header.BlackTitle || "";
+    
+    if (!isFideTitle(whiteTitle) || !isFideTitle(blackTitle)) {
+      return false;
+    }
+  }
+
   return true;
+}
+
+/**
+ * Check if a title is a recognized FIDE title.
+ * Valid titles: GM, IM, FM, WGM, WIM, WFM, CM, WCM, NM, WNM
+ *
+ * @param title - Title string from PGN header
+ * @returns true if valid FIDE title
+ */
+function isFideTitle(title: string): boolean {
+  const validTitles = [
+    "GM", "IM", "FM",       // Grandmaster, International Master, FIDE Master
+    "WGM", "WIM", "WFM",    // Women's titles
+    "CM", "WCM",            // Candidate Master
+    "NM", "WNM"             // National Master (some federations)
+  ];
+  return validTitles.includes(title.trim().toUpperCase());
 }
 
 /**

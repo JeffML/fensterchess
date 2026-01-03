@@ -107,7 +107,8 @@ async function processGames(
   pgnContent: string,
   sourceFile: string,
   deduplicationIndex: DeduplicationIndex,
-  gameIndex: number
+  gameIndex: number,
+  filterOptions?: { requireTitles?: boolean }
 ): Promise<{
   games: GameMetadata[];
   nextIndex: number;
@@ -149,8 +150,8 @@ async function processGames(
       try {
         const headers = game.headers;
 
-        // Apply filtering
-        if (!shouldImportGame(game)) {
+        // Apply filtering (pass options for site-specific rules)
+        if (!shouldImportGame(game, filterOptions)) {
           stats.rejected++;
           continue;
         }
@@ -271,13 +272,14 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
       continue;
     }
 
-    // Process games
+    // Process games (pgnmentor: no title requirement)
     console.log(`  Processing games...`);
     const { games, nextIndex, stats } = await processGames(
       pgnContent,
       master.filename,
       deduplicationIndex,
-      gameIndex
+      gameIndex,
+      { requireTitles: false }
     );
 
     allGames.push(...games);
@@ -334,13 +336,14 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
       continue;
     }
 
-    // Process games
+    // Process games (Lichess: require titled players)
     console.log(`  Processing games...`);
     const { games, nextIndex, stats } = await processGames(
       pgnContent,
       source.filename,
       deduplicationIndex,
-      gameIndex
+      gameIndex,
+      { requireTitles: true }
     );
 
     allGames.push(...games);
