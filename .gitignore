@@ -9,6 +9,9 @@ RELEASE*.md
 data/pgn-downloads/
 data/indexes/
 
+# Compiled scripts (transpiled from TypeScript)
+scripts/*.js
+
 # Backups
 *.gz
 

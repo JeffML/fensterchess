@@ -4,6 +4,11 @@
 import fs from "fs";
 import path from "path";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
+import {
+  openingBook,
+  lookupByMoves,
+  getPositionBook,
+} from "@chess-openings/eco.json";
 import type {
   GameMetadata,
   MasterIndex,
@@ -73,37 +78,108 @@ function buildGameChunks(games: GameMetadata[]): {
   return { chunks, masterIndex };
 }
 
+async function enrichGamesWithEcoJson(
+  games: GameMetadata[],
+  openings: any,
+  positionBook: any
+): Promise<void> {
+  console.log("\n🎯 Enriching games with eco.json opening matches...");
+
+  let matched = 0;
+  let unmatched = 0;
+  const progressInterval = 1000;
+
+  for (let i = 0; i < games.length; i++) {
+    const game = games[i];
+
+    if ((i + 1) % progressInterval === 0) {
+      process.stdout.write(`\r  Processing: ${i + 1}/${games.length} games...`);
+    }
+
+    try {
+      // OPTIMIZATION: Parse moves manually instead of using loadPgn()
+      // game.moves should contain just moves, but handle legacy data with headers too
+
+      let movesText = game.moves;
+
+      // Strip headers if present (legacy data compatibility)
+      if (movesText.includes("[")) {
+        movesText = movesText.replace(/^\[.*?\]\s*/gm, "").trim();
+      }
+
+      // Extract clean SAN moves
+      const cleanMoves = movesText
+        .replace(/\d+\.\s*/g, "") // Remove move numbers: "1." "2." etc.
+        .replace(/1-0|0-1|1\/2-1\/2|\*/g, "") // Remove result tokens
+        .replace(/\{[^}]*\}/g, "") // Remove comments
+        .replace(/\([^)]*\)/g, "") // Remove variations
+        .trim()
+        .split(/\s+/)
+        .filter((m) => m.length > 0 && m !== "");
+
+      if (cleanMoves.length === 0) {
+        unmatched++;
+        continue;
+      }
+
+      // Execute moves to build game state for lookupByMoves
+      const chess = new ChessPGN();
+      for (const move of cleanMoves) {
+        const result = chess.move(move);
+        if (!result) {
+          throw new Error(`Invalid move: ${move}`);
+        }
+      }
+
+      // Store ply count and clean SAN moves
+      game.ply = cleanMoves.length;
+      game.moves = cleanMoves.join(" ");
+
+      const result = lookupByMoves(chess, openings, { positionBook });
+
+      if (result.opening) {
+        // Store eco.json match info
+        game.ecoJsonFen = chess.fen();
+        game.ecoJsonOpening = result.opening.name;
+        game.ecoJsonEco = result.opening.eco;
+        game.movesBack = result.movesBack;
+        matched++;
+      } else {
+        unmatched++;
+      }
+    } catch (error) {
+      unmatched++;
+    }
+  }
+
+  process.stdout.write(
+    `\r  Processing: ${games.length}/${games.length} games complete!\n`
+  );
+  console.log(
+    `  ✅ Matched: ${matched} games (${((matched / games.length) * 100).toFixed(
+      1
+    )}%)`
+  );
+  console.log(`  ⚠️  Unmatched: ${unmatched} games`);
+}
+
 function buildOpeningByFenIndex(games: GameMetadata[]): OpeningByFenIndex {
-  console.log("\n🎯 Building Opening by FEN index...");
+  console.log("\n📖 Building Opening by FEN index (eco.json positions)...");
 
   const index: OpeningByFenIndex = {};
 
   for (const game of games) {
-    // Get FEN after each move
-    const chess = new ChessPGN();
-    const moves = game.moves.split(/\d+\./).filter((m) => m.trim());
-
-    for (const move of moves) {
-      const trimmed = move.trim();
-      if (trimmed) {
-        try {
-          chess.move(trimmed);
-          const fen = chess.fen();
-
-          if (!index[fen]) {
-            index[fen] = [];
-          }
-          if (!index[fen].includes(game.idx)) {
-            index[fen].push(game.idx);
-          }
-        } catch (error) {
-          // Skip invalid moves
-        }
+    if (game.ecoJsonFen) {
+      if (!index[game.ecoJsonFen]) {
+        index[game.ecoJsonFen] = [];
       }
+      index[game.ecoJsonFen].push(game.idx);
     }
   }
 
-  console.log(`  ✅ Indexed ${Object.keys(index).length} unique positions`);
+  console.log(
+    `  ✅ Indexed ${Object.keys(index).length} unique eco.json positions`
+  );
   return index;
 }
 
@@ -224,6 +300,15 @@ async function buildIndexes(): Promise<void> {
   console.log(`📖 Reading: ${INPUT_FILE}`);
   const data: ProcessedData = JSON.parse(fs.readFileSync(INPUT_FILE, "utf-8"));
   console.log(`  Found ${data.games.length} games\n`);
+
+  // Load eco.json opening book
+  console.log("📚 Loading eco.json opening book...");
+  const openings = await openingBook();
+  const positionBook = getPositionBook(openings);
+  console.log(`  ✅ Loaded ${Object.keys(openings).length} openings\n`);
+
+  // Enrich games with eco.json opening matches
+  await enrichGamesWithEcoJson(data.games, openings, positionBook);
 
   // Create output directory
   if (!fs.existsSync(OUTPUT_DIR)) {

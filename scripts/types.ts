@@ -15,13 +15,21 @@ export interface GameMetadata {
   date: string;
   event: string;
   site: string;
-  eco?: string;
-  opening?: string;
+  eco?: string; // ECO code from PGN header
+  opening?: string; // Opening name from PGN header
+  variation?: string; // Variation from PGN header
+  subVariation?: string; // SubVariation from PGN header
   moves: string; // SAN move sequence
   ply: number; // Half-moves
-  source: "pgnmentor";
+  source: "pgnmentor" | "lichess-elite";
   sourceFile: string;
   hash: string; // SHA-256 for deduplication
+
+  // eco.json opening match (added during buildIndexes)
+  ecoJsonFen?: string; // FEN at deepest eco.json matched position
+  ecoJsonOpening?: string; // eco.json opening name
+  ecoJsonEco?: string; // eco.json ECO code
+  movesBack?: number; // Number of moves walked back to find eco.json match
 }
 
 /**
@@ -55,10 +63,11 @@ export interface MasterIndex {
 
 /**
  * Opening by FEN index
- * Maps FEN strings to game indices
+ * Maps eco.json FEN strings to game indices
+ * Built during buildIndexes using lookupByMoves() from @chess-openings/eco.json
  */
 export interface OpeningByFenIndex {
-  [fen: string]: number[]; // Array of game indices
+  [fen: string]: number[]; // Array of game indices that reached this eco.json position
 }
 
 /**

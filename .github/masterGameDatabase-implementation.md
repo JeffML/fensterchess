@@ -317,6 +317,35 @@ Body: {
 
 ---
 
+## Performance Considerations
+
+### ChessPGN loadPgn() Performance
+
+**Critical optimization note**: `chess.loadPgn()` executes all moves and builds full game state (position tracking, hash calculation, castling rights). This is expensive.
+
+**When to use loadPgn():**
+
+- ✅ Need to call `lookupByMoves()` (requires game object with `.history()` and `.undo()`)
+- ✅ Need final FEN position after moves
+- ✅ Need to interact with game state
+
+**When to avoid loadPgn():**
+
+- ❌ Only need move list → Use `parsePgn()` to extract moves without executing (~10x faster)
+- ❌ Only need headers → Already have from `indexPgnGames()` cursor
+- ❌ Only need ply count → Can count moves from parser without executing
+
+**Current usage** (buildIndexes.ts):
+
+- Uses `loadPgn()` because `lookupByMoves()` requires a game object
+- This is the correct choice for eco.json enrichment
+
+**Optimization opportunity**:
+
+- If eco.json exports a `lookupByMovesArray(moves: string[], openings, options)` that accepts a plain move array, we could avoid `loadPgn()` entirely and get ~10x speedup
+
+---
+
 ## Risk Mitigation
 
 ### Technical Risks

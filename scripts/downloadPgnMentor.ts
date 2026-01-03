@@ -1,12 +1,12 @@
-// Download PGN files from pgnmentor.com
-// Phase 1 - POC with 5 masters
+// Download PGN files from multiple sources
+// Phase 1 - POC with pgnmentor.com (5 masters) + Lichess Elite
 
 import fs from "fs";
 import path from "path";
 import AdmZip from "adm-zip";
 import { shouldImportGame } from "./filterGame.js";
 import { hashGame } from "./hashGame.js";
-import { indexPgnGames } from "@chess-pgn/chess-pgn";
+import { indexPgnGames, ChessPGN } from "@chess-pgn/chess-pgn";
 import type {
   GameMetadata,
   DeduplicationIndex,
@@ -18,13 +18,26 @@ const THROTTLE_MS = 10000; // 10 seconds between downloads
 const USER_AGENT =
   "Fenster Chess Opening Explorer (https://fensterchess.com) - Educational research project";
 
-// Phase 1: POC with 5 masters
-const MASTERS = [
-  { name: "Carlsen", filename: "Carlsen.zip" },
-  { name: "Kasparov", filename: "Kasparov.zip" },
-  { name: "Nakamura", filename: "Nakamura.zip" },
-  { name: "Anand", filename: "Anand.zip" },
-  { name: "Fischer", filename: "Fischer.zip" },
+// Source 1: pgnmentor.com - 5 masters
+// Temporarily disabled - using existing processed-games.json
+const MASTERS: { name: string; filename: string }[] = [
+  // { name: "Carlsen", filename: "Carlsen.zip" },
+  // { name: "Kasparov", filename: "Kasparov.zip" },
+  // { name: "Nakamura", filename: "Nakamura.zip" },
+  // { name: "Anand", filename: "Anand.zip" },
+  // { name: "Fischer", filename: "Fischer.zip" },
+];
+
+// Source 2: Lichess Elite Database (2400+ rated games)
+// https://database.nikonoel.fr/
+// Note: Files are distributed as .zip (not .zst as originally documented)
+const LICHESS_ELITE = [
+  // Start with 1 month POC - December 2024
+  {
+    name: "Lichess Elite Dec 2024",
+    filename: "lichess_elite_2024-12.zip",
+    url: "https://database.nikonoel.fr/lichess_elite_2024-12.zip",
+  },
 ];
 
 interface ProcessedGames {
@@ -149,15 +162,14 @@ async function processGames(
           continue;
         }
 
-        // Game is accepted - now extract moves from PGN text
+        // Game is accepted - extract just the moves section (not headers)
         const pgnChunk = pgnContent.slice(game.startOffset, game.endOffset);
-        const movesMatch = pgnChunk.match(
-          /\n\n(.+?)(?:\s+(?:1-0|0-1|1\/2-1\/2|\*))?$/s
-        );
-        const movesText = movesMatch ? movesMatch[1].trim() : "";
 
-        // Count moves (rough estimate based on move numbers)
-        const plyCount = (movesText.match(/\d+\./g) || []).length * 2;
+        // Strip headers - find where moves start (after last header line and blank line)
+        const movesSectionMatch = pgnChunk.match(/\n\n(.+)/s);
+        const movesOnly = movesSectionMatch
+          ? movesSectionMatch[1].trim()
+          : pgnChunk;
 
         const metadata: GameMetadata = {
           idx: gameIndex,
@@ -171,8 +183,10 @@ async function processGames(
           site: headers.Site || "?",
           eco: headers.ECO,
           opening: headers.Opening,
-          moves: movesText,
-          ply: plyCount,
+          variation: headers.Variation,
+          subVariation: headers.SubVariation,
+          moves: movesOnly, // Store only moves section (no headers)
+          ply: 0, // Will be calculated in buildIndexes
           source: "pgnmentor",
           sourceFile,
           hash,
@@ -183,6 +197,7 @@ async function processGames(
         gameIndex++;
         stats.accepted++;
       } catch (error) {
+        // Error processing this game
         stats.rejected++;
       }
     }
@@ -194,7 +209,7 @@ async function processGames(
 }
 
 async function downloadAndProcessMasters(): Promise<ProcessedGames> {
-  console.log("🎯 Phase 1: Downloading and processing 5 masters\n");
+  console.log("🎯 Processing master games database\n");
   console.log(`Throttle: ${THROTTLE_MS / 1000} seconds between downloads`);
   console.log(`User-Agent: ${USER_AGENT}\n`);
 
@@ -203,10 +218,24 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
     fs.mkdirSync(DOWNLOAD_DIR, { recursive: true });
   }
 
-  const allGames: GameMetadata[] = [];
-  const deduplicationIndex: DeduplicationIndex = {};
-  const sourceTracking: SourceTracking = { sources: {} };
+  // Load existing processed-games.json if it exists (preserves pgnmentor data)
+  let allGames: GameMetadata[] = [];
+  let deduplicationIndex: DeduplicationIndex = {};
+  let sourceTracking: SourceTracking = { sources: {} };
   let gameIndex = 0;
+
+  const processedGamesPath = path.join(DOWNLOAD_DIR, "processed-games.json");
+  if (fs.existsSync(processedGamesPath)) {
+    console.log("📂 Loading existing processed-games.json...");
+    const existing: ProcessedGames = JSON.parse(
+      fs.readFileSync(processedGamesPath, "utf-8")
+    );
+    allGames = existing.games;
+    deduplicationIndex = existing.deduplicationIndex;
+    sourceTracking = existing.sourceTracking;
+    gameIndex = allGames.length;
+    console.log(`  ✅ Loaded ${allGames.length} existing games\n`);
+  }
 
   const totalStats = {
     total: 0,
@@ -217,6 +246,7 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
 
   const downloadDate = new Date().toISOString();
 
+  // Process pgnmentor masters (ZIP files)
   for (let i = 0; i < MASTERS.length; i++) {
     const master = MASTERS[i];
     console.log(`\n[${i + 1}/${MASTERS.length}] Processing: ${master.name}`);
@@ -273,6 +303,69 @@ async function downloadAndProcessMasters(): Promise<ProcessedGames> {
 
     // Throttle (except after last download)
     if (i < MASTERS.length - 1) {
+      console.log(`  ⏱️  Waiting ${THROTTLE_MS / 1000} seconds...`);
+      await sleep(THROTTLE_MS);
+    }
+  }
+
+  // Process Lichess Elite database (ZIP files, same as pgnmentor)
+  for (let i = 0; i < LICHESS_ELITE.length; i++) {
+    const source = LICHESS_ELITE[i];
+    console.log(
+      `\n[${i + 1}/${LICHESS_ELITE.length}] Processing: ${source.name}`
+    );
+
+    const zipPath = path.join(DOWNLOAD_DIR, source.filename);
+
+    // Download
+    const downloaded = await downloadFile(source.url, zipPath);
+    if (!downloaded) {
+      console.log(`  Skipping ${source.name} due to download failure`);
+      continue;
+    }
+
+    // Track source metadata
+    const zipSize = fs.statSync(zipPath).size;
+
+    // Extract
+    const pgnContent = extractZip(zipPath);
+    if (!pgnContent) {
+      console.log(`  Skipping ${source.name} due to extraction failure`);
+      continue;
+    }
+
+    // Process games
+    console.log(`  Processing games...`);
+    const { games, nextIndex, stats } = await processGames(
+      pgnContent,
+      source.filename,
+      deduplicationIndex,
+      gameIndex
+    );
+
+    allGames.push(...games);
+    gameIndex = nextIndex;
+
+    // Update total stats
+    totalStats.total += stats.total;
+    totalStats.accepted += stats.accepted;
+    totalStats.rejected += stats.rejected;
+    totalStats.duplicates += stats.duplicates;
+
+    // Record source tracking
+    sourceTracking.sources[source.filename] = {
+      url: source.url,
+      lastChecked: downloadDate,
+      size: zipSize,
+      gameCount: stats.accepted,
+    };
+
+    console.log(`  ✅ Accepted: ${stats.accepted}`);
+    console.log(`  ❌ Rejected: ${stats.rejected}`);
+    console.log(`  🔁 Duplicates: ${stats.duplicates}`);
+
+    // Throttle (except after last source)
+    if (i < LICHESS_ELITE.length - 1) {
       console.log(`  ⏱️  Waiting ${THROTTLE_MS / 1000} seconds...`);
       await sleep(THROTTLE_MS);
     }

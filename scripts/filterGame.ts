@@ -8,6 +8,7 @@ import type { IChessGame } from "@chess-pgn/chess-pgn";
  * - Standard chess only (no variants)
  * - No FEN setups (must start from standard position)
  * - Both players must have rating > 2400
+ * - Time control must be rapid or slower (>= 600 seconds base time)
  *
  * @param game - Chess game to evaluate (IChessGame or game metadata)
  * @returns true if game should be imported, false otherwise
@@ -37,7 +38,48 @@ export function shouldImportGame(game: IChessGame | any): boolean {
     return false;
   }
 
+  // Time control must be rapid or slower (>= 600 seconds = 10 minutes)
+  if (header.TimeControl) {
+    const baseTime = parseTimeControl(header.TimeControl);
+    if (baseTime !== null && baseTime < 600) {
+      return false;
+    }
+  }
+
   return true;
+}
+
+/**
+ * Parse TimeControl header to extract base time in seconds
+ * Formats: "600+0", "900+10", "40/7200", "-", "?"
+ *
+ * @param timeControl - TimeControl header value
+ * @returns Base time in seconds, or null if unparseable/unknown
+ */
+function parseTimeControl(timeControl: string): number | null {
+  if (!timeControl || timeControl === "-" || timeControl === "?") {
+    return null; // Unknown time control - accept these
+  }
+
+  // Format: "600+0" or "900+10" (base time + increment)
+  const incrementMatch = timeControl.match(/^(\d+)\+/);
+  if (incrementMatch) {
+    return parseInt(incrementMatch[1]);
+  }
+
+  // Format: "40/7200" (moves/seconds)
+  const movesMatch = timeControl.match(/^\d+\/(\d+)/);
+  if (movesMatch) {
+    return parseInt(movesMatch[1]);
+  }
+
+  // Format: just seconds "3600"
+  const simpleMatch = timeControl.match(/^(\d+)$/);
+  if (simpleMatch) {
+    return parseInt(simpleMatch[1]);
+  }
+
+  return null; // Unparseable - accept these
 }
 
 /**

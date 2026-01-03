@@ -292,6 +292,43 @@ Located in `__tests__/` directory:
 - `vite.config.mts` (chessPGN) - Vitest config
 - `rollup.config.mjs` - chessPGN multi-format build
 
+## Master Game Database (In Progress)
+
+**Goal**: Build searchable database of ~25,000 master games for opening research
+
+### Data Processing Pipeline
+
+**Scripts** (`scripts/` directory):
+- `types.ts` - Interfaces for GameMetadata, indexes, deduplication
+- `filterGame.ts` - Quality filters (ELO ≥2000, rejects variants/FEN setups)
+- `hashGame.ts` - Deterministic game hashing for deduplication
+- `downloadPgnMentor.ts` - Downloads PGN files from pgnmentor.com (5 masters POC)
+- `buildIndexes.ts` - Generates search indexes from processed games
+- `testBlobs.ts` - Netlify Blobs storage testing
+
+**Data Structure** (`data/` directory):
+- `pgn-downloads/` - Downloaded ZIP files and processed-games.json
+- `indexes/` - Pre-built search indexes:
+  - `master-index.json` - Complete game metadata
+  - `player-index.json` - Search by player name (white/black)
+  - `opening-by-eco.json` - Search by ECO code
+  - `opening-by-name.json` - Search by opening name
+  - `opening-by-fen.json` - Search by position FEN
+  - `event-index.json` - Search by event/tournament
+  - `date-index.json` - Search by date range
+  - `deduplication-index.json` - Hash → game index mapping
+  - `source-tracking.json` - Source metadata and checksums
+  - `chunk-*.json` - Game data chunks (100 games each)
+
+**Current Status**:
+- ✅ Phase 0: Foundation and filtering logic complete
+- ✅ Phase 1: Downloaded 5 masters (Carlsen, Kasparov, Nakamura, Anand, Fischer)
+- ✅ Indexes built locally (~25K games after filtering)
+- ⏳ Phase 2: UI integration (search interface and game viewer)
+- 🔜 Phase 3: Upload to Netlify Blobs and create serverless query functions
+
+**Design Docs**: See `.github/masterGameDatabase*.md` for detailed architecture
+
 ## Common Pitfalls
 
 1. **Don't edit `src/pgn.js` directly** - modify `src/pgn.peggy` and run `npm run parser`
