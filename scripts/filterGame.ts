@@ -55,7 +55,7 @@ export function shouldImportGame(
   if (options?.requireTitles) {
     const whiteTitle = header.WhiteTitle || "";
     const blackTitle = header.BlackTitle || "";
-    
+
     if (!isFideTitle(whiteTitle) || !isFideTitle(blackTitle)) {
       return false;
     }
@@ -73,10 +73,16 @@ export function shouldImportGame(
  */
 function isFideTitle(title: string): boolean {
   const validTitles = [
-    "GM", "IM", "FM",       // Grandmaster, International Master, FIDE Master
-    "WGM", "WIM", "WFM",    // Women's titles
-    "CM", "WCM",            // Candidate Master
-    "NM", "WNM"             // National Master (some federations)
+    "GM",
+    "IM",
+    "FM", // Grandmaster, International Master, FIDE Master
+    "WGM",
+    "WIM",
+    "WFM", // Women's titles
+    "CM",
+    "WCM", // Candidate Master
+    "NM",
+    "WNM", // National Master (some federations)
   ];
   return validTitles.includes(title.trim().toUpperCase());
 }
