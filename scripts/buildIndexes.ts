@@ -23,7 +23,9 @@ import type {
   SourceTracking,
 } from "./types.js";
 
-const CHUNK_SIZE = 200000; // 200K games per chunk
+// Netlify Blobs limit: 5 MB per blob
+// ~1 KB per game → 4000 games = ~4 MB (with headroom for metadata)
+const CHUNK_SIZE = 4000; // Games per chunk (keeps under 5 MB for Netlify Blobs)
 const INPUT_FILE = "./data/pgn-downloads/processed-games.json";
 const OUTPUT_DIR = "./data/indexes";
 
