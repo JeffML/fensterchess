@@ -3,7 +3,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { authenticateRequest } = require("./utils/auth");
+const { authenticateRequest, authFailureResponse } = require("./utils/auth");
 
 // Load indexes on cold start
 const INDEX_DIR = path.join(__dirname, "../../data/indexes");
@@ -13,7 +13,19 @@ let chunksCache = new Map();
 function loadIndex() {
   if (!openingByFenIndex) {
     const indexPath = path.join(INDEX_DIR, "opening-by-fen.json");
-    openingByFenIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    console.log("Loading index from:", indexPath);
+    console.log("Index exists:", fs.existsSync(indexPath));
+
+    try {
+      openingByFenIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+      console.log(
+        "Index loaded successfully, keys:",
+        Object.keys(openingByFenIndex).length
+      );
+    } catch (error) {
+      console.error("Failed to load index:", error.message);
+      throw error;
+    }
   }
   return openingByFenIndex;
 }
@@ -34,8 +46,9 @@ function getPositionFen(fen) {
 
 exports.handler = async (event) => {
   // Authenticate request
-  const authError = authenticateRequest(event);
-  if (authError) return authError;
+  if (!authenticateRequest(event)) {
+    return authFailureResponse;
+  }
 
   // Only allow GET requests
   if (event.httpMethod !== "GET") {
@@ -46,7 +59,11 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { fen, page = "0", pageSize = "20" } = event.queryStringParameters || {};
+    const {
+      fen,
+      page = "0",
+      pageSize = "20",
+    } = event.queryStringParameters || {};
 
     if (!fen) {
       return {
@@ -170,9 +187,14 @@ exports.handler = async (event) => {
     };
   } catch (error) {
     console.error("Query error:", error);
+    console.error("Error stack:", error.stack);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
+      body: JSON.stringify({
+        error: "Internal server error",
+        message: error.message,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+      }),
     };
   }
 };
