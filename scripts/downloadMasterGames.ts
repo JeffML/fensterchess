@@ -149,6 +149,11 @@ async function processGames(
 
       try {
         const headers = game.headers;
+        
+        if (!headers) {
+          stats.rejected++;
+          continue;
+        }
 
         // Apply filtering (pass options for site-specific rules)
         if (!shouldImportGame(game, filterOptions)) {

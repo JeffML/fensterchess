@@ -140,8 +140,18 @@ async function enrichGamesWithEcoJson(
       const result = lookupByMoves(chess, openings, { positionBook });
 
       if (result.opening) {
-        // Store eco.json match info
-        game.ecoJsonFen = chess.fen();
+        // lookupByMoves restores the chess position after search,
+        // so we need to find the FEN key in openingBook that corresponds to this opening
+        let openingFen: string | undefined;
+        for (const [fen, opening] of Object.entries(openings)) {
+          if (opening === result.opening) {
+            openingFen = fen;
+            break;
+          }
+        }
+
+        // Store eco.json match info with opening position FEN
+        game.ecoJsonFen = openingFen || chess.fen(); // Fallback to current FEN if not found
         game.ecoJsonOpening = result.opening.name;
         game.ecoJsonEco = result.opening.eco;
         game.movesBack = result.movesBack;

@@ -1,38 +1,24 @@
 // Query master games database by FEN position
 // Returns paginated list of games matching the position
 
-const fs = require("fs");
-const path = require("path");
-const { authenticateRequest, authFailureResponse } = require("./utils/auth");
+import fs from "fs";
+import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
 // Load indexes on cold start
-const INDEX_DIR = path.join(__dirname, "../../data/indexes");
 let openingByFenIndex = null;
 let chunksCache = new Map();
 
 function loadIndex() {
   if (!openingByFenIndex) {
-    const indexPath = path.join(INDEX_DIR, "opening-by-fen.json");
-    console.log("Loading index from:", indexPath);
-    console.log("Index exists:", fs.existsSync(indexPath));
-
-    try {
-      openingByFenIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
-      console.log(
-        "Index loaded successfully, keys:",
-        Object.keys(openingByFenIndex).length
-      );
-    } catch (error) {
-      console.error("Failed to load index:", error.message);
-      throw error;
-    }
+    const indexPath = "data/indexes/opening-by-fen.json";
+    openingByFenIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
   }
   return openingByFenIndex;
 }
 
 function loadChunk(chunkId) {
   if (!chunksCache.has(chunkId)) {
-    const chunkPath = path.join(INDEX_DIR, `chunk-${chunkId}.json`);
+    const chunkPath = `data/indexes/chunk-${chunkId}.json`;
     const chunk = JSON.parse(fs.readFileSync(chunkPath, "utf-8"));
     chunksCache.set(chunkId, chunk);
   }
@@ -44,7 +30,7 @@ function getPositionFen(fen) {
   return fen.split(" ")[0];
 }
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   // Authenticate request
   if (!authenticateRequest(event)) {
     return authFailureResponse;
@@ -78,11 +64,25 @@ exports.handler = async (event) => {
     // Load FEN index
     const index = loadIndex();
 
-    // Try exact FEN match first, then position-only fallback
+    // Try exact FEN match first
     let gameIds = index[fen];
+    
+    // If no exact match, try position-only fallback
     if (!gameIds) {
       const positionFen = getPositionFen(fen);
-      gameIds = index[positionFen];
+      
+      // Search for any FEN with matching position
+      for (const [indexedFen, ids] of Object.entries(index)) {
+        if (getPositionFen(indexedFen) === positionFen) {
+          gameIds = ids;
+          console.log('Game IDs:', ids);
+          break;
+        }
+      }
+      
+      if (!gameIds) {
+        console.log('No position match found');
+      }
     }
 
     if (!gameIds || gameIds.length === 0) {

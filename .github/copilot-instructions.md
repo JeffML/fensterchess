@@ -1,5 +1,31 @@
 # Copilot Instructions for Fenster Chess
 
+## Quick Reference
+
+**chessPGN API Patterns:**
+- **Single game**: `loadPgn(pgnString)` → `IChessGame` instance (use `.move()`, `.fen()`, etc.)
+- **Bulk processing**: `indexPgnGames(pgnString)` → `Cursor<metadata>` (yields `{startOffset, endOffset, headers}`)
+- **CRITICAL**: Cursor items are metadata objects, NOT `IChessGame` instances - must call `loadPgn()` separately for full game API
+- Access metadata: `game.headers.White` (not `game.header('White')`)
+
+**Netlify Serverless Functions:**
+- **ESM syntax required**: Use `import`/`export`, never `require`/`module.exports`
+- **File paths**: Use simple relative paths like `'data/file.json'` (see `getFromTosForFen.js` for pattern)
+- **NEVER use**: `import.meta.url`, `__dirname`, `path.join()` - causes bundler warnings
+- **Auth pattern**: Import from `./utils/auth.js`, check `VITE_API_SECRET_TOKEN`
+- **Data files**: Configure in `netlify.toml` under `[functions]` → `included_files`
+
+**Opening Lookup Patterns:**
+- **openingBook**: Full FEN → opening data (exact match with turn/castling/en passant)
+- **positionBook**: Position-only FEN → full FEN (fallback for transpositions)
+- **Pattern**: `findOpening(openingBook, fen, positionBook)` tries exact match first, then position-only
+- **FEN structure**: `"position w KQkq - halfmove fullmove"` - position is first field split by space
+
+**Game vs Opening Data:**
+- **Opening data** (~12K named variations): Use `@chess-openings/eco.json` package methods
+- **Master games** (~19K games): Use local indexes in `data/indexes/`
+- **Transitions**: `fromTo.json` is raw data, `fromToPositionIndexed.json` is optimized for lookup
+
 ## Project Overview
 
 This workspace contains two related chess projects:
@@ -54,7 +80,18 @@ fensterchess consumes chessPGN as a dependency and fetches chess opening data fr
 - `getFromTosForFen.js` - Returns next/previous positions for a FEN (reads from `data/fromToPositionIndexed.json`)
 - `scoresForFens.js` - Evaluates positions using pre-computed scores (`data/scores.json`)
 - `getPgnLinks.js` / `getRssXml.js` - Fetch PGN data from external chess sites
+- `queryMasterGamesByFen.js` - Returns master games matching a FEN position
+- `getMasterGameMoves.js` - Returns full moves for a specific game
 - All functions use Bearer token authentication via `utils/auth.js` (checks `VITE_API_SECRET_TOKEN`)
+
+**CRITICAL - Serverless Function Format:**
+
+- **MUST use ESM syntax** (`import`/`export`) not CommonJS (`require`/`exports`)
+- package.json has `"type": "module"` - all .js files are treated as ESM
+- Pattern: `export const handler = async (event) => { ... }`
+- Import with extensions: `import { auth } from "./utils/auth.js"` (note .js extension)
+- **NEVER use `import.meta.url` or `__dirname`** - Netlify's esbuild bundler defaults to cjs output format and throws warnings
+- **Use simple relative paths** for file operations: `fs.readFileSync('data/file.json')` (see existing functions like getFromTosForFen.js)
 
 **React Query Integration:**
 
@@ -299,6 +336,7 @@ Located in `__tests__/` directory:
 ### Data Processing Pipeline
 
 **Scripts** (`scripts/` directory):
+
 - `types.ts` - Interfaces for GameMetadata, indexes, deduplication
 - `filterGame.ts` - Site-specific quality filters with optional title requirement
 - `hashGame.ts` - Deterministic game hashing for deduplication
@@ -307,30 +345,35 @@ Located in `__tests__/` directory:
 
 **Filtering Strategy** (site-specific in `filterGame.ts`):
 
-*Common filters (all sources):*
+_Common filters (all sources):_
+
 - Standard chess only (no variants)
 - No FEN setups (must start from standard position)
 - Both players ELO >2400
 - Time control rapid or slower (≥600 seconds base time)
 
-*pgnmentor.com:*
+_pgnmentor.com:_
+
 - Downloads from Players section only
 - No title requirement
 - Accepts all 2400+ rated games
 - Current: 5 masters (Carlsen, Kasparov, Nakamura, Anand, Fischer) = ~19K games
 
-*Lichess Elite Database:*
+_Lichess Elite Database:_
+
 - **Requires BOTH players to have FIDE titles** (GM, IM, FM, WGM, WIM, WFM, CM, WCM, NM, WNM)
 - Combined with common filters above
 - Expected: ~3K-5K titled player games per month
 - More restrictive filtering ensures high-quality games
 
 **Performance**:
+
 - Manual SAN parsing (no loadPgn overhead): ~16 games/sec
 - 19K games: ~20 minutes processing time
 - Lichess Elite processing: ~15-20 minutes per month
 
 **Data Structure** (`data/` directory):
+
 - `pgn-downloads/` - Downloaded ZIP files and processed-games.json
 - `indexes/` - Pre-built search indexes:
   - `master-index.json` - Complete game metadata
@@ -345,6 +388,7 @@ Located in `__tests__/` directory:
   - `chunk-*.json` - Game data chunks (4000 games each, <5 MB for Netlify Blobs)
 
 **Current Status**:
+
 - ✅ Phase 0: Foundation and filtering logic complete
 - ✅ Phase 1: Downloaded 5 masters (Carlsen, Kasparov, Nakamura, Anand, Fischer)
 - ✅ Indexes built locally (~19K games, 5 chunks)

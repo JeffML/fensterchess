@@ -48,8 +48,58 @@ async function fetchMasterGames(
   return response.json();
 }
 
+async function fetchGameMoves(gameId: number): Promise<string> {
+  const response = await fetch(
+    `/.netlify/functions/getMasterGameMoves?gameId=${gameId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.moves;
+}
+
 export const MasterGames = ({ fen }: { fen: FEN }) => {
   const [page, setPage] = useState(0);
+
+  const handlePlayerClick = async (gameId: number) => {
+    try {
+      const moves = await fetchGameMoves(gameId);
+
+      // Find the moves input textarea and trigger a paste event
+      const movesInput = document.getElementById(
+        "moves-input"
+      ) as HTMLTextAreaElement;
+      if (!movesInput) {
+        console.error("Moves input not found");
+        return;
+      }
+
+      // Create and dispatch a paste event with the moves
+      const dataTransfer = new DataTransfer();
+      dataTransfer.setData("text/plain", moves);
+
+      const pasteEvent = new ClipboardEvent("paste", {
+        clipboardData: dataTransfer,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      movesInput.dispatchEvent(pasteEvent);
+
+      // TODO: Navigate to opening position after paste completes
+      // Would need chess ref and setBoardState passed as props
+    } catch (error) {
+      console.error("Error loading game moves:", error);
+    }
+  };
 
   const { isError, error, data, isPending } = useQuery<MasterGamesResponse>({
     queryKey: ["masterGames", fen, page],
@@ -86,7 +136,10 @@ export const MasterGames = ({ fen }: { fen: FEN }) => {
 
   return (
     <div style={{ marginTop: "2em", marginBottom: "1em" }}>
-      <div className="font-cinzel" style={{ fontWeight: "bold", color: "#fff", marginBottom: "0.5em" }}>
+      <div
+        className="font-cinzel"
+        style={{ fontWeight: "bold", color: "#fff", marginBottom: "0.5em" }}
+      >
         Master Games ({data.total.toLocaleString()} positions)
       </div>
 
@@ -98,6 +151,7 @@ export const MasterGames = ({ fen }: { fen: FEN }) => {
           gap: "0.5em 1em",
           fontSize: "0.9em",
           color: "#ddd",
+          textAlign: "left",
         }}
       >
         {/* Headers */}
@@ -117,22 +171,37 @@ export const MasterGames = ({ fen }: { fen: FEN }) => {
             : `${game.black} (${game.blackElo})`;
 
           return (
-            <>
-              <div key={`${game.idx}-num`} style={{ color: "#888" }}>
+            <div key={game.idx} style={{ display: "contents" }}>
+              <div style={{ color: "#888" }}>
                 {page * data.pageSize + idx + 1}
               </div>
-              <div key={`${game.idx}-white`}>{whiteDisplay}</div>
-              <div key={`${game.idx}-black`}>{blackDisplay}</div>
-              <div key={`${game.idx}-result`} style={{ textAlign: "center" }}>
-                {game.result}
+              <div
+                onClick={() => handlePlayerClick(game.idx)}
+                style={{
+                  cursor: "pointer",
+                  color: "#6db3f2",
+                  textDecoration: "underline",
+                }}
+                title="Click to load game moves"
+              >
+                {whiteDisplay}
               </div>
               <div
-                key={`${game.idx}-event`}
-                style={{ fontSize: "0.85em", color: "#bbb" }}
+                onClick={() => handlePlayerClick(game.idx)}
+                style={{
+                  cursor: "pointer",
+                  color: "#6db3f2",
+                  textDecoration: "underline",
+                }}
+                title="Click to load game moves"
               >
+                {blackDisplay}
+              </div>
+              <div>{game.result}</div>
+              <div style={{ fontSize: "0.85em", color: "#bbb" }}>
                 {game.event} {game.date && `(${game.date.substring(0, 4)})`}
               </div>
-            </>
+            </div>
           );
         })}
       </div>

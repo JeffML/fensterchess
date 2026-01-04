@@ -41,34 +41,35 @@ export const OpeningAdditionalWithBarChartGrid = ({ fen }: { fen: FEN }) => {
   return (
     <div style={{ marginTop: "1em" }}>
       {/* External site data (FICS/Lichess) */}
-      {data && Object.entries(data).map(([site, siteData]) => {
-        const { alsoKnownAs, wins } = siteData;
-        const games = wins.w + wins.d + wins.b;
-        return (
-          <div
-            id="opening-additional"
-            key={site}
-            style={{ marginBottom: "1em" }}
-          >
-            <div className="site left">
-              <span className="font-cinzel" style={{ fontWeight: "bold" }}>
-                {site}
-              </span>
+      {data &&
+        Object.entries(data).map(([site, siteData]) => {
+          const { alsoKnownAs, wins } = siteData;
+          const games = wins.w + wins.d + wins.b;
+          return (
+            <div
+              id="opening-additional"
+              key={site}
+              style={{ marginBottom: "1em" }}
+            >
+              <div className="site left">
+                <span className="font-cinzel" style={{ fontWeight: "bold" }}>
+                  {site}
+                </span>
+              </div>
+              <div className="left">
+                <span>
+                  {alsoKnownAs}, &nbsp;
+                  {games.toLocaleString()} games
+                </span>
+              </div>
+              <div>
+                {games ? (
+                  <StackedBarChart {...{ pctgs: winsAsPercentages(wins) }} />
+                ) : null}
+              </div>
             </div>
-            <div className="left">
-              <span>
-                {alsoKnownAs}, &nbsp;
-                {games.toLocaleString()} games
-              </span>
-            </div>
-            <div>
-              {games ? (
-                <StackedBarChart {...{ pctgs: winsAsPercentages(wins) }} />
-              ) : null}
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
 
       {/* Master games database */}
       <MasterGames fen={fen} />
