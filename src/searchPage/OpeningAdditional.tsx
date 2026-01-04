@@ -6,6 +6,7 @@ import { externalOpeningStats } from "../datasource/externalOpeningStats";
 import { dateStringShort } from "../utils/dateStringShort.js";
 import { winsAsPercentages } from "../utils/winsAsPercentages.js";
 import { FEN } from "../types";
+import { MasterGames } from "./MasterGames";
 
 interface ExternalSiteData {
   alsoKnownAs: string;
@@ -37,38 +38,40 @@ export const OpeningAdditionalWithBarChartGrid = ({ fen }: { fen: FEN }) => {
 
   if (isPending) return <span color="yellow">Loading...</span>;
 
-  if (data) {
-    return (
-      <div style={{ marginTop: "1em" }}>
-        {Object.entries(data).map(([site, siteData]) => {
-          const { alsoKnownAs, wins } = siteData;
-          const games = wins.w + wins.d + wins.b;
-          return (
-            <div
-              id="opening-additional"
-              key={site}
-              style={{ marginBottom: "1em" }}
-            >
-              <div className="site left">
-                <span className="font-cinzel" style={{ fontWeight: "bold" }}>
-                  {site}
-                </span>
-              </div>
-              <div className="left">
-                <span>
-                  {alsoKnownAs}, &nbsp;
-                  {games.toLocaleString()} games
-                </span>
-              </div>
-              <div>
-                {games ? (
-                  <StackedBarChart {...{ pctgs: winsAsPercentages(wins) }} />
-                ) : null}
-              </div>
+  return (
+    <div style={{ marginTop: "1em" }}>
+      {/* External site data (FICS/Lichess) */}
+      {data && Object.entries(data).map(([site, siteData]) => {
+        const { alsoKnownAs, wins } = siteData;
+        const games = wins.w + wins.d + wins.b;
+        return (
+          <div
+            id="opening-additional"
+            key={site}
+            style={{ marginBottom: "1em" }}
+          >
+            <div className="site left">
+              <span className="font-cinzel" style={{ fontWeight: "bold" }}>
+                {site}
+              </span>
             </div>
-          );
-        })}
-      </div>
-    );
-  }
+            <div className="left">
+              <span>
+                {alsoKnownAs}, &nbsp;
+                {games.toLocaleString()} games
+              </span>
+            </div>
+            <div>
+              {games ? (
+                <StackedBarChart {...{ pctgs: winsAsPercentages(wins) }} />
+              ) : null}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Master games database */}
+      <MasterGames fen={fen} />
+    </div>
+  );
 };
