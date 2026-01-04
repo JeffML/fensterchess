@@ -21,6 +21,9 @@
  [functions."scoresForFens"] 
    included_files = ["data/scores.json"]
 
+[functions."queryMasterGamesByFen"]
+   included_files = ["data/indexes/opening-by-fen.json", "data/indexes/chunk-*.json"]
+
   ## [functions."courses"] 
   ##  included_files = ["dataForLambdas/courseHtml/**/*.html"]
 
