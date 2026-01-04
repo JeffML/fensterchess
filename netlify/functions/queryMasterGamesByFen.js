@@ -75,13 +75,8 @@ export const handler = async (event) => {
       for (const [indexedFen, ids] of Object.entries(index)) {
         if (getPositionFen(indexedFen) === positionFen) {
           gameIds = ids;
-          console.log('Game IDs:', ids);
           break;
         }
-      }
-      
-      if (!gameIds) {
-        console.log('No position match found');
       }
     }
 
