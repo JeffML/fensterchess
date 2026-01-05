@@ -3,6 +3,7 @@ import { render, waitFor, screen } from "@testing-library/react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { SimilarOpenings } from "../src/searchPage/SimilarOpenings";
 import { OpeningBookContext } from "../src/contexts/OpeningBookContext";
+import { SearchPageContext } from "../src/searchPage/SearchPageContext";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
 import { useRef } from "react";
 
@@ -54,13 +55,19 @@ describe("SimilarOpenings - Back Button Fix", () => {
         moves: "1. e4",
       };
       const setBoardState = vi.fn();
+      const undoStack = [];
+      const setUndoStack = vi.fn();
 
       return (
         <QueryClientProvider client={queryClient}>
           <OpeningBookContext.Provider
             value={{ openingBook: mockOpeningBook, positionBook: {} }}
           >
-            <SimilarOpenings {...{ chess, boardState, setBoardState }} />
+            <SearchPageContext.Provider
+              value={{ chess, boardState, setBoardState, undoStack, setUndoStack }}
+            >
+              <SimilarOpenings />
+            </SearchPageContext.Provider>
           </OpeningBookContext.Provider>
         </QueryClientProvider>
       );
@@ -96,13 +103,19 @@ describe("SimilarOpenings - Back Button Fix", () => {
         moves: "1. e4",
       };
       const setBoardState = vi.fn();
+      const undoStack = [];
+      const setUndoStack = vi.fn();
 
       return (
         <QueryClientProvider client={queryClient}>
           <OpeningBookContext.Provider
             value={{ openingBook: mockOpeningBook, positionBook: {} }}
           >
-            <SimilarOpenings {...{ chess, boardState, setBoardState }} />
+            <SearchPageContext.Provider
+              value={{ chess, boardState, setBoardState, undoStack, setUndoStack }}
+            >
+              <SimilarOpenings />
+            </SearchPageContext.Provider>
           </OpeningBookContext.Provider>
         </QueryClientProvider>
       );
@@ -159,13 +172,19 @@ describe("SimilarOpenings - Back Button Fix", () => {
           expect(chess.current.pgn()).toContain(state.moves);
         }
       });
+      const undoStack = [];
+      const setUndoStack = vi.fn();
 
       return (
         <QueryClientProvider client={queryClient}>
           <OpeningBookContext.Provider
             value={{ openingBook: mockOpeningBook, positionBook: {} }}
           >
-            <SimilarOpenings {...{ chess, boardState, setBoardState }} />
+            <SearchPageContext.Provider
+              value={{ chess, boardState, setBoardState, undoStack, setUndoStack }}
+            >
+              <SimilarOpenings />
+            </SearchPageContext.Provider>
           </OpeningBookContext.Provider>
         </QueryClientProvider>
       );

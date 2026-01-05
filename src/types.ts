@@ -66,6 +66,7 @@ export type PositionBook = Record<string, FEN[]>;
 export interface BoardState {
   fen: FEN | "start";
   moves: string;
+  currentPly?: number; // Current ply index in the move sequence
 }
 
 /**

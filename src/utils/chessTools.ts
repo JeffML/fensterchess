@@ -68,6 +68,19 @@ export function pgnMovesOnly(pgn: PGN): string {
 }
 
 /**
+ * Extract SAN moves from PGN as an array
+ * @example extractSanMoves("1. e4 e5 2. Nf3 Nc6") => ["e4", "e5", "Nf3", "Nc6"]
+ */
+export function extractSanMoves(pgn: PGN): string[] {
+  const movesOnly = pgnMovesOnly(pgn);
+  return movesOnly
+    .replace(/\d+\./g, "") // Remove move numbers "1.", "2.", etc.
+    .trim()
+    .split(/\s+/)
+    .filter((m) => m.length > 0); // Filter empty strings
+}
+
+/**
  * Extract destination squares from a move string
  * @example destinationSquaresFromMoves("1. e4 e5 2. d4 exd4") => ["e4", "e5", "d4", "d4"]
  */

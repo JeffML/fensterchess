@@ -1,5 +1,4 @@
-import { ChessPGN } from "@chess-pgn/chess-pgn";
-import { MutableRefObject, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { parseMoves, toPlay } from "../utils/chessTools";
@@ -8,8 +7,10 @@ import { SimilarOpenings } from "./SimilarOpenings";
 import { NextOpenings } from "./nextOpeningsEtc/NextOpenings";
 import { Roots } from "./nextOpeningsEtc/Roots";
 import { Theory, theoryRequest } from "./Theory";
-import { BoardState, Opening } from "../types";
+import { Opening } from "../types";
 import { SelectedSitesState } from "../contexts/SelectedSitesContext";
+import { useSearchPage } from "./SearchPageContext";
+import { ChessPGN } from "@chess-pgn/chess-pgn";
 
 const chess = new ChessPGN();
 
@@ -66,9 +67,6 @@ const legalMove = (moves: string, variation: Opening): Variation | null => {
 };
 
 interface OpeningTabsProps {
-  chess: MutableRefObject<ChessPGN>;
-  boardState: BoardState;
-  setBoardState: (state: BoardState) => void;
   variations?: Opening[];
   currentMoves?: string;
   handleMovePlayed: (move: string) => void;
@@ -80,9 +78,6 @@ interface OpeningTabsProps {
 }
 
 const OpeningTabs = ({
-  chess: chessRef,
-  boardState,
-  setBoardState,
   variations,
   currentMoves,
   handleMovePlayed,
@@ -92,6 +87,7 @@ const OpeningTabs = ({
   from,
   lastKnownOpening,
 }: OpeningTabsProps) => {
+  const { boardState } = useSearchPage();
   const { fen } = boardState;
   const { move } = toPlay(fen);
 
@@ -160,9 +156,7 @@ const OpeningTabs = ({
         )}
         {searchable && (
           <TabPanel>
-            <SimilarOpenings
-              {...{ chess: chessRef, setBoardState, boardState }}
-            />
+            <SimilarOpenings />
           </TabPanel>
         )}
       </div>

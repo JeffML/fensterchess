@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Chessboard } from "kokopu-react";
-import { MutableRefObject, useContext } from "react";
+import { useContext } from "react";
 import { OpeningBookContext } from "../contexts/OpeningBookContext";
 import "../stylesheets/similar.css";
-import { BoardState, FEN } from "../types";
-import { ChessPGN } from "@chess-pgn/chess-pgn";
+import { FEN } from "../types";
+import { useSearchPage } from "./SearchPageContext";
 
 interface SimilarResponse {
   similar: FEN[];
@@ -23,17 +23,8 @@ const getSimilar = async (fen: FEN): Promise<SimilarResponse> => {
   return data;
 };
 
-interface SimilarOpeningsProps {
-  chess: MutableRefObject<ChessPGN>;
-  boardState: BoardState;
-  setBoardState: (state: BoardState) => void;
-}
-
-const SimilarOpenings = ({
-  chess,
-  boardState,
-  setBoardState,
-}: SimilarOpeningsProps) => {
+const SimilarOpenings = () => {
+  const { chess, boardState, setBoardState } = useSearchPage();
   const { fen } = boardState;
   const context = useContext(OpeningBookContext);
 

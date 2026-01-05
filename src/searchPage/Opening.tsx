@@ -1,13 +1,9 @@
-import { useContext, useEffect, MutableRefObject } from "react";
+import { useContext, useEffect } from "react";
 import { SelectedSitesContext } from "../contexts/SelectedSitesContext";
 import { OpeningTabs } from "./OpeningTabs";
-import { BoardState, Opening as OpeningType } from "../types";
-import { ChessPGN } from "@chess-pgn/chess-pgn";
+import { Opening as OpeningType } from "../types";
 
 interface OpeningProps {
-  chess: MutableRefObject<ChessPGN>;
-  boardState: BoardState;
-  setBoardState: (state: BoardState) => void;
   handleMovePlayed: (move: string) => void;
   data: OpeningType | null;
   lastKnownOpening: Partial<OpeningType>;
@@ -16,9 +12,6 @@ interface OpeningProps {
 }
 
 const Opening = ({
-  chess,
-  boardState,
-  setBoardState,
   handleMovePlayed,
   data,
   lastKnownOpening,
@@ -26,6 +19,7 @@ const Opening = ({
   nearestOpeningInfo,
 }: OpeningProps) => {
   const sites = useContext(SelectedSitesContext);
+  // Context is available to child components (OpeningTabs, MasterGames, etc.)
 
   useEffect(() => {
     if (data) {
@@ -65,9 +59,6 @@ const Opening = ({
 
         <OpeningTabs
           {...{
-            chess,
-            boardState,
-            setBoardState,
             variations,
             currentMoves,
             handleMovePlayed,
@@ -87,9 +78,6 @@ const Opening = ({
         <OpeningName {...{ eco, name, src, score }} />
         <OpeningTabs
           {...{
-            chess,
-            boardState,
-            setBoardState,
             variations: undefined,
             currentMoves: undefined,
             handleMovePlayed,

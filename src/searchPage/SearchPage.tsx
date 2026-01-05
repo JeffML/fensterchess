@@ -1,4 +1,4 @@
-import { lazy, MutableRefObject, Suspense, useState } from "react";
+import { lazy, MutableRefObject, Suspense, useState, useMemo } from "react";
 import { ActionButton } from "../common/Buttons";
 import { NO_ENTRY_FOUND } from "../common/consts";
 import "../stylesheets/search.css";
@@ -10,6 +10,8 @@ import {
   PositionBook,
 } from "../types";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
+import { SearchPageContext } from "./SearchPageContext";
+import { extractSanMoves } from "../utils/chessTools";
 
 // Lazy load heavy components
 const Opening = lazy(() =>
@@ -45,12 +47,16 @@ const SearchPage = ({
   const [lastKnownOpening, setLastKnownOpening] = useState<
     Partial<OpeningType>
   >({});
-  const [undoStack, setUndoStack] = useState<string[]>([]);
+  
+  // Create context value with all shared state
+  const contextValue = useMemo(
+    () => ({ chess, boardState, setBoardState }),
+    [chess, boardState, setBoardState]
+  );
 
   const reset = () => {
     setBoardState({ fen: "start", moves: "" });
     chess.current.reset();
-    setUndoStack([]);
   };
 
   /*
@@ -59,7 +65,6 @@ const SearchPage = ({
     The code below handles this case.
     */
   const handleMovePlayed = (move: string) => {
-    setUndoStack([]); // Clear forward history when new move is made
     chess.current.move(move);
     const fen = chess.current.fen();
     let moves = chess.current.pgn();
@@ -71,39 +76,56 @@ const SearchPage = ({
   };
 
   const back = () => {
-    const history = chess.current.history();
-    if (history.length === 0) return;
+    const { moves, currentPly } = boardState;
+    if (!moves || currentPly === undefined || currentPly === 0) return;
 
-    const lastMove = history[history.length - 1];
-    chess.current.undo();
-
-    // Save the undone move to undo stack for potential forward action
-    setUndoStack([...undoStack, lastMove]);
+    // Navigate to previous ply
+    const targetPly = currentPly - 1;
+    
+    // Load the game from start and navigate to target ply
+    chess.current.reset();
+    const sanMoves = extractSanMoves(moves);
+    
+    for (let i = 0; i < targetPly; i++) {
+      if (i < sanMoves.length) {
+        chess.current.move(sanMoves[i]);
+      }
+    }
 
     const fen = chess.current.fen();
-    const moves = chess.current.pgn();
-    setBoardState({ fen, moves });
+    const currentMoves = chess.current.pgn();
+    setBoardState({ fen, moves, currentPly: targetPly });
   };
 
   const forward = () => {
-    if (undoStack.length === 0) return;
+    const { moves, currentPly } = boardState;
+    if (!moves || currentPly === undefined) return;
 
-    // Get the last undone move and replay it
-    const moveToReplay = undoStack[undoStack.length - 1];
-    chess.current.move(moveToReplay);
+    const sanMoves = extractSanMoves(moves);
+    if (currentPly >= sanMoves.length) return; // Already at end
 
-    // Remove the move from undo stack
-    setUndoStack(undoStack.slice(0, -1));
+    // Navigate to next ply
+    const targetPly = currentPly + 1;
+    
+    // Load the game from start and navigate to target ply
+    chess.current.reset();
+    
+    for (let i = 0; i < targetPly; i++) {
+      if (i < sanMoves.length) {
+        chess.current.move(sanMoves[i]);
+      }
+    }
 
     const fen = chess.current.fen();
-    const moves = chess.current.pgn();
-    setBoardState({ fen, moves });
+    const currentMoves = chess.current.pgn();
+    setBoardState({ fen, moves, currentPly: targetPly });
   };
 
   const { fen } = boardState;
 
   return (
-    <div className="row text-white">
+    <SearchPageContext.Provider value={contextValue}>
+      <div className="row text-white">
       <div className="column" style={{ alignItems: "center" }}>
         <Suspense fallback={<div>Loading chessboard...</div>}>
           <Chessboard
@@ -126,7 +148,9 @@ const SearchPage = ({
             {...{
               onClick: () => forward(),
               text: ">>",
-              disabled: undoStack.length === 0,
+              disabled: boardState.currentPly === undefined || 
+                        !boardState.moves ||
+                        boardState.currentPly >= extractSanMoves(boardState.moves).length,
             }}
           />
         </div>
@@ -164,9 +188,6 @@ const SearchPage = ({
             <Suspense fallback={<div>Loading opening data...</div>}>
               <Opening
                 {...{
-                  chess,
-                  boardState,
-                  setBoardState,
                   handleMovePlayed,
                   data,
                   lastKnownOpening,
@@ -179,6 +200,7 @@ const SearchPage = ({
         </div>
       </div>
     </div>
+    </SearchPageContext.Provider>
   );
 };
 

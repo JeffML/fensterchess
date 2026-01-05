@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { FEN } from "../types";
+import { useSearchPage } from "./SearchPageContext";
 
 interface MasterGame {
   idx: number;
@@ -68,36 +69,42 @@ async function fetchGameMoves(gameId: number): Promise<string> {
 
 export const MasterGames = ({ fen }: { fen: FEN }) => {
   const [page, setPage] = useState(0);
+  const { chess, setBoardState } = useSearchPage();
 
   const handlePlayerClick = async (gameId: number) => {
     try {
       const moves = await fetchGameMoves(gameId);
 
-      // Find the moves input textarea and trigger a paste event
-      const movesInput = document.getElementById(
-        "moves-input"
-      ) as HTMLTextAreaElement;
-      if (!movesInput) {
-        console.error("Moves input not found");
-        return;
+      // Load the full game into chess to find the opening position
+      chess.current.loadPgn(moves);
+      const fullGameMoves = chess.current.pgn();
+
+      // Navigate to the opening position by undoing moves until we reach the opening FEN
+      let currentFen = chess.current.fen();
+      const targetPositionFen = fen.split(' ')[0]; // Position-only FEN (ignore turn/castling)
+      let plyCount = chess.current.history().length;
+      
+      while (currentFen.split(' ')[0] !== targetPositionFen) {
+        const history = chess.current.history();
+        if (history.length === 0) {
+          // Can't go back further - position not found in game
+          console.warn("Opening position not found in game, loading from start");
+          chess.current.reset();
+          chess.current.loadPgn(moves);
+          plyCount = chess.current.history().length;
+          break;
+        }
+        chess.current.undo();
+        plyCount--;
+        currentFen = chess.current.fen();
       }
 
-      // Create and dispatch a paste event with the moves
-      const dataTransfer = new DataTransfer();
-      dataTransfer.setData("text/plain", moves);
-
-      const pasteEvent = new ClipboardEvent("paste", {
-        clipboardData: dataTransfer,
-        bubbles: true,
-        cancelable: true,
-      });
-
-      movesInput.dispatchEvent(pasteEvent);
-
-      // TODO: Navigate to opening position after paste completes
-      // Would need chess ref and setBoardState passed as props
+      // Update board state with the opening position, full game moves, and current ply
+      const resultingFen = chess.current.fen();
+      setBoardState({ fen: resultingFen, moves: fullGameMoves, currentPly: plyCount });
     } catch (error) {
       console.error("Error loading game moves:", error);
+      alert(`Error loading game: ${(error as Error).message}`);
     }
   };
 
