@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { useContext } from "react";
+import { useContext, MutableRefObject } from "react";
 import StackedBarChart from "../common/StackedBarChart";
 import { SelectedSitesContext } from "../contexts/SelectedSitesContext";
 import { externalOpeningStats } from "../datasource/externalOpeningStats";
 import { dateStringShort } from "../utils/dateStringShort.js";
 import { winsAsPercentages } from "../utils/winsAsPercentages.js";
-import { FEN } from "../types";
+import { FEN, BoardState } from "../types";
 import { MasterGames } from "./MasterGames";
+import { ChessPGN } from "@chess-pgn/chess-pgn";
 
 interface ExternalSiteData {
   alsoKnownAs: string;
@@ -21,7 +22,17 @@ interface ExternalStatsResponse {
   [site: string]: ExternalSiteData;
 }
 
-export const OpeningAdditionalWithBarChartGrid = ({ fen }: { fen: FEN }) => {
+export const OpeningAdditionalWithBarChartGrid = ({ 
+  fen, 
+  openingName,
+  chess, 
+  setBoardState 
+}: { 
+  fen: FEN; 
+  openingName?: string;
+  chess: MutableRefObject<ChessPGN>;
+  setBoardState: (state: BoardState) => void;
+}) => {
   const { selectedSites: sites } = useContext(SelectedSitesContext);
 
   const { isError, error, data, isPending } = useQuery<ExternalStatsResponse>({
@@ -72,7 +83,7 @@ export const OpeningAdditionalWithBarChartGrid = ({ fen }: { fen: FEN }) => {
         })}
 
       {/* Master games database */}
-      <MasterGames fen={fen} />
+      <MasterGames fen={fen} openingName={openingName} chess={chess} setBoardState={setBoardState} />
     </div>
   );
 };

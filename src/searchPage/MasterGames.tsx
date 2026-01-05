@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { FEN } from "../types";
-import { useSearchPage } from "./SearchPageContext";
+import { useState, useEffect, useRef, memo, MutableRefObject } from "react";
+import { FEN, BoardState } from "../types";
+import { ChessPGN } from "@chess-pgn/chess-pgn";
 
 interface MasterGame {
   idx: number;
@@ -67,9 +67,30 @@ async function fetchGameMoves(gameId: number): Promise<string> {
   return data.moves;
 }
 
-export const MasterGames = ({ fen }: { fen: FEN }) => {
+const MasterGamesComponent = ({ 
+  fen, 
+  openingName,
+  chess, 
+  setBoardState 
+}: { 
+  fen: FEN; 
+  openingName?: string;
+  chess: MutableRefObject<ChessPGN>;
+  setBoardState: (state: BoardState) => void;
+}) => {
   const [page, setPage] = useState(0);
-  const { chess, setBoardState } = useSearchPage();
+  const [isFlashing, setIsFlashing] = useState(false);
+  const prevOpeningNameRef = useRef<string | undefined>(openingName);
+
+  // Detect when opening name changes and trigger flash
+  useEffect(() => {
+    if (openingName && prevOpeningNameRef.current && openingName !== prevOpeningNameRef.current) {
+      setIsFlashing(true);
+      const timer = setTimeout(() => setIsFlashing(false), 800);
+      return () => clearTimeout(timer);
+    }
+    prevOpeningNameRef.current = openingName;
+  }, [openingName]);
 
   const handlePlayerClick = async (gameId: number) => {
     try {
@@ -81,14 +102,16 @@ export const MasterGames = ({ fen }: { fen: FEN }) => {
 
       // Navigate to the opening position by undoing moves until we reach the opening FEN
       let currentFen = chess.current.fen();
-      const targetPositionFen = fen.split(' ')[0]; // Position-only FEN (ignore turn/castling)
+      const targetPositionFen = fen.split(" ")[0]; // Position-only FEN (ignore turn/castling)
       let plyCount = chess.current.history().length;
-      
-      while (currentFen.split(' ')[0] !== targetPositionFen) {
+
+      while (currentFen.split(" ")[0] !== targetPositionFen) {
         const history = chess.current.history();
         if (history.length === 0) {
           // Can't go back further - position not found in game
-          console.warn("Opening position not found in game, loading from start");
+          console.warn(
+            "Opening position not found in game, loading from start"
+          );
           chess.current.reset();
           chess.current.loadPgn(moves);
           plyCount = chess.current.history().length;
@@ -101,7 +124,11 @@ export const MasterGames = ({ fen }: { fen: FEN }) => {
 
       // Update board state with the opening position, full game moves, and current ply
       const resultingFen = chess.current.fen();
-      setBoardState({ fen: resultingFen, moves: fullGameMoves, currentPly: plyCount });
+      setBoardState({
+        fen: resultingFen,
+        moves: fullGameMoves,
+        currentPly: plyCount,
+      });
     } catch (error) {
       console.error("Error loading game moves:", error);
       alert(`Error loading game: ${(error as Error).message}`);
@@ -113,6 +140,11 @@ export const MasterGames = ({ fen }: { fen: FEN }) => {
     queryFn: () => fetchMasterGames(fen, page),
     staleTime: 24 * 60 * 60 * 1000, // 24 hours - data is immutable
   });
+
+  // Reset page when opening name changes
+  useEffect(() => {
+    setPage(0);
+  }, [openingName]);
 
   if (isError) {
     console.error(error);
@@ -145,7 +177,15 @@ export const MasterGames = ({ fen }: { fen: FEN }) => {
     <div style={{ marginTop: "2em", marginBottom: "1em" }}>
       <div
         className="font-cinzel"
-        style={{ fontWeight: "bold", color: "#fff", marginBottom: "0.5em" }}
+        style={{
+          fontWeight: "bold",
+          color: "#fff",
+          marginBottom: "0.5em",
+          transition: "background-color 0.3s ease",
+          backgroundColor: isFlashing ? "#4a7c59" : "transparent",
+          padding: "0.25em 0.5em",
+          borderRadius: "4px",
+        }}
       >
         Master Games ({data.total.toLocaleString()} positions)
       </div>
@@ -260,3 +300,18 @@ export const MasterGames = ({ fen }: { fen: FEN }) => {
     </div>
   );
 };
+
+// Memoize to prevent re-renders when fen changes but opening name stays the same
+export const MasterGames = memo(MasterGamesComponent, (prevProps, nextProps) => {
+  // Always compare chess and setBoardState references
+  if (prevProps.chess !== nextProps.chess || prevProps.setBoardState !== nextProps.setBoardState) {
+    return false;
+  }
+  
+  // Only re-render when opening name changes (or fen changes if no opening name)
+  if (nextProps.openingName) {
+    return prevProps.openingName === nextProps.openingName;
+  }
+  // If no opening name, re-render when fen changes
+  return prevProps.fen === nextProps.fen;
+});

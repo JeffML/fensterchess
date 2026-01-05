@@ -93,7 +93,6 @@ const SearchPage = ({
     }
 
     const fen = chess.current.fen();
-    const currentMoves = chess.current.pgn();
     setBoardState({ fen, moves, currentPly: targetPly });
   };
 
@@ -117,7 +116,6 @@ const SearchPage = ({
     }
 
     const fen = chess.current.fen();
-    const currentMoves = chess.current.pgn();
     setBoardState({ fen, moves, currentPly: targetPly });
   };
 

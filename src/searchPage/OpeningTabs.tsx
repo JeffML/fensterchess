@@ -87,7 +87,7 @@ const OpeningTabs = ({
   from,
   lastKnownOpening,
 }: OpeningTabsProps) => {
-  const { boardState } = useSearchPage();
+  const { boardState, chess, setBoardState } = useSearchPage();
   const { fen } = boardState;
   const { move } = toPlay(fen);
 
@@ -147,6 +147,9 @@ const OpeningTabs = ({
                 {...{
                   eco,
                   fen,
+                  openingName: name,
+                  chess,
+                  setBoardState,
                   name,
                   sites: sites.selectedSites,
                 }}
