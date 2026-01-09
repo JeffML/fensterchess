@@ -1,0 +1,322 @@
+# Master Games Browser - Implementation Plan
+
+## Overview
+
+Add a "Master Games" browser to the PGN Import page that allows users to browse and explore the master games database organized by opening.
+
+**UI Layout:**
+
+- Add "Master Games" radio button alongside TWIC and Upload PGN options
+- **Top Panel Structure (replaces PgnListPanel + RssFeed grid):**
+  - **Right side:** Searchable/selectable list of openings from master games database (similar to Visualizations/ECO categories)
+  - **Left side:** List of masters who played the selected opening(s), with count of games for each master
+- **Bottom Panel (existing tabs):**
+  - Hide **Summary** tab when in Master Games mode (not applicable)
+  - Show **Games** tab with games from selected master
+  - **Opening** tab behavior TBD (likely shows opening details)
+
+**Right Panel - Opening Browser:**
+
+- Openings organized by ECO category (A, B, C, D, E) - collapsible/expandable groups
+- Search input at top: Filter by FEN or partial opening name
+- Display format: `Opening Name - X games`
+- Only show openings that exist in master games database
+- **Multi-select support:** Users can select multiple openings
+
+**Left Panel - Master List:**
+
+- Initially empty (shows placeholder text)
+- After opening(s) selected: Display masters who played ANY of the selected openings
+- Format:
+  - Player name
+  - Game count (# of games master played using any of the selected openings)
+- When master is selected: Load their games into the **Games** tab (existing lower panel tab)
+- Games shown in **alphabetical order by player name** (White/Black combined)
+- Use debouncing if necessary for performance
+
+---
+
+## Implementation Tasks
+
+### Day 1: Backend / Serverless Functions
+
+**Goal:** Create data layer for querying master games indexes
+
+**Tasks:**
+
+1. **Create `netlify/functions/getMasterGameOpenings.js`**
+
+   - Query `opening-by-eco.json` to get all openings grouped by ECO category
+   - Return: `{ A: [...], B: [...], C: [...], D: [...], E: [...] }`
+   - Each opening: `{ fen, name, eco, gameCount }`
+   - Include auth with `VITE_API_SECRET_TOKEN`
+
+2. **Create `netlify/functions/getMastersByOpenings.js`**
+
+   - Input: Array of FEN strings (selected openings)
+   - Query `opening-by-fen.json` to get game indices for each FEN
+   - Query `master-index.json` to get player names (White/Black) for each game
+   - Aggregate: Count games per master across all selected openings
+   - Return: Array of `{ playerName, gameCount }` sorted alphabetically
+   - Include auth with `VITE_API_SECRET_TOKEN`
+
+3. **Create `netlify/functions/getGamesByMaster.js`**
+
+   - Input: Player name + array of FEN strings (selected openings)
+   - Query `master-index.json` to find all games where player is White OR Black
+   - Filter to only games using ANY of the selected openings (via `opening-by-fen.json`)
+   - Return: Array of games with full metadata (White, Black, WhiteElo, BlackElo, Event, Result, Date)
+   - Sort by player name (White/Black alphabetically)
+   - Include auth with `VITE_API_SECRET_TOKEN`
+
+4. **Optional: Create `netlify/functions/searchMasterGameOpenings.js`**
+   - Search by partial opening name or FEN
+   - Return matching openings with game counts
+   - Can be deferred if client-side filtering is sufficient
+
+**Deliverable:** Three (or four) working serverless functions with auth
+
+---
+
+### Day 2: Basic UI Structure & Radio Button
+
+**Goal:** Add Master Games option and create component skeleton
+
+**Tasks:**
+
+1. **Add "Master Games" radio button to PGN Import page**
+
+   - Update `PgnListPanel.tsx` to include new radio option
+   - Add state management for Master Games mode (alongside TWIC/Upload PGN)
+   - Position alongside existing TWIC and Upload PGN buttons
+
+2. **Create `src/pgnImportPage/MasterGamesBrowser.tsx`**
+
+   - Replace top panel grid when Master Games mode active
+   - Two-panel layout:
+     - **Right panel:** Opening browser (placeholder for now)
+     - **Left panel:** Master list (empty state with placeholder text)
+   - Basic styling matching existing page design
+   - Responsive grid layout similar to existing PgnListPanel + RssFeed
+
+3. **Update `AnalyzePgnPage.tsx`**
+
+   - Conditionally render `MasterGamesBrowser` vs existing grid when Master Games selected
+   - Pass mode state down to components
+
+4. **Hide Summary tab in Master Games mode**
+   - Update `PgnTabsPanel.tsx` to conditionally hide Summary tab
+   - Add prop to indicate Master Games mode
+   - Adjust tab indices when Summary is hidden
+
+**Deliverable:** Can click Master Games, see empty two-panel layout, Summary tab is hidden
+
+---
+
+### Day 3: Right Panel - Opening Browser
+
+**Goal:** Display openings organized by ECO category with search
+
+**Tasks:**
+
+1. **Fetch openings data on component mount**
+
+   - Call `getMasterGameOpenings` serverless function using React Query
+   - Store in component state
+   - Add loading state and error handling
+
+2. **Build ECO category collapsible groups**
+
+   - One section per category (A, B, C, D, E)
+   - Click to expand/collapse
+   - Show opening count per category in header (e.g., "Category A - 2,341 games")
+   - Use similar styling to Visualizations ECO categories
+
+3. **Display openings within each category**
+
+   - Format: `Opening Name - X games`
+   - Make clickable with checkbox or multi-select UI
+   - Handle multi-selection state (highlight selected openings)
+   - Store selected FENs in state
+
+4. **Add search input at top**
+   - Input field for FEN or partial opening name
+   - Clear button
+   - Filter displayed openings (hide empty categories)
+   - Debounce input (300ms)
+   - Maintain selection state during filtering
+
+**Deliverable:** Can browse, search, and select multiple openings by ECO category
+
+---
+
+### Day 4: Left Panel - Master List
+
+**Goal:** Show masters when opening(s) are selected
+
+**Tasks:**
+
+1. **Fetch masters when opening selection changes**
+
+   - Call `getMastersByOpenings` with selected FEN array
+   - Use debouncing (300ms) to avoid excessive calls during multi-select
+   - Store masters in state
+   - Add loading state
+
+2. **Display master list**
+
+   - Show placeholder text when no openings selected: "Select one or more openings to view masters"
+   - After selection: List of masters with format:
+     - `{Player Name} - {X games}`
+   - Make clickable to select a master
+   - Highlight selected master
+
+3. **Handle empty states and errors**
+   - No masters found for selected openings
+   - Network errors
+   - Loading indicators
+
+**Deliverable:** Selecting opening(s) shows masters who played them in left panel
+
+---
+
+### Day 5: Games Tab Integration
+
+**Goal:** Load master's games into existing Games tab
+
+**Tasks:**
+
+1. **Fetch games when master is selected**
+
+   - Call `getGamesByMaster` with player name + selected FENs
+   - Store games in format compatible with existing `GamesTab` component
+   - Handle loading state
+
+2. **Pass games to PgnTabsPanelContainer**
+
+   - Update `AnalyzePgnPage.tsx` to pass master games data to lower panel
+   - Create data structure compatible with existing `PgnSummary` interface
+   - Populate `GameDatabase` with master's games
+
+3. **Update `PgnTabsPanel` for Master Games mode**
+
+   - Accept Master Games mode prop
+   - Hide Summary tab (already done in Day 2)
+   - Populate Games tab with master's games
+   - Handle Opening tab (show opening details for selected game?)
+
+4. **Handle game display in Games tab**
+   - Reuse existing `GamesTab` component
+   - Ensure game format matches expected structure
+   - Sort games by player name (White/Black alphabetically)
+
+**Deliverable:** Clicking master loads their games into Games tab
+
+---
+
+### Day 6: Polish, Testing & Documentation
+
+**Goal:** Production-ready feature
+
+**Tasks:**
+
+1. **Error handling & edge cases**
+
+   - Handle empty master games database gracefully
+   - Handle network failures with retry logic
+   - Handle malformed data
+   - Handle no openings selected (clear master list)
+   - Handle no games found for master
+
+2. **Loading states & UX polish**
+
+   - Loading indicators for all async operations (openings, masters, games)
+   - Smooth transitions between states
+   - Responsive design check (mobile/tablet)
+   - Dark theme compatibility
+   - Proper spacing and alignment
+
+3. **Performance optimization**
+
+   - Debouncing on search input
+   - Debouncing on opening selection changes
+   - Lazy loading for large game lists (if needed)
+   - Memoization of expensive computations
+
+4. **Testing**
+
+   - Manual testing of all workflows:
+     - Select single opening → masters appear → select master → games load
+     - Select multiple openings → masters update → select master → games load
+     - Search openings → select → masters update
+     - Clear selections → reset state
+   - Test with actual master games data
+   - Test error scenarios (network failures, empty data)
+   - Test responsive behavior
+
+5. **Documentation**
+   - Update README or RELEASE_NOTES with new feature
+   - Add TODO comments for future enhancements:
+     - Game click behavior (open game viewer or load to board)
+     - Filter games by event, date range
+     - Export selected games
+     - Statistics view
+
+**Deliverable:** Fully functional Master Games browser ready for production
+
+---
+
+## Data Flow Summary
+
+1. **User selects opening(s)** (right panel) → Store selected FENs in state
+2. **Selected FENs trigger fetch** → `getMastersByOpenings(fens)` → Display masters in left panel
+3. **User selects master** → `getGamesByMaster(player, fens)` → Load games into Games tab
+4. **User clicks game** (future) → Load game to Opening tab or analysis board
+
+---
+
+## Dependencies
+
+- Master games indexes must exist in `data/indexes/`:
+  - `master-index.json` - Full game metadata
+  - `opening-by-eco.json` - Openings grouped by ECO
+  - `opening-by-fen.json` - Games indexed by position FEN
+- Netlify dev environment for testing serverless functions locally
+- React Query for data fetching and caching
+- Existing `PgnTabsPanel` and `GamesTab` components
+
+---
+
+## Component Structure
+
+```
+AnalyzePgnPage
+├── [Master Games mode]
+│   ├── MasterGamesBrowser (top panel)
+│   │   ├── OpeningBrowser (right panel)
+│   │   │   ├── Search input
+│   │   │   └── ECO category groups (collapsible)
+│   │   │       └── Opening items (multi-select)
+│   │   └── MasterList (left panel)
+│   │       └── Master items (clickable)
+│   └── PgnTabsPanelContainer (bottom panel)
+│       └── PgnTabsPanel
+│           ├── [Summary tab - HIDDEN]
+│           ├── Games tab (master's games)
+│           └── Opening tab (selected game details)
+└── [TWIC/Upload mode - existing]
+    ├── PgnListPanel + RssFeed grid (top panel)
+    └── PgnTabsPanelContainer (bottom panel)
+```
+
+---
+
+## Future Enhancements (Post-Implementation)
+
+- Game click behavior: Open game viewer or load moves to analysis board
+- Filter games by event, date range, result
+- Sort games by date, rating
+- Export selected games to PGN file
+- Statistics view for selected opening (win/loss/draw percentages)
+- Player profile view (all games by a master)
+- Compare masters (side-by-side statistics)
