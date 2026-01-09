@@ -287,6 +287,80 @@ Add a "Master Games" browser to the PGN Import page that allows users to browse 
 
 ---
 
+## Data Scale & Netlify Blob Storage Planning
+
+**Current Status (pgnmentor only - 19,211 games):**
+
+- Game chunks (5 files): 19.3 MB (~4 MB per chunk, 4,000 games each)
+- Search indexes: 8.7 MB (opening-by-eco, opening-by-fen, player-index, etc.)
+- **Total storage: ~28 MB**
+
+**Storage Efficiency:**
+
+- Average size per game: ~1,047 bytes (~1 KB)
+- 10,000 games ≈ 10 MB (game data)
+- Indexes scale sub-linearly (opening FENs don't grow 1:1 with games)
+
+**Netlify Blob Limits (Pro Tier):**
+
+- Storage: **50 GB** (5,000x more than current usage)
+- Bandwidth: **1 TB/month** (more than sufficient)
+- Current usage: ~28 MB (0.056% of storage limit)
+
+**Planned Data Sources:**
+
+1. **pgnmentor.com (all masters):** 19,211 games ✅ COMPLETE
+
+   - Carlsen, Kasparov, Nakamura, Anand, Fischer
+   - Storage: ~20 MB chunks + 9 MB indexes = **29 MB**
+
+2. **Lichess Elite Database (2400+ rated, titled players):**
+   - December 2024: Estimated 3,000-5,000 games (filtered)
+   - Per month: ~5 MB game data + ~1 MB index growth
+   - **12 months (2024):** ~60 MB game data + ~20 MB indexes = **~80 MB**
+   - **24 months (2023-2024):** ~120 MB game data + ~35 MB indexes = **~155 MB**
+   - **36 months (2022-2024):** ~180 MB game data + ~50 MB indexes = **~230 MB**
+
+**Recommended Scale (Pro Tier - Aggressive Import):**
+
+- **pgnmentor:** 19,211 games (~30 MB) ✅
+- **Lichess Elite:** 24-36 months (2022-2024) = **~60,000-90,000 games (~180-270 MB)**
+- **Indexes:** ~50-80 MB (player, opening, event, date indexes)
+- **Total: ~260-380 MB** (less than 1% of 50 GB Pro tier limit)
+- **Bandwidth:** Minimal (indexes cached by service worker, chunks loaded on-demand)
+
+**Maximum Theoretical Scale (Pro Tier Headroom):**
+
+- **100,000 games:** ~100 MB chunks + 50 MB indexes = **~150 MB** (0.3% of limit)
+- **500,000 games:** ~500 MB chunks + 150 MB indexes = **~650 MB** (1.3% of limit)
+- **1,000,000 games:** ~1 GB chunks + 250 MB indexes = **~1.25 GB** (2.5% of limit)
+
+**Realistically, you could import ALL available Lichess Elite data and still use <5% of storage.**
+
+**Performance Impact:**
+
+- Chunks are loaded on-demand (only when master is selected)
+- Indexes loaded once and cached (service worker + React Query)
+- No impact on initial page load
+- Opening browser loads in ~150-200ms (opening-by-eco.json = 203 KB)
+
+**Recommended Action Items (Pro Tier):**
+
+- **Phase 1:** Import 24 months of Lichess Elite data (2023-2024) = ~60K games, ~180 MB
+- **Phase 2 (optional):** Expand to 36 months (2022-2024) = ~90K games, ~270 MB
+- **Phase 3 (optional):** Add more pgnmentor masters or go deeper on Lichess
+- Monitor blob storage usage in Netlify dashboard
+- Document storage in source-tracking.json
+
+**Pro Tier Benefits:**
+
+- No need to aggressively prune duplicates or filter
+- Can include lower-rated titled players (FM, IM)
+- Can import full tournament histories
+- Plenty of headroom for future growth (using <1% of storage at 90K games)
+
+---
+
 ## Component Structure
 
 ```
