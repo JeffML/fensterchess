@@ -1,5 +1,9 @@
 # Master Games Browser - Implementation Plan
 
+> **This is the authoritative implementation document.**  
+> Historical context: See `masterGameDatabase.md` for original requirements.  
+> Analysis data (now archived): See `masterGameDatabase-analysis.md` for scale/storage research.
+
 ## Overview
 
 Add a "Master Games" browser to the PGN Import page that allows users to browse and explore the master games database organized by opening.
@@ -20,7 +24,7 @@ Add a "Master Games" browser to the PGN Import page that allows users to browse 
 - Openings organized by ECO category (A, B, C, D, E) - collapsible/expandable groups
 - Search input at top: Filter by FEN or partial opening name
 - Display format: `Opening Name - X games`
-- Only show openings that exist in master games database
+- **IMPORTANT: Only show the ~4,008 openings from `opening-by-name.json`** (openings that actually exist in master games, not all 15,836 eco.json openings)
 - **Multi-select support:** Users can select multiple openings
 
 **Left Panel - Master List:**
@@ -36,6 +40,33 @@ Add a "Master Games" browser to the PGN Import page that allows users to browse 
 
 ---
 
+## Existing Serverless Functions
+
+The following functions already exist and can be reused:
+
+| Function                   | Purpose                                 | Status      |
+| -------------------------- | --------------------------------------- | ----------- |
+| `queryMasterGamesByFen.js` | Query games by FEN position (paginated) | ✅ Complete |
+| `getMasterGameMoves.js`    | Fetch full moves for a game by `gameId` | ✅ Complete |
+
+**Index files available in `data/indexes/`:**
+
+- `master-index.json` - Full game metadata
+- `opening-by-eco.json` - Openings grouped by ECO code (467 unique ECO codes)
+- `opening-by-fen.json` - Games indexed by position FEN (4,573 unique positions)
+- `opening-by-name.json` - **KEY INDEX**: eco.json opening name → `{ fen, eco, gameIds }` (4,008 unique openings in master games)
+- `player-index.json` - Games indexed by player name (1,602 unique players)
+- `chunk-*.json` - Game data chunks (~4,000 games each, 5 chunks total)
+- `game-to-players.json` - Fast lookup: gameId → [white, black] (564 KB, for instant player aggregation)
+- `ancestor-to-descendants.json` - Ancestor FEN → descendant FENs with master games (4.5 MB, enables "French Defense" → all specific variations)
+
+**Standalone build scripts (no full rebuild needed):**
+
+- `scripts/buildGameToPlayers.ts` - Regenerates game-to-players.json from chunks
+- `scripts/buildAncestorIndex.ts` - Regenerates ancestor-to-descendants.json from opening-by-fen.json + fromTo data
+
+---
+
 ## Implementation Tasks
 
 ### Day 1: Backend / Serverless Functions
@@ -46,35 +77,48 @@ Add a "Master Games" browser to the PGN Import page that allows users to browse 
 
 1. **Create `netlify/functions/getMasterGameOpenings.js`**
 
-   - Query `opening-by-eco.json` to get all openings grouped by ECO category
+   - Query `opening-by-name.json` to get all 4,008 openings that exist in master games
+   - Group by ECO category letter (A, B, C, D, E) using the `eco` field
    - Return: `{ A: [...], B: [...], C: [...], D: [...], E: [...] }`
-   - Each opening: `{ fen, name, eco, gameCount }`
+   - Each opening: `{ name, fen, eco, gameCount }` (gameCount = gameIds.length)
    - Include auth with `VITE_API_SECRET_TOKEN`
 
 2. **Create `netlify/functions/getMastersByOpenings.js`**
 
-   - Input: Array of FEN strings (selected openings)
-   - Query `opening-by-fen.json` to get game indices for each FEN
-   - Query `master-index.json` to get player names (White/Black) for each game
+   - Input: Array of opening names (selected openings)
+   - Query `opening-by-name.json` to get game indices for each opening
+   - Use `game-to-players.json` for fast player aggregation (no chunk loading)
    - Aggregate: Count games per master across all selected openings
-   - Return: Array of `{ playerName, gameCount }` sorted alphabetically
+   - **Pagination:** `page` (default 0), `pageSize` (default 25)
+   - **Sorting:** `sortBy` = "name" | "gameCount", `sortOrder` = "asc" | "desc"
+   - Return: `{ masters: [{ playerName, gameCount }], total, page, pageSize }`
    - Include auth with `VITE_API_SECRET_TOKEN`
 
-3. **Create `netlify/functions/getGamesByMaster.js`**
+3. **Create `netlify/functions/getGamesByMasterAndOpening.js`**
 
-   - Input: Player name + array of FEN strings (selected openings)
-   - Query `master-index.json` to find all games where player is White OR Black
-   - Filter to only games using ANY of the selected openings (via `opening-by-fen.json`)
-   - Return: Array of games with full metadata (White, Black, WhiteElo, BlackElo, Event, Result, Date)
-   - Sort by player name (White/Black alphabetically)
+   - Input: Player name + array of opening names
+   - Query `opening-by-name.json` to get game indices for selected openings
+   - Filter to only games where player is White OR Black
+   - Load full game metadata from chunks
+   - Return: Array of games with full metadata (White, Black, WhiteElo, BlackElo, Event, Result, Date, opening)
    - Include auth with `VITE_API_SECRET_TOKEN`
 
-4. **Optional: Create `netlify/functions/searchMasterGameOpenings.js`**
-   - Search by partial opening name or FEN
-   - Return matching openings with game counts
-   - Can be deferred if client-side filtering is sufficient
+4. **Create `netlify/functions/getMasterGamesByPosition.js`** (for "enter moves" use case)
 
-**Deliverable:** Three (or four) working serverless functions with auth
+   - Input: FEN string
+   - Check `opening-by-fen.json` for direct match → get gameIds
+   - If no direct match, check `ancestor-to-descendants.json` for descendant FENs → get all gameIds
+   - Use `game-to-players.json` for fast player aggregation
+   - Return: `{ openings: [{ name, fen, eco, gameCount }], masters: [{ playerName, gameCount }], totalGames }`
+   - **Pagination** for masters: `page`, `pageSize` (default 25)
+   - **Sorting:** `sortBy` = "name" | "gameCount", `sortOrder` = "asc" | "desc"
+   - Include auth with `VITE_API_SECRET_TOKEN`
+
+5. **Client-side search** (no serverless function needed)
+   - Search/filter opening list by partial name or ECO code
+   - Done in browser since we load all 4,008 openings anyway
+
+**Deliverable:** Four working serverless functions with auth
 
 ---
 
@@ -389,8 +433,39 @@ AnalyzePgnPage
 
 - Game click behavior: Open game viewer or load moves to analysis board
 - Filter games by event, date range, result
-- Sort games by date, rating
+- Sort games by date
 - Export selected games to PGN file
 - Statistics view for selected opening (win/loss/draw percentages)
 - Player profile view (all games by a master)
 - Compare masters (side-by-side statistics)
+- **Sort masters by peak rating:** Integrate FIDE rating list(s) to lookup peak ratings for each master, enabling rating-based sorting
+
+---
+
+## Incremental Update Strategy (For Adding New Games)
+
+**Goal:** Add new games (e.g., monthly Lichess Elite updates) without full rebuild
+
+**Current architecture supports this:**
+
+- `deduplication-index.json` - Hash → gameId prevents duplicates
+- `source-tracking.json` - Tracks processed files with checksums
+- Chunk files - Append-only, 4,000 games each
+
+**Incremental update workflow:**
+
+1. Download new source files (e.g., lichess-elite-2026-01.pgn)
+2. Filter and deduplicate against `deduplication-index.json`
+3. Assign gameIds starting from current `totalGames`
+4. Append to latest chunk (or create new chunk if full)
+5. Update indexes incrementally:
+   - Add new gameIds to `opening-by-fen.json`, `player-index.json`, etc.
+   - Merge new entries into existing index files
+6. Update `master-index.json` with new totals
+7. Re-run standalone scripts: `buildGameToPlayers.ts`, `buildAncestorIndex.ts`
+
+**Script needed:** `scripts/addNewGames.ts`
+
+- Input: New PGN file(s)
+- Output: Updated chunks + indexes
+- Does NOT require re-downloading or reprocessing existing games

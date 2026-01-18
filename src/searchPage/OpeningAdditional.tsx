@@ -22,13 +22,13 @@ interface ExternalStatsResponse {
   [site: string]: ExternalSiteData;
 }
 
-export const OpeningAdditionalWithBarChartGrid = ({ 
-  fen, 
+export const OpeningAdditionalWithBarChartGrid = ({
+  fen,
   openingName,
-  chess, 
-  setBoardState 
-}: { 
-  fen: FEN; 
+  chess,
+  setBoardState,
+}: {
+  fen: FEN;
   openingName?: string;
   chess: MutableRefObject<ChessPGN>;
   setBoardState: (state: BoardState) => void;
@@ -83,7 +83,12 @@ export const OpeningAdditionalWithBarChartGrid = ({
         })}
 
       {/* Master games database */}
-      <MasterGames fen={fen} openingName={openingName} chess={chess} setBoardState={setBoardState} />
+      <MasterGames
+        fen={fen}
+        openingName={openingName}
+        chess={chess}
+        setBoardState={setBoardState}
+      />
     </div>
   );
 };

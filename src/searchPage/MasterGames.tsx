@@ -67,13 +67,13 @@ async function fetchGameMoves(gameId: number): Promise<string> {
   return data.moves;
 }
 
-const MasterGamesComponent = ({ 
-  fen, 
+const MasterGamesComponent = ({
+  fen,
   openingName,
-  chess, 
-  setBoardState 
-}: { 
-  fen: FEN; 
+  chess,
+  setBoardState,
+}: {
+  fen: FEN;
   openingName?: string;
   chess: MutableRefObject<ChessPGN>;
   setBoardState: (state: BoardState) => void;
@@ -84,7 +84,11 @@ const MasterGamesComponent = ({
 
   // Detect when opening name changes and trigger flash
   useEffect(() => {
-    if (openingName && prevOpeningNameRef.current && openingName !== prevOpeningNameRef.current) {
+    if (
+      openingName &&
+      prevOpeningNameRef.current &&
+      openingName !== prevOpeningNameRef.current
+    ) {
       setIsFlashing(true);
       const timer = setTimeout(() => setIsFlashing(false), 800);
       return () => clearTimeout(timer);
@@ -302,16 +306,22 @@ const MasterGamesComponent = ({
 };
 
 // Memoize to prevent re-renders when fen changes but opening name stays the same
-export const MasterGames = memo(MasterGamesComponent, (prevProps, nextProps) => {
-  // Always compare chess and setBoardState references
-  if (prevProps.chess !== nextProps.chess || prevProps.setBoardState !== nextProps.setBoardState) {
-    return false;
+export const MasterGames = memo(
+  MasterGamesComponent,
+  (prevProps, nextProps) => {
+    // Always compare chess and setBoardState references
+    if (
+      prevProps.chess !== nextProps.chess ||
+      prevProps.setBoardState !== nextProps.setBoardState
+    ) {
+      return false;
+    }
+
+    // Only re-render when opening name changes (or fen changes if no opening name)
+    if (nextProps.openingName) {
+      return prevProps.openingName === nextProps.openingName;
+    }
+    // If no opening name, re-render when fen changes
+    return prevProps.fen === nextProps.fen;
   }
-  
-  // Only re-render when opening name changes (or fen changes if no opening name)
-  if (nextProps.openingName) {
-    return prevProps.openingName === nextProps.openingName;
-  }
-  // If no opening name, re-render when fen changes
-  return prevProps.fen === nextProps.fen;
-});
+);

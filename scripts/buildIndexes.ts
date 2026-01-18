@@ -196,22 +196,31 @@ function buildOpeningByFenIndex(games: GameMetadata[]): OpeningByFenIndex {
 }
 
 function buildOpeningByNameIndex(games: GameMetadata[]): OpeningByNameIndex {
-  console.log("\n📖 Building Opening by Name index...");
+  console.log("\n📖 Building Opening by Name index (eco.json names)...");
 
   const index: OpeningByNameIndex = {};
 
   for (const game of games) {
-    if (game.opening) {
-      const normalized = game.opening.toLowerCase().trim();
+    // Use eco.json enriched opening name, FEN, and ECO
+    const openingName = game.ecoJsonOpening;
+    const fen = game.ecoJsonFen;
+    const eco = game.ecoJsonEco;
 
-      if (!index[normalized]) {
-        index[normalized] = [];
+    if (openingName && fen && eco) {
+      if (!index[openingName]) {
+        index[openingName] = {
+          fen,
+          eco,
+          gameIds: [],
+        };
       }
-      index[normalized].push(game.idx);
+      index[openingName].gameIds.push(game.idx);
     }
   }
 
-  console.log(`  ✅ Indexed ${Object.keys(index).length} unique opening names`);
+  console.log(
+    `  ✅ Indexed ${Object.keys(index).length} unique eco.json opening names`
+  );
   return index;
 }
 

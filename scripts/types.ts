@@ -72,10 +72,16 @@ export interface OpeningByFenIndex {
 
 /**
  * Opening by name index
- * Maps opening names to game indices (normalized lowercase)
+ * Maps eco.json opening names to FEN, ECO code, and game indices
  */
+export interface OpeningByNameEntry {
+  fen: string; // eco.json FEN for this opening
+  eco: string; // ECO code
+  gameIds: number[]; // Game indices
+}
+
 export interface OpeningByNameIndex {
-  [openingName: string]: number[];
+  [openingName: string]: OpeningByNameEntry;
 }
 
 /**
