@@ -10,6 +10,7 @@ import "react-tabs/style/react-tabs.css";
 import "../stylesheets/grid.css";
 import "../stylesheets/tabs.css";
 import { PgnTabsPanel } from "./PgnTabsPanel";
+import { MasterGamesPanel } from "./MasterGamesPanel";
 
 interface PgnFileRequest {
   link: string;
@@ -228,19 +229,12 @@ export const PgnTabsPanelContainer = ({
         </div>
       );
     }
-    // TODO: Implement master games display
+    // Show master games panel
     return (
-      <div className="white" style={{ padding: "1em" }}>
-        <p>
-          Showing games for <strong>{selectedMaster}</strong>
-        </p>
-        <p style={{ color: "#888" }}>
-          Openings: {selectedOpenings.join(", ")}
-        </p>
-        <p style={{ color: "#666", marginTop: "1em" }}>
-          (Games tab coming in Day 5)
-        </p>
-      </div>
+      <MasterGamesPanel
+        selectedMaster={selectedMaster}
+        selectedOpenings={selectedOpenings}
+      />
     );
   }
 
