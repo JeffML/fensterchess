@@ -184,9 +184,17 @@ interface PgnLink {
 
 interface PgnTabsPanelContainerProps {
   link: PgnLink;
+  pgnMode?: "twic" | "local" | "master";
+  selectedMaster?: string | null;
+  selectedOpenings?: string[];
 }
 
-export const PgnTabsPanelContainer = ({ link }: PgnTabsPanelContainerProps) => {
+export const PgnTabsPanelContainer = ({
+  link,
+  pgnMode,
+  selectedMaster,
+  selectedOpenings,
+}: PgnTabsPanelContainerProps) => {
   const { url = null, pgn } = link;
 
   // controlled mode; see https://www.npmjs.com/package/react-tabs#controlled-vs-uncontrolled-mode
@@ -210,6 +218,31 @@ export const PgnTabsPanelContainer = ({ link }: PgnTabsPanelContainerProps) => {
 
   if (error) console.error(error.toString());
   if (url && isPending) return <span className="white">Loading...</span>;
+
+  // Master Games mode - show placeholder or games for selected master
+  if (pgnMode === "master") {
+    if (!selectedMaster || !selectedOpenings?.length) {
+      return (
+        <div className="white" style={{ padding: "1em", color: "#888" }}>
+          Select openings and a master to view their games
+        </div>
+      );
+    }
+    // TODO: Implement master games display
+    return (
+      <div className="white" style={{ padding: "1em" }}>
+        <p>
+          Showing games for <strong>{selectedMaster}</strong>
+        </p>
+        <p style={{ color: "#888" }}>
+          Openings: {selectedOpenings.join(", ")}
+        </p>
+        <p style={{ color: "#666", marginTop: "1em" }}>
+          (Games tab coming in Day 5)
+        </p>
+      </div>
+    );
+  }
 
   if (data || pgn) {
     return (

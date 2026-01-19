@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import { PgnListPanel } from "../src/pgnImportPage/PgnListPanel.tsx";
@@ -22,21 +22,39 @@ const queryClient = new QueryClient({
  */
 describe("PGN File Upload", () => {
   let setLink;
+  let setPgnMode;
+  let pgnMode;
 
   beforeEach(() => {
-    setLink = (link) => {
-      // Track link updates
-    };
+    setLink = vi.fn();
+    pgnMode = "twic";
+    setPgnMode = vi.fn((newMode) => {
+      pgnMode = newMode;
+    });
   });
 
   it("should render Upload PGN option when local mode is selected", async () => {
     const user = userEvent.setup();
+    let currentPgnMode = "twic";
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <PgnListPanel link={{}} setLink={setLink} />
-      </QueryClientProvider>
-    );
+    const TestComponent = () => {
+      const [mode, setMode] = React.useState("twic");
+      return (
+        <QueryClientProvider client={queryClient}>
+          <PgnListPanel
+            link={{}}
+            setLink={setLink}
+            pgnMode={mode}
+            setPgnMode={setMode}
+          />
+        </QueryClientProvider>
+      );
+    };
+
+    // Need to import React for useState
+    const React = await import("react");
+
+    render(<TestComponent />);
 
     // Should default to TWIC mode - find radio by value
     const radios = screen.getAllByRole("radio");
@@ -69,18 +87,26 @@ describe("PGN File Upload", () => {
       capturedLink = link;
     };
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <PgnListPanel link={{}} setLink={mockSetLink} />
-      </QueryClientProvider>
-    );
+    // Need to import React for useState
+    const React = await import("react");
 
-    // Switch to local upload mode
-    const radios = screen.getAllByRole("radio");
-    const uploadRadio = radios.find((r) => r.value === "local");
-    await user.click(uploadRadio);
+    const TestComponent = () => {
+      const [mode, setMode] = React.useState("local"); // Start in local mode for file upload
+      return (
+        <QueryClientProvider client={queryClient}>
+          <PgnListPanel
+            link={{}}
+            setLink={mockSetLink}
+            pgnMode={mode}
+            setPgnMode={setMode}
+          />
+        </QueryClientProvider>
+      );
+    };
 
-    // Get file input and upload
+    render(<TestComponent />);
+
+    // Get file input and upload (already in local mode from TestComponent)
     const fileInput = screen.getByLabelText("Choose a PGN file:");
     await user.upload(fileInput, file);
 

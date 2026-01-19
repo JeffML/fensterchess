@@ -21,22 +21,30 @@ interface PgnLink {
   pgn?: string;
 }
 
+export type PgnMode = "twic" | "local" | "master";
+
 interface PgnListPanelProps {
   link: PgnLink;
   setLink: (link: PgnLink) => void;
+  pgnMode: PgnMode;
+  setPgnMode: (mode: PgnMode) => void;
 }
 
-export const PgnListPanel = ({ link, setLink }: PgnListPanelProps) => {
+export const PgnListPanel = ({
+  link,
+  setLink,
+  pgnMode,
+  setPgnMode,
+}: PgnListPanelProps) => {
   const { isPending, isError, data, error } = useQuery({
     queryFn: () => getPgnLinks(TWIC_PGN_LINKS),
     queryKey: ["pgnLinks", TWIC_PGN_LINKS, dateStringShort()],
   });
   const [end, setEnd] = useState(INCR);
-  const [pgnMode, setPgnMode] = useState<"twic" | "local">("twic");
 
   const handlePgnMode = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLink({});
-    setPgnMode(e.target.value as "twic" | "local");
+    setPgnMode(e.target.value as PgnMode);
   };
 
   return (
@@ -63,6 +71,15 @@ export const PgnListPanel = ({ link, setLink }: PgnListPanelProps) => {
           style={{ marginLeft: "1em" }}
         ></input>
         <label>Upload PGN</label>
+        <input
+          type="radio"
+          name="pgnMode"
+          value="master"
+          checked={pgnMode === "master"}
+          onChange={handlePgnMode}
+          style={{ marginLeft: "1em" }}
+        ></input>
+        <label>Master Games</label>
       </div>
 
       {pgnMode === "twic" && (
