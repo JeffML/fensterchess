@@ -305,11 +305,11 @@ const MasterGamesComponent = ({
   );
 };
 
-// Memoize to prevent re-renders when fen changes but opening name stays the same
+// Memoize to prevent unnecessary re-renders
 export const MasterGames = memo(
   MasterGamesComponent,
   (prevProps, nextProps) => {
-    // Always compare chess and setBoardState references
+    // Re-render if chess or setBoardState references change
     if (
       prevProps.chess !== nextProps.chess ||
       prevProps.setBoardState !== nextProps.setBoardState
@@ -317,11 +317,12 @@ export const MasterGames = memo(
       return false;
     }
 
-    // Only re-render when opening name changes (or fen changes if no opening name)
-    if (nextProps.openingName) {
-      return prevProps.openingName === nextProps.openingName;
+    // Always re-render when FEN changes (master games are queried by FEN)
+    if (prevProps.fen !== nextProps.fen) {
+      return false;
     }
-    // If no opening name, re-render when fen changes
-    return prevProps.fen === nextProps.fen;
+
+    // Re-render when opening name changes
+    return prevProps.openingName === nextProps.openingName;
   }
 );
