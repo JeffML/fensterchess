@@ -30,6 +30,18 @@
 [functions."getMasterGameMoves"]
    included_files = ["data/indexes/chunk-*.json"]
 
+[functions."getMasterGameOpenings"]
+   included_files = ["data/indexes/opening-by-name.json"]
+
+[functions."getMastersByOpenings"]
+   included_files = ["data/indexes/opening-by-name.json", "data/indexes/game-to-players.json"]
+
+[functions."getGamesByMasterAndOpening"]
+   included_files = ["data/indexes/opening-by-name.json", "data/indexes/game-to-players.json", "data/indexes/chunk-*.json"]
+
+[functions."getMasterGamesByPosition"]
+   included_files = ["data/indexes/opening-by-fen.json", "data/indexes/opening-by-name.json", "data/indexes/ancestor-to-descendants.json", "data/indexes/game-to-players.json"]
+
   ## [functions."courses"] 
   ##  included_files = ["dataForLambdas/courseHtml/**/*.html"]
 
