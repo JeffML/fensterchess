@@ -1,5 +1,19 @@
-// Query master games database by FEN position
-// Returns paginated list of games matching the position
+/**
+ * Query master games by EXACT FEN position match
+ *
+ * Purpose: Find games indexed at a specific named opening position.
+ * Use when: You have a terminal/named opening position and want games at that exact position.
+ *
+ * Fallback: Position-only matching (ignores turn/castling/en-passant metadata).
+ * Does NOT search ancestor/descendant positions.
+ *
+ * Example: Sicilian Najdorf FEN → returns games indexed at Najdorf position
+ *
+ * For ancestor/root positions (e.g., 1.e4), use getMasterGamesByPosition instead,
+ * which finds all descendant openings that branch from the given position.
+ *
+ * Returns: Paginated list of games with full metadata
+ */
 
 import fs from "fs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
@@ -66,11 +80,11 @@ export const handler = async (event) => {
 
     // Try exact FEN match first
     let gameIds = index[fen];
-    
+
     // If no exact match, try position-only fallback
     if (!gameIds) {
       const positionFen = getPositionFen(fen);
-      
+
       // Search for any FEN with matching position
       for (const [indexedFen, ids] of Object.entries(index)) {
         if (getPositionFen(indexedFen) === positionFen) {

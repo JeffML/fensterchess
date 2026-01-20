@@ -278,8 +278,8 @@ export const MasterGamesPanel = ({
                       game.result === "1-0"
                         ? "#8bc34a"
                         : game.result === "0-1"
-                          ? "#ff7043"
-                          : "#aaa",
+                        ? "#ff7043"
+                        : "#aaa",
                   }}
                 >
                   {game.result}

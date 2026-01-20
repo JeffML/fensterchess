@@ -224,8 +224,7 @@ export const MasterGamesBrowser = ({
           ...group,
           children: matchingChildren,
           // Keep root if it matches or header matches
-          rootOpening:
-            rootMatches || headerMatches ? group.rootOpening : null,
+          rootOpening: rootMatches || headerMatches ? group.rootOpening : null,
         };
       })
       .filter(
@@ -301,7 +300,10 @@ export const MasterGamesBrowser = ({
             // Count selected openings in this category
             let selectedInCategory = 0;
             for (const group of filtered) {
-              if (group.rootOpening && selectedOpenings.has(group.rootOpening.name)) {
+              if (
+                group.rootOpening &&
+                selectedOpenings.has(group.rootOpening.name)
+              ) {
                 selectedInCategory++;
               }
               selectedInCategory += (group.children || []).filter((o) =>
@@ -311,7 +313,8 @@ export const MasterGamesBrowser = ({
 
             // Count total openings
             const totalOpenings = filtered.reduce(
-              (sum, g) => sum + (g.rootOpening ? 1 : 0) + (g.children?.length || 0),
+              (sum, g) =>
+                sum + (g.rootOpening ? 1 : 0) + (g.children?.length || 0),
               0
             );
 
@@ -359,7 +362,8 @@ export const MasterGamesBrowser = ({
                   >
                     {filtered.map((group) => {
                       const isEcoExpanded = expandedEcoCodes.has(group.eco);
-                      const hasChildren = group.children && group.children.length > 0;
+                      const hasChildren =
+                        group.children && group.children.length > 0;
                       const allOpenings = [
                         ...(group.rootOpening ? [group.rootOpening] : []),
                         ...(group.children || []),
@@ -407,15 +411,23 @@ export const MasterGamesBrowser = ({
                                 style={{
                                   cursor: "pointer",
                                   marginRight: "0.5em",
-                                  color: selectedOpenings.has(group.rootOpening.name)
+                                  color: selectedOpenings.has(
+                                    group.rootOpening.name
+                                  )
                                     ? "#4a7c59"
                                     : "#666",
                                 }}
                               >
-                                {selectedOpenings.has(group.rootOpening.name) ? "☑" : "☐"}
+                                {selectedOpenings.has(group.rootOpening.name)
+                                  ? "☑"
+                                  : "☐"}
                               </span>
                             ) : (
-                              <span style={{ marginRight: "0.5em", color: "#444" }}>☐</span>
+                              <span
+                                style={{ marginRight: "0.5em", color: "#444" }}
+                              >
+                                ☐
+                              </span>
                             )}
 
                             {/* ECO code */}
@@ -434,7 +446,9 @@ export const MasterGamesBrowser = ({
                               style={{
                                 color: group.rootOpening ? "#ccc" : "#888",
                                 flex: 1,
-                                cursor: group.rootOpening ? "pointer" : "default",
+                                cursor: group.rootOpening
+                                  ? "pointer"
+                                  : "default",
                               }}
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -484,7 +498,9 @@ export const MasterGamesBrowser = ({
                                   style={{
                                     cursor: "pointer",
                                     padding: "0.25em 0.5em",
-                                    backgroundColor: selectedOpenings.has(opening.name)
+                                    backgroundColor: selectedOpenings.has(
+                                      opening.name
+                                    )
                                       ? "#4a7c59"
                                       : "transparent",
                                     borderRadius: "4px",
@@ -505,10 +521,16 @@ export const MasterGamesBrowser = ({
                                         : "#666",
                                     }}
                                   >
-                                    {selectedOpenings.has(opening.name) ? "☑" : "☐"}
+                                    {selectedOpenings.has(opening.name)
+                                      ? "☑"
+                                      : "☐"}
                                   </span>
-                                  <span style={{ flex: 1 }}>{opening.name}</span>
-                                  <span style={{ color: "#888", fontSize: "0.9em" }}>
+                                  <span style={{ flex: 1 }}>
+                                    {opening.name}
+                                  </span>
+                                  <span
+                                    style={{ color: "#888", fontSize: "0.9em" }}
+                                  >
                                     ({opening.gameCount})
                                   </span>
                                 </div>
@@ -580,7 +602,9 @@ export const MasterGamesBrowser = ({
             Select openings from the list to see masters who played them
           </div>
         ) : mastersLoading ? (
-          <div style={{ color: "#fff", padding: "1em" }}>Loading masters...</div>
+          <div style={{ color: "#fff", padding: "1em" }}>
+            Loading masters...
+          </div>
         ) : mastersError ? (
           <div style={{ color: "#ff6b6b", padding: "1em" }}>
             Error loading masters
@@ -645,7 +669,9 @@ export const MasterGamesBrowser = ({
                   }}
                 >
                   <span>{master.playerName}</span>
-                  <span style={{ color: "#888" }}>{master.gameCount} games</span>
+                  <span style={{ color: "#888" }}>
+                    {master.gameCount} games
+                  </span>
                 </div>
               ))}
             </div>
@@ -679,9 +705,8 @@ export const MasterGamesBrowser = ({
                   ← Prev
                 </button>
                 <span>
-                  {page * 25 + 1}-
-                  {Math.min((page + 1) * 25, mastersData.total)} of{" "}
-                  {mastersData.total}
+                  {page * 25 + 1}-{Math.min((page + 1) * 25, mastersData.total)}{" "}
+                  of {mastersData.total}
                 </span>
                 <button
                   onClick={() => setPage(page + 1)}

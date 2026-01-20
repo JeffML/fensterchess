@@ -1,6 +1,21 @@
-// Query master games by FEN position with ancestor fallback
-// For partial variations (e.g., "French Defense"), finds descendant positions with games
-// Returns openings and masters who played them
+/**
+ * Query master games by FEN position with ANCESTOR-TO-DESCENDANTS fallback
+ *
+ * Purpose: Find all openings and games that pass through a given position.
+ * Use when: You have a root/intermediate position (e.g., 1.e4) and want to see
+ * all named openings that branch from it (French, Sicilian, Caro-Kann, etc.).
+ *
+ * Fallback chain:
+ * 1. Exact FEN match in opening-by-fen index
+ * 2. Position-only match (ignores turn/castling/en-passant)
+ * 3. Ancestor-to-descendants lookup - finds all descendant positions with games
+ *
+ * Example: 1.e4 position → returns Sicilian, French, Caro-Kann, etc. openings
+ *
+ * For exact terminal position matching only, use queryMasterGamesByFen instead.
+ *
+ * Returns: { openings, masters, totalGames, usedAncestorFallback }
+ */
 
 import fs from "fs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
@@ -30,7 +45,9 @@ function loadOpeningByNameIndex() {
 function loadAncestorToDescendantsIndex() {
   if (!ancestorToDescendantsIndex) {
     const indexPath = "data/indexes/ancestor-to-descendants.json";
-    ancestorToDescendantsIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    ancestorToDescendantsIndex = JSON.parse(
+      fs.readFileSync(indexPath, "utf-8")
+    );
   }
   return ancestorToDescendantsIndex;
 }
