@@ -1,18 +1,25 @@
 // Get all openings from master games database grouped by ECO category
-// Returns openings organized by ECO letter (A, B, C, D, E)
+// Returns openings organized by ECO letter (A, B, C, D, E), then by ECO code
 
 import fs from "fs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
-// Cache index on cold start
+// Cache indexes on cold start
 let openingByNameIndex = null;
+let ecoRootsIndex = null;
 
-function loadIndex() {
+function loadIndexes() {
   if (!openingByNameIndex) {
-    const indexPath = "data/indexes/opening-by-name.json";
-    openingByNameIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    openingByNameIndex = JSON.parse(
+      fs.readFileSync("data/indexes/opening-by-name.json", "utf-8")
+    );
   }
-  return openingByNameIndex;
+  if (!ecoRootsIndex) {
+    ecoRootsIndex = JSON.parse(
+      fs.readFileSync("data/indexes/eco-roots.json", "utf-8")
+    );
+  }
+  return { openingByNameIndex, ecoRootsIndex };
 }
 
 export const handler = async (event) => {
@@ -30,26 +37,71 @@ export const handler = async (event) => {
   }
 
   try {
-    const index = loadIndex();
+    const { openingByNameIndex, ecoRootsIndex } = loadIndexes();
 
-    // Group openings by ECO category letter
-    const grouped = { A: [], B: [], C: [], D: [], E: [] };
+    // First, group all openings by ECO code
+    const byEcoCode = {};
 
-    for (const [name, data] of Object.entries(index)) {
-      const ecoLetter = data.eco.charAt(0).toUpperCase();
-      if (grouped[ecoLetter]) {
-        grouped[ecoLetter].push({
-          name,
-          fen: data.fen,
-          eco: data.eco,
-          gameCount: data.gameIds.length,
-        });
+    for (const [name, data] of Object.entries(openingByNameIndex)) {
+      const eco = data.eco;
+      if (!byEcoCode[eco]) {
+        byEcoCode[eco] = [];
       }
+      byEcoCode[eco].push({
+        name,
+        fen: data.fen,
+        eco: data.eco,
+        gameCount: data.gameIds.length,
+      });
     }
 
-    // Sort each category alphabetically by name
+    // Build hierarchical structure: ECO letter → ECO codes with root + children
+    const grouped = { A: [], B: [], C: [], D: [], E: [] };
+
+    for (const [eco, openings] of Object.entries(byEcoCode)) {
+      const ecoLetter = eco.charAt(0).toUpperCase();
+      if (!grouped[ecoLetter]) continue;
+
+      // Get the root info for this ECO code
+      const rootInfo = ecoRootsIndex[eco];
+      const rootName = rootInfo ? rootInfo.name : eco;
+      const rootFen = rootInfo?.fen;
+
+      // Find if the root opening exists in our master games
+      const rootOpening = openings.find((o) => o.fen === rootFen);
+
+      // Separate root from children
+      const children = openings.filter((o) => o.fen !== rootFen);
+
+      // Sort children by name
+      children.sort((a, b) => a.name.localeCompare(b.name));
+
+      // Calculate total games for this ECO code
+      const totalGames = openings.reduce((sum, o) => sum + o.gameCount, 0);
+
+      grouped[ecoLetter].push({
+        eco,
+        rootName,
+        rootFen,
+        rootOpening: rootOpening || null, // The root opening if it exists in master games
+        children, // Other openings with same ECO code
+        totalGames,
+      });
+    }
+
+    // Sort ECO codes within each category
     for (const letter of Object.keys(grouped)) {
-      grouped[letter].sort((a, b) => a.name.localeCompare(b.name));
+      grouped[letter].sort((a, b) => a.eco.localeCompare(b.eco));
+    }
+
+    // Count totals
+    let totalEcoCodes = 0;
+    let totalOpenings = 0;
+    for (const codes of Object.values(grouped)) {
+      totalEcoCodes += codes.length;
+      for (const code of codes) {
+        totalOpenings += (code.rootOpening ? 1 : 0) + code.children.length;
+      }
     }
 
     return {
@@ -60,7 +112,8 @@ export const handler = async (event) => {
       },
       body: JSON.stringify({
         openings: grouped,
-        totalOpenings: Object.keys(index).length,
+        totalEcoCodes,
+        totalOpenings,
       }),
     };
   } catch (error) {

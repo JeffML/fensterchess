@@ -31,7 +31,7 @@
    included_files = ["data/indexes/chunk-*.json"]
 
 [functions."getMasterGameOpenings"]
-   included_files = ["data/indexes/opening-by-name.json"]
+   included_files = ["data/indexes/opening-by-name.json", "data/indexes/eco-roots.json"]
 
 [functions."getMastersByOpenings"]
    included_files = ["data/indexes/opening-by-name.json", "data/indexes/game-to-players.json"]

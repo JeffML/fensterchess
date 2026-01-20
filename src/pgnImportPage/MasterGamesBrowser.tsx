@@ -11,14 +11,24 @@ interface Opening {
   gameCount: number;
 }
 
+interface EcoCodeGroup {
+  eco: string;
+  rootName: string;
+  rootFen?: string;
+  rootOpening: Opening | null; // The root opening if it exists in master games
+  children: Opening[]; // Other openings with same ECO code
+  totalGames: number;
+}
+
 interface OpeningsResponse {
   openings: {
-    A: Opening[];
-    B: Opening[];
-    C: Opening[];
-    D: Opening[];
-    E: Opening[];
+    A: EcoCodeGroup[];
+    B: EcoCodeGroup[];
+    C: EcoCodeGroup[];
+    D: EcoCodeGroup[];
+    E: EcoCodeGroup[];
   };
+  totalEcoCodes: number;
   totalOpenings: number;
 }
 
@@ -95,6 +105,9 @@ export const MasterGamesBrowser = ({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(["B"]) // Start with B expanded (most common)
   );
+  const [expandedEcoCodes, setExpandedEcoCodes] = useState<Set<string>>(
+    new Set()
+  );
   const [searchTerm, setSearchTerm] = useState("");
 
   // Master list state
@@ -147,6 +160,19 @@ export const MasterGamesBrowser = ({
     });
   };
 
+  // Toggle ECO code expansion
+  const toggleEcoCode = (eco: string) => {
+    setExpandedEcoCodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(eco)) {
+        next.delete(eco);
+      } else {
+        next.add(eco);
+      }
+      return next;
+    });
+  };
+
   // Toggle opening selection
   const toggleOpening = (name: string) => {
     setSelectedOpenings((prev) => {
@@ -168,15 +194,47 @@ export const MasterGamesBrowser = ({
     onSelectMaster(playerName, Array.from(selectedOpenings));
   };
 
-  // Filter openings by search term
-  const filterOpenings = (openings: Opening[]): Opening[] => {
-    if (!searchTerm) return openings;
+  // Filter ECO code groups by search term
+  const filterEcoGroups = (groups: EcoCodeGroup[]): EcoCodeGroup[] => {
+    if (!groups) return [];
+    if (!searchTerm) return groups;
     const term = searchTerm.toLowerCase();
-    return openings.filter(
-      (o) =>
-        o.name.toLowerCase().includes(term) ||
-        o.eco.toLowerCase().includes(term)
-    );
+
+    return groups
+      .map((group) => {
+        // Filter children that match
+        const matchingChildren = (group.children || []).filter(
+          (o) =>
+            o.name.toLowerCase().includes(term) ||
+            o.eco.toLowerCase().includes(term)
+        );
+
+        // Check if root matches
+        const rootMatches =
+          group.rootOpening &&
+          (group.rootOpening.name.toLowerCase().includes(term) ||
+            group.eco.toLowerCase().includes(term));
+
+        // Check if the group header matches
+        const headerMatches =
+          group.eco.toLowerCase().includes(term) ||
+          group.rootName.toLowerCase().includes(term);
+
+        return {
+          ...group,
+          children: matchingChildren,
+          // Keep root if it matches or header matches
+          rootOpening:
+            rootMatches || headerMatches ? group.rootOpening : null,
+        };
+      })
+      .filter(
+        (group) =>
+          group.rootOpening !== null ||
+          group.children.length > 0 ||
+          group.eco.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          group.rootName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
   };
 
   if (openingsError) {
@@ -236,12 +294,26 @@ export const MasterGamesBrowser = ({
 
         <div style={{ overflow: "auto", flex: 1 }}>
           {categories.map((cat) => {
-            const openings = openingsData?.openings[cat] || [];
-            const filtered = filterOpenings(openings);
+            const ecoGroups = openingsData?.openings?.[cat] || [];
+            const filtered = filterEcoGroups(ecoGroups);
             const isExpanded = expandedCategories.has(cat);
-            const selectedInCategory = filtered.filter((o) =>
-              selectedOpenings.has(o.name)
-            ).length;
+
+            // Count selected openings in this category
+            let selectedInCategory = 0;
+            for (const group of filtered) {
+              if (group.rootOpening && selectedOpenings.has(group.rootOpening.name)) {
+                selectedInCategory++;
+              }
+              selectedInCategory += (group.children || []).filter((o) =>
+                selectedOpenings.has(o.name)
+              ).length;
+            }
+
+            // Count total openings
+            const totalOpenings = filtered.reduce(
+              (sum, g) => sum + (g.rootOpening ? 1 : 0) + (g.children?.length || 0),
+              0
+            );
 
             return (
               <div key={cat} style={{ marginBottom: "0.25em" }}>
@@ -260,7 +332,7 @@ export const MasterGamesBrowser = ({
                   }}
                 >
                   <span>
-                    {isExpanded ? "▼" : "▶"} ECO {cat} ({filtered.length}{" "}
+                    {isExpanded ? "▼" : "▶"} ECO {cat} ({totalOpenings}{" "}
                     openings)
                   </span>
                   {selectedInCategory > 0 && (
@@ -280,38 +352,172 @@ export const MasterGamesBrowser = ({
                 {isExpanded && (
                   <div
                     style={{
-                      paddingLeft: "1em",
-                      maxHeight: "200px",
+                      paddingLeft: "0.5em",
+                      maxHeight: "300px",
                       overflow: "auto",
                     }}
                   >
-                    {filtered.map((opening) => (
-                      <div
-                        key={opening.name}
-                        onClick={() => toggleOpening(opening.name)}
-                        style={{
-                          cursor: "pointer",
-                          padding: "0.3em 0.5em",
-                          backgroundColor: selectedOpenings.has(opening.name)
-                            ? "#4a7c59"
-                            : "transparent",
-                          borderRadius: "4px",
-                          marginTop: "0.2em",
-                          fontSize: "0.9em",
-                          color: selectedOpenings.has(opening.name)
-                            ? "#fff"
-                            : "#ccc",
-                        }}
-                      >
-                        <span style={{ color: "#888", marginRight: "0.5em" }}>
-                          {opening.eco}
-                        </span>
-                        {opening.name}
-                        <span style={{ color: "#888", marginLeft: "0.5em" }}>
-                          ({opening.gameCount})
-                        </span>
-                      </div>
-                    ))}
+                    {filtered.map((group) => {
+                      const isEcoExpanded = expandedEcoCodes.has(group.eco);
+                      const hasChildren = group.children && group.children.length > 0;
+                      const allOpenings = [
+                        ...(group.rootOpening ? [group.rootOpening] : []),
+                        ...(group.children || []),
+                      ];
+                      const selectedInEco = allOpenings.filter((o) =>
+                        selectedOpenings.has(o.name)
+                      ).length;
+
+                      return (
+                        <div key={group.eco} style={{ marginTop: "0.3em" }}>
+                          {/* ECO Code Row */}
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              padding: "0.3em 0.5em",
+                              backgroundColor: "#333",
+                              borderRadius: "4px",
+                            }}
+                          >
+                            {/* Expander - only show if there are children */}
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (hasChildren) toggleEcoCode(group.eco);
+                              }}
+                              style={{
+                                cursor: hasChildren ? "pointer" : "default",
+                                color: hasChildren ? "#888" : "#444",
+                                marginRight: "0.5em",
+                                fontSize: "0.85em",
+                                width: "1em",
+                              }}
+                            >
+                              {hasChildren ? (isEcoExpanded ? "▼" : "▶") : " "}
+                            </span>
+
+                            {/* Checkbox for root opening */}
+                            {group.rootOpening ? (
+                              <span
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleOpening(group.rootOpening!.name);
+                                }}
+                                style={{
+                                  cursor: "pointer",
+                                  marginRight: "0.5em",
+                                  color: selectedOpenings.has(group.rootOpening.name)
+                                    ? "#4a7c59"
+                                    : "#666",
+                                }}
+                              >
+                                {selectedOpenings.has(group.rootOpening.name) ? "☑" : "☐"}
+                              </span>
+                            ) : (
+                              <span style={{ marginRight: "0.5em", color: "#444" }}>☐</span>
+                            )}
+
+                            {/* ECO code */}
+                            <span
+                              style={{
+                                color: "#6a9",
+                                fontWeight: "bold",
+                                marginRight: "0.5em",
+                              }}
+                            >
+                              {group.eco}
+                            </span>
+
+                            {/* Root name */}
+                            <span
+                              style={{
+                                color: group.rootOpening ? "#ccc" : "#888",
+                                flex: 1,
+                                cursor: group.rootOpening ? "pointer" : "default",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (group.rootOpening) {
+                                  toggleOpening(group.rootOpening.name);
+                                }
+                              }}
+                            >
+                              {group.rootName}
+                            </span>
+
+                            {/* Game count */}
+                            <span
+                              style={{
+                                color: "#888",
+                                fontSize: "0.85em",
+                                marginLeft: "0.5em",
+                              }}
+                            >
+                              ({group.totalGames})
+                            </span>
+
+                            {/* Selected badge */}
+                            {selectedInEco > 0 && (
+                              <span
+                                style={{
+                                  backgroundColor: "#4a7c59",
+                                  padding: "0.1em 0.4em",
+                                  borderRadius: "8px",
+                                  fontSize: "0.75em",
+                                  marginLeft: "0.5em",
+                                  color: "#fff",
+                                }}
+                              >
+                                {selectedInEco}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Children (when expanded) */}
+                          {isEcoExpanded && hasChildren && (
+                            <div style={{ paddingLeft: "2em" }}>
+                              {group.children.map((opening) => (
+                                <div
+                                  key={opening.name}
+                                  onClick={() => toggleOpening(opening.name)}
+                                  style={{
+                                    cursor: "pointer",
+                                    padding: "0.25em 0.5em",
+                                    backgroundColor: selectedOpenings.has(opening.name)
+                                      ? "#4a7c59"
+                                      : "transparent",
+                                    borderRadius: "4px",
+                                    marginTop: "0.15em",
+                                    fontSize: "0.85em",
+                                    color: selectedOpenings.has(opening.name)
+                                      ? "#fff"
+                                      : "#aaa",
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      marginRight: "0.5em",
+                                      color: selectedOpenings.has(opening.name)
+                                        ? "#fff"
+                                        : "#666",
+                                    }}
+                                  >
+                                    {selectedOpenings.has(opening.name) ? "☑" : "☐"}
+                                  </span>
+                                  <span style={{ flex: 1 }}>{opening.name}</span>
+                                  <span style={{ color: "#888", fontSize: "0.9em" }}>
+                                    ({opening.gameCount})
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

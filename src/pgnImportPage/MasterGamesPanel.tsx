@@ -56,8 +56,21 @@ async function fetchMasterGames(
   return response.json();
 }
 
+// Game data returned from getMasterGameMoves
+interface GameMovesResponse {
+  gameId: number;
+  moves: string;
+  white: string;
+  black: string;
+  whiteElo?: number;
+  blackElo?: number;
+  event?: string;
+  date?: string;
+  result?: string;
+}
+
 // Fetch full moves for a game
-async function fetchGameMoves(gameId: number): Promise<string> {
+async function fetchGameMoves(gameId: number): Promise<GameMovesResponse> {
   const response = await fetch(
     `/.netlify/functions/getMasterGameMoves?gameId=${gameId}`,
     {
@@ -68,11 +81,29 @@ async function fetchGameMoves(gameId: number): Promise<string> {
   );
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    const text = await response.text();
+    throw new Error(`HTTP ${response.status}: ${text}`);
   }
 
   const data = await response.json();
-  return data.pgn;
+  if (!data.moves) {
+    throw new Error(`No moves in response: ${JSON.stringify(data)}`);
+  }
+  return data;
+}
+
+// Build PGN string with headers from game data
+function buildPgn(data: GameMovesResponse): string {
+  const headers: string[] = [];
+  if (data.event) headers.push(`[Event "${data.event}"]`);
+  if (data.white) headers.push(`[White "${data.white}"]`);
+  if (data.black) headers.push(`[Black "${data.black}"]`);
+  if (data.whiteElo) headers.push(`[WhiteElo "${data.whiteElo}"]`);
+  if (data.blackElo) headers.push(`[BlackElo "${data.blackElo}"]`);
+  if (data.date) headers.push(`[Date "${data.date}"]`);
+  if (data.result) headers.push(`[Result "${data.result}"]`);
+
+  return headers.join("\n") + "\n\n" + data.moves;
 }
 
 interface MasterGamesPanelProps {
@@ -107,7 +138,8 @@ export const MasterGamesPanel = ({
     setLoadingGame(true);
 
     try {
-      const pgn = await fetchGameMoves(game.idx);
+      const gameData = await fetchGameMoves(game.idx);
+      const pgn = buildPgn(gameData);
       const chess = new ChessPGN();
       chess.loadPgn(pgn);
       const adapter = new GameAdapter(chess);
