@@ -386,6 +386,7 @@ const FenAndMovesInputs = ({
                 overflowY: "auto",
                 whiteSpace: "pre-wrap",
                 wordBreak: "break-word",
+                textAlign: "left",
               }}
             >
               <MoveDisplay

@@ -10,6 +10,12 @@
  * 2. Position-only match (ignores turn/castling/en-passant)
  * 3. Ancestor-to-descendants lookup - finds all descendant positions with games
  *
+ * TODO: Add "look UP the tree" fallback for positions that are continuations of
+ * named openings but not named themselves. Example: 1.b3 d6 has no named opening,
+ * but should inherit games from 1.b3 (Nimzo-Larsen Attack). Would require:
+ * - Receiving move history or chess instance to walk back
+ * - Or building a descendant-to-ancestors index
+ *
  * Example: 1.e4 position → returns Sicilian, French, Caro-Kann, etc. openings
  *
  * For exact terminal position matching only, use queryMasterGamesByFen instead.
