@@ -15,6 +15,49 @@ import { ChessPGN } from "@chess-pgn/chess-pgn";
 
 type SearchMode = "position" | "name";
 
+/**
+ * Component to display moves with opening variation highlighted in bold
+ */
+const MoveDisplay = ({
+  moves,
+  openingPlyCount,
+}: {
+  moves: string;
+  openingPlyCount?: number;
+}) => {
+  if (!moves) {
+    return <span style={{ color: "#888" }}>Paste moves or PGN here</span>;
+  }
+
+  // If no opening ply count, just display all moves normally
+  if (!openingPlyCount) {
+    return <>{moves}</>;
+  }
+
+  // Find where opening ends by counting SAN moves
+  const sanMoveRegex = /[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](=[QRBN])?[+#]?|O-O(-O)?[+#]?/g;
+  let plyCount = 0;
+  let splitIndex = moves.length;
+
+  for (const match of moves.matchAll(sanMoveRegex)) {
+    plyCount++;
+    if (plyCount === openingPlyCount) {
+      splitIndex = match.index! + match[0].length;
+      break;
+    }
+  }
+
+  const openingPart = moves.substring(0, splitIndex);
+  const restPart = moves.substring(splitIndex);
+
+  return (
+    <>
+      <span style={{ fontWeight: "bold" }}>{openingPart}</span>
+      <span>{restPart}</span>
+    </>
+  );
+};
+
 const OPENING_ALIASES: Record<string, string[]> = {
   petrov: ["petroff", "petrov defense", "petroff defense"],
   petroff: ["petrov", "petrov defense", "petroff defense"],
@@ -325,21 +368,31 @@ const FenAndMovesInputs = ({
             >
               Move Sequence:
             </label>
-            <textarea
+            <div
               id="moves-input"
-              spellCheck="false"
-              placeholder="Paste moves or PGN here"
-              onChange={() => {}}
-              onPaste={handleMovesPaste}
-              value={pgnMovesOnly(moves)}
+              onPaste={(e: ClipboardEvent<HTMLDivElement>) => {
+                handleMovesPaste(e as unknown as ClipboardEvent<HTMLTextAreaElement>);
+              }}
               style={{
                 fontFamily: "monospace",
                 fontSize: "11px",
                 width: "100%",
                 minHeight: "55px",
                 padding: "4px",
+                backgroundColor: "#fff",
+                color: "#000",
+                border: "1px solid #ccc",
+                borderRadius: "3px",
+                overflowY: "auto",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
               }}
-            />
+            >
+              <MoveDisplay
+                moves={pgnMovesOnly(moves)}
+                openingPlyCount={boardState.openingPlyCount}
+              />
+            </div>
           </div>
         </>
       ) : (

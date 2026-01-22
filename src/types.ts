@@ -67,6 +67,7 @@ export interface BoardState {
   fen: FEN | "start";
   moves: string;
   currentPly?: number; // Current ply index in the move sequence
+  openingPlyCount?: number; // Number of plies in the opening variation (for highlighting)
 }
 
 /**

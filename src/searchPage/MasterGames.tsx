@@ -195,6 +195,7 @@ const MasterGamesComponent = ({
         fen: resultingFen,
         moves: fullGameMoves,
         currentPly: plyCount,
+        openingPlyCount: plyCount, // Highlight opening moves in move display
       });
     } catch (error) {
       console.error("Error loading game moves:", error);
