@@ -128,6 +128,7 @@ const MasterGamesComponent = ({
   const [page, setPage] = useState(0);
   const [selectedOpening, setSelectedOpening] = useState<Opening | null>(null);
   const [gamesPage, setGamesPage] = useState(0);
+  const [selectedGameIdx, setSelectedGameIdx] = useState<number | null>(null);
   const [isFlashing, setIsFlashing] = useState(false);
   const [expandedEcoCodes, setExpandedEcoCodes] = useState<Set<string>>(
     new Set()
@@ -139,6 +140,7 @@ const MasterGamesComponent = ({
     setSelectedOpening(null);
     setGamesPage(0);
     setPage(0);
+    setSelectedGameIdx(null);
     setExpandedEcoCodes(new Set());
   }, [fen]);
 
@@ -157,6 +159,7 @@ const MasterGamesComponent = ({
   }, [openingName]);
 
   const handlePlayerClick = async (gameId: number, targetFen: string) => {
+    setSelectedGameIdx(gameId);
     try {
       const moves = await fetchGameMoves(gameId);
 
@@ -294,20 +297,29 @@ const MasterGamesComponent = ({
             {/* Game list */}
             <div
               style={{
-                display: "grid",
-                gridTemplateColumns: "auto 1fr 1fr auto auto",
-                gap: "0.5em 1em",
                 fontSize: "0.9em",
                 color: "#ddd",
                 textAlign: "left",
               }}
             >
               {/* Headers */}
-              <div style={{ fontWeight: "bold", color: "#aaa" }}>#</div>
-              <div style={{ fontWeight: "bold", color: "#aaa" }}>White</div>
-              <div style={{ fontWeight: "bold", color: "#aaa" }}>Black</div>
-              <div style={{ fontWeight: "bold", color: "#aaa" }}>Result</div>
-              <div style={{ fontWeight: "bold", color: "#aaa" }}>Event</div>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "auto 1fr 1fr auto auto",
+                  gap: "0.5em 1em",
+                  padding: "0.25em 0.5em",
+                  fontWeight: "bold",
+                  color: "#aaa",
+                  borderBottom: "1px solid #444",
+                }}
+              >
+                <div>#</div>
+                <div>White</div>
+                <div>Black</div>
+                <div>Result</div>
+                <div>Event</div>
+              </div>
 
               {/* Games */}
               {gamesData.games.map((game, idx) => {
@@ -319,36 +331,38 @@ const MasterGamesComponent = ({
                   : `${game.black} (${game.blackElo})`;
 
                 return (
-                  <div key={game.idx} style={{ display: "contents" }}>
+                  <div
+                    key={game.idx}
+                    onClick={() =>
+                      handlePlayerClick(game.idx, selectedOpening.fen)
+                    }
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "auto 1fr 1fr auto auto",
+                      gap: "0.5em 1em",
+                      padding: "0.25em 0.5em",
+                      cursor: "pointer",
+                      borderBottom: "1px solid #333",
+                      backgroundColor:
+                        selectedGameIdx === game.idx ? "#2a4a6a" : "transparent",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedGameIdx !== game.idx) {
+                        e.currentTarget.style.backgroundColor = "#3a3a3a";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedGameIdx !== game.idx) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }
+                    }}
+                    title="Click to load game"
+                  >
                     <div style={{ color: "#888" }}>
                       {gamesPage * gamesData.pageSize + idx + 1}
                     </div>
-                    <div
-                      onClick={() =>
-                        handlePlayerClick(game.idx, selectedOpening.fen)
-                      }
-                      style={{
-                        cursor: "pointer",
-                        color: "#6db3f2",
-                        textDecoration: "underline",
-                      }}
-                      title="Click to load game moves"
-                    >
-                      {whiteDisplay}
-                    </div>
-                    <div
-                      onClick={() =>
-                        handlePlayerClick(game.idx, selectedOpening.fen)
-                      }
-                      style={{
-                        cursor: "pointer",
-                        color: "#6db3f2",
-                        textDecoration: "underline",
-                      }}
-                      title="Click to load game moves"
-                    >
-                      {blackDisplay}
-                    </div>
+                    <div style={{ color: "#6db3f2" }}>{whiteDisplay}</div>
+                    <div style={{ color: "#6db3f2" }}>{blackDisplay}</div>
                     <div>{game.result}</div>
                     <div style={{ fontSize: "0.85em", color: "#bbb" }}>
                       {game.event}{" "}
