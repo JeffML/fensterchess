@@ -596,30 +596,38 @@ const MasterGamesComponent = ({
       {data.masters.length > 0 && (
         <div style={{ marginTop: "1em" }}>
           <div
-            style={{ fontWeight: "bold", color: "#aaa", marginBottom: "0.5em" }}
+            style={{
+              fontWeight: "bold",
+              color: "#aaa",
+              marginBottom: "0.5em",
+              textAlign: "left",
+            }}
           >
             Top Masters ({data.totalMasters})
           </div>
           <div
             style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "0.5em",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+              gap: "0.25em 1em",
               fontSize: "0.85em",
             }}
           >
             {data.masters.map((master) => (
-              <span
+              <div
                 key={master.playerName}
                 style={{
-                  backgroundColor: "#3a3a3a",
-                  padding: "0.25em 0.5em",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "0.2em 0.5em",
                   borderRadius: "4px",
                   color: "#ccc",
+                  backgroundColor: "#2a2a2a",
                 }}
               >
-                {master.playerName} ({master.gameCount})
-              </span>
+                <span>{master.playerName}</span>
+                <span style={{ color: "#888" }}>{master.gameCount}</span>
+              </div>
             ))}
           </div>
 
