@@ -1,7 +1,6 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
 import {
   findOpening as ecoFindOpening,
-  lookupByMoves,
   getPositionBook,
 } from "@chess-openings/eco.json";
 import type {
@@ -38,7 +37,8 @@ export function findOpening(
   }
 
   // Create enriched opening with fensterchess-specific fields
-  let opening: Opening = { ...baseOpening };
+  // Include the FEN since it's the key, not stored in the value
+  let opening: Opening = { ...baseOpening, fen: fen === "start" ? undefined : fen };
 
   // Enrich with scores and transitions (fensterchess-specific)
   if (fromTosForFen && scoresForFens) {
@@ -76,9 +76,8 @@ export function findOpening(
  * Returns the opening and how many moves back it was found.
  *
  * @param moves - The PGN moves string
- * @param openingBook - The opening book database
- * @param positionBook - The position-only lookup database
- * @returns Object with opening (or undefined) and movesBack count
+ * @param openingBook - The opening book database (keyed by FEN)
+ * @returns Object with opening (including its FEN) and movesBack count
  */
 export function findNearestOpening(
   moves: string,
@@ -98,17 +97,48 @@ export function findNearestOpening(
     return { opening: undefined, movesBack: 0 };
   }
 
-  // Use eco.json's optimized lookupByMoves
-  // Note: Type cast needed because fensterchess Opening.src is optional
   const posBook = getPositionBook(openingBook as any);
-  const result = lookupByMoves(tempChess, openingBook as any, {
-    positionBook: posBook,
-  });
+  let movesBack = 0;
 
-  return {
-    opening: result.opening as Opening | undefined,
-    movesBack: result.movesBack,
-  };
+  // Walk backward through moves until we find an opening
+  while (true) {
+    const currentFen = tempChess.fen();
+    
+    // Check if this position is in the opening book (the FEN IS the key)
+    let opening = openingBook[currentFen];
+    
+    // Try position-only fallback if no exact match
+    if (!opening && posBook) {
+      const position = currentFen.split(" ")[0];
+      const posEntry = posBook[position];
+      if (posEntry && posEntry.length > 0) {
+        opening = openingBook[posEntry[0]];
+        if (opening) {
+          // Use the actual FEN from the position book
+          return {
+            opening: { ...opening, fen: posEntry[0] },
+            movesBack,
+          };
+        }
+      }
+    }
+
+    if (opening) {
+      return {
+        opening: { ...opening, fen: currentFen },
+        movesBack,
+      };
+    }
+
+    // Try to undo - if no more moves, stop
+    const undoResult = tempChess.undo();
+    if (!undoResult) {
+      break;
+    }
+    movesBack++;
+  }
+
+  return { opening: undefined, movesBack: 0 };
 }
 
 export const getFromTosForFen = async (fen: FEN): Promise<FromTosResponse> => {

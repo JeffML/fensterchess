@@ -380,12 +380,29 @@ _Lichess Elite Database:_
   - `player-index.json` - Search by player name (white/black)
   - `opening-by-eco.json` - Search by ECO code
   - `opening-by-name.json` - Search by opening name
-  - `opening-by-fen.json` - Search by position FEN
+  - `opening-by-fen.json` - Search by position FEN (KEY = `ecoJsonFen`)
   - `event-index.json` - Search by event/tournament
   - `date-index.json` - Search by date range
   - `deduplication-index.json` - Hash → game index mapping
   - `source-tracking.json` - Source metadata and checksums
   - `chunk-*.json` - Game data chunks (4000 games each, <5 MB for Netlify Blobs)
+
+**CRITICAL - GameMetadata Opening Fields** (defined in `scripts/types.ts`):
+
+Each game in the index has these fields for opening lookup:
+
+- **`ecoJsonFen`**: THE KEY for `opening-by-fen.json` index. This is the FEN of the opening position the game is indexed under. To query games for an opening, use THIS FEN as the lookup key.
+- **`ecoJsonOpening`**: The opening name (e.g., "Nimzo-Larsen Attack")
+- **`ecoJsonEco`**: The ECO code (e.g., "A01")
+- **`movesBack`**: How many half-moves from the end of the game this opening position occurs
+
+**Example**: A game ending at move 40 that plays 1.b3 d6 2.Bb2:
+- `ecoJsonFen`: FEN after 1.b3 (the Nimzo-Larsen Attack position - the INDEX KEY)
+- `ecoJsonOpening`: "Nimzo-Larsen Attack"
+- `ecoJsonEco`: "A01"
+- `movesBack`: 3 (d6 and Bb2 are 2 more half-moves after 1.b3)
+
+**Why this matters**: When a user is at position 1.b3 d6 (no named opening), to find relevant games, look up the `opening-by-fen.json` using the nearest ancestor opening's FEN (1.b3), NOT the current position's FEN. The game metadata already stores this as `ecoJsonFen`.
 
 **Current Status**:
 

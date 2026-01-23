@@ -75,6 +75,7 @@ interface OpeningTabsProps {
   name?: string;
   from?: Opening[];
   lastKnownOpening: Partial<Opening>;
+  openingFen?: string;
 }
 
 const OpeningTabs = ({
@@ -86,6 +87,7 @@ const OpeningTabs = ({
   name,
   from,
   lastKnownOpening,
+  openingFen,
 }: OpeningTabsProps) => {
   const { boardState, chess, setBoardState } = useSearchPage();
   const { fen } = boardState;
@@ -152,6 +154,7 @@ const OpeningTabs = ({
                   setBoardState,
                   name,
                   sites: sites.selectedSites,
+                  openingFen,
                 }}
               />
             </div>

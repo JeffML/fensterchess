@@ -53,18 +53,20 @@ interface MasterGamesResponse {
 // Fetch openings and masters for a position (uses ancestor fallback)
 async function fetchMasterGamesByPosition(
   fen: string,
-  page: number
+  page: number,
+  fallbackFen?: string
 ): Promise<MasterGamesByPositionResponse> {
-  const response = await fetch(
-    `/.netlify/functions/getMasterGamesByPosition?fen=${encodeURIComponent(
-      fen
-    )}&page=${page}&pageSize=10`,
-    {
-      headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
-      },
-    }
-  );
+  let url = `/.netlify/functions/getMasterGamesByPosition?fen=${encodeURIComponent(
+    fen
+  )}&page=${page}&pageSize=10`;
+  if (fallbackFen) {
+    url += `&fallbackFen=${encodeURIComponent(fallbackFen)}`;
+  }
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -117,11 +119,13 @@ async function fetchGameMoves(gameId: number): Promise<string> {
 const MasterGamesComponent = ({
   fen,
   openingName,
+  openingFen,
   chess,
   setBoardState,
 }: {
   fen: FEN;
   openingName?: string;
+  openingFen?: string;
   chess: MutableRefObject<ChessPGN>;
   setBoardState: (state: BoardState) => void;
 }) => {
@@ -204,10 +208,11 @@ const MasterGamesComponent = ({
   };
 
   // Fetch openings/masters for the position
+  console.log('[DEBUG MasterGames] fen:', fen, 'openingFen:', openingFen);
   const { isError, error, data, isPending } =
     useQuery<MasterGamesByPositionResponse>({
-      queryKey: ["masterGamesByPosition", fen, page],
-      queryFn: () => fetchMasterGamesByPosition(fen, page),
+      queryKey: ["masterGamesByPosition", fen, page, openingFen],
+      queryFn: () => fetchMasterGamesByPosition(fen, page, openingFen),
       staleTime: 24 * 60 * 60 * 1000, // 24 hours - data is immutable
     });
 
@@ -716,7 +721,10 @@ export const MasterGames = memo(
       return false;
     }
 
-    // Re-render when opening name changes
-    return prevProps.openingName === nextProps.openingName;
+    // Re-render when opening name or opening FEN changes
+    return (
+      prevProps.openingName === nextProps.openingName &&
+      prevProps.openingFen === nextProps.openingFen
+    );
   }
 );

@@ -53,59 +53,41 @@ describe("MasterGames Component", () => {
   };
 
   it("should display master games for a position", async () => {
+    // First call: getMasterGamesByPosition returns openings and masters
     fetchSpy.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        games: [
+        openings: [
           {
-            idx: 1,
-            white: "Carlsen, Magnus",
-            black: "Nakamura, Hikaru",
-            whiteElo: 2850,
-            blackElo: 2780,
-            whiteTitle: "GM",
-            blackTitle: "GM",
-            result: "1-0",
-            date: "2023.05.15",
-            event: "Norway Chess",
-            eco: "C65",
-            opening: "Spanish Game",
-            ply: 45,
-            source: "pgnmentor",
-          },
-          {
-            idx: 2,
-            white: "Caruana, Fabiano",
-            black: "So, Wesley",
-            whiteElo: 2800,
-            blackElo: 2770,
-            whiteTitle: "GM",
-            blackTitle: "GM",
-            result: "1/2-1/2",
-            date: "2023.04.10",
-            event: "Candidates 2023",
-            eco: "C65",
-            opening: "Spanish Game",
-            ply: 60,
-            source: "pgnmentor",
+            name: "Italian Game",
+            fen: testFen,
+            eco: "C50",
+            gameCount: 2,
           },
         ],
-        total: 2,
+        masters: [
+          { playerName: "Carlsen, Magnus", gameCount: 2 },
+          { playerName: "Nakamura, Hikaru", gameCount: 1 },
+        ],
+        totalMasters: 2,
+        totalGames: 2,
         page: 0,
-        pageSize: 20,
+        pageSize: 10,
+        usedAncestorFallback: false,
+        matchedPositions: 1,
       }),
     });
 
     render(<TestWrapper fen={testFen} openingName="Italian Game" />);
 
-    // Wait for games to load
+    // Wait for data to load and display
     await waitFor(() => {
-      expect(screen.getByText(/Carlsen, Magnus/)).toBeTruthy();
+      expect(screen.getByText(/Master Games/)).toBeTruthy();
     });
 
+    // Check masters are displayed
+    expect(screen.getByText(/Carlsen, Magnus/)).toBeTruthy();
     expect(screen.getByText(/Nakamura, Hikaru/)).toBeTruthy();
-    expect(screen.getByText(/Caruana, Fabiano/)).toBeTruthy();
-    expect(screen.getByText(/1-0/)).toBeTruthy();
   });
 
   it("should show loading state", () => {
@@ -122,10 +104,14 @@ describe("MasterGames Component", () => {
     fetchSpy.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        games: [],
-        total: 0,
+        openings: [],
+        masters: [],
+        totalMasters: 0,
+        totalGames: 0,
         page: 0,
-        pageSize: 20,
+        pageSize: 10,
+        usedAncestorFallback: false,
+        matchedPositions: 0,
       }),
     });
 
@@ -149,45 +135,27 @@ describe("MasterGames Component", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          games: [
-            {
-              idx: 1,
-              white: "Player A",
-              black: "Player B",
-              whiteElo: 2500,
-              blackElo: 2500,
-              result: "1-0",
-              date: "2023.01.01",
-              event: "Event 1",
-              ply: 30,
-              source: "pgnmentor",
-            },
-          ],
-          total: 1,
+          openings: [{ name: "King's Pawn", fen: fen1, eco: "B00", gameCount: 1 }],
+          masters: [{ playerName: "Player A", gameCount: 1 }],
+          totalMasters: 1,
+          totalGames: 1,
           page: 0,
-          pageSize: 20,
+          pageSize: 10,
+          usedAncestorFallback: false,
+          matchedPositions: 1,
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          games: [
-            {
-              idx: 2,
-              white: "Player C",
-              black: "Player D",
-              whiteElo: 2600,
-              blackElo: 2600,
-              result: "0-1",
-              date: "2023.02.01",
-              event: "Event 2",
-              ply: 40,
-              source: "pgnmentor",
-            },
-          ],
-          total: 1,
+          openings: [{ name: "King's Pawn Game", fen: fen2, eco: "C20", gameCount: 1 }],
+          masters: [{ playerName: "Player C", gameCount: 1 }],
+          totalMasters: 1,
+          totalGames: 1,
           page: 0,
-          pageSize: 20,
+          pageSize: 10,
+          usedAncestorFallback: false,
+          matchedPositions: 1,
         }),
       });
 
@@ -220,11 +188,28 @@ describe("MasterGames Component", () => {
     );
   });
 
-  it("should load game moves when clicking a player", async () => {
+  it("should load game moves when clicking a game row", async () => {
     const gameMoves = "1. e4 e5 2. Nf3 Nc6 3. Bb5";
     const setBoardState = vi.fn();
 
+    // First call: getMasterGamesByPosition returns openings
     fetchSpy
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          openings: [
+            { name: "Spanish Game", fen: testFen, eco: "C60", gameCount: 1 },
+          ],
+          masters: [{ playerName: "Fischer, Bobby", gameCount: 1 }],
+          totalMasters: 1,
+          totalGames: 1,
+          page: 0,
+          pageSize: 10,
+          usedAncestorFallback: false,
+          matchedPositions: 1,
+        }),
+      })
+      // Second call: queryMasterGamesByFen returns games for the opening
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -247,6 +232,7 @@ describe("MasterGames Component", () => {
           pageSize: 20,
         }),
       })
+      // Third call: getMasterGameMoves returns moves
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ moves: gameMoves }),
@@ -260,12 +246,21 @@ describe("MasterGames Component", () => {
       />
     );
 
+    // Wait for openings to load
     await waitFor(() => {
-      expect(screen.getByText(/Fischer, Bobby/)).toBeTruthy();
+      expect(screen.getByText(/Spanish Game/)).toBeTruthy();
     });
 
-    // Click on the player name
-    fireEvent.click(screen.getByText(/Fischer, Bobby/));
+    // Click on the opening to see games (the opening row has ECO + name)
+    fireEvent.click(screen.getByText(/Spanish Game/));
+
+    // Wait for games to load - look for the game row which has "Click to load game" title
+    await waitFor(() => {
+      expect(screen.getByTitle("Click to load game")).toBeTruthy();
+    });
+
+    // Click on the game row
+    fireEvent.click(screen.getByTitle("Click to load game"));
 
     // Wait for moves to be fetched and board state to update
     await waitFor(() => {

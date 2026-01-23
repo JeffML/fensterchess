@@ -25,11 +25,13 @@ interface ExternalStatsResponse {
 export const OpeningAdditionalWithBarChartGrid = ({
   fen,
   openingName,
+  openingFen,
   chess,
   setBoardState,
 }: {
   fen: FEN;
   openingName?: string;
+  openingFen?: string;
   chess: MutableRefObject<ChessPGN>;
   setBoardState: (state: BoardState) => void;
 }) => {
@@ -86,6 +88,7 @@ export const OpeningAdditionalWithBarChartGrid = ({
       <MasterGames
         fen={fen}
         openingName={openingName}
+        openingFen={openingFen}
         chess={chess}
         setBoardState={setBoardState}
       />

@@ -88,6 +88,7 @@ export const handler = async (event) => {
   try {
     const {
       fen,
+      fallbackFen,
       page = "0",
       pageSize = "25",
       sortBy = "name", // "name" or "gameCount"
@@ -145,6 +146,31 @@ export const handler = async (event) => {
           matchingFens.push(descendantFen);
           for (const gameId of fenIndex[descendantFen]) {
             allGameIds.add(gameId);
+          }
+        }
+      }
+    }
+
+    // If still no matches and we have a fallback FEN (nearest known opening), use that
+    let usedFallbackFen = false;
+    if (matchingFens.length === 0 && fallbackFen) {
+      const fallbackPositionFen = getPositionFen(fallbackFen);
+      // Try exact match on fallback FEN
+      if (fenIndex[fallbackFen]) {
+        usedFallbackFen = true;
+        matchingFens.push(fallbackFen);
+        for (const gameId of fenIndex[fallbackFen]) {
+          allGameIds.add(gameId);
+        }
+      } else {
+        // Try position-only match on fallback
+        for (const [indexedFen, gameIds] of Object.entries(fenIndex)) {
+          if (getPositionFen(indexedFen) === fallbackPositionFen) {
+            usedFallbackFen = true;
+            matchingFens.push(indexedFen);
+            for (const gameId of gameIds) {
+              allGameIds.add(gameId);
+            }
           }
         }
       }
@@ -221,6 +247,7 @@ export const handler = async (event) => {
         page: pageNum,
         pageSize: pageSizeNum,
         usedAncestorFallback,
+        usedFallbackFen,
         matchedPositions: matchingFens.length,
       }),
     };

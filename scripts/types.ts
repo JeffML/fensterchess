@@ -19,17 +19,34 @@ export interface GameMetadata {
   opening?: string; // Opening name from PGN header
   variation?: string; // Variation from PGN header
   subVariation?: string; // SubVariation from PGN header
-  moves: string; // SAN move sequence
+  moves: string; // SAN move sequence (space-separated, no move numbers)
   ply: number; // Half-moves
   source: "pgnmentor" | "lichess-elite";
   sourceFile: string;
   hash: string; // SHA-256 for deduplication
 
-  // eco.json opening match (added during buildIndexes)
-  ecoJsonFen?: string; // FEN at deepest eco.json matched position
-  ecoJsonOpening?: string; // eco.json opening name
-  ecoJsonEco?: string; // eco.json ECO code
-  movesBack?: number; // Number of moves walked back to find eco.json match
+  // =========================================================================
+  // OPENING INDEX FIELDS (populated by buildIndexes.ts from eco.json lookup)
+  // These fields are used to index games by opening position.
+  // The FEN is the KEY used in opening-by-fen.json index.
+  // =========================================================================
+
+  /**
+   * The FEN of the opening position this game is indexed under.
+   * This is the opening's unique identifier in the opening-by-fen index.
+   * Use this FEN to query games that pass through this opening position.
+   * Example: "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1" for 1.b3
+   */
+  ecoJsonFen?: string;
+
+  /** The opening name from eco.json (e.g., "Nimzo-Larsen Attack") */
+  ecoJsonOpening?: string;
+
+  /** The ECO code from eco.json (e.g., "A01") */
+  ecoJsonEco?: string;
+
+  /** How many half-moves back from the game's end position was this opening found */
+  movesBack?: number;
 }
 
 /**

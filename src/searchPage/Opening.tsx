@@ -67,12 +67,13 @@ const Opening = ({
             name,
             from,
             lastKnownOpening,
+            openingFen: data.fen,
           }}
         />
       </div>
     );
   } else {
-    const { eco, name, src, score } = lastKnownOpening;
+    const { eco, name, src, score, fen: openingFen } = lastKnownOpening;
     return (
       <div className="double-column left">
         <OpeningName {...{ eco, name, src, score }} />
@@ -86,6 +87,7 @@ const Opening = ({
             name,
             from: undefined,
             lastKnownOpening,
+            openingFen,
           }}
         />
       </div>
