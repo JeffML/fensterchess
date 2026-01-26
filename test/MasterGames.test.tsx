@@ -92,7 +92,7 @@ describe("MasterGames Component", () => {
 
   it("should show loading state", () => {
     fetchSpy.mockImplementation(
-      () => new Promise(() => {}) // Never resolves
+      () => new Promise(() => {}), // Never resolves
     );
 
     render(<TestWrapper fen={testFen} openingName="Italian Game" />);
@@ -135,7 +135,9 @@ describe("MasterGames Component", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          openings: [{ name: "King's Pawn", fen: fen1, eco: "B00", gameCount: 1 }],
+          openings: [
+            { name: "King's Pawn", fen: fen1, eco: "B00", gameCount: 1 },
+          ],
           masters: [{ playerName: "Player A", gameCount: 1 }],
           totalMasters: 1,
           totalGames: 1,
@@ -148,7 +150,9 @@ describe("MasterGames Component", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          openings: [{ name: "King's Pawn Game", fen: fen2, eco: "C20", gameCount: 1 }],
+          openings: [
+            { name: "King's Pawn Game", fen: fen2, eco: "C20", gameCount: 1 },
+          ],
           masters: [{ playerName: "Player C", gameCount: 1 }],
           totalMasters: 1,
           totalGames: 1,
@@ -160,7 +164,7 @@ describe("MasterGames Component", () => {
       });
 
     const { rerender } = render(
-      <TestWrapper fen={fen1} openingName="King's Pawn" />
+      <TestWrapper fen={fen1} openingName="King's Pawn" />,
     );
 
     await waitFor(() => {
@@ -179,12 +183,12 @@ describe("MasterGames Component", () => {
     expect(fetchSpy).toHaveBeenNthCalledWith(
       1,
       expect.stringContaining(encodeURIComponent(fen1)),
-      expect.any(Object)
+      expect.any(Object),
     );
     expect(fetchSpy).toHaveBeenNthCalledWith(
       2,
       expect.stringContaining(encodeURIComponent(fen2)),
-      expect.any(Object)
+      expect.any(Object),
     );
   });
 
@@ -243,7 +247,7 @@ describe("MasterGames Component", () => {
         fen={testFen}
         openingName="Spanish Game"
         onBoardStateChange={setBoardState}
-      />
+      />,
     );
 
     // Wait for openings to load
@@ -270,7 +274,7 @@ describe("MasterGames Component", () => {
     // Verify getMasterGameMoves was called
     expect(fetchSpy).toHaveBeenCalledWith(
       expect.stringContaining("getMasterGameMoves?gameId=42"),
-      expect.any(Object)
+      expect.any(Object),
     );
   });
 });

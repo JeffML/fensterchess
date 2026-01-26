@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-import { parseMoves, toPlay } from "../utils/chessTools";
+import { parseMoves, toPlay, extractSanMoves } from "../utils/chessTools";
 import { OpeningAdditionalWithBarChartGrid } from "./OpeningAdditional";
 import { SimilarOpenings } from "./SimilarOpenings";
 import { NextOpenings } from "./nextOpeningsEtc/NextOpenings";
@@ -155,6 +155,9 @@ const OpeningTabs = ({
                   name,
                   sites: sites.selectedSites,
                   openingFen,
+                  searchMoves: extractSanMoves(boardState.moves)
+                    .filter((m) => !["*", "1-0", "0-1", "1/2-1/2"].includes(m))
+                    .join(" "),
                 }}
               />
             </div>

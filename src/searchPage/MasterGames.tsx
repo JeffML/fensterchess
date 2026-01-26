@@ -18,6 +18,7 @@ interface MasterGame {
   opening?: string;
   ply: number;
   source: string;
+  moves: string; // SAN move sequence (space-separated, no move numbers)
 }
 
 interface Opening {
@@ -54,10 +55,10 @@ interface MasterGamesResponse {
 async function fetchMasterGamesByPosition(
   fen: string,
   page: number,
-  fallbackFen?: string
+  fallbackFen?: string,
 ): Promise<MasterGamesByPositionResponse> {
   let url = `/.netlify/functions/getMasterGamesByPosition?fen=${encodeURIComponent(
-    fen
+    fen,
   )}&page=${page}&pageSize=10`;
   if (fallbackFen) {
     url += `&fallbackFen=${encodeURIComponent(fallbackFen)}`;
@@ -78,17 +79,17 @@ async function fetchMasterGamesByPosition(
 // Fetch games for a specific FEN (exact match)
 async function fetchMasterGames(
   fen: string,
-  page: number
+  page: number,
 ): Promise<MasterGamesResponse> {
   const response = await fetch(
     `/.netlify/functions/queryMasterGamesByFen?fen=${encodeURIComponent(
-      fen
+      fen,
     )}&page=${page}&pageSize=20`,
     {
       headers: {
         Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
       },
-    }
+    },
   );
 
   if (!response.ok) {
@@ -105,7 +106,7 @@ async function fetchGameMoves(gameId: number): Promise<string> {
       headers: {
         Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
       },
-    }
+    },
   );
 
   if (!response.ok) {
@@ -120,12 +121,14 @@ const MasterGamesComponent = ({
   fen,
   openingName,
   openingFen,
+  searchMoves,
   chess,
   setBoardState,
 }: {
   fen: FEN;
   openingName?: string;
   openingFen?: string;
+  searchMoves?: string;
   chess: MutableRefObject<ChessPGN>;
   setBoardState: (state: BoardState) => void;
 }) => {
@@ -135,7 +138,7 @@ const MasterGamesComponent = ({
   const [selectedGameIdx, setSelectedGameIdx] = useState<number | null>(null);
   const [isFlashing, setIsFlashing] = useState(false);
   const [expandedEcoCodes, setExpandedEcoCodes] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const prevOpeningNameRef = useRef<string | undefined>(openingName);
 
@@ -171,35 +174,37 @@ const MasterGamesComponent = ({
       chess.current.loadPgn(moves);
       const fullGameMoves = chess.current.pgn();
 
-      // Navigate to the opening position by undoing moves until we reach the opening FEN
-      let currentFen = chess.current.fen();
-      const targetPositionFen = targetFen.split(" ")[0]; // Position-only FEN (ignore turn/castling)
-      let plyCount = chess.current.history().length;
-
-      while (currentFen.split(" ")[0] !== targetPositionFen) {
-        const history = chess.current.history();
-        if (history.length === 0) {
-          // Can't go back further - position not found in game
-          console.warn(
-            "Opening position not found in game, loading from start"
-          );
-          chess.current.reset();
-          chess.current.loadPgn(moves);
-          plyCount = chess.current.history().length;
-          break;
+      // Find the ply count for the selected opening
+      let openingPlyCount = 0;
+      if (selectedOpening && typeof selectedOpening.ply === "number") {
+        openingPlyCount = selectedOpening.ply;
+      } else {
+        // Fallback: use the number of moves up to the target position
+        // Try to find the position in the game
+        let currentFen = chess.current.fen();
+        const targetPositionFen = targetFen.split(" ")[0];
+        let plyCount = chess.current.history().length;
+        while (currentFen.split(" ")[0] !== targetPositionFen) {
+          const history = chess.current.history();
+          if (history.length === 0) {
+            chess.current.reset();
+            chess.current.loadPgn(moves);
+            plyCount = chess.current.history().length;
+            break;
+          }
+          chess.current.undo();
+          plyCount--;
+          currentFen = chess.current.fen();
         }
-        chess.current.undo();
-        plyCount--;
-        currentFen = chess.current.fen();
+        openingPlyCount = plyCount;
       }
 
-      // Update board state with the opening position, full game moves, and current ply
-      const resultingFen = chess.current.fen();
+      // Update board state with the opening position, full game moves, and opening ply count
       setBoardState({
-        fen: resultingFen,
+        fen: chess.current.fen(),
         moves: fullGameMoves,
-        currentPly: plyCount,
-        openingPlyCount: plyCount, // Highlight opening moves in move display
+        currentPly: openingPlyCount,
+        openingPlyCount,
       });
     } catch (error) {
       console.error("Error loading game moves:", error);
@@ -208,7 +213,7 @@ const MasterGamesComponent = ({
   };
 
   // Fetch openings/masters for the position
-  console.log('[DEBUG MasterGames] fen:', fen, 'openingFen:', openingFen);
+  console.log("[DEBUG MasterGames] fen:", fen, "openingFen:", openingFen);
   const { isError, error, data, isPending } =
     useQuery<MasterGamesByPositionResponse>({
       queryKey: ["masterGamesByPosition", fen, page, openingFen],
@@ -259,7 +264,17 @@ const MasterGamesComponent = ({
 
   // If showing games for a selected opening
   if (selectedOpening && gamesData) {
-    const totalGamesPages = Math.ceil(gamesData.total / gamesData.pageSize);
+    // Mark transpositions and prepare display games
+    const hasSearchMoves =
+      searchMoves && gamesData.games[0]?.moves !== undefined;
+    const displayGames = hasSearchMoves
+      ? gamesData.games.map((game) => {
+          const isTransposition = !game.moves.startsWith(searchMoves);
+          return { ...game, isTransposition };
+        })
+      : gamesData.games.map((game) => ({ ...game, isTransposition: false }));
+
+    const totalGamesPages = Math.ceil(displayGames.length / gamesData.pageSize);
     const hasNextGamesPage = gamesPage < totalGamesPages - 1;
     const hasPrevGamesPage = gamesPage > 0;
 
@@ -328,13 +343,21 @@ const MasterGamesComponent = ({
               </div>
 
               {/* Games */}
-              {gamesData.games.map((game, idx) => {
+              {displayGames.map((game, idx) => {
                 const whiteDisplay = game.whiteTitle
                   ? `${game.whiteTitle} ${game.white} (${game.whiteElo})`
                   : `${game.white} (${game.whiteElo})`;
                 const blackDisplay = game.blackTitle
                   ? `${game.blackTitle} ${game.black} (${game.blackElo})`
                   : `${game.black} (${game.blackElo})`;
+
+                // Color code: blue for exact, yellow for transposition, highlight selected
+                let bgColor = "transparent";
+                if (selectedGameIdx === game.idx) {
+                  bgColor = "#2a4a6a";
+                } else if (game.isTransposition) {
+                  bgColor = "#6a5c2a"; // yellow-brown for transpositions
+                }
 
                 return (
                   <div
@@ -349,20 +372,24 @@ const MasterGamesComponent = ({
                       padding: "0.25em 0.5em",
                       cursor: "pointer",
                       borderBottom: "1px solid #333",
-                      backgroundColor:
-                        selectedGameIdx === game.idx ? "#2a4a6a" : "transparent",
+                      backgroundColor: bgColor,
                     }}
                     onMouseEnter={(e) => {
                       if (selectedGameIdx !== game.idx) {
-                        e.currentTarget.style.backgroundColor = "#3a3a3a";
+                        e.currentTarget.style.backgroundColor =
+                          game.isTransposition ? "#8a7c3a" : "#3a3a3a";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (selectedGameIdx !== game.idx) {
-                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.backgroundColor = bgColor;
                       }
                     }}
-                    title="Click to load game"
+                    title={
+                      game.isTransposition
+                        ? "Transposition: position reached by different move order"
+                        : "Click to load game"
+                    }
                   >
                     <div style={{ color: "#888" }}>
                       {gamesPage * gamesData.pageSize + idx + 1}
@@ -373,6 +400,17 @@ const MasterGamesComponent = ({
                     <div style={{ fontSize: "0.85em", color: "#bbb" }}>
                       {game.event}{" "}
                       {game.date && `(${game.date.substring(0, 4)})`}
+                      {game.isTransposition && (
+                        <span
+                          style={{
+                            color: "#e6c200",
+                            marginLeft: "0.5em",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          [T]
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
@@ -481,7 +519,7 @@ const MasterGamesComponent = ({
             const openings = ecoGroups.get(eco)!;
             const totalGames = openings.reduce(
               (sum, o) => sum + o.gameCount,
-              0
+              0,
             );
             const isExpanded = expandedEcoCodes.has(eco);
             const hasMultiple = openings.length > 1;
@@ -726,5 +764,5 @@ export const MasterGames = memo(
       prevProps.openingName === nextProps.openingName &&
       prevProps.openingFen === nextProps.openingFen
     );
-  }
+  },
 );

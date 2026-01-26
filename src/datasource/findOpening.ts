@@ -23,13 +23,13 @@ export function findOpening(
   fen: FEN | "start",
   positionBook: PositionBook,
   fromTosForFen: FromTosResponse | null,
-  scoresForFens: ScoresResponse | null
+  scoresForFens: ScoresResponse | null,
 ): Opening | undefined {
   // Use eco.json's findOpening for base lookup (cast to handle type compatibility)
   const baseOpening = ecoFindOpening(
     openingBook as any,
     fen === "start" ? "start" : fen,
-    positionBook
+    positionBook,
   );
 
   if (!baseOpening) {
@@ -38,7 +38,10 @@ export function findOpening(
 
   // Create enriched opening with fensterchess-specific fields
   // Include the FEN since it's the key, not stored in the value
-  let opening: Opening = { ...baseOpening, fen: fen === "start" ? undefined : fen };
+  let opening: Opening = {
+    ...baseOpening,
+    fen: fen === "start" ? undefined : fen,
+  };
 
   // Enrich with scores and transitions (fensterchess-specific)
   if (fromTosForFen && scoresForFens) {
@@ -81,7 +84,7 @@ export function findOpening(
  */
 export function findNearestOpening(
   moves: string,
-  openingBook: OpeningBook
+  openingBook: OpeningBook,
 ): NearestOpeningResult {
   if (!moves || moves.trim() === "") {
     return { opening: undefined, movesBack: 0 };
@@ -103,10 +106,10 @@ export function findNearestOpening(
   // Walk backward through moves until we find an opening
   while (true) {
     const currentFen = tempChess.fen();
-    
+
     // Check if this position is in the opening book (the FEN IS the key)
     let opening = openingBook[currentFen];
-    
+
     // Try position-only fallback if no exact match
     if (!opening && posBook) {
       const position = currentFen.split(" ")[0];
@@ -148,12 +151,12 @@ export const getFromTosForFen = async (fen: FEN): Promise<FromTosResponse> => {
       headers: {
         Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
       },
-    }
+    },
   );
 
   if (!response.ok) {
     console.error(
-      `Failed to fetch fromTos for FEN: ${response.status} ${response.statusText}`
+      `Failed to fetch fromTos for FEN: ${response.status} ${response.statusText}`,
     );
     // Return empty arrays instead of throwing, so the app continues to work
     return { next: [], from: [] };
@@ -163,7 +166,7 @@ export const getFromTosForFen = async (fen: FEN): Promise<FromTosResponse> => {
 };
 
 export const getScoresForFens = async (
-  json: ScoresRequest
+  json: ScoresRequest,
 ): Promise<ScoresResponse> => {
   const response = await fetch("/.netlify/functions/scoresForFens", {
     method: "POST",
@@ -176,7 +179,7 @@ export const getScoresForFens = async (
 
   if (!response.ok) {
     console.error(
-      `Failed to fetch scores: ${response.status} ${response.statusText}`
+      `Failed to fetch scores: ${response.status} ${response.statusText}`,
     );
     // Return null scores instead of throwing, so the app continues to work
     return { score: null, nextScores: [], fromScores: [] };

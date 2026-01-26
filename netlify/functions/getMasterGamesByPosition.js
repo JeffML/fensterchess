@@ -52,7 +52,7 @@ function loadAncestorToDescendantsIndex() {
   if (!ancestorToDescendantsIndex) {
     const indexPath = "data/indexes/ancestor-to-descendants.json";
     ancestorToDescendantsIndex = JSON.parse(
-      fs.readFileSync(indexPath, "utf-8")
+      fs.readFileSync(indexPath, "utf-8"),
     );
   }
   return ancestorToDescendantsIndex;
@@ -189,7 +189,7 @@ export const handler = async (event) => {
       }
     }
     const openings = Array.from(openingsMap.values()).sort((a, b) =>
-      a.name.localeCompare(b.name)
+      a.name.localeCompare(b.name),
     );
 
     // Aggregate game counts per player
@@ -212,7 +212,7 @@ export const handler = async (event) => {
       ([playerName, gameCount]) => ({
         playerName,
         gameCount,
-      })
+      }),
     );
 
     // Sort based on parameters

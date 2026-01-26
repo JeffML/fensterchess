@@ -1,3 +1,4 @@
+// Force reload - v2 with moves field
 /**
  * Query master games by EXACT FEN position match
  *
@@ -126,7 +127,8 @@ export const handler = async (event) => {
       // Find game in chunk
       const game = chunk.games.find((g) => g.idx === gameId);
       if (game) {
-        // Return only metadata (not full PGN moves)
+        console.log("[DEBUG] game.moves:", game.moves?.substring(0, 30));
+        // Return metadata and moves for filtering
         games.push({
           idx: game.idx,
           white: game.white,
@@ -142,6 +144,7 @@ export const handler = async (event) => {
           opening: game.opening || game.ecoJsonOpening,
           ply: game.ply,
           source: game.source,
+          moves: game.moves,
         });
       }
     }
@@ -164,11 +167,11 @@ export const handler = async (event) => {
       // Sort by highest title first
       const aMaxTitle = Math.min(
         titleRank[a.whiteTitle] || 99,
-        titleRank[a.blackTitle] || 99
+        titleRank[a.blackTitle] || 99,
       );
       const bMaxTitle = Math.min(
         titleRank[b.whiteTitle] || 99,
-        titleRank[b.blackTitle] || 99
+        titleRank[b.blackTitle] || 99,
       );
 
       if (aMaxTitle !== bMaxTitle) {

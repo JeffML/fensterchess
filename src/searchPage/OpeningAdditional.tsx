@@ -26,12 +26,14 @@ export const OpeningAdditionalWithBarChartGrid = ({
   fen,
   openingName,
   openingFen,
+  searchMoves,
   chess,
   setBoardState,
 }: {
   fen: FEN;
   openingName?: string;
   openingFen?: string;
+  searchMoves?: string;
   chess: MutableRefObject<ChessPGN>;
   setBoardState: (state: BoardState) => void;
 }) => {
@@ -89,6 +91,7 @@ export const OpeningAdditionalWithBarChartGrid = ({
         fen={fen}
         openingName={openingName}
         openingFen={openingFen}
+        searchMoves={searchMoves}
         chess={chess}
         setBoardState={setBoardState}
       />

@@ -24,7 +24,7 @@ describe("findNearestOpening", () => {
     expect(result.movesBack).toBe(0);
     // FEN should be the position after 1. b3
     expect(result.opening?.fen).toBe(
-      "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1"
+      "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1",
     );
   });
 
@@ -36,7 +36,7 @@ describe("findNearestOpening", () => {
     expect(result.movesBack).toBe(1);
     // FEN should be the position after 1. b3, NOT after 1. b3 d6
     expect(result.opening?.fen).toBe(
-      "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1"
+      "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1",
     );
   });
 
@@ -48,7 +48,7 @@ describe("findNearestOpening", () => {
     expect(result.movesBack).toBe(2);
     // FEN should be the position after 1. b3
     expect(result.opening?.fen).toBe(
-      "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1"
+      "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1",
     );
   });
 
@@ -63,7 +63,7 @@ describe("findNearestOpening", () => {
     // The opening FEN (after 1. b3) should be DIFFERENT
     expect(result.opening?.fen).not.toBe(searchFen);
     expect(result.opening?.fen).toBe(
-      "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1"
+      "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1",
     );
   });
 });

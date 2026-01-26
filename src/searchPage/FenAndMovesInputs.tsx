@@ -35,7 +35,8 @@ const MoveDisplay = ({
   }
 
   // Find where opening ends by counting SAN moves
-  const sanMoveRegex = /[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](=[QRBN])?[+#]?|O-O(-O)?[+#]?/g;
+  const sanMoveRegex =
+    /[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](=[QRBN])?[+#]?|O-O(-O)?[+#]?/g;
   let plyCount = 0;
   let splitIndex = moves.length;
 
@@ -71,7 +72,7 @@ const OPENING_ALIASES: Record<string, string[]> = {
 
 function filterOpenings(
   searchTerm: string,
-  openingBook: OpeningBook | undefined
+  openingBook: OpeningBook | undefined,
 ): Array<[string, Opening]> {
   if (!searchTerm.trim() || !openingBook) return [];
 
@@ -134,7 +135,7 @@ const FenAndMovesInputs = ({
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   const handleFenPaste = (
-    e: ClipboardEvent<HTMLDivElement | HTMLTextAreaElement>
+    e: ClipboardEvent<HTMLDivElement | HTMLTextAreaElement>,
   ) => {
     e.preventDefault();
     let input = e.clipboardData.getData("text");
@@ -160,7 +161,7 @@ const FenAndMovesInputs = ({
       const posEntry = positionBook[stubFen];
       if (!posEntry || posEntry.length === 0) {
         alert(
-          "Position not found in opening database. Please enter a full FEN or a position from the opening book."
+          "Position not found in opening database. Please enter a full FEN or a position from the opening book.",
         );
         return;
       }
@@ -226,7 +227,7 @@ const FenAndMovesInputs = ({
   // Filter openings based on debounced search term
   const filteredOpenings = useMemo(
     () => filterOpenings(debouncedSearchTerm, openingBook),
-    [debouncedSearchTerm, openingBook]
+    [debouncedSearchTerm, openingBook],
   );
 
   const handleOpeningClick = useCallback(
@@ -244,7 +245,7 @@ const FenAndMovesInputs = ({
         alert(`Error loading opening: ${(ex as Error).message}`);
       }
     },
-    [chess, setBoardState, setLastKnownOpening]
+    [chess, setBoardState, setLastKnownOpening],
   );
 
   const fenDisplay =
@@ -371,7 +372,9 @@ const FenAndMovesInputs = ({
             <div
               id="moves-input"
               onPaste={(e: ClipboardEvent<HTMLDivElement>) => {
-                handleMovesPaste(e as unknown as ClipboardEvent<HTMLTextAreaElement>);
+                handleMovesPaste(
+                  e as unknown as ClipboardEvent<HTMLTextAreaElement>,
+                );
               }}
               style={{
                 fontFamily: "monospace",

@@ -3,12 +3,14 @@
 ## Quick Reference
 
 **chessPGN API Patterns:**
+
 - **Single game**: `loadPgn(pgnString)` → `IChessGame` instance (use `.move()`, `.fen()`, etc.)
 - **Bulk processing**: `indexPgnGames(pgnString)` → `Cursor<metadata>` (yields `{startOffset, endOffset, headers}`)
 - **CRITICAL**: Cursor items are metadata objects, NOT `IChessGame` instances - must call `loadPgn()` separately for full game API
 - Access metadata: `game.headers.White` (not `game.header('White')`)
 
 **Netlify Serverless Functions:**
+
 - **ESM syntax required**: Use `import`/`export`, never `require`/`module.exports`
 - **File paths**: Use simple relative paths like `'data/file.json'` (see `getFromTosForFen.js` for pattern)
 - **NEVER use**: `import.meta.url`, `__dirname`, `path.join()` - causes bundler warnings
@@ -16,12 +18,14 @@
 - **Data files**: Configure in `netlify.toml` under `[functions]` → `included_files`
 
 **Opening Lookup Patterns:**
+
 - **openingBook**: Full FEN → opening data (exact match with turn/castling/en passant)
 - **positionBook**: Position-only FEN → full FEN (fallback for transpositions)
 - **Pattern**: `findOpening(openingBook, fen, positionBook)` tries exact match first, then position-only
 - **FEN structure**: `"position w KQkq - halfmove fullmove"` - position is first field split by space
 
 **Game vs Opening Data:**
+
 - **Opening data** (~12K named variations): Use `@chess-openings/eco.json` package methods
 - **Master games** (~19K games): Use local indexes in `data/indexes/`
 - **Transitions**: `fromTo.json` is raw data, `fromToPositionIndexed.json` is optimized for lookup
@@ -397,6 +401,7 @@ Each game in the index has these fields for opening lookup:
 - **`movesBack`**: How many half-moves from the end of the game this opening position occurs
 
 **Example**: A game ending at move 40 that plays 1.b3 d6 2.Bb2:
+
 - `ecoJsonFen`: FEN after 1.b3 (the Nimzo-Larsen Attack position - the INDEX KEY)
 - `ecoJsonOpening`: "Nimzo-Larsen Attack"
 - `ecoJsonEco`: "A01"
