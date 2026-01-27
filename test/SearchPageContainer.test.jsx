@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import SearchPageContainer from "../src/searchPage/SearchPageContainer";
 import { OpeningBookContext } from "../src/contexts/OpeningBookContext";
+import { SearchPageProvider } from "../src/contexts/SearchPageContext";
 
 // Mock the OpeningBookContext to provide a valid openingBook
 vi.mock("../src/contexts/OpeningBookContext", async () => {
@@ -19,7 +20,7 @@ vi.mock("../src/datasource/findOpening.ts", () => ({
   findNearestOpening: vi.fn(() => ({ opening: undefined, movesBack: 0 })),
   getFromTosForFen: vi.fn(() => Promise.resolve({ next: [], from: [] })),
   getScoresForFens: vi.fn(() =>
-    Promise.resolve({ score: null, nextScores: [], fromScores: [] })
+    Promise.resolve({ score: null, nextScores: [], fromScores: [] }),
   ),
 }));
 
@@ -73,15 +74,17 @@ describe("SearchPageContainer with query parameters", () => {
 
     const { container } = render(
       <QueryClientProvider client={queryClient}>
-        <OpeningBookContext.Provider
-          value={{
-            openingBook: mockOpeningBook,
-            positionBook: mockPositionBook,
-          }}
-        >
-          <SearchPageContainer />
-        </OpeningBookContext.Provider>
-      </QueryClientProvider>
+        <SearchPageProvider>
+          <OpeningBookContext.Provider
+            value={{
+              openingBook: mockOpeningBook,
+              positionBook: mockPositionBook,
+            }}
+          >
+            <SearchPageContainer />
+          </OpeningBookContext.Provider>
+        </SearchPageProvider>
+      </QueryClientProvider>,
     );
 
     // Wait for the board state to update
@@ -123,7 +126,7 @@ describe("SearchPageContainer with query parameters", () => {
         >
           <SearchPageContainer />
         </OpeningBookContext.Provider>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
 
     // Wait for the state to update with the parsed moves
@@ -167,7 +170,7 @@ describe("SearchPageContainer with query parameters", () => {
         >
           <SearchPageContainer />
         </OpeningBookContext.Provider>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
 
     // Wait for the opening to be found and moves to be displayed
@@ -177,7 +180,7 @@ describe("SearchPageContainer with query parameters", () => {
         expect(movesInput).toBeTruthy();
         expect(movesInput.value).toContain("d4");
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     );
 
     // Verify the FEN display shows the position
@@ -209,7 +212,7 @@ describe("SearchPageContainer with query parameters", () => {
         >
           <SearchPageContainer />
         </OpeningBookContext.Provider>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
 
     // Wait for the FEN to be displayed
@@ -248,7 +251,7 @@ describe("SearchPageContainer with query parameters", () => {
         >
           <SearchPageContainer />
         </OpeningBookContext.Provider>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
 
     // Wait for the FEN to be displayed AND moves to be loaded from opening
@@ -263,7 +266,7 @@ describe("SearchPageContainer with query parameters", () => {
         // Wait for moves to be populated
         expect(movesInput.value).not.toBe("");
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     );
 
     // Verify the moves are displayed correctly
@@ -294,7 +297,7 @@ describe("SearchPageContainer with query parameters", () => {
         >
           <SearchPageContainer />
         </OpeningBookContext.Provider>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
 
     // Wait for the moves to be processed

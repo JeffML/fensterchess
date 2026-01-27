@@ -3,7 +3,7 @@ import { render, waitFor, screen } from "@testing-library/react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { SimilarOpenings } from "../src/searchPage/SimilarOpenings";
 import { OpeningBookContext } from "../src/contexts/OpeningBookContext";
-import { SearchPageContext } from "../src/searchPage/SearchPageContext";
+import { SearchPageContext } from "../src/contexts/SearchPageContext";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
 import { useRef } from "react";
 
@@ -64,7 +64,13 @@ describe("SimilarOpenings - Back Button Fix", () => {
             value={{ openingBook: mockOpeningBook, positionBook: {} }}
           >
             <SearchPageContext.Provider
-              value={{ chess, boardState, setBoardState, undoStack, setUndoStack }}
+              value={{
+                chess,
+                boardState,
+                setBoardState,
+                undoStack,
+                setUndoStack,
+              }}
             >
               <SimilarOpenings />
             </SearchPageContext.Provider>
@@ -112,7 +118,13 @@ describe("SimilarOpenings - Back Button Fix", () => {
             value={{ openingBook: mockOpeningBook, positionBook: {} }}
           >
             <SearchPageContext.Provider
-              value={{ chess, boardState, setBoardState, undoStack, setUndoStack }}
+              value={{
+                chess,
+                boardState,
+                setBoardState,
+                undoStack,
+                setUndoStack,
+              }}
             >
               <SimilarOpenings />
             </SearchPageContext.Provider>
@@ -181,7 +193,13 @@ describe("SimilarOpenings - Back Button Fix", () => {
             value={{ openingBook: mockOpeningBook, positionBook: {} }}
           >
             <SearchPageContext.Provider
-              value={{ chess, boardState, setBoardState, undoStack, setUndoStack }}
+              value={{
+                chess,
+                boardState,
+                setBoardState,
+                undoStack,
+                setUndoStack,
+              }}
             >
               <SimilarOpenings />
             </SearchPageContext.Provider>

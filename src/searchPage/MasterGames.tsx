@@ -26,6 +26,7 @@ interface Opening {
   fen: string;
   eco: string;
   gameCount: number;
+  ply: number;
 }
 
 interface Master {

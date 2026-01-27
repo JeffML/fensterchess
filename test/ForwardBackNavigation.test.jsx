@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import SearchPage from "../src/searchPage/SearchPage";
 import { OpeningBookContext } from "../src/contexts/OpeningBookContext";
@@ -50,7 +49,14 @@ describe("Forward/Back Navigation", () => {
             value={{ openingBook: mockOpeningBook, positionBook: {} }}
           >
             <SearchPage
-              {...{ chess, boardState, setBoardState, data: mockOpeningBook["rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"] }}
+              {...{
+                chess,
+                boardState,
+                setBoardState,
+                data: mockOpeningBook[
+                  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                ],
+              }}
             />
           </OpeningBookContext.Provider>
         </QueryClientProvider>

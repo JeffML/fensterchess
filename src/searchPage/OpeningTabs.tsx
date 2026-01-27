@@ -9,7 +9,7 @@ import { Roots } from "./nextOpeningsEtc/Roots";
 import { Theory, theoryRequest } from "./Theory";
 import { Opening } from "../types";
 import { SelectedSitesState } from "../contexts/SelectedSitesContext";
-import { useSearchPage } from "./SearchPageContext";
+import { useSearchPage } from "../contexts/SearchPageContext";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
 
 const chess = new ChessPGN();

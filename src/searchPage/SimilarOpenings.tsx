@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { OpeningBookContext } from "../contexts/OpeningBookContext";
 import "../stylesheets/similar.css";
 import { FEN } from "../types";
-import { useSearchPage } from "./SearchPageContext";
+import { useSearchPage } from "../contexts/SearchPageContext";
 
 interface SimilarResponse {
   similar: FEN[];
@@ -17,7 +17,7 @@ const getSimilar = async (fen: FEN): Promise<SimilarResponse> => {
       headers: {
         Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
       },
-    }
+    },
   );
   const data = await response.json();
   return data;
@@ -63,7 +63,7 @@ const SimilarOpenings = () => {
         return { fen, name, moves };
       })
       .filter(
-        (sim): sim is { fen: FEN; name: string; moves: string } => sim !== null
+        (sim): sim is { fen: FEN; name: string; moves: string } => sim !== null,
       );
 
     //   if (!openingBook) return <div>Loading...</div>;

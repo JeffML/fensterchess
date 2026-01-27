@@ -10,15 +10,15 @@ import {
   PositionBook,
 } from "../types";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
-import { SearchPageContext } from "./SearchPageContext";
+import { SearchPageContext } from "../contexts/SearchPageContext";
 import { extractSanMoves } from "../utils/chessTools";
 
 // Lazy load heavy components
 const Opening = lazy(() =>
-  import("./Opening").then((m) => ({ default: m.Opening }))
+  import("./Opening").then((m) => ({ default: m.Opening })),
 );
 const Chessboard = lazy(() =>
-  import("kokopu-react").then((m) => ({ default: m.Chessboard }))
+  import("kokopu-react").then((m) => ({ default: m.Chessboard })),
 );
 
 interface SearchPageProps {
@@ -47,11 +47,11 @@ const SearchPage = ({
   const [lastKnownOpening, setLastKnownOpening] = useState<
     Partial<OpeningType>
   >({});
-  
+
   // Create context value with all shared state
   const contextValue = useMemo(
     () => ({ chess, boardState, setBoardState }),
-    [chess, boardState, setBoardState]
+    [chess, boardState, setBoardState],
   );
 
   const reset = () => {
@@ -81,11 +81,11 @@ const SearchPage = ({
 
     // Navigate to previous ply
     const targetPly = currentPly - 1;
-    
+
     // Load the game from start and navigate to target ply
     chess.current.reset();
     const sanMoves = extractSanMoves(moves);
-    
+
     for (let i = 0; i < targetPly; i++) {
       if (i < sanMoves.length) {
         chess.current.move(sanMoves[i]);
@@ -105,10 +105,10 @@ const SearchPage = ({
 
     // Navigate to next ply
     const targetPly = currentPly + 1;
-    
+
     // Load the game from start and navigate to target ply
     chess.current.reset();
-    
+
     for (let i = 0; i < targetPly; i++) {
       if (i < sanMoves.length) {
         chess.current.move(sanMoves[i]);
@@ -124,80 +124,82 @@ const SearchPage = ({
   return (
     <SearchPageContext.Provider value={contextValue}>
       <div className="row text-white">
-      <div className="column" style={{ alignItems: "center" }}>
-        <Suspense fallback={<div>Loading chessboard...</div>}>
-          <Chessboard
-            interactionMode="playMoves"
-            position={fen}
-            onMovePlayed={(move: string) => handleMovePlayed(move)}
-          />
-        </Suspense>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            width: "100%",
-            marginLeft: "-20px",
-          }}
-        >
-          <ActionButton {...{ onClick: () => back(), text: "<<" }} />
-          <ActionButton {...{ onClick: () => reset(), text: "Reset" }} />
-          <ActionButton
-            {...{
-              onClick: () => forward(),
-              text: ">>",
-              disabled: boardState.currentPly === undefined || 
-                        !boardState.moves ||
-                        boardState.currentPly >= extractSanMoves(boardState.moves).length,
+        <div className="column" style={{ alignItems: "center" }}>
+          <Suspense fallback={<div>Loading chessboard...</div>}>
+            <Chessboard
+              interactionMode="playMoves"
+              position={fen}
+              onMovePlayed={(move: string) => handleMovePlayed(move)}
+            />
+          </Suspense>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              width: "100%",
+              marginLeft: "-20px",
             }}
-          />
-        </div>
+          >
+            <ActionButton {...{ onClick: () => back(), text: "<<" }} />
+            <ActionButton {...{ onClick: () => reset(), text: "Reset" }} />
+            <ActionButton
+              {...{
+                onClick: () => forward(),
+                text: ">>",
+                disabled:
+                  boardState.currentPly === undefined ||
+                  !boardState.moves ||
+                  boardState.currentPly >=
+                    extractSanMoves(boardState.moves).length,
+              }}
+            />
+          </div>
 
-        <div className="row">
-          <div className="column">
-            <div className="row">
-              <FenAndMovesInputs
-                {...{
-                  boardState,
-                  setBoardState,
-                  chess,
-                  setLastKnownOpening,
-                  openingBook,
-                  positionBook,
-                }}
-              />
+          <div className="row">
+            <div className="column">
+              <div className="row">
+                <FenAndMovesInputs
+                  {...{
+                    boardState,
+                    setBoardState,
+                    chess,
+                    setLastKnownOpening,
+                    openingBook,
+                    positionBook,
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="double-column left">
-        <div className="row" style={{ marginTop: "0px" }}>
-          {loading && <span className="text-success">Searching...</span>}
+        <div className="double-column left">
+          <div className="row" style={{ marginTop: "0px" }}>
+            {loading && <span className="text-success">Searching...</span>}
 
-          {error &&
-            (error.message.startsWith("not_found") ? (
-              NO_ENTRY_FOUND
-            ) : (
-              <span className="text-error">{error.toString()}</span>
-            ))}
+            {error &&
+              (error.message.startsWith("not_found") ? (
+                NO_ENTRY_FOUND
+              ) : (
+                <span className="text-error">{error.toString()}</span>
+              ))}
 
-          {data && (
-            <Suspense fallback={<div>Loading opening data...</div>}>
-              <Opening
-                {...{
-                  handleMovePlayed,
-                  data,
-                  lastKnownOpening,
-                  setLastKnownOpening,
-                  nearestOpeningInfo,
-                }}
-              />
-            </Suspense>
-          )}
+            {data && (
+              <Suspense fallback={<div>Loading opening data...</div>}>
+                <Opening
+                  {...{
+                    handleMovePlayed,
+                    data,
+                    lastKnownOpening,
+                    setLastKnownOpening,
+                    nearestOpeningInfo,
+                  }}
+                />
+              </Suspense>
+            )}
+          </div>
         </div>
       </div>
-    </div>
     </SearchPageContext.Provider>
   );
 };
