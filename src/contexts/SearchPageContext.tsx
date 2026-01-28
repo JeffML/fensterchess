@@ -29,7 +29,9 @@ const defaultBoardState: BoardState = {
   openingPlyCount: 0,
 };
 
-export const SearchPageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SearchPageProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [boardState, setBoardState] = useState<BoardState>(defaultBoardState);
   const chess = useRef(new ChessPGN());
   return (
