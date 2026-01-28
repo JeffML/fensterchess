@@ -21,7 +21,7 @@ interface PgnLink {
   pgn?: string;
 }
 
-export type PgnMode = "twic" | "local" | "master";
+export type PgnMode = "twic" | "local" | "master" | null;
 
 interface PgnListPanelProps {
   link: PgnLink;

@@ -11,7 +11,7 @@ import { MasterGamesBrowser } from "./MasterGamesBrowser";
  */
 const AnalyzePgnPage = () => {
   const [link, setLink] = useState<{ url?: string; pgn?: string }>({});
-  const [pgnMode, setPgnMode] = useState<PgnMode>("twic");
+  const [pgnMode, setPgnMode] = useState<PgnMode>(null);
 
   // State for master games selection
   const [selectedMaster, setSelectedMaster] = useState<string | null>(null);
@@ -63,9 +63,7 @@ const AnalyzePgnPage = () => {
       ) : (
         // TWIC/Upload mode - original grid layout
         <div className="grid-style-top-panel">
-          <PgnListPanel
-            {...{ link, setLink, pgnMode, setPgnMode }}
-          />
+          <PgnListPanel {...{ link, setLink, pgnMode, setPgnMode }} />
           <RssFeed />
         </div>
       )}
