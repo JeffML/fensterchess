@@ -10,12 +10,13 @@ const AboutPage = lazy(() => import("./AboutPage")); // default export
 const Visualizations = lazy(() => import("./Visualizations"));
 const AnalyzePgnPage = lazy(() => import("./pgnImportPage/AnalyzePgnPage.jsx"));
 const SearchPageContainer = lazy(
-  () => import("./searchPage/SearchPageContainer")
+  () => import("./searchPage/SearchPageContainer"),
 );
+const GuidePage = lazy(() => import("./GuidePage"));
 
 function App() {
   const [mode, setMode] = useState<Modes>(
-    isTestMode ? modes.test : modes.search
+    isTestMode ? modes.test : modes.search,
   );
 
   return (
@@ -32,6 +33,7 @@ function App() {
             {mode === modes.pgnAnalyze && <AnalyzePgnPage />}
             {mode === modes.visualization && <Visualizations />}
             {mode === modes.about && <AboutPage />}
+            {mode === modes.guide && <GuidePage />}
           </Suspense>
         </OpeningBookProvider>
       </SelectedSitesContextProvider>

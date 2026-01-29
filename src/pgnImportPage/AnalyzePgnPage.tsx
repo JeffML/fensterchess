@@ -71,7 +71,7 @@ const AnalyzePgnPage = () => {
         <PgnTabsPanelContainer
           {...{
             link,
-            pgnMode,
+            pgnMode: pgnMode ?? undefined,
             selectedMaster,
             selectedOpenings,
           }}

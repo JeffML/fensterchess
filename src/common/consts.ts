@@ -25,6 +25,7 @@ export enum Modes {
   PGN_ANALYZE = 4,
   ABOUT = 5,
   VISUALIZATION = 6,
+  GUIDE = 7,
 }
 
 // Legacy export for backward compatibility
@@ -33,6 +34,7 @@ export const modes = {
   test: Modes.TEST,
   search: Modes.SEARCH,
   pgnAnalyze: Modes.PGN_ANALYZE,
+  guide: Modes.GUIDE,
   about: Modes.ABOUT,
   visualization: Modes.VISUALIZATION,
 } as const;
@@ -43,6 +45,7 @@ export const SUBTITLES: Record<number, string> = {
   [Modes.PGN_ANALYZE]: "Import and Analyze PGN",
   [Modes.VISUALIZATION]: "Visualization",
   [Modes.ABOUT]: "About Fenster",
+  [Modes.GUIDE]: "Usage Guide",
 };
 
 export const siteUrls = {

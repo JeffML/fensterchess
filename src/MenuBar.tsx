@@ -42,6 +42,14 @@ const MenuBar = ({ mode, setMode }: MenuBarProps) => {
       >
         <span>About</span>
       </div>
+      <div
+        className={
+          "column menuitem " + (mode === modes.guide ? "selected" : "")
+        }
+        onClick={() => setMode(modes.guide)}
+      >
+        <span>Guide</span>
+      </div>
       <div className="double-column menuitem" style={{ marginTop: "0.5em" }}>
         <label>
           Include Info From:
