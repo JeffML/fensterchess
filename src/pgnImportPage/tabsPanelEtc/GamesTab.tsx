@@ -185,7 +185,7 @@ export const GamesTab = ({
     const opening = findOpeningFromPgnText(
       item.pgnText,
       openingBook,
-      positionBook
+      positionBook,
     );
     const name = opening?.name || "N/A";
     fensterOpeningsCache.current.set(item.index, name);
@@ -201,7 +201,7 @@ export const GamesTab = ({
           <span>White</span>
           <span>Black</span>
           <span className="openingHeading">
-            Opening
+            Opening from
             <span>
               <input
                 type="radio"
@@ -222,13 +222,9 @@ export const GamesTab = ({
                 readOnly={true}
                 onClick={() => setOpeningSrc("fenster")}
                 disabled={!openingBook}
-                title={
-                  openingBook
-                    ? "Fenster openings from eco.json"
-                    : "Loading opening book..."
-                }
+                title={openingBook ? "Opening book" : "Loading opening book..."}
               ></input>
-              Fenster
+              eco.json
             </span>
           </span>
           <span>Result</span>

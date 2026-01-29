@@ -18,4 +18,4 @@ The project expects to be hosted on [Netlify](https://www.netlify.com/), and the
 
 ## Troubleshooting
 
-If encountering problems, send an email to <a href="mailto:fensterchess@gmail.com">Fenster</a>, describing what you are trying to do and you can recieve your own private credential. You can also [raise an issue](https://github.com/JeffML/fensterchess/issues) in GitHub.
+If encountering problems, send an email to <a href="mailto:fensterchess@gmail.com">Fenster</a>, describing what you are trying to do and you can receive your own private credential. You can also [raise an issue](https://github.com/JeffML/fensterchess/issues) in GitHub.
