@@ -262,9 +262,7 @@ const MasterGamesPositionView: React.FC<MasterGamesPositionViewProps> = ({
       Master Games ({data.totalGames.toLocaleString()} games in{" "}
       {new Set(data.openings.map((o) => o.eco)).size} ECO codes)
       {data.usedAncestorFallback && (
-        <span
-          style={{ fontSize: "0.8em", color: "#aaa", marginLeft: "0.5em" }}
-        >
+        <span style={{ fontSize: "0.8em", color: "#aaa", marginLeft: "0.5em" }}>
           (via descendant positions)
         </span>
       )}
@@ -632,14 +630,17 @@ const MasterGamesOpeningView: React.FC<MasterGamesOpeningViewProps> = ({
     </>
   );
 
-  const pagination = totalGamesPages > 1 ? {
-    currentPage: gamesPage,
-    totalPages: totalGamesPages,
-    hasNext: hasNextGamesPage,
-    hasPrev: hasPrevGamesPage,
-    onPrev: () => setGamesPage(gamesPage - 1),
-    onNext: () => setGamesPage(gamesPage + 1),
-  } : undefined;
+  const pagination =
+    totalGamesPages > 1
+      ? {
+          currentPage: gamesPage,
+          totalPages: totalGamesPages,
+          hasNext: hasNextGamesPage,
+          hasPrev: hasPrevGamesPage,
+          onPrev: () => setGamesPage(gamesPage - 1),
+          onNext: () => setGamesPage(gamesPage + 1),
+        }
+      : undefined;
 
   return (
     <MasterGamesLayout header={header} pagination={pagination}>
