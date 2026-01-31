@@ -52,6 +52,31 @@ interface MasterGamesResponse {
   pageSize: number;
 }
 
+interface MasterGamesPositionViewProps {
+  data: MasterGamesByPositionResponse;
+  page: number;
+  setPage: (page: number) => void;
+  totalMasterPages: number;
+  hasNextMasterPage: boolean;
+  hasPrevMasterPage: boolean;
+  expandedEcoCodes: Set<string>;
+  setExpandedEcoCodes: (setter: (prev: Set<string>) => Set<string>) => void;
+  setSelectedOpening: (opening: Opening | null) => void;
+  setGamesPage: (page: number) => void;
+  isFlashing: boolean;
+}
+
+interface MasterGamesOpeningViewProps {
+  selectedOpening: Opening;
+  gamesData: MasterGamesResponse;
+  gamesPage: number;
+  setGamesPage: (page: number) => void;
+  setSelectedOpening: (opening: Opening | null) => void;
+  searchMoves?: string;
+  handlePlayerClick: (gameId: number, targetFen: string) => void;
+  selectedGameIdx: number | null;
+}
+
 // Fetch openings and masters for a position (uses ancestor fallback)
 async function fetchMasterGamesByPosition(
   fen: string,
@@ -118,356 +143,19 @@ async function fetchGameMoves(gameId: number): Promise<string> {
   return data.moves;
 }
 
-const MasterGamesComponent = ({
-  fen,
-  openingName,
-  openingFen,
-  searchMoves,
-  chess,
-  setBoardState,
-}: {
-  fen: FEN;
-  openingName?: string;
-  openingFen?: string;
-  searchMoves?: string;
-  chess: MutableRefObject<ChessPGN>;
-  setBoardState: (state: BoardState) => void;
+const MasterGamesPositionView: React.FC<MasterGamesPositionViewProps> = ({
+  data,
+  page,
+  setPage,
+  totalMasterPages,
+  hasNextMasterPage,
+  hasPrevMasterPage,
+  expandedEcoCodes,
+  setExpandedEcoCodes,
+  setSelectedOpening,
+  setGamesPage,
+  isFlashing,
 }) => {
-  const [page, setPage] = useState(0);
-  const [selectedOpening, setSelectedOpening] = useState<Opening | null>(null);
-  const [gamesPage, setGamesPage] = useState(0);
-  const [selectedGameIdx, setSelectedGameIdx] = useState<number | null>(null);
-  const [isFlashing, setIsFlashing] = useState(false);
-  const [expandedEcoCodes, setExpandedEcoCodes] = useState<Set<string>>(
-    new Set(),
-  );
-  const prevOpeningNameRef = useRef<string | undefined>(openingName);
-
-  // Reset selection when FEN changes
-  useEffect(() => {
-    setSelectedOpening(null);
-    setGamesPage(0);
-    setPage(0);
-    setSelectedGameIdx(null);
-    setExpandedEcoCodes(new Set());
-  }, [fen]);
-
-  // Detect when opening name changes and trigger flash
-  useEffect(() => {
-    if (
-      openingName &&
-      prevOpeningNameRef.current &&
-      openingName !== prevOpeningNameRef.current
-    ) {
-      setIsFlashing(true);
-      const timer = setTimeout(() => setIsFlashing(false), 800);
-      return () => clearTimeout(timer);
-    }
-    prevOpeningNameRef.current = openingName;
-  }, [openingName]);
-
-  const handlePlayerClick = async (gameId: number, targetFen: string) => {
-    setSelectedGameIdx(gameId);
-    try {
-      const moves = await fetchGameMoves(gameId);
-
-      // Load the full game into chess to find the opening position
-      chess.current.loadPgn(moves);
-      const fullGameMoves = chess.current.pgn();
-
-      // Find the ply count for the selected opening
-      let openingPlyCount = 0;
-      if (selectedOpening && typeof selectedOpening.ply === "number") {
-        openingPlyCount = selectedOpening.ply;
-      } else {
-        // Fallback: use the number of moves up to the target position
-        // Try to find the position in the game
-        let currentFen = chess.current.fen();
-        const targetPositionFen = targetFen.split(" ")[0];
-        let plyCount = chess.current.history().length;
-        while (currentFen.split(" ")[0] !== targetPositionFen) {
-          const history = chess.current.history();
-          if (history.length === 0) {
-            chess.current.reset();
-            chess.current.loadPgn(moves);
-            plyCount = chess.current.history().length;
-            break;
-          }
-          chess.current.undo();
-          plyCount--;
-          currentFen = chess.current.fen();
-        }
-        openingPlyCount = plyCount;
-      }
-
-      // Update board state with the opening position, full game moves, and opening ply count
-      setBoardState({
-        fen: chess.current.fen(),
-        moves: fullGameMoves,
-        currentPly: openingPlyCount,
-        openingPlyCount,
-      });
-    } catch (error) {
-      console.error("Error loading game moves:", error);
-      alert(`Error loading game: ${(error as Error).message}`);
-    }
-  };
-
-  // Fetch openings/masters for the position
-  console.log("[DEBUG MasterGames] fen:", fen, "openingFen:", openingFen);
-  const { isError, error, data, isPending } =
-    useQuery<MasterGamesByPositionResponse>({
-      queryKey: ["masterGamesByPosition", fen, page, openingFen],
-      queryFn: () => fetchMasterGamesByPosition(fen, page, openingFen),
-      staleTime: 24 * 60 * 60 * 1000, // 24 hours - data is immutable
-    });
-
-  // Fetch games when an opening is selected
-  const { data: gamesData, isPending: gamesPending } =
-    useQuery<MasterGamesResponse>({
-      queryKey: ["masterGames", selectedOpening?.fen, gamesPage],
-      queryFn: () => fetchMasterGames(selectedOpening!.fen, gamesPage),
-      enabled: !!selectedOpening,
-      staleTime: 24 * 60 * 60 * 1000,
-    });
-
-  // Reset page when opening name changes
-  useEffect(() => {
-    setPage(0);
-  }, [openingName]);
-
-  if (isError) {
-    console.error(error);
-    return (
-      <div className="white" style={{ marginTop: "1em" }}>
-        <span style={{ color: "#ff6b6b" }}>
-          Error loading master games: {error.message}
-        </span>
-      </div>
-    );
-  }
-
-  if (isPending) {
-    return (
-      <div className="white" style={{ marginTop: "1em" }}>
-        Loading master games...
-      </div>
-    );
-  }
-
-  if (!data || data.totalGames === 0) {
-    return null; // Don't show section if no games found
-  }
-
-  const totalMasterPages = Math.ceil(data.totalMasters / data.pageSize);
-  const hasNextMasterPage = page < totalMasterPages - 1;
-  const hasPrevMasterPage = page > 0;
-
-  // If showing games for a selected opening
-  if (selectedOpening && gamesData) {
-    // Mark transpositions and prepare display games
-    const hasSearchMoves =
-      searchMoves && gamesData.games[0]?.moves !== undefined;
-    const displayGames = hasSearchMoves
-      ? gamesData.games.map((game) => {
-          const isTransposition = !game.moves.startsWith(searchMoves);
-          return { ...game, isTransposition };
-        })
-      : gamesData.games.map((game) => ({ ...game, isTransposition: false }));
-
-    const totalGamesPages = Math.ceil(displayGames.length / gamesData.pageSize);
-    const hasNextGamesPage = gamesPage < totalGamesPages - 1;
-    const hasPrevGamesPage = gamesPage > 0;
-
-    return (
-      <div style={{ marginTop: "2em", marginBottom: "1em" }}>
-        <div
-          className="font-cinzel"
-          style={{
-            fontWeight: "bold",
-            color: "#fff",
-            marginBottom: "0.5em",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5em",
-          }}
-        >
-          <button
-            onClick={() => setSelectedOpening(null)}
-            style={{
-              padding: "0.25em 0.5em",
-              backgroundColor: "#4a4a4a",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "0.85em",
-            }}
-          >
-            ← Back
-          </button>
-          <span>
-            {selectedOpening.eco} {selectedOpening.name} ({gamesData.total}{" "}
-            games)
-          </span>
-        </div>
-
-        {gamesPending ? (
-          <div style={{ color: "#aaa" }}>Loading games...</div>
-        ) : (
-          <>
-            {/* Game list */}
-            <div
-              style={{
-                fontSize: "0.9em",
-                color: "#ddd",
-                textAlign: "left",
-              }}
-            >
-              {/* Headers */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "auto 1fr 1fr auto auto",
-                  gap: "0.5em 1em",
-                  padding: "0.25em 0.5em",
-                  fontWeight: "bold",
-                  color: "#aaa",
-                  borderBottom: "1px solid #444",
-                }}
-              >
-                <div>#</div>
-                <div>White</div>
-                <div>Black</div>
-                <div>Result</div>
-                <div>Event</div>
-              </div>
-
-              {/* Games */}
-              {displayGames.map((game, idx) => {
-                const whiteDisplay = game.whiteTitle
-                  ? `${game.whiteTitle} ${game.white} (${game.whiteElo})`
-                  : `${game.white} (${game.whiteElo})`;
-                const blackDisplay = game.blackTitle
-                  ? `${game.blackTitle} ${game.black} (${game.blackElo})`
-                  : `${game.black} (${game.blackElo})`;
-
-                // Color code: blue for exact, yellow for transposition, highlight selected
-                let bgColor = "transparent";
-                if (selectedGameIdx === game.idx) {
-                  bgColor = "#2a4a6a";
-                } else if (game.isTransposition) {
-                  bgColor = "#6a5c2a"; // yellow-brown for transpositions
-                }
-
-                return (
-                  <div
-                    key={game.idx}
-                    onClick={() =>
-                      handlePlayerClick(game.idx, selectedOpening.fen)
-                    }
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "auto 1fr 1fr auto auto",
-                      gap: "0.5em 1em",
-                      padding: "0.25em 0.5em",
-                      cursor: "pointer",
-                      borderBottom: "1px solid #333",
-                      backgroundColor: bgColor,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (selectedGameIdx !== game.idx) {
-                        e.currentTarget.style.backgroundColor =
-                          game.isTransposition ? "#8a7c3a" : "#3a3a3a";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (selectedGameIdx !== game.idx) {
-                        e.currentTarget.style.backgroundColor = bgColor;
-                      }
-                    }}
-                    title={
-                      game.isTransposition
-                        ? "Transposition: position reached by different move order"
-                        : "Click to load game"
-                    }
-                  >
-                    <div style={{ color: "#888" }}>
-                      {gamesPage * gamesData.pageSize + idx + 1}
-                    </div>
-                    <div style={{ color: "#6db3f2" }}>{whiteDisplay}</div>
-                    <div style={{ color: "#6db3f2" }}>{blackDisplay}</div>
-                    <div>{game.result}</div>
-                    <div style={{ fontSize: "0.85em", color: "#bbb" }}>
-                      {game.event}{" "}
-                      {game.date && `(${game.date.substring(0, 4)})`}
-                      {game.isTransposition && (
-                        <span
-                          style={{
-                            color: "#e6c200",
-                            marginLeft: "0.5em",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          [T]
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Games Pagination */}
-            {totalGamesPages > 1 && (
-              <div
-                style={{
-                  marginTop: "1em",
-                  display: "flex",
-                  gap: "1em",
-                  alignItems: "center",
-                  color: "#ddd",
-                }}
-              >
-                <button
-                  onClick={() => setGamesPage(gamesPage - 1)}
-                  disabled={!hasPrevGamesPage}
-                  style={{
-                    padding: "0.5em 1em",
-                    backgroundColor: hasPrevGamesPage ? "#4a4a4a" : "#2a2a2a",
-                    color: hasPrevGamesPage ? "#fff" : "#666",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: hasPrevGamesPage ? "pointer" : "not-allowed",
-                  }}
-                >
-                  Previous
-                </button>
-                <span>
-                  Page {gamesPage + 1} of {totalGamesPages}
-                </span>
-                <button
-                  onClick={() => setGamesPage(gamesPage + 1)}
-                  disabled={!hasNextGamesPage}
-                  style={{
-                    padding: "0.5em 1em",
-                    backgroundColor: hasNextGamesPage ? "#4a4a4a" : "#2a2a2a",
-                    color: hasNextGamesPage ? "#fff" : "#666",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: hasNextGamesPage ? "pointer" : "not-allowed",
-                  }}
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div style={{ marginTop: "2em", marginBottom: "1em" }}>
       <div
@@ -740,6 +428,387 @@ const MasterGamesComponent = ({
         </div>
       )}
     </div>
+  );
+};
+
+const MasterGamesOpeningView: React.FC<MasterGamesOpeningViewProps> = ({
+  selectedOpening,
+  gamesData,
+  gamesPage,
+  setGamesPage,
+  setSelectedOpening,
+  searchMoves,
+  handlePlayerClick,
+  selectedGameIdx,
+}) => {
+  // Mark transpositions and prepare display games
+  const hasSearchMoves = searchMoves && gamesData.games[0]?.moves !== undefined;
+  const displayGames = hasSearchMoves
+    ? gamesData.games.map((game) => {
+        const isTransposition = !game.moves.startsWith(searchMoves);
+        return { ...game, isTransposition };
+      })
+    : gamesData.games.map((game) => ({ ...game, isTransposition: false }));
+
+  const totalGamesPages = Math.ceil(displayGames.length / gamesData.pageSize);
+  const hasNextGamesPage = gamesPage < totalGamesPages - 1;
+  const hasPrevGamesPage = gamesPage > 0;
+
+  return (
+    <div style={{ marginTop: "2em", marginBottom: "1em" }}>
+      <div
+        className="font-cinzel"
+        style={{
+          fontWeight: "bold",
+          color: "#fff",
+          marginBottom: "0.5em",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5em",
+        }}
+      >
+        <button
+          onClick={() => setSelectedOpening(null)}
+          style={{
+            padding: "0.25em 0.5em",
+            backgroundColor: "#4a4a4a",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "0.8em",
+          }}
+        >
+          ← Back
+        </button>
+        <span>
+          {selectedOpening.eco} {selectedOpening.name} ({gamesData.total} games)
+        </span>
+      </div>
+
+      {/* Game list */}
+      <div
+        style={{
+          fontSize: "0.9em",
+          color: "#ddd",
+          textAlign: "left",
+        }}
+      >
+        {/* Headers */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "auto 1fr 1fr auto auto",
+            gap: "0.5em 1em",
+            padding: "0.25em 0.5em",
+            fontWeight: "bold",
+            color: "#aaa",
+            borderBottom: "1px solid #444",
+          }}
+        >
+          <div>#</div>
+          <div>White</div>
+          <div>Black</div>
+          <div>Result</div>
+          <div>Event</div>
+        </div>
+
+        {/* Games */}
+        {displayGames.map((game, idx) => {
+          const whiteDisplay = game.whiteTitle
+            ? `${game.whiteTitle} ${game.white} (${game.whiteElo})`
+            : `${game.white} (${game.whiteElo})`;
+          const blackDisplay = game.blackTitle
+            ? `${game.blackTitle} ${game.black} (${game.blackElo})`
+            : `${game.black} (${game.blackElo})`;
+
+          // Color code: blue for exact, yellow for transposition, highlight selected
+          let bgColor = "transparent";
+          if (selectedGameIdx === game.idx) {
+            bgColor = "#2a4a6a";
+          } else if (game.isTransposition) {
+            bgColor = "#6a5c2a"; // yellow-brown for transpositions
+          }
+
+          return (
+            <div
+              key={game.idx}
+              onClick={() => handlePlayerClick(game.idx, selectedOpening.fen)}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "auto 1fr 1fr auto auto",
+                gap: "0.5em 1em",
+                padding: "0.25em 0.5em",
+                cursor: "pointer",
+                borderBottom: "1px solid #333",
+                backgroundColor: bgColor,
+              }}
+              onMouseEnter={(e) => {
+                if (selectedGameIdx !== game.idx) {
+                  e.currentTarget.style.backgroundColor = game.isTransposition
+                    ? "#8a7c3a"
+                    : "#3a3a3a";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedGameIdx !== game.idx) {
+                  e.currentTarget.style.backgroundColor = bgColor;
+                }
+              }}
+              title={
+                game.isTransposition
+                  ? "Transposition: position reached by different move order"
+                  : "Click to load game"
+              }
+            >
+              <div style={{ color: "#888" }}>
+                {gamesPage * gamesData.pageSize + idx + 1}
+              </div>
+              <div style={{ color: "#6db3f2" }}>{whiteDisplay}</div>
+              <div style={{ color: "#6db3f2" }}>{blackDisplay}</div>
+              <div>{game.result}</div>
+              <div style={{ fontSize: "0.85em", color: "#bbb" }}>
+                {game.event} {game.date && `(${game.date.substring(0, 4)})`}
+                {game.isTransposition && (
+                  <span
+                    style={{
+                      color: "#e6c200",
+                      marginLeft: "0.5em",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    [T]
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Games Pagination */}
+      {totalGamesPages > 1 && (
+        <div
+          style={{
+            marginTop: "1em",
+            display: "flex",
+            gap: "1em",
+            alignItems: "center",
+            color: "#ddd",
+          }}
+        >
+          <button
+            onClick={() => setGamesPage(gamesPage - 1)}
+            disabled={!hasPrevGamesPage}
+            style={{
+              padding: "0.5em 1em",
+              backgroundColor: hasPrevGamesPage ? "#4a4a4a" : "#2a2a2a",
+              color: hasPrevGamesPage ? "#fff" : "#666",
+              border: "none",
+              borderRadius: "4px",
+              cursor: hasPrevGamesPage ? "pointer" : "not-allowed",
+            }}
+          >
+            Previous
+          </button>
+          <span>
+            Page {gamesPage + 1} of {totalGamesPages}
+          </span>
+          <button
+            onClick={() => setGamesPage(gamesPage + 1)}
+            disabled={!hasNextGamesPage}
+            style={{
+              padding: "0.5em 1em",
+              backgroundColor: hasNextGamesPage ? "#4a4a4a" : "#2a2a2a",
+              color: hasNextGamesPage ? "#fff" : "#666",
+              border: "none",
+              borderRadius: "4px",
+              cursor: hasNextGamesPage ? "pointer" : "not-allowed",
+            }}
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MasterGamesComponent = ({
+  fen,
+  openingName,
+  openingFen,
+  searchMoves,
+  chess,
+  setBoardState,
+}: {
+  fen: FEN;
+  openingName?: string;
+  openingFen?: string;
+  searchMoves?: string;
+  chess: MutableRefObject<ChessPGN>;
+  setBoardState: (state: BoardState) => void;
+}) => {
+  const [page, setPage] = useState(0);
+  const [selectedOpening, setSelectedOpening] = useState<Opening | null>(null);
+  const [gamesPage, setGamesPage] = useState(0);
+  const [selectedGameIdx, setSelectedGameIdx] = useState<number | null>(null);
+  const [isFlashing, setIsFlashing] = useState(false);
+  const [expandedEcoCodes, setExpandedEcoCodes] = useState<Set<string>>(
+    new Set(),
+  );
+  const prevOpeningNameRef = useRef<string | undefined>(openingName);
+
+  // Reset selection when FEN changes
+  useEffect(() => {
+    setSelectedOpening(null);
+    setGamesPage(0);
+    setPage(0);
+    setSelectedGameIdx(null);
+    setExpandedEcoCodes(new Set());
+  }, [fen]);
+
+  // Detect when opening name changes and trigger flash
+  useEffect(() => {
+    if (
+      openingName &&
+      prevOpeningNameRef.current &&
+      openingName !== prevOpeningNameRef.current
+    ) {
+      setIsFlashing(true);
+      const timer = setTimeout(() => setIsFlashing(false), 800);
+      return () => clearTimeout(timer);
+    }
+    prevOpeningNameRef.current = openingName;
+  }, [openingName]);
+
+  const handlePlayerClick = async (gameId: number, targetFen: string) => {
+    setSelectedGameIdx(gameId);
+    try {
+      const moves = await fetchGameMoves(gameId);
+
+      // Load the full game into chess to find the opening position
+      chess.current.loadPgn(moves);
+      const fullGameMoves = chess.current.pgn();
+
+      // Find the ply count for the selected opening
+      let openingPlyCount = 0;
+      if (selectedOpening && typeof selectedOpening.ply === "number") {
+        openingPlyCount = selectedOpening.ply;
+      } else {
+        // Fallback: use the number of moves up to the target position
+        // Try to find the position in the game
+        let currentFen = chess.current.fen();
+        const targetPositionFen = targetFen.split(" ")[0];
+        let plyCount = chess.current.history().length;
+        while (currentFen.split(" ")[0] !== targetPositionFen) {
+          const history = chess.current.history();
+          if (history.length === 0) {
+            chess.current.reset();
+            chess.current.loadPgn(moves);
+            plyCount = chess.current.history().length;
+            break;
+          }
+          chess.current.undo();
+          plyCount--;
+          currentFen = chess.current.fen();
+        }
+        openingPlyCount = plyCount;
+      }
+
+      // Update board state with the opening position, full game moves, and opening ply count
+      setBoardState({
+        fen: chess.current.fen(),
+        moves: fullGameMoves,
+        currentPly: openingPlyCount,
+        openingPlyCount,
+      });
+    } catch (error) {
+      console.error("Error loading game moves:", error);
+      alert(`Error loading game: ${(error as Error).message}`);
+    }
+  };
+
+  // Fetch openings/masters for the position
+  // console.log("[DEBUG MasterGames] fen:", fen, "openingFen:", openingFen);
+  const { isError, error, data, isPending } =
+    useQuery<MasterGamesByPositionResponse>({
+      queryKey: ["masterGamesByPosition", fen, page, openingFen],
+      queryFn: () => fetchMasterGamesByPosition(fen, page, openingFen),
+      staleTime: 24 * 60 * 60 * 1000, // 24 hours - data is immutable
+    });
+
+  // Fetch games when an opening is selected
+  const { data: gamesData } = useQuery<MasterGamesResponse>({
+    queryKey: ["masterGames", selectedOpening?.fen, gamesPage],
+    queryFn: () => fetchMasterGames(selectedOpening!.fen, gamesPage),
+    enabled: !!selectedOpening,
+    staleTime: 24 * 60 * 60 * 1000,
+  });
+
+  // Reset page when opening name changes
+  useEffect(() => {
+    setPage(0);
+  }, [openingName]);
+
+  if (isError) {
+    console.error(error);
+    return (
+      <div className="white" style={{ marginTop: "1em" }}>
+        <span style={{ color: "#ff6b6b" }}>
+          Error loading master games: {error.message}
+        </span>
+      </div>
+    );
+  }
+
+  if (isPending) {
+    return (
+      <div className="white" style={{ marginTop: "1em" }}>
+        Loading master games...
+      </div>
+    );
+  }
+
+  if (!data || data.totalGames === 0) {
+    return null; // Don't show section if no games found
+  }
+
+  const totalMasterPages = Math.ceil(data.totalMasters / data.pageSize);
+  const hasNextMasterPage = page < totalMasterPages - 1;
+  const hasPrevMasterPage = page > 0;
+
+  // If showing games for a selected opening
+  if (selectedOpening && gamesData) {
+    return (
+      <MasterGamesOpeningView
+        selectedOpening={selectedOpening}
+        gamesData={gamesData}
+        gamesPage={gamesPage}
+        setGamesPage={setGamesPage}
+        setSelectedOpening={setSelectedOpening}
+        searchMoves={searchMoves}
+        handlePlayerClick={handlePlayerClick}
+        selectedGameIdx={selectedGameIdx}
+      />
+    );
+  }
+
+  // Default: show openings/masters for the position
+  return (
+    <MasterGamesPositionView
+      data={data}
+      page={page}
+      setPage={setPage}
+      totalMasterPages={totalMasterPages}
+      hasNextMasterPage={hasNextMasterPage}
+      hasPrevMasterPage={hasPrevMasterPage}
+      expandedEcoCodes={expandedEcoCodes}
+      setExpandedEcoCodes={setExpandedEcoCodes}
+      setSelectedOpening={setSelectedOpening}
+      setGamesPage={setGamesPage}
+      isFlashing={isFlashing}
+    />
   );
 };
 
