@@ -77,6 +77,100 @@ interface MasterGamesOpeningViewProps {
   selectedGameIdx: number | null;
 }
 
+interface MasterGamesLayoutProps {
+  header: React.ReactNode;
+  children: React.ReactNode;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+    onPrev: () => void;
+    onNext: () => void;
+    prevLabel?: string;
+    nextLabel?: string;
+  };
+}
+
+// Shared layout component for both MasterGames views
+const MasterGamesLayout: React.FC<MasterGamesLayoutProps> = ({
+  header,
+  children,
+  pagination,
+}) => {
+  return (
+    <div style={{ marginTop: "2em", marginBottom: "1em" }}>
+      {/* Header */}
+      <div
+        className="font-cinzel"
+        style={{
+          fontWeight: "bold",
+          color: "#fff",
+          marginBottom: "0.5em",
+        }}
+      >
+        {header}
+      </div>
+
+      {/* Main content */}
+      <div
+        style={{
+          fontSize: "0.9em",
+          color: "#ddd",
+          textAlign: "left",
+        }}
+      >
+        {children}
+      </div>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <div
+          style={{
+            marginTop: "1em",
+            display: "flex",
+            gap: "1em",
+            alignItems: "center",
+            color: "#ddd",
+          }}
+        >
+          <button
+            onClick={pagination.onPrev}
+            disabled={!pagination.hasPrev}
+            style={{
+              padding: "0.5em 1em",
+              backgroundColor: pagination.hasPrev ? "#4a4a4a" : "#2a2a2a",
+              color: pagination.hasPrev ? "#fff" : "#666",
+              border: "none",
+              borderRadius: "4px",
+              cursor: pagination.hasPrev ? "pointer" : "not-allowed",
+            }}
+          >
+            {pagination.prevLabel || "Previous"}
+          </button>
+          <span>
+            Page {pagination.currentPage + 1} of {pagination.totalPages}
+          </span>
+          <button
+            onClick={pagination.onNext}
+            disabled={!pagination.hasNext}
+            style={{
+              padding: "0.5em 1em",
+              backgroundColor: pagination.hasNext ? "#4a4a4a" : "#2a2a2a",
+              color: pagination.hasNext ? "#fff" : "#666",
+              border: "none",
+              borderRadius: "4px",
+              cursor: pagination.hasNext ? "pointer" : "not-allowed",
+            }}
+          >
+            {pagination.nextLabel || "Next"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Fetch openings and masters for a position (uses ancestor fallback)
 async function fetchMasterGamesByPosition(
   fen: string,
@@ -156,37 +250,32 @@ const MasterGamesPositionView: React.FC<MasterGamesPositionViewProps> = ({
   setGamesPage,
   isFlashing,
 }) => {
-  return (
-    <div style={{ marginTop: "2em", marginBottom: "1em" }}>
-      <div
-        className="font-cinzel"
-        style={{
-          fontWeight: "bold",
-          color: "#fff",
-          marginBottom: "0.5em",
-          transition: "background-color 0.3s ease",
-          backgroundColor: isFlashing ? "#4a7c59" : "transparent",
-          padding: "0.25em 0.5em",
-          borderRadius: "4px",
-        }}
-      >
-        Master Games ({data.totalGames.toLocaleString()} games in{" "}
-        {new Set(data.openings.map((o) => o.eco)).size} ECO codes)
-        {data.usedAncestorFallback && (
-          <span
-            style={{ fontSize: "0.8em", color: "#aaa", marginLeft: "0.5em" }}
-          >
-            (via descendant positions)
-          </span>
-        )}
-      </div>
+  const header = (
+    <div
+      style={{
+        transition: "background-color 0.3s ease",
+        backgroundColor: isFlashing ? "#4a7c59" : "transparent",
+        padding: "0.25em 0.5em",
+        borderRadius: "4px",
+      }}
+    >
+      Master Games ({data.totalGames.toLocaleString()} games in{" "}
+      {new Set(data.openings.map((o) => o.eco)).size} ECO codes)
+      {data.usedAncestorFallback && (
+        <span
+          style={{ fontSize: "0.8em", color: "#aaa", marginLeft: "0.5em" }}
+        >
+          (via descendant positions)
+        </span>
+      )}
+    </div>
+  );
 
+  const content = (
+    <>
       {/* Openings list - grouped by ECO code */}
       <div
         style={{
-          fontSize: "0.9em",
-          color: "#ddd",
-          textAlign: "left",
           maxHeight: "300px",
           overflow: "auto",
         }}
@@ -377,57 +466,29 @@ const MasterGamesPositionView: React.FC<MasterGamesPositionViewProps> = ({
               </div>
             ))}
           </div>
-
-          {/* Masters Pagination */}
-          {totalMasterPages > 1 && (
-            <div
-              style={{
-                marginTop: "0.5em",
-                display: "flex",
-                gap: "0.5em",
-                alignItems: "center",
-                color: "#888",
-                fontSize: "0.85em",
-              }}
-            >
-              <button
-                onClick={() => setPage(page - 1)}
-                disabled={!hasPrevMasterPage}
-                style={{
-                  padding: "0.25em 0.5em",
-                  backgroundColor: hasPrevMasterPage ? "#4a4a4a" : "#2a2a2a",
-                  color: hasPrevMasterPage ? "#fff" : "#666",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: hasPrevMasterPage ? "pointer" : "not-allowed",
-                  fontSize: "0.85em",
-                }}
-              >
-                ←
-              </button>
-              <span>
-                {page + 1}/{totalMasterPages}
-              </span>
-              <button
-                onClick={() => setPage(page + 1)}
-                disabled={!hasNextMasterPage}
-                style={{
-                  padding: "0.25em 0.5em",
-                  backgroundColor: hasNextMasterPage ? "#4a4a4a" : "#2a2a2a",
-                  color: hasNextMasterPage ? "#fff" : "#666",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: hasNextMasterPage ? "pointer" : "not-allowed",
-                  fontSize: "0.85em",
-                }}
-              >
-                →
-              </button>
-            </div>
-          )}
         </div>
       )}
-    </div>
+    </>
+  );
+
+  const pagination =
+    data.masters.length > 0 && totalMasterPages > 1
+      ? {
+          currentPage: page,
+          totalPages: totalMasterPages,
+          hasNext: hasNextMasterPage,
+          hasPrev: hasPrevMasterPage,
+          onPrev: () => setPage(page - 1),
+          onNext: () => setPage(page + 1),
+          prevLabel: "←",
+          nextLabel: "→",
+        }
+      : undefined;
+
+  return (
+    <MasterGamesLayout header={header} pagination={pagination}>
+      {content}
+    </MasterGamesLayout>
   );
 };
 
@@ -454,183 +515,136 @@ const MasterGamesOpeningView: React.FC<MasterGamesOpeningViewProps> = ({
   const hasNextGamesPage = gamesPage < totalGamesPages - 1;
   const hasPrevGamesPage = gamesPage > 0;
 
-  return (
-    <div style={{ marginTop: "2em", marginBottom: "1em" }}>
-      <div
-        className="font-cinzel"
+  const header = (
+    <div style={{ display: "flex", alignItems: "center", gap: "0.5em" }}>
+      <button
+        onClick={() => setSelectedOpening(null)}
         style={{
-          fontWeight: "bold",
+          padding: "0.25em 0.5em",
+          backgroundColor: "#4a4a4a",
           color: "#fff",
-          marginBottom: "0.5em",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5em",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          fontSize: "0.8em",
         }}
       >
-        <button
-          onClick={() => setSelectedOpening(null)}
-          style={{
-            padding: "0.25em 0.5em",
-            backgroundColor: "#4a4a4a",
-            color: "#fff",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "0.8em",
-          }}
-        >
-          ← Back
-        </button>
-        <span>
-          {selectedOpening.eco} {selectedOpening.name} ({gamesData.total} games)
-        </span>
-      </div>
+        ← Back
+      </button>
+      <span>
+        {selectedOpening.eco} {selectedOpening.name} ({gamesData.total} games)
+      </span>
+    </div>
+  );
 
-      {/* Game list */}
+  const content = (
+    <>
+      {/* Headers */}
       <div
         style={{
-          fontSize: "0.9em",
-          color: "#ddd",
-          textAlign: "left",
+          display: "grid",
+          gridTemplateColumns: "auto 1fr 1fr auto auto",
+          gap: "0.5em 1em",
+          padding: "0.25em 0.5em",
+          fontWeight: "bold",
+          color: "#aaa",
+          borderBottom: "1px solid #444",
         }}
       >
-        {/* Headers */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "auto 1fr 1fr auto auto",
-            gap: "0.5em 1em",
-            padding: "0.25em 0.5em",
-            fontWeight: "bold",
-            color: "#aaa",
-            borderBottom: "1px solid #444",
-          }}
-        >
-          <div>#</div>
-          <div>White</div>
-          <div>Black</div>
-          <div>Result</div>
-          <div>Event</div>
-        </div>
-
-        {/* Games */}
-        {displayGames.map((game, idx) => {
-          const whiteDisplay = game.whiteTitle
-            ? `${game.whiteTitle} ${game.white} (${game.whiteElo})`
-            : `${game.white} (${game.whiteElo})`;
-          const blackDisplay = game.blackTitle
-            ? `${game.blackTitle} ${game.black} (${game.blackElo})`
-            : `${game.black} (${game.blackElo})`;
-
-          // Color code: blue for exact, yellow for transposition, highlight selected
-          let bgColor = "transparent";
-          if (selectedGameIdx === game.idx) {
-            bgColor = "#2a4a6a";
-          } else if (game.isTransposition) {
-            bgColor = "#6a5c2a"; // yellow-brown for transpositions
-          }
-
-          return (
-            <div
-              key={game.idx}
-              onClick={() => handlePlayerClick(game.idx, selectedOpening.fen)}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "auto 1fr 1fr auto auto",
-                gap: "0.5em 1em",
-                padding: "0.25em 0.5em",
-                cursor: "pointer",
-                borderBottom: "1px solid #333",
-                backgroundColor: bgColor,
-              }}
-              onMouseEnter={(e) => {
-                if (selectedGameIdx !== game.idx) {
-                  e.currentTarget.style.backgroundColor = game.isTransposition
-                    ? "#8a7c3a"
-                    : "#3a3a3a";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedGameIdx !== game.idx) {
-                  e.currentTarget.style.backgroundColor = bgColor;
-                }
-              }}
-              title={
-                game.isTransposition
-                  ? "Transposition: position reached by different move order"
-                  : "Click to load game"
-              }
-            >
-              <div style={{ color: "#888" }}>
-                {gamesPage * gamesData.pageSize + idx + 1}
-              </div>
-              <div style={{ color: "#6db3f2" }}>{whiteDisplay}</div>
-              <div style={{ color: "#6db3f2" }}>{blackDisplay}</div>
-              <div>{game.result}</div>
-              <div style={{ fontSize: "0.85em", color: "#bbb" }}>
-                {game.event} {game.date && `(${game.date.substring(0, 4)})`}
-                {game.isTransposition && (
-                  <span
-                    style={{
-                      color: "#e6c200",
-                      marginLeft: "0.5em",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    [T]
-                  </span>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        <div>#</div>
+        <div>White</div>
+        <div>Black</div>
+        <div>Result</div>
+        <div>Event</div>
       </div>
 
-      {/* Games Pagination */}
-      {totalGamesPages > 1 && (
-        <div
-          style={{
-            marginTop: "1em",
-            display: "flex",
-            gap: "1em",
-            alignItems: "center",
-            color: "#ddd",
-          }}
-        >
-          <button
-            onClick={() => setGamesPage(gamesPage - 1)}
-            disabled={!hasPrevGamesPage}
+      {/* Games */}
+      {displayGames.map((game, idx) => {
+        const whiteDisplay = game.whiteTitle
+          ? `${game.whiteTitle} ${game.white} (${game.whiteElo})`
+          : `${game.white} (${game.whiteElo})`;
+        const blackDisplay = game.blackTitle
+          ? `${game.blackTitle} ${game.black} (${game.blackElo})`
+          : `${game.black} (${game.blackElo})`;
+
+        // Color code: blue for exact, yellow for transposition, highlight selected
+        let bgColor = "transparent";
+        if (selectedGameIdx === game.idx) {
+          bgColor = "#2a4a6a";
+        } else if (game.isTransposition) {
+          bgColor = "#6a5c2a"; // yellow-brown for transpositions
+        }
+
+        return (
+          <div
+            key={game.idx}
+            onClick={() => handlePlayerClick(game.idx, selectedOpening.fen)}
             style={{
-              padding: "0.5em 1em",
-              backgroundColor: hasPrevGamesPage ? "#4a4a4a" : "#2a2a2a",
-              color: hasPrevGamesPage ? "#fff" : "#666",
-              border: "none",
-              borderRadius: "4px",
-              cursor: hasPrevGamesPage ? "pointer" : "not-allowed",
+              display: "grid",
+              gridTemplateColumns: "auto 1fr 1fr auto auto",
+              gap: "0.5em 1em",
+              padding: "0.25em 0.5em",
+              cursor: "pointer",
+              borderBottom: "1px solid #333",
+              backgroundColor: bgColor,
             }}
-          >
-            Previous
-          </button>
-          <span>
-            Page {gamesPage + 1} of {totalGamesPages}
-          </span>
-          <button
-            onClick={() => setGamesPage(gamesPage + 1)}
-            disabled={!hasNextGamesPage}
-            style={{
-              padding: "0.5em 1em",
-              backgroundColor: hasNextGamesPage ? "#4a4a4a" : "#2a2a2a",
-              color: hasNextGamesPage ? "#fff" : "#666",
-              border: "none",
-              borderRadius: "4px",
-              cursor: hasNextGamesPage ? "pointer" : "not-allowed",
+            onMouseEnter={(e) => {
+              if (selectedGameIdx !== game.idx) {
+                e.currentTarget.style.backgroundColor = game.isTransposition
+                  ? "#8a7c3a"
+                  : "#3a3a3a";
+              }
             }}
+            onMouseLeave={(e) => {
+              if (selectedGameIdx !== game.idx) {
+                e.currentTarget.style.backgroundColor = bgColor;
+              }
+            }}
+            title={
+              game.isTransposition
+                ? "Transposition: position reached by different move order"
+                : "Click to load game"
+            }
           >
-            Next
-          </button>
-        </div>
-      )}
-    </div>
+            <div style={{ color: "#888" }}>
+              {gamesPage * gamesData.pageSize + idx + 1}
+            </div>
+            <div style={{ color: "#6db3f2" }}>{whiteDisplay}</div>
+            <div style={{ color: "#6db3f2" }}>{blackDisplay}</div>
+            <div>{game.result}</div>
+            <div style={{ fontSize: "0.85em", color: "#bbb" }}>
+              {game.event} {game.date && `(${game.date.substring(0, 4)})`}
+              {game.isTransposition && (
+                <span
+                  style={{
+                    color: "#e6c200",
+                    marginLeft: "0.5em",
+                    fontWeight: "bold",
+                  }}
+                >
+                  [T]
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+
+  const pagination = totalGamesPages > 1 ? {
+    currentPage: gamesPage,
+    totalPages: totalGamesPages,
+    hasNext: hasNextGamesPage,
+    hasPrev: hasPrevGamesPage,
+    onPrev: () => setGamesPage(gamesPage - 1),
+    onNext: () => setGamesPage(gamesPage + 1),
+  } : undefined;
+
+  return (
+    <MasterGamesLayout header={header} pagination={pagination}>
+      {content}
+    </MasterGamesLayout>
   );
 };
 
