@@ -94,7 +94,6 @@ const OpeningTabs = ({
   const { move } = toPlay(fen);
 
   const searchable = parseInt(move) > 4;
-  const showExternal = sites.selectedSites.length > 0;
   const showTransitions = from && from.length > 1;
 
   const [html, setHtml] = useState<string | null>(null);
@@ -116,7 +115,7 @@ const OpeningTabs = ({
         {legalMoves && legalMoves.length !== 0 && <Tab>Variations</Tab>}
         {showTransitions && <Tab>Roots</Tab>}
         {html && <Tab>Theory</Tab>}
-        {showExternal && <Tab>External Info</Tab>}
+        <Tab>External Info</Tab>
         {searchable && <Tab>Similar Openings</Tab>}
       </TabList>
       <div style={{ border: "thick solid white" }}>
@@ -139,13 +138,12 @@ const OpeningTabs = ({
           </TabPanel>
         )}
         {html && <TabPanel>{hasLastMove && <Theory {...{ html }} />}</TabPanel>}
-        {showExternal && (
-          <TabPanel>
-            <div
-              className="row"
-              style={{ marginLeft: "1em", marginBottom: "1em" }}
-            >
-              <OpeningAdditionalWithBarChartGrid
+        <TabPanel>
+          <div
+            className="row"
+            style={{ marginLeft: "1em", marginBottom: "1em" }}
+          >
+            <OpeningAdditionalWithBarChartGrid
                 {...{
                   eco,
                   fen,
@@ -162,7 +160,6 @@ const OpeningTabs = ({
               />
             </div>
           </TabPanel>
-        )}
         {searchable && (
           <TabPanel>
             <SimilarOpenings />

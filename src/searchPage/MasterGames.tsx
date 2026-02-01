@@ -786,7 +786,11 @@ const MasterGamesComponent = ({
   }
 
   if (!data || data.totalGames === 0) {
-    return null; // Don't show section if no games found
+    return (
+      <div className="white" style={{ marginTop: "1em" }}>
+        (No master games found for this position.)
+      </div>
+    );
   }
 
   const totalMasterPages = Math.ceil(data.totalMasters / data.pageSize);
