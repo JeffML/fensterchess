@@ -122,8 +122,8 @@ describe("MasterGames Component", () => {
       expect(screen.queryByText(/Loading/i)).toBeNull();
     });
 
-    // Component should render nothing - no player names or games visible
-    expect(screen.queryByText(/Master Games/i)).toBeNull();
+    // Component should render message when no games found
+    expect(screen.getByText(/No master games found for this position/i)).toBeInTheDocument();
   });
 
   it("should refetch when FEN changes", async () => {
