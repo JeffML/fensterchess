@@ -39,7 +39,13 @@ vi.mock("../src/datasource/findOpening.ts", () => ({
 // Mock master games fetch functions
 vi.mock("../src/datasource/fetchMasterGames.ts", () => ({
   fetchMasterGamesByPosition: vi.fn(() =>
-    Promise.resolve({ totalGames: 0, totalMasters: 0, openings: [], masters: [], pageSize: 20 }),
+    Promise.resolve({
+      totalGames: 0,
+      totalMasters: 0,
+      openings: [],
+      masters: [],
+      pageSize: 20,
+    }),
   ),
   fetchMasterGames: vi.fn(() =>
     Promise.resolve({ total: 0, games: [], pageSize: 50 }),

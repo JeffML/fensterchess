@@ -123,7 +123,9 @@ describe("MasterGames Component", () => {
     });
 
     // Component should render message when no games found
-    expect(screen.getByText(/No master games found for this position/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No master games found for this position/i),
+    ).toBeInTheDocument();
   });
 
   it("should refetch when FEN changes", async () => {

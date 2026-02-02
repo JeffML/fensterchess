@@ -144,22 +144,22 @@ const OpeningTabs = ({
             style={{ marginLeft: "1em", marginBottom: "1em" }}
           >
             <OpeningAdditionalWithBarChartGrid
-                {...{
-                  eco,
-                  fen,
-                  openingName: name,
-                  chess,
-                  setBoardState,
-                  name,
-                  sites: sites.selectedSites,
-                  openingFen,
-                  searchMoves: extractSanMoves(boardState.moves)
-                    .filter((m) => !["*", "1-0", "0-1", "1/2-1/2"].includes(m))
-                    .join(" "),
-                }}
-              />
-            </div>
-          </TabPanel>
+              {...{
+                eco,
+                fen,
+                openingName: name,
+                chess,
+                setBoardState,
+                name,
+                sites: sites.selectedSites,
+                openingFen,
+                searchMoves: extractSanMoves(boardState.moves)
+                  .filter((m) => !["*", "1-0", "0-1", "1/2-1/2"].includes(m))
+                  .join(" "),
+              }}
+            />
+          </div>
+        </TabPanel>
         {searchable && (
           <TabPanel>
             <SimilarOpenings />
