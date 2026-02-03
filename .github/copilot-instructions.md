@@ -337,15 +337,31 @@ Located in `__tests__/` directory:
 
 **Goal**: Build searchable database of ~25,000 master games for opening research
 
+**CRITICAL - Tooling Separation**: Data maintenance scripts are in the separate [fensterchess.tooling](https://github.com/JeffML/fensterchess.tooling) repository. This follows the pattern established by eco.json + eco.json.tooling.
+
+### Repository Structure
+
+**fensterchess** (this repo):
+- Runtime code: `src/searchPage/MasterGames.tsx`, `src/datasource/fetchMasterGames.ts`
+- Serverless functions: `netlify/functions/queryMasterGamesByFen.js`, `getMasterGameMoves.js`
+- Generated indexes: `data/indexes/` (master-index.json, opening-by-fen.json, chunks, etc.)
+- Static data: `data/scores.json`, `data/fromToPositionIndexed.json`
+
+**fensterchess.tooling** (separate repo):
+- Data pipeline scripts: `downloadMasterGames.ts`, `buildIndexes.ts`, `filterGame.ts`, `hashGame.ts`
+- Type definitions: `types.ts` (GameMetadata, indexes, deduplication)
+- Filtering tests: `testFiltering.js`
+- Design docs: `.github/docs/masterGameDatabase*.md`
+- **When modifying data processing logic, work in fensterchess.tooling repo**
+
 ### Data Processing Pipeline
 
-**Scripts** (`scripts/` directory):
-
-- `types.ts` - Interfaces for GameMetadata, indexes, deduplication
-- `filterGame.ts` - Site-specific quality filters with optional title requirement
-- `hashGame.ts` - Deterministic game hashing for deduplication
-- `downloadMasterGames.ts` - Downloads from multiple sources (pgnmentor + Lichess Elite)
-- `buildIndexes.ts` - Generates search indexes from processed games
+See [fensterchess.tooling](https://github.com/JeffML/fensterchess.tooling) for:
+- Download scripts (pgnmentor + Lichess Elite)
+- Filtering strategies (ELO, time control, titles)
+- Index building (9 index types + chunking)
+- Deduplication logic
+- Performance optimization
 
 **Filtering Strategy** (site-specific in `filterGame.ts`):
 
@@ -391,7 +407,7 @@ _Lichess Elite Database:_
   - `source-tracking.json` - Source metadata and checksums
   - `chunk-*.json` - Game data chunks (4000 games each, <5 MB for Netlify Blobs)
 
-**CRITICAL - GameMetadata Opening Fields** (defined in `scripts/types.ts`):
+**CRITICAL - GameMetadata Opening Fields** (defined in fensterchess.tooling `scripts/types.ts`):
 
 Each game in the index has these fields for opening lookup:
 
@@ -418,7 +434,7 @@ Each game in the index has these fields for opening lookup:
 - ⏳ Phase 2: UI integration (search interface and game viewer)
 - 🔜 Phase 3: Upload to Netlify Blobs and create serverless query functions
 
-**Design Docs**: See `.github/masterGameDatabase*.md` for detailed architecture
+**Design Docs**: See `.github/masterGameDatabase*.md` for detailed architecture (these docs have been moved to fensterchess.tooling repo)
 
 ## Common Pitfalls
 
