@@ -29,8 +29,21 @@ let blobStore = null;
 
 function getBlobStore() {
   if (!blobStore) {
-    // Netlify automatically provides blob access in both dev and production
-    blobStore = getStore("master-games");
+    // Netlify Functions need explicit configuration for blobs
+    // Environment variables should be set in Netlify dashboard
+    const siteID = process.env.SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+    
+    if (siteID && token) {
+      blobStore = getStore({
+        name: "master-games",
+        siteID,
+        token,
+      });
+    } else {
+      // Fallback to simple name (auto-config) if env vars not available
+      blobStore = getStore("master-games");
+    }
   }
   return blobStore;
 }
