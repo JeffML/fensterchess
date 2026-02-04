@@ -33,7 +33,7 @@ function getBlobStore() {
     // Environment variables should be set in Netlify dashboard
     const siteID = process.env.SITE_ID;
     const token = process.env.NETLIFY_AUTH_TOKEN;
-    
+
     if (siteID && token) {
       blobStore = getStore({
         name: "master-games",
