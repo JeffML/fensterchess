@@ -1,4 +1,4 @@
-// Force reload - v2 with moves field
+// Force reload - v3 with Netlify Blobs
 /**
  * Query master games by EXACT FEN position match
  *
@@ -14,27 +14,41 @@
  * which finds all descendant openings that branch from the given position.
  *
  * Returns: Paginated list of games with full metadata
+ *
+ * NOTE: Migrated from bundled JSON files to Netlify Blobs for better scalability.
+ * Indexes are uploaded by fensterchess.tooling repository.
  */
 
-import fs from "fs";
+import { getStore } from "@netlify/blobs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
-// Load indexes on cold start
+// Cache indexes and chunks in memory during cold start
 let openingByFenIndex = null;
 let chunksCache = new Map();
+let blobStore = null;
 
-function loadIndex() {
+function getBlobStore() {
+  if (!blobStore) {
+    // Netlify automatically provides blob access in both dev and production
+    blobStore = getStore("master-games");
+  }
+  return blobStore;
+}
+
+async function loadIndex() {
   if (!openingByFenIndex) {
-    const indexPath = "data/indexes/opening-by-fen.json";
-    openingByFenIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get("indexes/opening-by-fen.json");
+    openingByFenIndex = JSON.parse(data);
   }
   return openingByFenIndex;
 }
 
-function loadChunk(chunkId) {
+async function loadChunk(chunkId) {
   if (!chunksCache.has(chunkId)) {
-    const chunkPath = `data/indexes/chunk-${chunkId}.json`;
-    const chunk = JSON.parse(fs.readFileSync(chunkPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get(`indexes/chunk-${chunkId}.json`);
+    const chunk = JSON.parse(data);
     chunksCache.set(chunkId, chunk);
   }
   return chunksCache.get(chunkId);
@@ -76,8 +90,8 @@ export const handler = async (event) => {
     const pageNum = parseInt(page);
     const pageSizeNum = parseInt(pageSize);
 
-    // Load FEN index
-    const index = loadIndex();
+    // Load FEN index from Blobs
+    const index = await loadIndex();
 
     // Try exact FEN match first
     let gameIds = index[fen];
@@ -116,13 +130,13 @@ export const handler = async (event) => {
     const endIdx = Math.min(startIdx + pageSizeNum, gameIds.length);
     const paginatedIds = gameIds.slice(startIdx, endIdx);
 
-    // Load games from chunks
+    // Load games from chunks (stored in Blobs)
     const games = [];
     for (const gameId of paginatedIds) {
       // Game IDs are sequential - determine which chunk they're in
       // Each chunk has 4000 games (chunk-0: 0-3999, chunk-1: 4000-7999, etc.)
       const chunkId = Math.floor(gameId / 4000);
-      const chunk = loadChunk(chunkId);
+      const chunk = await loadChunk(chunkId);
 
       // Find game in chunk
       const game = chunk.games.find((g) => g.idx === gameId);
