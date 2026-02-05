@@ -73,16 +73,6 @@ function getPositionFen(fen) {
 }
 
 export const handler = async (event) => {
-  // Debug: Log environment info
-  console.log("[DEBUG] Environment variables:");
-  console.log("  NETLIFY_DEV:", process.env.NETLIFY_DEV);
-  console.log("  SITE_ID:", process.env.SITE_ID);
-  console.log(
-    "  NETLIFY_AUTH_TOKEN:",
-    process.env.NETLIFY_AUTH_TOKEN ? "present" : "missing",
-  );
-  console.log("  Context:", process.env.CONTEXT);
-
   // Authenticate request
   if (!authenticateRequest(event)) {
     return authFailureResponse;
@@ -164,7 +154,6 @@ export const handler = async (event) => {
       // Find game in chunk
       const game = chunk.games.find((g) => g.idx === gameId);
       if (game) {
-        console.log("[DEBUG] game.moves:", game.moves?.substring(0, 30));
         // Return metadata and moves for filtering
         games.push({
           idx: game.idx,

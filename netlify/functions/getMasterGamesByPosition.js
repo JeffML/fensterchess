@@ -200,15 +200,6 @@ export const handler = async (event) => {
     // Build openings list by checking which openings have games in our collected game IDs
     const openingsMap = new Map();
     
-    // Debug logging
-    console.log("DEBUG getMasterGamesByPosition:");
-    console.log("  Input FEN:", fen);
-    console.log("  Position FEN:", positionFen);
-    console.log("  Matching FENs count:", matchingFens.length);
-    console.log("  First 3 matching FENs:", matchingFens.slice(0, 3));
-    console.log("  Total game IDs:", allGameIds.size);
-    console.log("  Used ancestor fallback:", usedAncestorFallback);
-    
     // For each opening, check if it has any games that match our position
     for (const [name, data] of Object.entries(nameIndex)) {
       // Count how many of this opening's games are in our matched games
@@ -226,8 +217,6 @@ export const handler = async (event) => {
         });
       }
     }
-    
-    console.log("  Openings found:", openingsMap.size);
     
     const openings = Array.from(openingsMap.values()).sort((a, b) =>
       a.name.localeCompare(b.name),
