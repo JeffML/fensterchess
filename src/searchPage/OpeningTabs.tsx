@@ -97,6 +97,7 @@ const OpeningTabs = ({
   const showTransitions = from && from.length > 1;
 
   const [html, setHtml] = useState<string | null>(null);
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   const { legalMoves, transpositions } = moveLists({
     variations,
@@ -110,7 +111,11 @@ const OpeningTabs = ({
   const hasLastMove = Object.keys(lastKnownOpening).length !== 0;
 
   return (
-    <Tabs style={{ minWidth: "100%", marginRight: "2em" }}>
+    <Tabs
+      style={{ minWidth: "100%", marginRight: "2em" }}
+      selectedIndex={selectedTabIndex}
+      onSelect={(index) => setSelectedTabIndex(index)}
+    >
       <TabList className="left openings-tablist">
         {legalMoves && legalMoves.length !== 0 && <Tab>Variations</Tab>}
         {showTransitions && <Tab>Roots</Tab>}
