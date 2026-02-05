@@ -1,25 +1,55 @@
-import fs from "fs";
+import { getStore } from "@netlify/blobs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
 // Load chunk metadata to find which chunk contains which game IDs
 let chunkMetadata = null;
+let chunksCache = new Map();
+let blobStore = null;
 
-function loadChunkMetadata() {
+function getBlobStore() {
+  if (!blobStore) {
+    const siteID = process.env.SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+
+    if (siteID && token) {
+      blobStore = getStore({
+        name: "master-games",
+        siteID,
+        token,
+      });
+    } else {
+      blobStore = getStore("master-games");
+    }
+  }
+  return blobStore;
+}
+
+async function loadChunkMetadata() {
   if (chunkMetadata) return chunkMetadata;
 
-  const dataDir = "data/indexes";
-  const files = fs.readdirSync(dataDir).filter((f) => f.startsWith("chunk-"));
-
+  const store = getBlobStore();
   chunkMetadata = {};
-  files.forEach((file) => {
-    const chunkPath = `${dataDir}/${file}`;
-    const chunk = JSON.parse(fs.readFileSync(chunkPath, "utf8"));
+
+  // Load all 5 chunks (0-4) since we know we have exactly 5
+  for (let i = 0; i < 5; i++) {
+    const chunkData = await store.get(`indexes/chunk-${i}.json`);
+    const chunk = JSON.parse(chunkData);
     chunk.games.forEach((game) => {
-      chunkMetadata[game.idx] = { file, chunkPath };
+      chunkMetadata[game.idx] = { chunkId: i };
     });
-  });
+  }
 
   return chunkMetadata;
+}
+
+async function loadChunk(chunkId) {
+  if (!chunksCache.has(chunkId)) {
+    const store = getBlobStore();
+    const data = await store.get(`indexes/chunk-${chunkId}.json`);
+    const chunk = JSON.parse(data);
+    chunksCache.set(chunkId, chunk);
+  }
+  return chunksCache.get(chunkId);
 }
 
 export const handler = async (event) => {
@@ -39,7 +69,7 @@ export const handler = async (event) => {
   }
 
   try {
-    const metadata = loadChunkMetadata();
+    const metadata = await loadChunkMetadata();
     const chunkInfo = metadata[gameId];
 
     if (!chunkInfo) {
@@ -50,7 +80,7 @@ export const handler = async (event) => {
     }
 
     // Load the chunk and find the game
-    const chunk = JSON.parse(fs.readFileSync(chunkInfo.chunkPath, "utf8"));
+    const chunk = await loadChunk(chunkInfo.chunkId);
     const game = chunk.games.find((g) => g.idx === gameId);
 
     if (!game || !game.moves) {

@@ -73,6 +73,16 @@ function getPositionFen(fen) {
 }
 
 export const handler = async (event) => {
+  // Debug: Log environment info
+  console.log("[DEBUG] Environment variables:");
+  console.log("  NETLIFY_DEV:", process.env.NETLIFY_DEV);
+  console.log("  SITE_ID:", process.env.SITE_ID);
+  console.log(
+    "  NETLIFY_AUTH_TOKEN:",
+    process.env.NETLIFY_AUTH_TOKEN ? "present" : "missing",
+  );
+  console.log("  Context:", process.env.CONTEXT);
+
   // Authenticate request
   if (!authenticateRequest(event)) {
     return authFailureResponse;

@@ -1,44 +1,66 @@
 // Get games for a specific master and selected openings
 // Returns full game metadata for display in Games tab
 
-import fs from "fs";
+import { getStore } from "@netlify/blobs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
 // Cache indexes on cold start
 let openingByNameIndex = null;
 let gameToPlayersIndex = null;
 let chunksCache = new Map();
+let blobStore = null;
 
 const CHUNK_SIZE = 4000;
 
-function loadOpeningByNameIndex() {
+function getBlobStore() {
+  if (!blobStore) {
+    const siteID = process.env.SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+
+    if (siteID && token) {
+      blobStore = getStore({
+        name: "master-games",
+        siteID,
+        token,
+      });
+    } else {
+      blobStore = getStore("master-games");
+    }
+  }
+  return blobStore;
+}
+
+async function loadOpeningByNameIndex() {
   if (!openingByNameIndex) {
-    const indexPath = "data/indexes/opening-by-name.json";
-    openingByNameIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get("indexes/opening-by-name.json");
+    openingByNameIndex = JSON.parse(data);
   }
   return openingByNameIndex;
 }
 
-function loadGameToPlayersIndex() {
+async function loadGameToPlayersIndex() {
   if (!gameToPlayersIndex) {
-    const indexPath = "data/indexes/game-to-players.json";
-    gameToPlayersIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get("indexes/game-to-players.json");
+    gameToPlayersIndex = JSON.parse(data);
   }
   return gameToPlayersIndex;
 }
 
-function loadChunk(chunkId) {
+async function loadChunk(chunkId) {
   if (!chunksCache.has(chunkId)) {
-    const chunkPath = `data/indexes/chunk-${chunkId}.json`;
-    const chunk = JSON.parse(fs.readFileSync(chunkPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get(`indexes/chunk-${chunkId}.json`);
+    const chunk = JSON.parse(data);
     chunksCache.set(chunkId, chunk);
   }
   return chunksCache.get(chunkId);
 }
 
-function getGameFromChunk(gameId) {
+async function getGameFromChunk(gameId) {
   const chunkId = Math.floor(gameId / CHUNK_SIZE);
-  const chunk = loadChunk(chunkId);
+  const chunk = await loadChunk(chunkId);
   return chunk.games.find((g) => g.idx === gameId);
 }
 
@@ -79,8 +101,8 @@ export const handler = async (event) => {
     const openingNames = openings.split(",").map((s) => s.trim());
 
     // Load indexes
-    const openingIndex = loadOpeningByNameIndex();
-    const gameToPlayers = loadGameToPlayersIndex();
+    const openingIndex = await loadOpeningByNameIndex();
+    const gameToPlayers = await loadGameToPlayersIndex();
 
     // Collect all game IDs for selected openings
     const allGameIds = new Set();
@@ -108,7 +130,7 @@ export const handler = async (event) => {
     // Load full game metadata from chunks
     const games = [];
     for (const gameId of playerGameIds) {
-      const game = getGameFromChunk(gameId);
+      const game = await getGameFromChunk(gameId);
       if (game) {
         // Return metadata without moves (moves fetched separately via getMasterGameMoves)
         games.push({

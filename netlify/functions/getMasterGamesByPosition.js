@@ -23,45 +23,66 @@
  * Returns: { openings, masters, totalGames, usedAncestorFallback }
  */
 
-import fs from "fs";
+import { getStore } from "@netlify/blobs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
-// Cache indexes on cold start
+// Cache indexes and blob store on cold start
 let openingByFenIndex = null;
 let openingByNameIndex = null;
 let ancestorToDescendantsIndex = null;
 let gameToPlayersIndex = null;
+let blobStore = null;
 
-function loadOpeningByFenIndex() {
+function getBlobStore() {
+  if (!blobStore) {
+    const siteID = process.env.SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+
+    if (siteID && token) {
+      blobStore = getStore({
+        name: "master-games",
+        siteID,
+        token,
+      });
+    } else {
+      blobStore = getStore("master-games");
+    }
+  }
+  return blobStore;
+}
+
+async function loadOpeningByFenIndex() {
   if (!openingByFenIndex) {
-    const indexPath = "data/indexes/opening-by-fen.json";
-    openingByFenIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get("indexes/opening-by-fen.json");
+    openingByFenIndex = JSON.parse(data);
   }
   return openingByFenIndex;
 }
 
-function loadOpeningByNameIndex() {
+async function loadOpeningByNameIndex() {
   if (!openingByNameIndex) {
-    const indexPath = "data/indexes/opening-by-name.json";
-    openingByNameIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get("indexes/opening-by-name.json");
+    openingByNameIndex = JSON.parse(data);
   }
   return openingByNameIndex;
 }
 
-function loadAncestorToDescendantsIndex() {
+async function loadAncestorToDescendantsIndex() {
   if (!ancestorToDescendantsIndex) {
-    const indexPath = "data/indexes/ancestor-to-descendants.json";
-    ancestorToDescendantsIndex = JSON.parse(
-      fs.readFileSync(indexPath, "utf-8"),
-    );
+    const store = getBlobStore();
+    const data = await store.get("indexes/ancestor-to-descendants.json");
+    ancestorToDescendantsIndex = JSON.parse(data);
   }
   return ancestorToDescendantsIndex;
 }
 
-function loadGameToPlayersIndex() {
+async function loadGameToPlayersIndex() {
   if (!gameToPlayersIndex) {
-    const indexPath = "data/indexes/game-to-players.json";
-    gameToPlayersIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get("indexes/game-to-players.json");
+    gameToPlayersIndex = JSON.parse(data);
   }
   return gameToPlayersIndex;
 }
@@ -106,11 +127,11 @@ export const handler = async (event) => {
     const pageSizeNum = parseInt(pageSize);
     const positionFen = getPositionFen(fen);
 
-    // Load indexes
-    const fenIndex = loadOpeningByFenIndex();
-    const nameIndex = loadOpeningByNameIndex();
-    const ancestorIndex = loadAncestorToDescendantsIndex();
-    const gameToPlayers = loadGameToPlayersIndex();
+    // Load indexes from blobs
+    const fenIndex = await loadOpeningByFenIndex();
+    const nameIndex = await loadOpeningByNameIndex();
+    const ancestorIndex = await loadAncestorToDescendantsIndex();
+    const gameToPlayers = await loadGameToPlayersIndex();
 
     // Collect matching FENs and game IDs
     const matchingFens = [];
@@ -176,18 +197,38 @@ export const handler = async (event) => {
       }
     }
 
-    // Build openings list from matching FENs
+    // Build openings list by checking which openings have games in our collected game IDs
     const openingsMap = new Map();
+    
+    // Debug logging
+    console.log("DEBUG getMasterGamesByPosition:");
+    console.log("  Input FEN:", fen);
+    console.log("  Position FEN:", positionFen);
+    console.log("  Matching FENs count:", matchingFens.length);
+    console.log("  First 3 matching FENs:", matchingFens.slice(0, 3));
+    console.log("  Total game IDs:", allGameIds.size);
+    console.log("  Used ancestor fallback:", usedAncestorFallback);
+    
+    // For each opening, check if it has any games that match our position
     for (const [name, data] of Object.entries(nameIndex)) {
-      if (matchingFens.includes(data.fen)) {
-        openingsMap.set(name, {
+      // Count how many of this opening's games are in our matched games
+      const matchingGameCount = data.gameIds.filter(id => allGameIds.has(id)).length;
+      
+      if (matchingGameCount > 0) {
+        // Use a unique key combining name, eco, and fen to avoid collisions
+        // (multiple openings can have the same name but different ECO codes)
+        const uniqueKey = `${name}|${data.eco}|${data.fen}`;
+        openingsMap.set(uniqueKey, {
           name,
           fen: data.fen,
           eco: data.eco,
-          gameCount: data.gameIds.length,
+          gameCount: matchingGameCount, // Use the count of games at this position
         });
       }
     }
+    
+    console.log("  Openings found:", openingsMap.size);
+    
     const openings = Array.from(openingsMap.values()).sort((a, b) =>
       a.name.localeCompare(b.name),
     );
