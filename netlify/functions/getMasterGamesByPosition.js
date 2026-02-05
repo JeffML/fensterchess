@@ -197,23 +197,29 @@ export const handler = async (event) => {
       }
     }
 
-    // Build openings list by checking which openings have games in our collected game IDs
+    // Build openings list using FEN-based lookup (more direct and efficient)
     const openingsMap = new Map();
     
-    // For each opening, check if it has any games that match our position
+    // Build reverse lookup: FEN → opening data
+    const fenToOpening = new Map();
     for (const [name, data] of Object.entries(nameIndex)) {
-      // Count how many of this opening's games are in our matched games
-      const matchingGameCount = data.gameIds.filter(id => allGameIds.has(id)).length;
-      
-      if (matchingGameCount > 0) {
-        // Use a unique key combining name, eco, and fen to avoid collisions
-        // (multiple openings can have the same name but different ECO codes)
-        const uniqueKey = `${name}|${data.eco}|${data.fen}`;
+      fenToOpening.set(data.fen, { name, eco: data.eco, gameIds: data.gameIds });
+    }
+    
+    // For each matching FEN, look up the opening directly
+    for (const fen of matchingFens) {
+      const opening = fenToOpening.get(fen);
+      if (opening) {
+        // Count games at this specific position (not opening's total)
+        const gameCount = fenIndex[fen]?.length || 0;
+        
+        // Use unique key to avoid collisions (multiple FENs can have same name/eco)
+        const uniqueKey = `${opening.name}|${opening.eco}|${fen}`;
         openingsMap.set(uniqueKey, {
-          name,
-          fen: data.fen,
-          eco: data.eco,
-          gameCount: matchingGameCount, // Use the count of games at this position
+          name: opening.name,
+          fen: fen,
+          eco: opening.eco,
+          gameCount: gameCount,
         });
       }
     }
