@@ -25,6 +25,7 @@
 
 import { getStore } from "@netlify/blobs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
+import fs from "fs";
 
 // Cache indexes and blob store on cold start
 let openingByFenIndex = null;
@@ -130,92 +131,105 @@ export const handler = async (event) => {
     // Load indexes from blobs
     const fenIndex = await loadOpeningByFenIndex();
     const nameIndex = await loadOpeningByNameIndex();
-    const ancestorIndex = await loadAncestorToDescendantsIndex();
     const gameToPlayers = await loadGameToPlayersIndex();
 
-    // Collect matching FENs and game IDs
-    const matchingFens = [];
-    let allGameIds = new Set();
-    let usedAncestorFallback = false;
+    // Load fromToPositionIndexed for finding continuations
+    const fromToIndexed = JSON.parse(
+      fs.readFileSync("data/fromToPositionIndexed.json", "utf-8"),
+    );
+
+    // Separate direct matches from continuations
+    const directFens = [];
+    const continuationFens = [];
+    let directGameIds = new Set();
+    let continuationGameIds = new Set();
 
     // Try direct FEN match first
     if (fenIndex[fen]) {
-      matchingFens.push(fen);
+      directFens.push(fen);
       for (const gameId of fenIndex[fen]) {
-        allGameIds.add(gameId);
+        directGameIds.add(gameId);
       }
     }
 
-    // Try position-only match
-    if (matchingFens.length === 0) {
+    // Try position-only match (when exact FEN doesn't match but position does)
+    if (directFens.length === 0) {
       for (const [indexedFen, gameIds] of Object.entries(fenIndex)) {
         if (getPositionFen(indexedFen) === positionFen) {
-          matchingFens.push(indexedFen);
+          directFens.push(indexedFen);
           for (const gameId of gameIds) {
-            allGameIds.add(gameId);
+            directGameIds.add(gameId);
           }
         }
       }
     }
 
-    // If still no matches, try ancestor fallback
-    if (matchingFens.length === 0 && ancestorIndex[positionFen]) {
-      usedAncestorFallback = true;
-      const descendantFens = ancestorIndex[positionFen];
-      for (const descendantFen of descendantFens) {
-        if (fenIndex[descendantFen]) {
-          matchingFens.push(descendantFen);
-          for (const gameId of fenIndex[descendantFen]) {
-            allGameIds.add(gameId);
+    // Check for continuations using fromTo index (eco.json transitions)
+    let hasDescendants = false;
+    const continuationPositions = fromToIndexed.to[positionFen] || [];
+    if (continuationPositions.length > 0) {
+      hasDescendants = true;
+      // For each continuation position, find master games
+      for (const continuationFen of continuationPositions) {
+        if (fenIndex[continuationFen]) {
+          continuationFens.push(continuationFen);
+          for (const gameId of fenIndex[continuationFen]) {
+            continuationGameIds.add(gameId);
           }
         }
       }
     }
 
-    // If still no matches and we have a fallback FEN (nearest known opening), use that
+    // If no direct matches and no continuations, try fallback FEN
     let usedFallbackFen = false;
-    if (matchingFens.length === 0 && fallbackFen) {
+    if (
+      directFens.length === 0 &&
+      continuationFens.length === 0 &&
+      fallbackFen
+    ) {
       const fallbackPositionFen = getPositionFen(fallbackFen);
       // Try exact match on fallback FEN
       if (fenIndex[fallbackFen]) {
         usedFallbackFen = true;
-        matchingFens.push(fallbackFen);
+        directFens.push(fallbackFen);
         for (const gameId of fenIndex[fallbackFen]) {
-          allGameIds.add(gameId);
+          directGameIds.add(gameId);
         }
       } else {
         // Try position-only match on fallback
         for (const [indexedFen, gameIds] of Object.entries(fenIndex)) {
           if (getPositionFen(indexedFen) === fallbackPositionFen) {
             usedFallbackFen = true;
-            matchingFens.push(indexedFen);
+            directFens.push(indexedFen);
             for (const gameId of gameIds) {
-              allGameIds.add(gameId);
+              directGameIds.add(gameId);
             }
           }
         }
       }
     }
 
-    // Build openings list using FEN-based lookup (more direct and efficient)
-    const openingsMap = new Map();
-    
+    // Combine all game IDs for player aggregation
+    const allGameIds = new Set([...directGameIds, ...continuationGameIds]);
+
     // Build reverse lookup: FEN → opening data
     const fenToOpening = new Map();
     for (const [name, data] of Object.entries(nameIndex)) {
-      fenToOpening.set(data.fen, { name, eco: data.eco, gameIds: data.gameIds });
+      fenToOpening.set(data.fen, {
+        name,
+        eco: data.eco,
+        gameIds: data.gameIds,
+      });
     }
-    
-    // For each matching FEN, look up the opening directly
-    for (const fen of matchingFens) {
+
+    // Build direct openings list
+    const directOpeningsMap = new Map();
+    for (const fen of directFens) {
       const opening = fenToOpening.get(fen);
       if (opening) {
-        // Count games at this specific position (not opening's total)
         const gameCount = fenIndex[fen]?.length || 0;
-        
-        // Use unique key to avoid collisions (multiple FENs can have same name/eco)
         const uniqueKey = `${opening.name}|${opening.eco}|${fen}`;
-        openingsMap.set(uniqueKey, {
+        directOpeningsMap.set(uniqueKey, {
           name: opening.name,
           fen: fen,
           eco: opening.eco,
@@ -223,9 +237,29 @@ export const handler = async (event) => {
         });
       }
     }
-    
-    const openings = Array.from(openingsMap.values()).sort((a, b) =>
+
+    // Build continuation openings list
+    const continuationOpeningsMap = new Map();
+    for (const fen of continuationFens) {
+      const opening = fenToOpening.get(fen);
+      if (opening) {
+        const gameCount = fenIndex[fen]?.length || 0;
+        const uniqueKey = `${opening.name}|${opening.eco}|${fen}`;
+        continuationOpeningsMap.set(uniqueKey, {
+          name: opening.name,
+          fen: fen,
+          eco: opening.eco,
+          gameCount: gameCount,
+        });
+      }
+    }
+
+    const openings = Array.from(directOpeningsMap.values()).sort((a, b) =>
       a.name.localeCompare(b.name),
+    );
+
+    const continuations = Array.from(continuationOpeningsMap.values()).sort(
+      (a, b) => a.name.localeCompare(b.name),
     );
 
     // Aggregate game counts per player
@@ -277,14 +311,16 @@ export const handler = async (event) => {
       },
       body: JSON.stringify({
         openings,
+        continuations,
         masters: paginatedMasters,
         totalMasters,
         totalGames: allGameIds.size,
+        directGames: directGameIds.size,
+        continuationGames: continuationGameIds.size,
         page: pageNum,
         pageSize: pageSizeNum,
-        usedAncestorFallback,
+        hasDescendants,
         usedFallbackFen,
-        matchedPositions: matchingFens.length,
       }),
     };
   } catch (error) {
