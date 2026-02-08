@@ -116,7 +116,7 @@ export const handler = async (event) => {
       ([playerName, gameCount]) => ({
         playerName,
         gameCount,
-      })
+      }),
     );
 
     // Sort based on parameters

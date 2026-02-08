@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef, memo, MutableRefObject } from "react";
 import { FEN, BoardState } from "../types";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
@@ -861,6 +861,7 @@ const MasterGamesComponent = ({
   );
   const [showContinuations, setShowContinuations] = useState(false);
   const prevOpeningNameRef = useRef<string | undefined>(openingName);
+  const queryClient = useQueryClient();
 
   // Reset selection when FEN changes
   useEffect(() => {
@@ -888,7 +889,11 @@ const MasterGamesComponent = ({
   const handlePlayerClick = async (gameId: number, targetFen: string) => {
     setSelectedGameIdx(gameId);
     try {
-      const moves = await fetchGameMoves(gameId);
+      // Use queryClient.fetchQuery to cache game moves
+      const moves = await queryClient.fetchQuery({
+        queryKey: ["gameMoves", gameId],
+        queryFn: () => fetchGameMoves(gameId),
+      });
 
       // Load the full game into chess to find the opening position
       chess.current.loadPgn(moves);
