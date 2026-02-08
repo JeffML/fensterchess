@@ -30,14 +30,18 @@ async function loadChunkMetadata() {
   const store = getBlobStore();
   chunkMetadata = {};
 
-  // Load all 5 chunks (0-4) since we know we have exactly 5
-  for (let i = 0; i < 5; i++) {
-    const chunkData = await store.get(`indexes/chunk-${i}.json`);
+  // Load all 5 chunks (0-4) in parallel since we know we have exactly 5
+  const chunkPromises = Array.from({ length: 5 }, (_, i) =>
+    store.get(`indexes/chunk-${i}.json`),
+  );
+  const chunkDataArray = await Promise.all(chunkPromises);
+
+  chunkDataArray.forEach((chunkData, i) => {
     const chunk = JSON.parse(chunkData);
     chunk.games.forEach((game) => {
       chunkMetadata[game.idx] = { chunkId: i };
     });
-  }
+  });
 
   return chunkMetadata;
 }

@@ -144,12 +144,19 @@ export const handler = async (event) => {
     const paginatedIds = gameIds.slice(startIdx, endIdx);
 
     // Load games from chunks (stored in Blobs)
+    // First, determine which chunks we need and load them in parallel
+    const uniqueChunkIds = new Set(
+      paginatedIds.map((gameId) => Math.floor(gameId / 4000)),
+    );
+    await Promise.all(
+      Array.from(uniqueChunkIds).map((chunkId) => loadChunk(chunkId)),
+    );
+
+    // Now extract games from cached chunks
     const games = [];
     for (const gameId of paginatedIds) {
-      // Game IDs are sequential - determine which chunk they're in
-      // Each chunk has 4000 games (chunk-0: 0-3999, chunk-1: 4000-7999, etc.)
       const chunkId = Math.floor(gameId / 4000);
-      const chunk = await loadChunk(chunkId);
+      const chunk = chunksCache.get(chunkId);
 
       // Find game in chunk
       const game = chunk.games.find((g) => g.idx === gameId);

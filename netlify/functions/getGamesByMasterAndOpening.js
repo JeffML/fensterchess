@@ -128,9 +128,20 @@ export const handler = async (event) => {
     }
 
     // Load full game metadata from chunks
+    // First, determine which chunks we need and load them in parallel
+    const uniqueChunkIds = new Set(
+      playerGameIds.map((gameId) => Math.floor(gameId / CHUNK_SIZE)),
+    );
+    await Promise.all(
+      Array.from(uniqueChunkIds).map((chunkId) => loadChunk(chunkId)),
+    );
+
+    // Now extract games from cached chunks
     const games = [];
     for (const gameId of playerGameIds) {
-      const game = await getGameFromChunk(gameId);
+      const chunkId = Math.floor(gameId / CHUNK_SIZE);
+      const chunk = chunksCache.get(chunkId);
+      const game = chunk.games.find((g) => g.idx === gameId);
       if (game) {
         // Return metadata without moves (moves fetched separately via getMasterGameMoves)
         games.push({
