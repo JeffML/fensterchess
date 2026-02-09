@@ -18,12 +18,9 @@
     format = "esm"
 #  external_node_modules = ["express", "import-fresh"]
 
-# Master game functions load all indexes from Netlify Blobs
-# fromToPositionIndexed.json downloaded from eco.json GitHub repo
-# Only scores.json still bundled (legacy)
-
-[functions."scoresForFens"] 
-   included_files = ["data/scores.json"]
+# All data now loaded from remote sources:
+# - Master game indexes: Netlify Blobs (managed by fensterchess.tooling)
+# - Opening transitions & scores: eco.json GitHub repo (managed by eco.json.tooling)
 
   ## [functions."courses"] 
   ##  included_files = ["dataForLambdas/courseHtml/**/*.html"]
