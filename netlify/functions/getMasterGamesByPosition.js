@@ -52,15 +52,6 @@ function getBlobStore() {
   return blobStore;
 }
 
-async function loadOpeningByFenIndex() {
-  if (!openingByFenIndex) {
-    const store = getBlobStore();
-    const data = await store.get("indexes/opening-by-fen.json");
-    openingByFenIndex = JSON.parse(data);
-  }
-  return openingByFenIndex;
-}
-
 async function loadOpeningByNameIndex() {
   if (!openingByNameIndex) {
     const store = getBlobStore();
@@ -68,6 +59,18 @@ async function loadOpeningByNameIndex() {
     openingByNameIndex = JSON.parse(data);
   }
   return openingByNameIndex;
+}
+
+async function loadOpeningByFenIndex() {
+  // Build FEN→gameIds index from opening-by-name (eliminates 539 KB redundancy)
+  if (!openingByFenIndex) {
+    const nameIndex = await loadOpeningByNameIndex();
+    openingByFenIndex = {};
+    Object.values(nameIndex).forEach((opening) => {
+      openingByFenIndex[opening.fen] = opening.gameIds;
+    });
+  }
+  return openingByFenIndex;
 }
 
 async function loadAncestorToDescendantsIndex() {

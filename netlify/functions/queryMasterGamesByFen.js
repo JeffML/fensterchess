@@ -24,6 +24,7 @@ import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
 // Cache indexes and chunks in memory during cold start
 let openingByFenIndex = null;
+let openingByNameIndex = null;
 let chunksCache = new Map();
 let blobStore = null;
 
@@ -48,11 +49,23 @@ function getBlobStore() {
   return blobStore;
 }
 
-async function loadIndex() {
-  if (!openingByFenIndex) {
+async function loadOpeningByNameIndex() {
+  if (!openingByNameIndex) {
     const store = getBlobStore();
-    const data = await store.get("indexes/opening-by-fen.json");
-    openingByFenIndex = JSON.parse(data);
+    const data = await store.get("indexes/opening-by-name.json");
+    openingByNameIndex = JSON.parse(data);
+  }
+  return openingByNameIndex;
+}
+
+async function loadIndex() {
+  // Build FEN→gameIds index from opening-by-name (eliminates 539 KB redundancy)
+  if (!openingByFenIndex) {
+    const nameIndex = await loadOpeningByNameIndex();
+    openingByFenIndex = {};
+    Object.values(nameIndex).forEach((opening) => {
+      openingByFenIndex[opening.fen] = opening.gameIds;
+    });
   }
   return openingByFenIndex;
 }
