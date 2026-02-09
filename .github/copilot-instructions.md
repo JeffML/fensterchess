@@ -27,8 +27,9 @@
 **Game vs Opening Data:**
 
 - **Opening data** (~12K named variations): Use `@chess-openings/eco.json` package methods
-- **Master games** (~19K games): Use local indexes in `data/indexes/`
-- **Transitions**: `fromTo.json` is raw data, `fromToPositionIndexed.json` is optimized for lookup
+- **Master games** (~19K games): Load from Netlify Blobs via serverless functions
+- **Transitions**: Download `fromToPositionIndexed.json` from eco.json GitHub repo (optimized for lookup)
+- **Position scores**: Download `scores.json` from eco.json GitHub repo
 
 ## Project Overview
 
@@ -81,11 +82,12 @@ fensterchess consumes chessPGN as a dependency and fetches chess opening data fr
 
 **Netlify Serverless Functions** (`netlify/functions/`):
 
-- `getFromTosForFen.js` - Returns next/previous positions for a FEN (reads from `data/fromToPositionIndexed.json`)
-- `scoresForFens.js` - Evaluates positions using pre-computed scores (`data/scores.json`)
+- `getFromTosForFen.js` - Returns next/previous positions for a FEN (downloads from eco.json GitHub)
+- `scoresForFens.js` - Evaluates positions using pre-computed scores (downloads from eco.json GitHub)
 - `getPgnLinks.js` / `getRssXml.js` - Fetch PGN data from external chess sites
-- `queryMasterGamesByFen.js` - Returns master games matching a FEN position
-- `getMasterGameMoves.js` - Returns full moves for a specific game
+- `queryMasterGamesByFen.js` - Returns master games matching a FEN (loads from Netlify Blobs)
+- `getMasterGameMoves.js` - Returns full moves for a specific game (loads from Netlify Blobs)
+- All master game functions load indexes from Netlify Blobs with module-level caching
 - All functions use Bearer token authentication via `utils/auth.js` (checks `VITE_API_SECRET_TOKEN`)
 
 **CRITICAL - Serverless Function Format:**
@@ -344,8 +346,10 @@ Located in `__tests__/` directory:
 **fensterchess** (this repo):
 - Runtime code: `src/searchPage/MasterGames.tsx`, `src/datasource/fetchMasterGames.ts`
 - Serverless functions: `netlify/functions/queryMasterGamesByFen.js`, `getMasterGameMoves.js`
-- Generated indexes: `data/indexes/` (master-index.json, opening-by-fen.json, chunks, etc.)
-- Static data: `data/scores.json`, `data/fromToPositionIndexed.json`
+- **Zero bundled data files** - all data loaded from remote sources:
+  - Master game indexes: Netlify Blobs (uploaded by fensterchess.tooling)
+  - Opening transitions: eco.json GitHub (`fromToPositionIndexed.json`)
+  - Position scores: eco.json GitHub (`scores.json`)
 
 **fensterchess.tooling** (separate repo):
 - Data pipeline scripts: `downloadMasterGames.ts`, `buildIndexes.ts`, `filterGame.ts`, `hashGame.ts`
@@ -392,20 +396,19 @@ _Lichess Elite Database:_
 - 19K games: ~20 minutes processing time
 - Lichess Elite processing: ~15-20 minutes per month
 
-**Data Structure** (`data/` directory):
+**Data Structure**:
 
-- `pgn-downloads/` - Downloaded ZIP files and processed-games.json
-- `indexes/` - Pre-built search indexes:
-  - `master-index.json` - Complete game metadata
-  - `player-index.json` - Search by player name (white/black)
-  - `opening-by-eco.json` - Search by ECO code
-  - `opening-by-name.json` - Search by opening name
-  - `opening-by-fen.json` - Search by position FEN (KEY = `ecoJsonFen`)
-  - `event-index.json` - Search by event/tournament
-  - `date-index.json` - Search by date range
-  - `deduplication-index.json` - Hash → game index mapping
-  - `source-tracking.json` - Source metadata and checksums
-  - `chunk-*.json` - Game data chunks (4000 games each, <5 MB for Netlify Blobs)
+**Netlify Blobs** (`master-games` store):
+- `indexes/opening-by-name.json` - Opening name → {fen, eco, gameIds}
+- `indexes/opening-by-eco.json` - ECO code → openings
+- `indexes/game-to-players.json` - GameId → [white, black]
+- `indexes/ancestor-to-descendants.json` - Position navigation tree
+- `indexes/eco-roots.json` - ECO category data
+- `indexes/chunk-*.json` - Game data chunks (5 files, 4000 games each, ~4 MB per chunk)
+
+**Local** (`data/` directory):
+- `pgn-downloads/` - Downloaded ZIP files and processed-games.json (gitignored, not deployed)
+- `README.md` - Data file origin documentation
 
 **CRITICAL - GameMetadata Opening Fields** (defined in fensterchess.tooling `scripts/types.ts`):
 
@@ -429,10 +432,13 @@ Each game in the index has these fields for opening lookup:
 
 - ✅ Phase 0: Foundation and filtering logic complete
 - ✅ Phase 1: Downloaded 5 masters (Carlsen, Kasparov, Nakamura, Anand, Fischer)
-- ✅ Indexes built locally (~19K games, 5 chunks)
-- ✅ Chunk size optimized for Netlify Blobs (4000 games = ~4 MB per chunk)
-- ⏳ Phase 2: UI integration (search interface and game viewer)
-- 🔜 Phase 3: Upload to Netlify Blobs and create serverless query functions
+- ✅ Phase 2: UI integration (search interface and game viewer)
+- ✅ Phase 3: Complete migration to Netlify Blobs
+  - All 10 indexes uploaded to Netlify Blobs
+  - 6 serverless functions migrated to load from blobs
+  - Zero bundled data files (30.9 MB eliminated)
+  - fromToPositionIndexed.json and scores.json download from eco.json GitHub
+  - Module-level caching in all functions for performance
 
 **Design Docs**: See `.github/masterGameDatabase*.md` for detailed architecture (these docs have been moved to fensterchess.tooling repo)
 
@@ -441,6 +447,7 @@ Each game in the index has these fields for opening lookup:
 1. **Don't edit `src/pgn.js` directly** - modify `src/pgn.peggy` and run `npm run parser`
 2. **ChessPGN vs Game** - Modify Game.ts for logic changes; ChessPGN is just a wrapper
 3. **Worker thread setup** - Workers use CommonJS; see `src/workerParser.js` for pattern
-4. **Netlify function data** - Use `included_files` in `netlify.toml` to bundle JSON data
-5. **React Query keys** - Must include ALL variables that affect the query (especially FEN strings)
-6. **Opening book lookup** - Always check `positionBook` fallback when `openingBook[fen]` is null
+4. **Netlify Blobs** - Master game indexes load from Netlify Blobs, NOT bundled files
+5. **eco.json GitHub files** - fromToPositionIndexed.json and scores.json download from eco.json repo
+6. **React Query keys** - Must include ALL variables that affect the query (especially FEN strings)
+7. **Opening book lookup** - Always check `positionBook` fallback when `openingBook[fen]` is null
