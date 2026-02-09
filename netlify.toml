@@ -18,17 +18,12 @@
     format = "esm"
 #  external_node_modules = ["express", "import-fresh"]
 
-[functions."getFromTosForFen"] 
-   included_files = ["data/fromToPositionIndexed.json"]
+# Master game functions load all indexes from Netlify Blobs
+# fromToPositionIndexed.json downloaded from eco.json GitHub repo
+# Only scores.json still bundled (legacy)
 
- [functions."scoresForFens"] 
+[functions."scoresForFens"] 
    included_files = ["data/scores.json"]
-
-# Master game functions now load all indexes from Netlify Blobs
-# No local files needed except for legacy fromToPositionIndexed
-
-[functions."getMasterGamesByPosition"]
-   included_files = ["data/fromToPositionIndexed.json"]
 
   ## [functions."courses"] 
   ##  included_files = ["dataForLambdas/courseHtml/**/*.html"]
