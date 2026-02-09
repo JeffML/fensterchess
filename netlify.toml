@@ -18,29 +18,9 @@
     format = "esm"
 #  external_node_modules = ["express", "import-fresh"]
 
-[functions."getFromTosForFen"] 
-   included_files = ["data/fromToPositionIndexed.json"]
-
- [functions."scoresForFens"] 
-   included_files = ["data/scores.json"]
-
-[functions."queryMasterGamesByFen"]
-   included_files = ["data/indexes/opening-by-fen.json", "data/indexes/chunk-*.json"]
-
-[functions."getMasterGameMoves"]
-   included_files = ["data/indexes/chunk-*.json"]
-
-[functions."getMasterGameOpenings"]
-   included_files = ["data/indexes/opening-by-name.json", "data/indexes/eco-roots.json"]
-
-[functions."getMastersByOpenings"]
-   included_files = ["data/indexes/opening-by-name.json", "data/indexes/game-to-players.json"]
-
-[functions."getGamesByMasterAndOpening"]
-   included_files = ["data/indexes/opening-by-name.json", "data/indexes/game-to-players.json", "data/indexes/chunk-*.json"]
-
-[functions."getMasterGamesByPosition"]
-   included_files = ["data/indexes/opening-by-fen.json", "data/indexes/opening-by-name.json", "data/indexes/ancestor-to-descendants.json", "data/indexes/game-to-players.json"]
+# All data now loaded from remote sources:
+# - Master game indexes: Netlify Blobs (managed by fensterchess.tooling)
+# - Opening transitions & scores: eco.json GitHub repo (managed by eco.json.tooling)
 
   ## [functions."courses"] 
   ##  included_files = ["dataForLambdas/courseHtml/**/*.html"]

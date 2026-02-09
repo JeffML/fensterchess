@@ -1,25 +1,46 @@
 // Get masters who played selected openings with game counts
 // Returns paginated list of players with aggregated game counts
 
-import fs from "fs";
+import { getStore } from "@netlify/blobs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
 // Cache indexes on cold start
 let openingByNameIndex = null;
 let gameToPlayersIndex = null;
+let blobStore = null;
 
-function loadOpeningByNameIndex() {
+function getBlobStore() {
+  if (!blobStore) {
+    const siteID = process.env.SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+
+    if (siteID && token) {
+      blobStore = getStore({
+        name: "master-games",
+        siteID,
+        token,
+      });
+    } else {
+      blobStore = getStore("master-games");
+    }
+  }
+  return blobStore;
+}
+
+async function loadOpeningByNameIndex() {
   if (!openingByNameIndex) {
-    const indexPath = "data/indexes/opening-by-name.json";
-    openingByNameIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get("indexes/opening-by-name.json");
+    openingByNameIndex = JSON.parse(data);
   }
   return openingByNameIndex;
 }
 
-function loadGameToPlayersIndex() {
+async function loadGameToPlayersIndex() {
   if (!gameToPlayersIndex) {
-    const indexPath = "data/indexes/game-to-players.json";
-    gameToPlayersIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get("indexes/game-to-players.json");
+    gameToPlayersIndex = JSON.parse(data);
   }
   return gameToPlayersIndex;
 }
@@ -61,8 +82,8 @@ export const handler = async (event) => {
     const pageSizeNum = parseInt(pageSize);
 
     // Load indexes
-    const openingIndex = loadOpeningByNameIndex();
-    const gameToPlayers = loadGameToPlayersIndex();
+    const openingIndex = await loadOpeningByNameIndex();
+    const gameToPlayers = await loadGameToPlayersIndex();
 
     // Collect all game IDs for selected openings
     const allGameIds = new Set();
@@ -95,7 +116,7 @@ export const handler = async (event) => {
       ([playerName, gameCount]) => ({
         playerName,
         gameCount,
-      })
+      }),
     );
 
     // Sort based on parameters

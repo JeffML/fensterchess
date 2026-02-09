@@ -1,23 +1,42 @@
 // Get all openings from master games database grouped by ECO category
 // Returns openings organized by ECO letter (A, B, C, D, E), then by ECO code
 
-import fs from "fs";
+import { getStore } from "@netlify/blobs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
 // Cache indexes on cold start
 let openingByNameIndex = null;
 let ecoRootsIndex = null;
+let blobStore = null;
 
-function loadIndexes() {
+function getBlobStore() {
+  if (!blobStore) {
+    const siteID = process.env.SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+
+    if (siteID && token) {
+      blobStore = getStore({
+        name: "master-games",
+        siteID,
+        token,
+      });
+    } else {
+      blobStore = getStore("master-games");
+    }
+  }
+  return blobStore;
+}
+
+async function loadIndexes() {
+  const store = getBlobStore();
+
   if (!openingByNameIndex) {
-    openingByNameIndex = JSON.parse(
-      fs.readFileSync("data/indexes/opening-by-name.json", "utf-8")
-    );
+    const data = await store.get("indexes/opening-by-name.json");
+    openingByNameIndex = JSON.parse(data);
   }
   if (!ecoRootsIndex) {
-    ecoRootsIndex = JSON.parse(
-      fs.readFileSync("data/indexes/eco-roots.json", "utf-8")
-    );
+    const data = await store.get("indexes/eco-roots.json");
+    ecoRootsIndex = JSON.parse(data);
   }
   return { openingByNameIndex, ecoRootsIndex };
 }
@@ -37,7 +56,7 @@ export const handler = async (event) => {
   }
 
   try {
-    const { openingByNameIndex, ecoRootsIndex } = loadIndexes();
+    const { openingByNameIndex, ecoRootsIndex } = await loadIndexes();
 
     // First, group all openings by ECO code
     const byEcoCode = {};

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef, memo, MutableRefObject } from "react";
 import { FEN, BoardState } from "../types";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
@@ -36,13 +36,16 @@ interface Master {
 
 interface MasterGamesByPositionResponse {
   openings: Opening[];
+  continuations: Opening[];
   masters: Master[];
   totalMasters: number;
   totalGames: number;
+  directGames: number;
+  continuationGames: number;
   page: number;
   pageSize: number;
-  usedAncestorFallback: boolean;
-  matchedPositions: number;
+  hasDescendants: boolean;
+  usedFallbackFen: boolean;
 }
 
 interface MasterGamesResponse {
@@ -64,6 +67,8 @@ interface MasterGamesPositionViewProps {
   setSelectedOpening: (opening: Opening | null) => void;
   setGamesPage: (page: number) => void;
   isFlashing: boolean;
+  showContinuations: boolean;
+  setShowContinuations: (show: boolean) => void;
 }
 
 interface MasterGamesOpeningViewProps {
@@ -249,6 +254,8 @@ const MasterGamesPositionView: React.FC<MasterGamesPositionViewProps> = ({
   setSelectedOpening,
   setGamesPage,
   isFlashing,
+  showContinuations,
+  setShowContinuations,
 }) => {
   const header = (
     <div
@@ -259,13 +266,17 @@ const MasterGamesPositionView: React.FC<MasterGamesPositionViewProps> = ({
         borderRadius: "4px",
       }}
     >
-      Master Games ({data.totalGames.toLocaleString()} games in{" "}
-      {new Set(data.openings.map((o) => o.eco)).size} ECO codes)
-      {data.usedAncestorFallback && (
-        <span style={{ fontSize: "0.8em", color: "#aaa", marginLeft: "0.5em" }}>
-          (via descendant positions)
-        </span>
+      Master Games (
+      {data.directGames > 0 && (
+        <>
+          {data.directGames.toLocaleString()} at this position
+          {data.continuationGames > 0 && ", "}
+        </>
       )}
+      {data.continuationGames > 0 && (
+        <>{data.continuationGames.toLocaleString()} in continuations</>
+      )}
+      )
     </div>
   );
 
@@ -425,6 +436,182 @@ const MasterGamesPositionView: React.FC<MasterGamesPositionViewProps> = ({
           });
         })()}
       </div>
+
+      {/* Continuations section */}
+      {data.continuations && data.continuations.length > 0 && (
+        <div style={{ marginTop: "1em" }}>
+          <div
+            onClick={() => setShowContinuations(!showContinuations)}
+            style={{
+              fontWeight: "bold",
+              color: "#aaa",
+              marginBottom: "0.5em",
+              textAlign: "left",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5em",
+            }}
+          >
+            <span style={{ color: "#888", fontSize: "0.8em" }}>
+              {showContinuations ? "▼" : "▶"}
+            </span>
+            Continuations ({data.continuationGames.toLocaleString()} games in{" "}
+            {new Set(data.continuations.map((o) => o.eco)).size} ECO codes)
+          </div>
+
+          {showContinuations && (
+            <div
+              style={{
+                maxHeight: "300px",
+                overflow: "auto",
+              }}
+            >
+              {(() => {
+                // Group continuations by ECO code (same logic as openings)
+                const ecoGroups = new Map<string, Opening[]>();
+                for (const opening of data.continuations) {
+                  const group = ecoGroups.get(opening.eco) || [];
+                  group.push(opening);
+                  ecoGroups.set(opening.eco, group);
+                }
+
+                const sortedEcos = Array.from(ecoGroups.keys()).sort();
+
+                return sortedEcos.map((eco) => {
+                  const openings = ecoGroups.get(eco)!;
+                  const totalGames = openings.reduce(
+                    (sum, o) => sum + o.gameCount,
+                    0,
+                  );
+                  const isExpanded = expandedEcoCodes.has(`cont-${eco}`);
+                  const hasMultiple = openings.length > 1;
+
+                  if (!hasMultiple) {
+                    const opening = openings[0];
+                    return (
+                      <div
+                        key={eco}
+                        onClick={() => {
+                          setSelectedOpening(opening);
+                          setGamesPage(0);
+                        }}
+                        style={{
+                          display: "flex",
+                          gap: "0.5em",
+                          padding: "0.25em 0.5em",
+                          cursor: "pointer",
+                          borderRadius: "4px",
+                        }}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.backgroundColor = "#333")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.backgroundColor =
+                            "transparent")
+                        }
+                      >
+                        <span
+                          style={{
+                            color: "#6a9",
+                            fontWeight: "bold",
+                            minWidth: "3em",
+                          }}
+                        >
+                          {eco}
+                        </span>
+                        <span style={{ color: "#6db3f2", flex: 1 }}>
+                          {opening.name}
+                        </span>
+                        <span style={{ color: "#888" }}>
+                          ({opening.gameCount})
+                        </span>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={eco}>
+                      <div
+                        onClick={() => {
+                          setExpandedEcoCodes((prev) => {
+                            const next = new Set(prev);
+                            const key = `cont-${eco}`;
+                            if (next.has(key)) {
+                              next.delete(key);
+                            } else {
+                              next.add(key);
+                            }
+                            return next;
+                          });
+                        }}
+                        style={{
+                          display: "flex",
+                          gap: "0.5em",
+                          padding: "0.25em 0.5em",
+                          cursor: "pointer",
+                          backgroundColor: "#2a2a2a",
+                          borderRadius: "4px",
+                          marginTop: "0.2em",
+                        }}
+                      >
+                        <span style={{ color: "#888", width: "1em" }}>
+                          {isExpanded ? "▼" : "▶"}
+                        </span>
+                        <span
+                          style={{
+                            color: "#6a9",
+                            fontWeight: "bold",
+                            minWidth: "3em",
+                          }}
+                        >
+                          {eco}
+                        </span>
+                        <span style={{ color: "#fff", flex: 1 }}>
+                          ({openings.length} openings)
+                        </span>
+                        <span style={{ color: "#888" }}>({totalGames})</span>
+                      </div>
+
+                      {isExpanded &&
+                        openings.map((opening) => (
+                          <div
+                            key={`${opening.eco}-${opening.name}-${opening.fen}`}
+                            onClick={() => {
+                              setSelectedOpening(opening);
+                              setGamesPage(0);
+                            }}
+                            style={{
+                              display: "flex",
+                              gap: "0.5em",
+                              padding: "0.25em 0.5em 0.25em 2em",
+                              cursor: "pointer",
+                              borderRadius: "4px",
+                            }}
+                            onMouseEnter={(e) =>
+                              (e.currentTarget.style.backgroundColor = "#333")
+                            }
+                            onMouseLeave={(e) =>
+                              (e.currentTarget.style.backgroundColor =
+                                "transparent")
+                            }
+                          >
+                            <span style={{ color: "#6db3f2", flex: 1 }}>
+                              {opening.name}
+                            </span>
+                            <span style={{ color: "#888" }}>
+                              ({opening.gameCount})
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Top Masters */}
       {data.masters.length > 0 && (
@@ -672,7 +859,9 @@ const MasterGamesComponent = ({
   const [expandedEcoCodes, setExpandedEcoCodes] = useState<Set<string>>(
     new Set(),
   );
+  const [showContinuations, setShowContinuations] = useState(false);
   const prevOpeningNameRef = useRef<string | undefined>(openingName);
+  const queryClient = useQueryClient();
 
   // Reset selection when FEN changes
   useEffect(() => {
@@ -700,7 +889,11 @@ const MasterGamesComponent = ({
   const handlePlayerClick = async (gameId: number, targetFen: string) => {
     setSelectedGameIdx(gameId);
     try {
-      const moves = await fetchGameMoves(gameId);
+      // Use queryClient.fetchQuery to cache game moves
+      const moves = await queryClient.fetchQuery({
+        queryKey: ["gameMoves", gameId],
+        queryFn: () => fetchGameMoves(gameId),
+      });
 
       // Load the full game into chess to find the opening position
       chess.current.loadPgn(moves);
@@ -827,6 +1020,8 @@ const MasterGamesComponent = ({
       setSelectedOpening={setSelectedOpening}
       setGamesPage={setGamesPage}
       isFlashing={isFlashing}
+      showContinuations={showContinuations}
+      setShowContinuations={setShowContinuations}
     />
   );
 };

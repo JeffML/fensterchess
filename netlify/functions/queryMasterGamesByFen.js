@@ -1,4 +1,4 @@
-// Force reload - v2 with moves field
+// Force reload - v3 with Netlify Blobs
 /**
  * Query master games by EXACT FEN position match
  *
@@ -14,27 +14,67 @@
  * which finds all descendant openings that branch from the given position.
  *
  * Returns: Paginated list of games with full metadata
+ *
+ * NOTE: Migrated from bundled JSON files to Netlify Blobs for better scalability.
+ * Indexes are uploaded by fensterchess.tooling repository.
  */
 
-import fs from "fs";
+import { getStore } from "@netlify/blobs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
-// Load indexes on cold start
+// Cache indexes and chunks in memory during cold start
 let openingByFenIndex = null;
+let openingByNameIndex = null;
 let chunksCache = new Map();
+let blobStore = null;
 
-function loadIndex() {
+function getBlobStore() {
+  if (!blobStore) {
+    // Netlify Functions need explicit configuration for blobs
+    // Environment variables should be set in Netlify dashboard
+    const siteID = process.env.SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+
+    if (siteID && token) {
+      blobStore = getStore({
+        name: "master-games",
+        siteID,
+        token,
+      });
+    } else {
+      // Fallback to simple name (auto-config) if env vars not available
+      blobStore = getStore("master-games");
+    }
+  }
+  return blobStore;
+}
+
+async function loadOpeningByNameIndex() {
+  if (!openingByNameIndex) {
+    const store = getBlobStore();
+    const data = await store.get("indexes/opening-by-name.json");
+    openingByNameIndex = JSON.parse(data);
+  }
+  return openingByNameIndex;
+}
+
+async function loadIndex() {
+  // Build FEN→gameIds index from opening-by-name (eliminates 539 KB redundancy)
   if (!openingByFenIndex) {
-    const indexPath = "data/indexes/opening-by-fen.json";
-    openingByFenIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const nameIndex = await loadOpeningByNameIndex();
+    openingByFenIndex = {};
+    Object.values(nameIndex).forEach((opening) => {
+      openingByFenIndex[opening.fen] = opening.gameIds;
+    });
   }
   return openingByFenIndex;
 }
 
-function loadChunk(chunkId) {
+async function loadChunk(chunkId) {
   if (!chunksCache.has(chunkId)) {
-    const chunkPath = `data/indexes/chunk-${chunkId}.json`;
-    const chunk = JSON.parse(fs.readFileSync(chunkPath, "utf-8"));
+    const store = getBlobStore();
+    const data = await store.get(`indexes/chunk-${chunkId}.json`);
+    const chunk = JSON.parse(data);
     chunksCache.set(chunkId, chunk);
   }
   return chunksCache.get(chunkId);
@@ -76,8 +116,8 @@ export const handler = async (event) => {
     const pageNum = parseInt(page);
     const pageSizeNum = parseInt(pageSize);
 
-    // Load FEN index
-    const index = loadIndex();
+    // Load FEN index from Blobs
+    const index = await loadIndex();
 
     // Try exact FEN match first
     let gameIds = index[fen];
@@ -116,18 +156,24 @@ export const handler = async (event) => {
     const endIdx = Math.min(startIdx + pageSizeNum, gameIds.length);
     const paginatedIds = gameIds.slice(startIdx, endIdx);
 
-    // Load games from chunks
+    // Load games from chunks (stored in Blobs)
+    // First, determine which chunks we need and load them in parallel
+    const uniqueChunkIds = new Set(
+      paginatedIds.map((gameId) => Math.floor(gameId / 4000)),
+    );
+    await Promise.all(
+      Array.from(uniqueChunkIds).map((chunkId) => loadChunk(chunkId)),
+    );
+
+    // Now extract games from cached chunks
     const games = [];
     for (const gameId of paginatedIds) {
-      // Game IDs are sequential - determine which chunk they're in
-      // Each chunk has 4000 games (chunk-0: 0-3999, chunk-1: 4000-7999, etc.)
       const chunkId = Math.floor(gameId / 4000);
-      const chunk = loadChunk(chunkId);
+      const chunk = chunksCache.get(chunkId);
 
       // Find game in chunk
       const game = chunk.games.find((g) => g.idx === gameId);
       if (game) {
-        console.log("[DEBUG] game.moves:", game.moves?.substring(0, 30));
         // Return metadata and moves for filtering
         games.push({
           idx: game.idx,
