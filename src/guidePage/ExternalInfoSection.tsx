@@ -19,8 +19,9 @@ export const ExternalInfoSection = () => (
     </p>
     <p>
       The External Info tab also displays master games from Fenster's database
-      of ~19,000 high-level games (2400+ rated players). Games are grouped by
-      opening variation and show top players who have played each position.
+      of tens of thousands of high-level games (2400+ rated players). Games are
+      grouped by opening variation and show top players who have played each
+      position.
       <img
         src="resources/MasterGamesPosition.png"
         className="image"

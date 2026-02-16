@@ -8,6 +8,3 @@
 - **PGN downloads** and processing: Maintained in [fensterchess.tooling](https://github.com/JeffML/fensterchess.tooling) repository
 
 This directory is preserved for potential future local data caching.
-
-
-
