@@ -2,9 +2,10 @@ import { getStore } from "@netlify/blobs";
 import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
 // Load chunk metadata to find which chunk contains which game IDs
-let chunkMetadata = null;
 let chunksCache = new Map();
 let blobStore = null;
+
+const CHUNK_SIZE = 4000;
 
 function getBlobStore() {
   if (!blobStore) {
@@ -22,28 +23,6 @@ function getBlobStore() {
     }
   }
   return blobStore;
-}
-
-async function loadChunkMetadata() {
-  if (chunkMetadata) return chunkMetadata;
-
-  const store = getBlobStore();
-  chunkMetadata = {};
-
-  // Load all 5 chunks (0-4) in parallel since we know we have exactly 5
-  const chunkPromises = Array.from({ length: 5 }, (_, i) =>
-    store.get(`indexes/chunk-${i}.json`),
-  );
-  const chunkDataArray = await Promise.all(chunkPromises);
-
-  chunkDataArray.forEach((chunkData, i) => {
-    const chunk = JSON.parse(chunkData);
-    chunk.games.forEach((game) => {
-      chunkMetadata[game.idx] = { chunkId: i };
-    });
-  });
-
-  return chunkMetadata;
 }
 
 async function loadChunk(chunkId) {
@@ -73,18 +52,11 @@ export const handler = async (event) => {
   }
 
   try {
-    const metadata = await loadChunkMetadata();
-    const chunkInfo = metadata[gameId];
-
-    if (!chunkInfo) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: "Game not found" }),
-      };
-    }
+    // Calculate which chunk contains this game ID using formula
+    const chunkId = Math.floor(gameId / CHUNK_SIZE);
 
     // Load the chunk and find the game
-    const chunk = await loadChunk(chunkInfo.chunkId);
+    const chunk = await loadChunk(chunkId);
     const game = chunk.games.find((g) => g.idx === gameId);
 
     if (!game || !game.moves) {
