@@ -6,8 +6,10 @@ export const authenticateRequest = (event) => {
     const allowedOrigins = [
         'https://fensterchess.com',
         'https://fensterchess.netlify.app',
-        'http://localhost:8888', // dev
-        'http://localhost:5173', // vite dev
+        'http://localhost:8888', // netlify dev
+        'http://localhost:5173', // vite dev default
+        'http://localhost:3000', // vite dev alt
+        'http://localhost:3001', // vite dev alt
     ];
 
     if (allowedOrigins.some((allowed) => origin?.includes(allowed))) {

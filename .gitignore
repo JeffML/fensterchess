@@ -8,6 +8,9 @@ RELEASE*.md
 # Master game database files (generated/downloaded)
 data/pgn-downloads/
 data/indexes/
+# NOTE: fromToPositionIndexed.json is TEMPORARILY committed to repo
+# until eco.json.tooling can publish it to eco.json GitHub
+# TODO: Remove this file once eco.json.tooling is set up
 
 # Compiled scripts (transpiled from TypeScript)
 scripts/*.js
