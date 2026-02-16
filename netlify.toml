@@ -13,14 +13,17 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  # Include data files in function bundle (TEMPORARY until eco.json.tooling publishes to GitHub)
+  included_files = ["data/fromToPositionIndexed.json"]
   # Use ESM output format for functions
   [functions.node_bundler_config]
     format = "esm"
 #  external_node_modules = ["express", "import-fresh"]
 
-# All data now loaded from remote sources:
+# Data sources:
 # - Master game indexes: Netlify Blobs (managed by fensterchess.tooling)
-# - Opening transitions & scores: eco.json GitHub repo (managed by eco.json.tooling)
+# - Opening transitions: TEMPORARY local file (TODO: eco.json GitHub once eco.json.tooling exists)
+# - Position scores: eco.json GitHub repo (managed by eco.json.tooling)
 
   ## [functions."courses"] 
   ##  included_files = ["dataForLambdas/courseHtml/**/*.html"]
