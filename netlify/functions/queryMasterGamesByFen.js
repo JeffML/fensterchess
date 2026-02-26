@@ -26,6 +26,7 @@ import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 let openingByFenIndex = null;
 let openingByNameIndex = null;
 let chunksCache = new Map();
+let gameToChunkIndex = null;
 let blobStore = null;
 
 function getBlobStore() {
@@ -78,6 +79,23 @@ async function loadChunk(chunkId) {
     chunksCache.set(chunkId, chunk);
   }
   return chunksCache.get(chunkId);
+}
+
+async function loadGameToChunkIndex() {
+  if (!gameToChunkIndex) {
+    const store = getBlobStore();
+    const data = await store.get("indexes/game-to-chunk.json");
+    gameToChunkIndex = JSON.parse(data);
+  }
+  return gameToChunkIndex;
+}
+
+function getChunkIdForGame(gameId) {
+  if (gameToChunkIndex) {
+    const chunkId = gameToChunkIndex[gameId];
+    return chunkId !== undefined ? chunkId : Math.floor(gameId / 4000);
+  }
+  return Math.floor(gameId / 4000);
 }
 
 function getPositionFen(fen) {
@@ -156,10 +174,13 @@ export const handler = async (event) => {
     const endIdx = Math.min(startIdx + pageSizeNum, gameIds.length);
     const paginatedIds = gameIds.slice(startIdx, endIdx);
 
+    // Load game-to-chunk index for correct chunk lookup
+    await loadGameToChunkIndex();
+
     // Load games from chunks (stored in Blobs)
     // First, determine which chunks we need and load them in parallel
     const uniqueChunkIds = new Set(
-      paginatedIds.map((gameId) => Math.floor(gameId / 4000)),
+      paginatedIds.map((gameId) => getChunkIdForGame(gameId)),
     );
     await Promise.all(
       Array.from(uniqueChunkIds).map((chunkId) => loadChunk(chunkId)),
@@ -168,7 +189,7 @@ export const handler = async (event) => {
     // Now extract games from cached chunks
     const games = [];
     for (const gameId of paginatedIds) {
-      const chunkId = Math.floor(gameId / 4000);
+      const chunkId = getChunkIdForGame(gameId);
       const chunk = chunksCache.get(chunkId);
 
       // Find game in chunk
