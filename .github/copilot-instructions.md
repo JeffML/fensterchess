@@ -401,6 +401,7 @@ _Lichess Elite Database:_
 - `indexes/opening-by-name.json` - Opening name → {fen, eco, gameIds}
 - `indexes/opening-by-eco.json` - ECO code → openings
 - `indexes/game-to-players.json` - GameId → [white, black]
+- `indexes/game-to-chunk.json` - idx → chunkId (correct chunk lookup; see Critical note below)
 - `indexes/chunk-*.json` - Game data chunks (insertion-order, 4000 games each, ~4 MB per chunk)
 
 **Local** (`data/` directory):
@@ -411,6 +412,12 @@ _Lichess Elite Database:_
 
 - **`hash`**: SHA-256 of `event|white|black|date|round`. Globally unique per game. The true identity key.
 - **`idx`**: Per-source-file sequential integer. NOT globally unique across sources. Do not use for deduplication.
+
+**CRITICAL - Chunk Lookup** (`queryMasterGamesByFen.js`):
+
+- **NEVER use `Math.floor(idx / 4000)` to find a game's chunk.** After `rechunkByHash` sorted chunks by hash (not idx), this formula returns wrong chunks.
+- Always use `game-to-chunk.json` index via `getChunkIdForGame(gameId)`. The helper falls back to `Math.floor` only if the index hasn't loaded yet.
+- `game-to-chunk.json` is built by `buildGameToChunkIndex()` in `buildIndexes.ts` and must be re-generated + uploaded whenever chunks change.
 
 **CRITICAL - GameMetadata Opening Fields** (defined in fensterchess.tooling `scripts/types.ts`):
 
@@ -445,6 +452,7 @@ Each game in the index has these fields for opening lookup:
   - `buildIndexes` enriches in-place without rechunking
   - Deduplication via SHA-256 hash (not `idx`); ~45K unique games across 12 chunks
   - Upload does diff by chunk fingerprint; orphan blobs deleted automatically
+  - `game-to-chunk.json` index enables correct chunk lookup (replaces broken `Math.floor(idx/4000)` formula)
 
 **Design Docs**: See `.github/masterGameDatabase*.md` for detailed architecture (these docs have been moved to fensterchess.tooling repo)
 
@@ -457,3 +465,4 @@ Each game in the index has these fields for opening lookup:
 5. **eco.json GitHub files** - fromToPositionIndexed.json and scores.json download from eco.json repo
 6. **React Query keys** - Must include ALL variables that affect the query (especially FEN strings)
 7. **Opening book lookup** - Always check `positionBook` fallback when `openingBook[fen]` is null
+8. **Chunk lookup** - NEVER use `Math.floor(idx/4000)` to find a game's chunk; use `getChunkIdForGame()` backed by `game-to-chunk.json`

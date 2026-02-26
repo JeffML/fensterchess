@@ -3,9 +3,8 @@ import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 
 // Load chunk metadata to find which chunk contains which game IDs
 let chunksCache = new Map();
+let gameToChunkIndex = null;
 let blobStore = null;
-
-const CHUNK_SIZE = 4000;
 
 function getBlobStore() {
   if (!blobStore) {
@@ -35,6 +34,23 @@ async function loadChunk(chunkId) {
   return chunksCache.get(chunkId);
 }
 
+async function loadGameToChunkIndex() {
+  if (!gameToChunkIndex) {
+    const store = getBlobStore();
+    const data = await store.get("indexes/game-to-chunk.json");
+    gameToChunkIndex = JSON.parse(data);
+  }
+  return gameToChunkIndex;
+}
+
+function getChunkIdForGame(gameId) {
+  if (gameToChunkIndex) {
+    const chunkId = gameToChunkIndex[gameId];
+    return chunkId !== undefined ? chunkId : Math.floor(gameId / 4000);
+  }
+  return Math.floor(gameId / 4000);
+}
+
 export const handler = async (event) => {
   // Auth check
   const isAuthenticated = authenticateRequest(event);
@@ -52,8 +68,9 @@ export const handler = async (event) => {
   }
 
   try {
-    // Calculate which chunk contains this game ID using formula
-    const chunkId = Math.floor(gameId / CHUNK_SIZE);
+    // Look up correct chunk from index (Math.floor formula is broken after rechunkByHash)
+    await loadGameToChunkIndex();
+    const chunkId = getChunkIdForGame(gameId);
 
     // Load the chunk and find the game
     const chunk = await loadChunk(chunkId);
