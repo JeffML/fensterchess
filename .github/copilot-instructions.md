@@ -27,7 +27,7 @@
 **Game vs Opening Data:**
 
 - **Opening data** (~12K named variations): Use `@chess-openings/eco.json` package methods
-- **Master games** (~19K games): Load from Netlify Blobs via serverless functions
+- **Master games** (~45K games): Load from Netlify Blobs via serverless functions
 - **Transitions**: Download `fromToPositionIndexed.json` from eco.json GitHub repo (optimized for lookup)
 - **Position scores**: Download `scores.json` from eco.json GitHub repo
 
@@ -352,10 +352,9 @@ Located in `__tests__/` directory:
   - Position scores: eco.json GitHub (`scores.json`)
 
 **fensterchess.tooling** (separate repo):
-- Data pipeline scripts: `downloadMasterGames.ts`, `buildIndexes.ts`, `filterGame.ts`, `hashGame.ts`
+- Data pipeline scripts: `downloadPgnmentor.ts`, `buildIndexes.ts`, `filterGame.ts`, `hashGame.ts`, `rechunkByHash.ts`
 - Type definitions: `types.ts` (GameMetadata, indexes, deduplication)
 - Filtering tests: `testFiltering.js`
-- Design docs: `.github/docs/masterGameDatabase*.md`
 - **When modifying data processing logic, work in fensterchess.tooling repo**
 
 ### Data Processing Pipeline
@@ -381,7 +380,7 @@ _pgnmentor.com:_
 - Downloads from Players section only
 - No title requirement
 - Accepts all 2400+ rated games
-- Current: 5 masters (Carlsen, Kasparov, Nakamura, Anand, Fischer) = ~19K games
+- Current: 5 masters (Carlsen, Kasparov, Nakamura, Anand, Fischer) + additional downloads = ~45K games
 
 _Lichess Elite Database:_
 
@@ -402,13 +401,16 @@ _Lichess Elite Database:_
 - `indexes/opening-by-name.json` - Opening name → {fen, eco, gameIds}
 - `indexes/opening-by-eco.json` - ECO code → openings
 - `indexes/game-to-players.json` - GameId → [white, black]
-- `indexes/ancestor-to-descendants.json` - Position navigation tree
-- `indexes/eco-roots.json` - ECO category data
-- `indexes/chunk-*.json` - Game data chunks (5 files, 4000 games each, ~4 MB per chunk)
+- `indexes/chunk-*.json` - Game data chunks (insertion-order, 4000 games each, ~4 MB per chunk)
 
 **Local** (`data/` directory):
 - `pgn-downloads/` - Downloaded ZIP files and processed-games.json (gitignored, not deployed)
 - `README.md` - Data file origin documentation
+
+**CRITICAL - Game Identity** (defined in fensterchess.tooling `scripts/types.ts`):
+
+- **`hash`**: SHA-256 of `event|white|black|date|round`. Globally unique per game. The true identity key.
+- **`idx`**: Per-source-file sequential integer. NOT globally unique across sources. Do not use for deduplication.
 
 **CRITICAL - GameMetadata Opening Fields** (defined in fensterchess.tooling `scripts/types.ts`):
 
@@ -434,11 +436,15 @@ Each game in the index has these fields for opening lookup:
 - ✅ Phase 1: Downloaded 5 masters (Carlsen, Kasparov, Nakamura, Anand, Fischer)
 - ✅ Phase 2: UI integration (search interface and game viewer)
 - ✅ Phase 3: Complete migration to Netlify Blobs
-  - All 10 indexes uploaded to Netlify Blobs
-  - 6 serverless functions migrated to load from blobs
+  - All indexes uploaded to Netlify Blobs
+  - Serverless functions load from blobs with module-level caching
   - Zero bundled data files (30.9 MB eliminated)
   - fromToPositionIndexed.json and scores.json download from eco.json GitHub
-  - Module-level caching in all functions for performance
+- ✅ Phase 4: Chunk stability
+  - Insertion-order chunk model (append-only via `saveGamesToChunks`)
+  - `buildIndexes` enriches in-place without rechunking
+  - Deduplication via SHA-256 hash (not `idx`); ~45K unique games across 12 chunks
+  - Upload does diff by chunk fingerprint; orphan blobs deleted automatically
 
 **Design Docs**: See `.github/masterGameDatabase*.md` for detailed architecture (these docs have been moved to fensterchess.tooling repo)
 
