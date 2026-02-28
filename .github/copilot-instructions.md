@@ -344,6 +344,7 @@ Located in `__tests__/` directory:
 ### Repository Structure
 
 **fensterchess** (this repo):
+
 - Runtime code: `src/searchPage/MasterGames.tsx`, `src/datasource/fetchMasterGames.ts`
 - Serverless functions: `netlify/functions/queryMasterGamesByFen.js`, `getMasterGameMoves.js`
 - **Zero bundled data files** - all data loaded from remote sources:
@@ -352,6 +353,7 @@ Located in `__tests__/` directory:
   - Position scores: eco.json GitHub (`scores.json`)
 
 **fensterchess.tooling** (separate repo):
+
 - Data pipeline scripts: `downloadPgnmentor.ts`, `buildIndexes.ts`, `filterGame.ts`, `hashGame.ts`, `rechunkByHash.ts`
 - Type definitions: `types.ts` (GameMetadata, indexes, deduplication)
 - Filtering tests: `testFiltering.js`
@@ -360,6 +362,7 @@ Located in `__tests__/` directory:
 ### Data Processing Pipeline
 
 See [fensterchess.tooling](https://github.com/JeffML/fensterchess.tooling) for:
+
 - Download scripts (pgnmentor + Lichess Elite)
 - Filtering strategies (ELO, time control, titles)
 - Index building (9 index types + chunking)
@@ -398,6 +401,7 @@ _Lichess Elite Database:_
 **Data Structure**:
 
 **Netlify Blobs** (`master-games` store):
+
 - `indexes/opening-by-name.json` - Opening name → {fen, eco, gameIds}
 - `indexes/opening-by-eco.json` - ECO code → openings
 - `indexes/game-to-players.json` - GameId → [white, black]
@@ -405,6 +409,7 @@ _Lichess Elite Database:_
 - `indexes/chunk-*.json` - Game data chunks (insertion-order, 4000 games each, ~4 MB per chunk)
 
 **Local** (`data/` directory):
+
 - `pgn-downloads/` - Downloaded ZIP files and processed-games.json (gitignored, not deployed)
 - `README.md` - Data file origin documentation
 
