@@ -194,7 +194,9 @@ describe("getExternalOpeningStats handler", () => {
         text: async () => FICS_XML,
       });
 
-      const result = await handler(makeEvent({ fen: TEST_FEN, sites: ["FICS"] }));
+      const result = await handler(
+        makeEvent({ fen: TEST_FEN, sites: ["FICS"] }),
+      );
 
       expect(result.statusCode).toBe(200);
       const data = JSON.parse(result.body);
@@ -234,7 +236,9 @@ describe("getExternalOpeningStats handler", () => {
         statusText: "Internal Server Error",
       });
 
-      const result = await handler(makeEvent({ fen: TEST_FEN, sites: ["FICS"] }));
+      const result = await handler(
+        makeEvent({ fen: TEST_FEN, sites: ["FICS"] }),
+      );
 
       expect(result.statusCode).toBe(200);
       const data = JSON.parse(result.body);
@@ -245,7 +249,9 @@ describe("getExternalOpeningStats handler", () => {
     it("returns ERROR on network failure", async () => {
       global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
 
-      const result = await handler(makeEvent({ fen: TEST_FEN, sites: ["FICS"] }));
+      const result = await handler(
+        makeEvent({ fen: TEST_FEN, sites: ["FICS"] }),
+      );
 
       expect(result.statusCode).toBe(200);
       const data = JSON.parse(result.body);

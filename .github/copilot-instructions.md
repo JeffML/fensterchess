@@ -38,7 +38,7 @@ This workspace contains two related chess projects:
 1. **fensterchess** - React web app for chess opening research **hosted on Netlify**
 2. **chessPGN** - TypeScript chess library with enhanced PGN parsing (npm package `@chess-pgn/chess-pgn`)
 
-fensterchess consumes chessPGN as a dependency and fetches chess opening data from the [eco.json](https://github.com/hayatbiralem/eco.json) GitHub repository.
+fensterchess consumes chessPGN as a dependency and fetches chess opening data from the [eco.json](https://github.com/JeffML/eco.json) GitHub repository.
 
 ## Deployment
 

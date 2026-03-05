@@ -13,7 +13,7 @@ async function getDownloadUrls(): Promise<GitHubFileMetadata[]> {
   const { data } = await octokit.request(
     "GET /repos/{owner}/{repo}/contents/",
     {
-      owner: "hayatbiralem",
+      owner: "JeffML",
       repo: "eco.json",
     }
   );

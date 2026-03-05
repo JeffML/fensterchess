@@ -4,7 +4,7 @@ export const LICHESS = "https://lichess.org/";
 // Removed by request of the Shredder guy:
 // export const SHREDDER = "https://www.shredderchess.com/"
 
-export const ECO_JSON = "https://github.com/hayatbiralem/eco.json";
+export const ECO_JSON = "https://github.com/JeffML/eco.json";
 export const FICS_GAMES = "https://www.ficsgames.org/";
 export const WIKI_ECO =
   "https://en.wikipedia.org/wiki/Encyclopaedia_of_Chess_Openings#Main_ECO_codes";
@@ -24,4 +24,4 @@ export const DISCUSSION =
 export const ISSUES = "https://github.com/JeffML/fensterchess/issues";
 
 export const ECO_JSON_RAW =
-  "https://raw.githubusercontent.com/hayatbiralem/eco.json/master/";
+  "https://raw.githubusercontent.com/JeffML/eco.json/master/";

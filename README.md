@@ -1,6 +1,6 @@
 # About
 
-[Fenster](https://fensterchess.com) is an open-source web application for chess opening research. It uses opening data pulled directly from the github project <a href="https://github.com/hayatbiralem/eco.json">eco.json</a>.
+[Fenster](https://fensterchess.com) is an open-source web application for chess opening research. It uses opening data pulled directly from the github project <a href="https://github.com/JeffML/eco.json">eco.json</a>.
 
 ## Tech Stack
 
