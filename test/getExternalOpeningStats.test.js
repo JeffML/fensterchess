@@ -9,17 +9,21 @@ vi.mock("../netlify/functions/utils/auth.js", () => ({
   },
 }));
 
-// Mock fast-xml-parser
-vi.mock("fast-xml-parser", () => ({
-  XMLParser: vi.fn().mockImplementation(() => ({
-    parse: vi.fn(),
-  })),
-}));
-
 import { handler } from "../netlify/functions/getExternalOpeningStats.js";
 import { authenticateRequest } from "../netlify/functions/utils/auth.js";
 
 const TEST_FEN = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+
+const FICS_XML = `<?xml version="1.0" encoding="utf-8" ?>
+<FEN>
+  <FENlong>rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1</FENlong>
+  <ECOName>Kings Pawn</ECOName>
+  <NumGames>100</NumGames>
+  <MvList>
+    <Mv><san>e5</san><ww>40</ww><bw>35</bw><d>20</d><n>95</n></Mv>
+    <Mv><san>c5</san><ww>2</ww><bw>2</bw><d>1</d><n>5</n></Mv>
+  </MvList>
+</FEN>`;
 
 const makeEvent = (body) => ({
   httpMethod: "POST",
@@ -180,6 +184,73 @@ describe("getExternalOpeningStats handler", () => {
       const data = JSON.parse(result.body);
       expect(data.lichess.alsoKnownAs).toBe("ERROR");
       expect(data.lichess.wins).toEqual({ w: 0, b: 0, d: 0 });
+    });
+  });
+
+  describe("FICS", () => {
+    it("returns opening stats on success", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        text: async () => FICS_XML,
+      });
+
+      const result = await handler(makeEvent({ fen: TEST_FEN, sites: ["FICS"] }));
+
+      expect(result.statusCode).toBe(200);
+      const data = JSON.parse(result.body);
+      expect(data.FICS.alsoKnownAs).toBe("Kings Pawn");
+      expect(data.FICS.wins).toEqual({ w: 42, b: 37, d: 21 });
+    });
+
+    it("URL-encodes the FEN", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        text: async () => FICS_XML,
+      });
+
+      await handler(makeEvent({ fen: TEST_FEN, sites: ["FICS"] }));
+
+      const calledUrl = vi.mocked(global.fetch).mock.calls[0][0];
+      expect(calledUrl).not.toContain(" ");
+      expect(calledUrl).toContain(encodeURIComponent(TEST_FEN));
+    });
+
+    it("sends X-Requested-With: XMLHttpRequest header", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        text: async () => FICS_XML,
+      });
+
+      await handler(makeEvent({ fen: TEST_FEN, sites: ["FICS"] }));
+
+      const calledHeaders = vi.mocked(global.fetch).mock.calls[0][1]?.headers;
+      expect(calledHeaders["X-Requested-With"]).toBe("XMLHttpRequest");
+    });
+
+    it("returns ERROR on non-ok HTTP response", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: "Internal Server Error",
+      });
+
+      const result = await handler(makeEvent({ fen: TEST_FEN, sites: ["FICS"] }));
+
+      expect(result.statusCode).toBe(200);
+      const data = JSON.parse(result.body);
+      expect(data.FICS.alsoKnownAs).toBe("ERROR");
+      expect(data.FICS.wins).toEqual({ w: 0, b: 0, d: 0 });
+    });
+
+    it("returns ERROR on network failure", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
+
+      const result = await handler(makeEvent({ fen: TEST_FEN, sites: ["FICS"] }));
+
+      expect(result.statusCode).toBe(200);
+      const data = JSON.parse(result.body);
+      expect(data.FICS.alsoKnownAs).toBe("ERROR");
+      expect(data.FICS.wins).toEqual({ w: 0, b: 0, d: 0 });
     });
   });
 });

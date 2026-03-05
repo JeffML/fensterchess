@@ -40,13 +40,19 @@ const lichessRequest = async ({ fen }) => {
 };
 
 /*
-FICS responses are in XML
-query: FEN=rnbqkbnr%2Fpp1p1ppp%2F4p3%2F8%2F3pP3%2F5N2%2FPPP2PPP%2FRNBQKB1R+w+KQkq+-+0+4&ratingclass=1&variant=0&transpos=1
+FICS responses are in XML; requires XMLHttpRequest header to return XML instead of HTML
+query: FEN=rnbqkbnr%2Fpp1p1ppp%2F4p3%2F8%2F3pP3%2F5N2%2FPPP2PPP%2FRNBQKB1R+w+KQkq+-+0+4&ratingclass=0&variant=0&transpos=0
 */
 const ficsRequest = async ({ fen }) => {
   try {
-    const url = `https://www.ficsgames.org/cgi-bin/explorer.cgi?FEN=${fen}&ratingclass=1&variant=0&transpos=1`;
-    const response = await fetch(url, { mode: "cors" });
+    const url = `https://www.ficsgames.org/cgi-bin/explorer.cgi?FEN=${encodeURIComponent(fen)}&ratingclass=0&variant=0&transpos=0`;
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/xml, text/xml, */*; q=0.01",
+        "X-Requested-With": "XMLHttpRequest",
+        Referer: "https://www.ficsgames.org/openings.html",
+      },
+    });
     if (!response.ok) {
       console.error(
         "FICS request failed:",
