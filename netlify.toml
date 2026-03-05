@@ -36,3 +36,15 @@
   #  status = 200
 
   ## more info on configuring this file: https://www.netlify.com/docs/netlify-toml-reference/
+
+# Don't cache HTML - always fetch fresh so content-hashed asset filenames stay in sync
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Cache hashed assets forever (filenames change on each build)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
