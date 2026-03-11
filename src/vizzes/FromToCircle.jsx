@@ -2,7 +2,6 @@
 import { useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getOpeningsForEcoCode } from "../datasource/getOpeningsForEcoCode";
-import p5 from "p5";
 import getColorForValue from "./colorGradient.js";
 import { FILES, RANKS } from "../common/consts";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
@@ -47,6 +46,7 @@ const FromToCircleImpl = ({ fromTos }) => {
     let stepCount = 0;
     const moveCoords = [];
 
+    import("p5").then(({ default: p5 }) => {
     new p5((p) => {
       remove = p.remove;
 
@@ -105,7 +105,8 @@ const FromToCircleImpl = ({ fromTos }) => {
       };
     });
 
-    return remove;
+    }); // end import
+    return () => remove?.();
   }, [fromTos]);
 
   return (

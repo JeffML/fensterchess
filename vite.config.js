@@ -60,9 +60,13 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 1000,
-    // Note: Test files are automatically excluded from build
-    // Vite only bundles files imported from src/index.jsx (entry point)
-    // The test/ directory is never imported, so it's naturally excluded
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules/p5")) return "p5";
+        },
+      },
+    },
   },
   // Ensure test directory is not served during development
   publicDir: "public",

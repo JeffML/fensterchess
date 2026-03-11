@@ -1,5 +1,4 @@
 import { useRef, useEffect, useMemo } from "react";
-import p5 from "p5";
 
 // see "3d grid" @ https://editor.p5js.org/otsohavanto/sketches/OHPamV3P2
 export const HeatMap3D = ({ dests }) => {
@@ -25,6 +24,7 @@ export const HeatMap3D = ({ dests }) => {
             return h * 10;
         }
 
+        import("p5").then(({ default: p5 }) => {
         new p5((p) => {
             // remove = p.remove;
             let rotX = 45;
@@ -124,6 +124,7 @@ export const HeatMap3D = ({ dests }) => {
             };
         });
 
+        }); // end import
         // return remove;
     }, [freqs, root]);
 
