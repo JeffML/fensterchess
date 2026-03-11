@@ -39,7 +39,7 @@ const FromToCircleImpl = ({ fromTos }) => {
   const renderRef = useRef();
 
   useEffect(() => {
-    let remove;
+    let p5Instance;
     var r; //radius
     var angle;
     var step; //distance between steps in radians
@@ -47,8 +47,7 @@ const FromToCircleImpl = ({ fromTos }) => {
     const moveCoords = [];
 
     import("p5").then(({ default: p5 }) => {
-    new p5((p) => {
-      remove = p.remove;
+    p5Instance = new p5((p) => {
 
       p.setup = () => {
         r = 250;
@@ -106,7 +105,7 @@ const FromToCircleImpl = ({ fromTos }) => {
     });
 
     }); // end import
-    return () => remove?.();
+    return () => p5Instance?.remove();
   }, [fromTos]);
 
   return (
