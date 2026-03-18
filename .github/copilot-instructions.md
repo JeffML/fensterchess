@@ -444,6 +444,8 @@ Each game in the index has these fields for opening lookup:
 
 **Current Status**:
 
+> ⚠️ **The game database is actively growing.** New games are periodically downloaded, filtered, and uploaded via `fensterchess.tooling`. Never hardcode game counts, player lists, or chunk counts — always derive them from the indexes at runtime.
+
 - ✅ Phase 0: Foundation and filtering logic complete
 - ✅ Phase 1: Downloaded 5 masters (Carlsen, Kasparov, Nakamura, Anand, Fischer)
 - ✅ Phase 2: UI integration (search interface and game viewer)
@@ -471,3 +473,4 @@ Each game in the index has these fields for opening lookup:
 6. **React Query keys** - Must include ALL variables that affect the query (especially FEN strings)
 7. **Opening book lookup** - Always check `positionBook` fallback when `openingBook[fen]` is null
 8. **Chunk lookup** - NEVER use `Math.floor(idx/4000)` to find a game's chunk; use `getChunkIdForGame()` backed by `game-to-chunk.json`
+9. **Growing database** - Never hardcode game counts, player names, chunk counts, or ECO distributions. The database grows over time as new games are downloaded and uploaded. Always load counts and lists from indexes at runtime.
