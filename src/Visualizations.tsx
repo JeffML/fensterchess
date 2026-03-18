@@ -2,13 +2,16 @@ import { useState, lazy, Suspense, MouseEvent } from "react";
 import "./stylesheets/vizz.css";
 
 const Display = lazy(() =>
-  import("./vizzes/Display.jsx").then((module) => ({ default: module.Display }))
+  import("./vizzes/Display.jsx").then((module) => ({
+    default: module.Display,
+  })),
 );
 
 export const MOST_ACTIVE = "Destination Squares (for all pieces)";
 export const FROM_TO = "from-to squares";
 export const PIECE_DESTINATION = "Destination Squares (detailed)";
 export const ECO_FLOWCHART = "ECO Categories";
+export const PLAYER_OPENING_CHORD = "Player ↔ Opening Repertoire";
 
 interface Visualization {
   name: string;
@@ -21,6 +24,7 @@ const visualizations: Visualization[] = [
   { name: ECO_FLOWCHART, type: "graph", source: "openings" },
   { name: MOST_ACTIVE, type: "heatmap", source: "openings" },
   { name: PIECE_DESTINATION, type: "heatmap", source: "openings" },
+  { name: PLAYER_OPENING_CHORD, type: "graph", source: "games" },
 ];
 
 interface VisualizationGroupProps {
@@ -67,15 +71,29 @@ const Visualizations = () => {
 
         <div style={{ gridColumn: "1" }}>
           <h3 className="left">Opening Book</h3>
-          <VisualizationGroup items={openingVizzes} handler={handler} id="openings" />
+          <VisualizationGroup
+            items={openingVizzes}
+            handler={handler}
+            id="openings"
+          />
         </div>
 
         <div style={{ gridColumn: "1" }}>
           <h3 className="left">Master Games</h3>
           {gameVizzes.length > 0 ? (
-            <VisualizationGroup items={gameVizzes} handler={handler} id="games" />
+            <VisualizationGroup
+              items={gameVizzes}
+              handler={handler}
+              id="games"
+            />
           ) : (
-            <div style={{ marginLeft: "0.5em", fontStyle: "italic", color: "#aaa" }}>
+            <div
+              style={{
+                marginLeft: "0.5em",
+                fontStyle: "italic",
+                color: "#aaa",
+              }}
+            >
               Coming soon
             </div>
           )}
