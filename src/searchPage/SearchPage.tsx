@@ -55,7 +55,7 @@ const SearchPage = ({
   );
 
   const reset = () => {
-    setBoardState({ fen: "start", moves: "" });
+    setBoardState({ fen: "start", moves: "", currentPly: 0 });
     chess.current.reset();
   };
 
@@ -72,7 +72,8 @@ const SearchPage = ({
     if (movesPosition > -1) {
       moves = moves.substring(movesPosition + 3, moves.length); // +3 for the newlines between SetUp FEN and move list
     }
-    setBoardState({ fen, moves });
+    const currentPly = extractSanMoves(moves).length;
+    setBoardState({ fen, moves, currentPly });
   };
 
   const back = () => {
