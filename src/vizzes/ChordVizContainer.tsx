@@ -89,10 +89,18 @@ export function ChordVizContainer() {
       <div className="chord-explain">{explanation}</div>
       <div className="chord-layout">
         {playersCollapsed ? (
-          <div className="chord-players-collapsed" onClick={() => setPlayersCollapsed(false)} title="Expand player panel">
+          <div
+            className="chord-players-collapsed"
+            onClick={() => setPlayersCollapsed(false)}
+            title="Expand player panel"
+          >
             <span className="chord-players-collapsed-label">Players</span>
             {selectedPlayers.map((key, idx) => (
-              <span key={key} className="chord-players-collapsed-dot" style={{ background: PALETTE[idx] }} />
+              <span
+                key={key}
+                className="chord-players-collapsed-dot"
+                style={{ background: PALETTE[idx] }}
+              />
             ))}
           </div>
         ) : (
