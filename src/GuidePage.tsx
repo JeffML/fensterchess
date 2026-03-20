@@ -40,6 +40,10 @@ const toc: TocItem[] = [
       { id: "eco-categories", label: "ECO categories and codes" },
       { id: "active-squares", label: "Most active squares" },
       { id: "destination-squares", label: "Destination squares" },
+      { id: "eco-theory-heatmap", label: "ECO Theory Heatmap" },
+      { id: "player-chord", label: "Player ↔ Opening Repertoire" },
+      { id: "player-radar", label: "Player ECO Radar" },
+      { id: "player-diversity", label: "Player Opening Diversity" },
     ],
   },
   { id: "questions", label: "Questions? Bugs? Feature requests?" },
@@ -76,7 +80,7 @@ function TocSidebar() {
           <li key={section.id} style={{ marginBottom: 8 }}>
             <a
               href={`#${section.id}`}
-              style={{ color: accent, textDecoration: "none", fontWeight: 600 }}
+              style={{ color: accent, textDecoration: "underline", fontWeight: 600, fontSize: "1.05em" }}
             >
               {section.label}
             </a>
@@ -90,6 +94,7 @@ function TocSidebar() {
                         color: "#b6f5c3",
                         textDecoration: "none",
                         fontWeight: 400,
+                        fontSize: "0.9em",
                       }}
                     >
                       {sub.label}
