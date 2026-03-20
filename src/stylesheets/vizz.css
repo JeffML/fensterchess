@@ -628,3 +628,297 @@
 .diversity-tt-eco-label {
   color: #888;
 }
+
+/* ── ECO Theory Heatmap ─────────────────────────────────────────────────── */
+.heatmap-outer {
+  display: flex;
+  gap: 24px;
+  padding: 14px 20px;
+  align-items: flex-start;
+  position: relative;
+}
+
+/* ── Left: grid ── */
+.heatmap-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.heatmap-explain {
+  font-size: 0.78em;
+  color: #999;
+  background: #161616;
+  border: 1px solid #2e2e2e;
+  border-radius: 4px;
+  padding: 7px 11px;
+  line-height: 1.5;
+  max-width: 440px;
+}
+
+.heatmap-grid-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.heatmap-grid-header {
+  display: flex;
+  margin-bottom: 2px;
+}
+
+.heatmap-col-header {
+  width: 68px;
+  text-align: center;
+  font-family: Georgia, serif;
+  font-weight: bold;
+  font-size: 0.95em;
+  padding-bottom: 2px;
+  margin-right: 4px;
+}
+
+.heatmap-grid-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+.heatmap-row-label {
+  width: 30px;
+  font-size: 0.72em;
+  color: #888;
+  text-align: right;
+  padding-right: 6px;
+  flex-shrink: 0;
+}
+
+.heatmap-cell {
+  width: 68px;
+  height: 36px;
+  border-radius: 3px;
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72em;
+  cursor: pointer;
+  transition: filter 0.12s, outline 0.05s;
+  position: relative;
+  user-select: none;
+}
+
+.heatmap-cell:hover {
+  filter: brightness(1.4);
+  z-index: 1;
+  outline: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+.heatmap-cell.selected {
+  outline: 2px solid #fff;
+  filter: brightness(1.25);
+}
+
+.heatmap-cell-count {
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Legend below grid */
+.heatmap-legend-row {
+  display: flex;
+  margin-top: 6px;
+}
+
+.heatmap-legend-item {
+  width: 68px;
+  margin-right: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.7em;
+  color: #888;
+}
+
+.heatmap-legend-scale {
+  width: 52px;
+  height: 7px;
+  border-radius: 2px;
+}
+
+.heatmap-legend-range {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.85em;
+}
+
+/* ── Right: drill-down panel ── */
+.heatmap-panel {
+  flex: 1;
+  min-width: 260px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.heatmap-panel-header {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #333;
+}
+
+.heatmap-panel-subtitle {
+  font-size: 0.9em;
+  color: #888;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.heatmap-panel-cell-label {
+  font-size: 0.75em;
+  color: #888;
+}
+
+.heatmap-panel-hint {
+  color: #777;
+  font-style: italic;
+  font-size: 0.88em;
+  margin-top: 10px;
+}
+
+.heatmap-panel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+  max-height: 520px;
+}
+
+/* Level 1: ECO code accordion rows */
+.heatmap-eco-row {
+  border-radius: 3px;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+
+.heatmap-eco-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.heatmap-eco-header:hover {
+  background: #222;
+}
+
+.heatmap-eco-header.open {
+  background: #1e2218;
+}
+
+.heatmap-eco-chevron {
+  font-size: 0.65em;
+  color: #888;
+  width: 10px;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.heatmap-eco-chevron.open {
+  transform: rotate(90deg);
+  color: #888;
+}
+
+.heatmap-eco-code {
+  font-family: monospace;
+  font-size: 0.82em;
+  color: #aaa;
+  flex-shrink: 0;
+  width: 36px;
+}
+
+.heatmap-eco-name {
+  flex: 1;
+  font-size: 0.82em;
+  color: #bbb;
+  line-height: 1.3;
+}
+
+.heatmap-eco-count {
+  font-size: 0.75em;
+  color: #888;
+  flex-shrink: 0;
+}
+
+/* Level 2: variation list */
+.heatmap-eco-variations {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #2a2a2a;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.heatmap-variation-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 8px 4px 24px;
+  cursor: default;
+  transition: background 0.1s;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.heatmap-variation-item:last-child {
+  border-bottom: none;
+}
+
+.heatmap-variation-item:hover {
+  background: #1e2a1e;
+}
+
+.heatmap-variation-name {
+  flex: 1;
+  font-size: 0.8em;
+  color: #aaa;
+  line-height: 1.3;
+}
+
+.heatmap-variation-item:hover .heatmap-variation-name {
+  color: #9fda9f;
+}
+
+.heatmap-variation-eco {
+  font-family: monospace;
+  font-size: 0.72em;
+  color: #777;
+  flex-shrink: 0;
+}
+
+/* Floating tooltip */
+.heatmap-tooltip {
+  position: fixed;
+  background: #181818;
+  border: 1px solid #494949;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 0.78em;
+  pointer-events: none;
+  color: #ccc;
+  z-index: 99;
+  line-height: 1.7;
+  white-space: nowrap;
+}

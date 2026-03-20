@@ -14,6 +14,7 @@ export const ECO_FLOWCHART = "ECO Categories";
 export const PLAYER_OPENING_CHORD = "Player ↔ Opening Repertoire";
 export const PLAYER_ECO_RADAR = "Player ECO Radar";
 export const PLAYER_ECO_DIVERSITY = "Player Opening Diversity";
+export const ECO_THEORY_HEATMAP = "ECO Theory Heatmap";
 
 interface Visualization {
   name: string;
@@ -29,6 +30,7 @@ const visualizations: Visualization[] = [
   { name: PLAYER_OPENING_CHORD, type: "graph", source: "games" },
   { name: PLAYER_ECO_RADAR, type: "graph", source: "games" },
   { name: PLAYER_ECO_DIVERSITY, type: "graph", source: "games" },
+  { name: ECO_THEORY_HEATMAP, type: "heatmap", source: "openings" },
 ];
 
 interface VisualizationGroupProps {

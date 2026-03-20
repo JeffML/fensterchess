@@ -7,6 +7,7 @@ import {
   PLAYER_OPENING_CHORD,
   PLAYER_ECO_RADAR,
   PLAYER_ECO_DIVERSITY,
+  ECO_THEORY_HEATMAP,
 } from "../Visualizations.jsx";
 import { ColorAndPieces } from "./ColorAndPieces";
 import { EcoCatCode } from "./EcoCatSelector";
@@ -20,6 +21,9 @@ const RadarVizContainer = lazy(() =>
 );
 const DiversityVizContainer = lazy(() =>
   import("./DiversityVizContainer").then((m) => ({ default: m.DiversityVizContainer })),
+);
+const EcoHeatmapContainer = lazy(() =>
+  import("./EcoHeatmapContainer").then((m) => ({ default: m.EcoHeatmapContainer })),
 );
 const EcoFlowchart = lazy(() =>
   import("./EcoFlowchart").then((m) => ({ default: m.EcoFlowchart })),
@@ -114,6 +118,13 @@ export const Display = ({ viz }: DisplayProps) => {
     return (
       <Suspense fallback={<Loading />}>
         <DiversityVizContainer />
+      </Suspense>
+    );
+
+  if (viz === ECO_THEORY_HEATMAP)
+    return (
+      <Suspense fallback={<Loading />}>
+        <EcoHeatmapContainer />
       </Suspense>
     );
 
