@@ -60,13 +60,6 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes("node_modules/p5")) return "p5";
-        },
-      },
-    },
   },
   // Ensure test directory is not served during development
   publicDir: "public",

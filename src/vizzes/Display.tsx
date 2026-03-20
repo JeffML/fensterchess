@@ -4,22 +4,26 @@ import {
   FROM_TO,
   MOST_ACTIVE,
   PIECE_DESTINATION,
+  PLAYER_OPENING_CHORD,
 } from "../Visualizations.jsx";
 import { ColorAndPieces } from "./ColorAndPieces";
 import { EcoCatCode } from "./EcoCatSelector";
 
 // Lazy load heavy components
+const ChordVizContainer = lazy(() =>
+  import("./ChordVizContainer").then((m) => ({ default: m.ChordVizContainer })),
+);
 const EcoFlowchart = lazy(() =>
-  import("./EcoFlowchart").then((m) => ({ default: m.EcoFlowchart }))
+  import("./EcoFlowchart").then((m) => ({ default: m.EcoFlowchart })),
 );
 const FromToCircle = lazy(() =>
-  import("./FromToCircle.jsx").then((m) => ({ default: m.FromToCircle }))
+  import("./FromToCircle.jsx").then((m) => ({ default: m.FromToCircle })),
 );
 const MostActiveByPiece = lazy(() =>
-  import("./MostActive").then((m) => ({ default: m.MostActiveByPiece }))
+  import("./MostActive").then((m) => ({ default: m.MostActiveByPiece })),
 );
 const MostActiveSquaresByEco = lazy(() =>
-  import("./MostActive").then((m) => ({ default: m.MostActiveSquaresByEco }))
+  import("./MostActive").then((m) => ({ default: m.MostActiveSquaresByEco })),
 );
 
 interface DisplayProps {
@@ -81,6 +85,13 @@ export const Display = ({ viz }: DisplayProps) => {
     return (
       <Suspense fallback={<Loading />}>
         <EcoFlowchart />
+      </Suspense>
+    );
+
+  if (viz === PLAYER_OPENING_CHORD)
+    return (
+      <Suspense fallback={<Loading />}>
+        <ChordVizContainer />
       </Suspense>
     );
 

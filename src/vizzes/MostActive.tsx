@@ -1,21 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { HeatMap3D } from "./HeatMap3D.jsx";
 import { HeatMap2D } from "./HeatMap2D";
 import {
   getMostActiveSquaresByEco,
   getMostActiveSquaresByEcoDetailed,
 } from "../datasource/getMostActiveSquaresByEco";
 
-interface HeatMapTypeProps {
-  type?: string;
-  setType: (type: string) => void;
-}
-
 interface HeatMapsProps {
   dests: Record<string, number>;
-  type?: string;
-  setType: (type: string) => void;
 }
 
 interface MostActiveSquaresByEcoProps {
@@ -36,60 +27,15 @@ interface DetailedSquareData {
   count: number;
 }
 
-const HeatMapType = ({ type, setType }: HeatMapTypeProps) => {
-  const gridStyle = {
-    display: "grid",
-    gridTemplateColumns: "auto auto auto auto",
-    gridColumnGap: "3em",
-  };
-
-  return (
-    <div className="row" style={gridStyle} id="heatmaptype">
-      <span style={{ fontWeight: "bold", color: "mediumturquoise" }}>
-        Select a style:
-      </span>
-      <label>
-        <input
-          type="radio"
-          name="type"
-          defaultChecked={type === "2D"}
-          onClick={() => setType("2D")}
-        />{" "}
-        2D
-      </label>
-      <br />
-      <label>
-        <input
-          type="radio"
-          name="type"
-          defaultChecked={type === "3D"}
-          onClick={() => setType("3D")}
-        />
-        3D
-        {type === "3D" && (
-          <span style={{ color: "lightgreen", marginLeft: "2em" }}>
-            (mouse draggable)
-          </span>
-        )}
-      </label>
-    </div>
-  );
-};
-
-const HeatMaps = ({ dests, type, setType }: HeatMapsProps) => {
+const HeatMaps = ({ dests }: HeatMapsProps) => {
   return (
     <div className="double-column left" style={{ marginTop: "1em" }}>
-      <HeatMapType {...{ type, setType }} />
-      <br />
-      {type === "3D" && <HeatMap3D {...{ dests }} />}
-      {type === "2D" && <HeatMap2D {...{ dests }} />}
+      <HeatMap2D {...{ dests }} />
     </div>
   );
 };
 
 const MostActiveSquaresByEco = ({ cat, code }: MostActiveSquaresByEcoProps) => {
-  const [type, setType] = useState<string | undefined>();
-
   let processedCode = code;
   if (processedCode === "all") processedCode = undefined;
   else if (processedCode) processedCode = processedCode.substr(1, 2);
@@ -109,7 +55,7 @@ const MostActiveSquaresByEco = ({ cat, code }: MostActiveSquaresByEcoProps) => {
   if (isError) console.error(error?.toString());
   if (isPending) return <div className="double-column left">Loading...</div>;
   if (data) {
-    return <HeatMaps {...{ dests: data, type, setType }} />;
+    return <HeatMaps {...{ dests: data }} />;
   }
   return null;
 };
@@ -120,8 +66,6 @@ const MostActiveByPiece = ({
   colors,
   piece,
 }: MostActiveByPieceProps) => {
-  const [type, setType] = useState<string | undefined>();
-
   let processedCode = code;
   if (processedCode === "all") processedCode = undefined;
   else if (processedCode) processedCode = processedCode.substr(1, 2);
@@ -158,7 +102,7 @@ const MostActiveByPiece = ({
       }
     }
 
-    return <HeatMaps {...{ dests, type, setType }} />;
+    return <HeatMaps {...{ dests }} />;
   }
 
   return null;

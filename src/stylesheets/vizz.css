@@ -86,3 +86,309 @@
   max-width: 300px;
   text-align: left;
 }
+
+/* ── Chord Diagram ─────────────────────────────── */
+
+.chord-container {
+  padding: 0.5em 1em 1em;
+  color: #ccc;
+}
+
+.chord-subtitle {
+  font-size: 0.82em;
+  color: #888;
+  margin-bottom: 0.9em;
+  text-align: left;
+}
+
+.chord-explain {
+  font-size: 0.8em;
+  color: #999;
+  background: #161616;
+  border: 1px solid #2e2e2e;
+  border-radius: 4px;
+  padding: 7px 11px;
+  margin-bottom: 10px;
+  margin-right: 1em;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.chord-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.chord-diagram-wrapper {
+  flex: 0 0 auto;
+}
+
+.chord-empty-hint {
+  width: 648px;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-style: italic;
+  font-size: 0.9em;
+  text-align: center;
+  padding: 0 2em;
+}
+
+.chord-loading,
+.chord-error {
+  padding: 1em;
+  color: #aaa;
+  font-style: italic;
+}
+
+/* ── Side panels ── */
+
+.chord-panel {
+  flex: 0 0 auto;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 5px;
+  padding: 10px 12px;
+  max-height: 660px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.chord-players-panel {
+  width: 180px;
+}
+
+.chord-openings-panel {
+  flex: 1 1 auto;
+  min-width: 280px;
+  max-width: 480px;
+  margin-right: 1em;
+}
+
+.chord-panel-header {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.85em;
+  color: #bbb;
+  margin-bottom: 6px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ── Collapsed player strip ── */
+
+.chord-players-collapsed {
+  flex: 0 0 28px;
+  width: 28px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0 8px;
+  gap: 6px;
+  cursor: pointer;
+  max-height: 660px;
+  overflow: hidden;
+  transition: background 0.12s;
+}
+.chord-players-collapsed:hover {
+  background: #222;
+}
+
+.chord-players-collapsed-label {
+  font-size: 0.65em;
+  color: #888;
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  user-select: none;
+}
+
+.chord-players-collapsed-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.chord-sort-btn {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 3px;
+  color: #888;
+  font-size: 0.7em;
+  padding: 1px 5px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.chord-sort-btn.active {
+  background: #3a4a5a;
+  color: #acd;
+  border-color: #5a7a9a;
+}
+
+.chord-player-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.chord-player-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78em;
+  color: #bbb;
+  transition: background 0.12s;
+}
+.chord-player-item:hover:not(.capped) {
+  background: #252525;
+}
+.chord-player-item.capped {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.chord-player-dot {
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+
+.chord-player-name {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chord-player-elo {
+  flex: 0 0 auto;
+  color: #7a9;
+  font-size: 0.88em;
+}
+
+.chord-player-games {
+  flex: 0 0 auto;
+  color: #666;
+  font-size: 0.78em;
+}
+
+/* ── Opening list ── */
+
+.chord-openings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chord-eco-group {
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.chord-eco-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  cursor: pointer;
+  background: #1e1e1e;
+  border-radius: 3px;
+  font-size: 0.79em;
+  user-select: none;
+  transition: background 0.1s;
+}
+.chord-eco-header:hover {
+  background: #252525;
+}
+.chord-eco-header.highlighted {
+  background: #1e2a1e;
+}
+
+.chord-eco-chevron {
+  font-size: 0.75em;
+  color: #666;
+}
+
+.chord-eco-letter {
+  font-weight: 700;
+  font-size: 1.05em;
+}
+
+.chord-eco-desc {
+  color: #777;
+  font-size: 0.88em;
+  white-space: normal;
+}
+
+.chord-opening-items {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.chord-opening-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 0.75em;
+  color: #999;
+  border-radius: 2px;
+  transition: background 0.1s;
+}
+.chord-opening-item:hover {
+  background: #232323;
+}
+.chord-opening-item.clickable {
+  cursor: pointer;
+}
+.chord-opening-item.clickable:hover {
+  background: #1a2a1a;
+  color: #9fda9f;
+}
+.chord-opening-item.highlighted {
+  color: #ddd;
+  background: #1e241e;
+}
+
+.chord-opening-pip {
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.chord-opening-name {
+  flex: 1 1 auto;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.3;
+}
+
+.chord-opening-eco {
+  flex: 0 0 auto;
+  color: #555;
+  font-size: 0.88em;
+  font-family: monospace;
+}

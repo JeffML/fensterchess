@@ -32,7 +32,6 @@
     "kokopu-react": "^3.3.3",
     "node-html-parser": "^7.0.1",
     "octokit": "^5.0.3",
-    "p5": "^2.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-tabs": "^6.1.0",
