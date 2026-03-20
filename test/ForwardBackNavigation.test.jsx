@@ -78,12 +78,18 @@ describe("Forward/Back Navigation", () => {
 
   it("back button navigates one ply back after moves are loaded", () => {
     // Two moves played: e4 e5; currentPly is at end (2)
-    renderSearchPage({ fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2", moves: "1. e4 e5", currentPly: 2 });
+    renderSearchPage({
+      fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
+      moves: "1. e4 e5",
+      currentPly: 2,
+    });
 
     const backButton = screen.getByText("<<");
     expect(backButton.disabled).toBe(false);
 
-    act(() => { fireEvent.click(backButton); });
+    act(() => {
+      fireEvent.click(backButton);
+    });
 
     // After one back press the forward button must be enabled (we're no longer at end)
     const forwardButton = screen.getByText(">>");
@@ -94,10 +100,16 @@ describe("Forward/Back Navigation", () => {
     // Regression: currentPly must not be inflated by the PGN '*' termination marker.
     // One move played: e4; currentPly is 1. After one back press we should be at ply 0.
     // At ply 0, forward becomes enabled — proof that back worked on the first press.
-    renderSearchPage({ fen: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", moves: "1. e4", currentPly: 1 });
+    renderSearchPage({
+      fen: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+      moves: "1. e4",
+      currentPly: 1,
+    });
 
     const backButton = screen.getByText("<<");
-    act(() => { fireEvent.click(backButton); });
+    act(() => {
+      fireEvent.click(backButton);
+    });
 
     // After one back press we should be at ply 0; forward must now be enabled
     const forwardButton = screen.getByText(">>");
@@ -105,14 +117,22 @@ describe("Forward/Back Navigation", () => {
   });
 
   it("forward button is disabled when currentPly equals move count", () => {
-    renderSearchPage({ fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2", moves: "1. e4 e5", currentPly: 2 });
+    renderSearchPage({
+      fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
+      moves: "1. e4 e5",
+      currentPly: 2,
+    });
 
     const forwardButton = screen.getByText(">>");
     expect(forwardButton.disabled).toBe(true);
   });
 
   it("forward button is enabled when currentPly is less than move count", () => {
-    renderSearchPage({ fen: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", moves: "1. e4 e5", currentPly: 1 });
+    renderSearchPage({
+      fen: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+      moves: "1. e4 e5",
+      currentPly: 1,
+    });
 
     const forwardButton = screen.getByText(">>");
     expect(forwardButton.disabled).toBe(false);

@@ -75,7 +75,7 @@ export function extractSanMoves(pgn: PGN): string[] {
   const movesOnly = pgnMovesOnly(pgn);
   return movesOnly
     .replace(/\d+\./g, "") // Remove move numbers "1.", "2.", etc.
-    .replace(/\*/g, "")    // Remove game termination marker
+    .replace(/\*/g, "") // Remove game termination marker
     .trim()
     .split(/\s+/)
     .filter((m) => m.length > 0); // Filter empty strings
