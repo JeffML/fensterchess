@@ -21,3 +21,11 @@
 ## Code Quality / Performance
 
 - [ ] **Parallelize .json() parsing in getLatestEcoJson.ts** — change sequential `await res[i++].json()` loop to `Promise.all(res.map(r => r.json()))` for faster opening book load on cold start.
+
+---
+
+## Master Game Database
+
+- [ ] **Include old masters** — game visualizations (chord, radar, diversity) currently only cover the initial set of players. Expand the database to include historical masters (e.g. Morphy, Alekhine, Capablanca, Tal, Karpov, Spassky) so the vizzes reflect a broader range of playing styles and eras.
+
+- [ ] **Bug: Yu Yangyi band drill-down shows "No named openings in this band"** — Root cause: the band filter in `getPlayerOpeningMatrix.js` compares `displayName` from the player-eco-matrix against player names stored in `game-to-players.json` (sourced verbatim from PGN headers). Chinese players' PGN names are often stored as `"Yu,Yangyi"` (comma-separated, no space) while `displayName` normalizes to `"Yu Yangyi"`, causing `displayNames.has()` to always fail. Fix: normalize both sides before comparing (strip commas/extra whitespace, or build `gameToPlayers` with the same normalized key used by the matrix).
