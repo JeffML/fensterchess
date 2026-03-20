@@ -29,6 +29,7 @@ export interface OpeningEntry {
   ecoLetter: string;
   decade: number;
   games: number;
+  fen?: string | null;
 }
 
 export interface PlayerOpeningMatrixResponse {

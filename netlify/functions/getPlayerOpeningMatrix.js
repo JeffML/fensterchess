@@ -151,7 +151,7 @@ export const handler = async (event) => {
           return players && (displayNames.has(players[0]) || displayNames.has(players[1]));
         }).length;
         if (matchCount === 0) continue;
-        result.push({ name, eco, ecoLetter: letterParam, decade, games: matchCount });
+        result.push({ name, eco, ecoLetter: letterParam, decade, games: matchCount, fen: entry.fen ?? null });
       }
       result.sort((a, b) => b.games - a.games || a.name.localeCompare(b.name));
 

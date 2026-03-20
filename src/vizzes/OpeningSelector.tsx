@@ -65,16 +65,26 @@ export function OpeningSelector({
         <div style={{ fontSize: "0.8em", color: "#555" }}>No named openings in this band</div>
       ) : (
         <ul className="chord-opening-items">
-          {bandOpenings.map((op) => (
-            <li key={`${op.eco}:${op.name}`} className="chord-opening-item">
-              <span
-                className="chord-opening-pip"
-                style={{ background: `hsl(${h},${s}%,${28 + decade * 3.8}%)` }}
-              />
-              <span className="chord-opening-name">{op.name}</span>
-              <span className="chord-opening-eco">{op.eco}</span>
-            </li>
-          ))}
+          {bandOpenings.map((op) => {
+            const href = op.fen
+              ? `${window.location.origin}?fen=${encodeURIComponent(op.fen)}`
+              : undefined;
+            return (
+              <li
+                key={`${op.eco}:${op.name}`}
+                className={`chord-opening-item${href ? " clickable" : ""}`}
+                onClick={href ? () => window.open(href, "_blank") : undefined}
+                title={href ? `Open ${op.name} in Search` : undefined}
+              >
+                <span
+                  className="chord-opening-pip"
+                  style={{ background: `hsl(${h},${s}%,${28 + decade * 3.8}%)` }}
+                />
+                <span className="chord-opening-name">{op.name}</span>
+                <span className="chord-opening-eco">{op.eco}</span>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

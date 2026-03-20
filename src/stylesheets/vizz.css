@@ -360,6 +360,13 @@
 .chord-opening-item:hover {
   background: #232323;
 }
+.chord-opening-item.clickable {
+  cursor: pointer;
+}
+.chord-opening-item.clickable:hover {
+  background: #1a2a1a;
+  color: #9fda9f;
+}
 .chord-opening-item.highlighted {
   color: #ddd;
   background: #1e241e;
