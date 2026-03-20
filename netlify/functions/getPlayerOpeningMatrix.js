@@ -145,13 +145,24 @@ export const handler = async (event) => {
         const eco = entry.eco ?? "";
         if (!eco.startsWith(letterParam)) continue;
         const numericVal = parseInt(eco.slice(1), 10);
-        if (isNaN(numericVal) || Math.floor(numericVal / 10) !== decade) continue;
+        if (isNaN(numericVal) || Math.floor(numericVal / 10) !== decade)
+          continue;
         const matchCount = (entry.gameIds ?? []).filter((id) => {
           const players = gameToPlayers[id];
-          return players && (displayNames.has(players[0]) || displayNames.has(players[1]));
+          return (
+            players &&
+            (displayNames.has(players[0]) || displayNames.has(players[1]))
+          );
         }).length;
         if (matchCount === 0) continue;
-        result.push({ name, eco, ecoLetter: letterParam, decade, games: matchCount, fen: entry.fen ?? null });
+        result.push({
+          name,
+          eco,
+          ecoLetter: letterParam,
+          decade,
+          games: matchCount,
+          fen: entry.fen ?? null,
+        });
       }
       result.sort((a, b) => b.games - a.games || a.name.localeCompare(b.name));
 

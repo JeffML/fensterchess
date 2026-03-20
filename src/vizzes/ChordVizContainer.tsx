@@ -68,7 +68,12 @@ export function ChordVizContainer() {
     .filter((x): x is ActivePlayer => x !== null);
 
   const highlightBands: HighlightBand[] = selectedBand
-    ? [{ ecoLetter: selectedBand.split(":")[0], decade: parseInt(selectedBand.split(":")[1], 10) }]
+    ? [
+        {
+          ecoLetter: selectedBand.split(":")[0],
+          decade: parseInt(selectedBand.split(":")[1], 10),
+        },
+      ]
     : [];
 
   const handleBandClick = (letter: string, decade: number) => {

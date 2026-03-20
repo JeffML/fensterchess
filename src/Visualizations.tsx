@@ -12,6 +12,7 @@ export const FROM_TO = "from-to squares";
 export const PIECE_DESTINATION = "Destination Squares (detailed)";
 export const ECO_FLOWCHART = "ECO Categories";
 export const PLAYER_OPENING_CHORD = "Player ↔ Opening Repertoire";
+export const PLAYER_ECO_RADAR = "Player ECO Radar";
 
 interface Visualization {
   name: string;
@@ -25,6 +26,7 @@ const visualizations: Visualization[] = [
   { name: MOST_ACTIVE, type: "heatmap", source: "openings" },
   { name: PIECE_DESTINATION, type: "heatmap", source: "openings" },
   { name: PLAYER_OPENING_CHORD, type: "graph", source: "games" },
+  { name: PLAYER_ECO_RADAR, type: "graph", source: "games" },
 ];
 
 interface VisualizationGroupProps {

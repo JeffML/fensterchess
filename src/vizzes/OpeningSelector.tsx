@@ -56,13 +56,22 @@ export function OpeningSelector({
   return (
     <div className="chord-panel chord-openings-panel">
       <div className="chord-panel-header">Openings</div>
-      <div style={{ fontSize: "0.78em", color: headerColor, marginBottom: 8, fontWeight: 500 }}>
+      <div
+        style={{
+          fontSize: "0.78em",
+          color: headerColor,
+          marginBottom: 8,
+          fontWeight: 500,
+        }}
+      >
         {decadeLabel} &middot; {ECO_LABELS[letter]}
       </div>
       {isLoading ? (
         <div style={{ fontSize: "0.8em", color: "#555" }}>Loading…</div>
       ) : bandOpenings.length === 0 ? (
-        <div style={{ fontSize: "0.8em", color: "#555" }}>No named openings in this band</div>
+        <div style={{ fontSize: "0.8em", color: "#555" }}>
+          No named openings in this band
+        </div>
       ) : (
         <ul className="chord-opening-items">
           {bandOpenings.map((op) => {
@@ -78,7 +87,9 @@ export function OpeningSelector({
               >
                 <span
                   className="chord-opening-pip"
-                  style={{ background: `hsl(${h},${s}%,${28 + decade * 3.8}%)` }}
+                  style={{
+                    background: `hsl(${h},${s}%,${28 + decade * 3.8}%)`,
+                  }}
                 />
                 <span className="chord-opening-name">{op.name}</span>
                 <span className="chord-opening-eco">{op.eco}</span>

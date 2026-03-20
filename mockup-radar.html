@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ECO Radar Chart — Mockup</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: -apple-system, "Segoe UI", sans-serif;
+        font-size: 13px;
+        background: #222;
+        color: #ccc;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      header {
+        padding: 0.5em 1em;
+        background: #1a1a1a;
+        border-bottom: 1px solid #3a3a3a;
+        display: flex;
+        align-items: center;
+        gap: 1em;
+      }
+      header h2 {
+        margin: 0;
+        font-size: 1em;
+        color: #ddd;
+        font-family: Georgia, serif;
+        letter-spacing: 0.5px;
+      }
+      .subtitle {
+        color: #555;
+        font-size: 0.8em;
+      }
+
+      .workspace {
+        flex: 1;
+        display: flex;
+        gap: 0;
+        overflow: hidden;
+      }
+
+      /* ── Player panel ─────────────────────────────────── */
+      .panel {
+        background: #1c1c1c;
+        border-right: 1px solid #333;
+        display: flex;
+        flex-direction: column;
+        padding: 10px 8px;
+        width: 190px;
+        flex-shrink: 0;
+        overflow-y: auto;
+      }
+      .panel-header {
+        font-size: 0.78em;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #333;
+      }
+      .player-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .player-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 5px 4px;
+        border-radius: 4px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .player-item:hover {
+        background: #252525;
+      }
+      .player-item.selected {
+        background: #1e2a1e;
+      }
+      .player-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .player-name {
+        flex: 1;
+        color: #bbb;
+        font-size: 0.88em;
+      }
+      .player-elo {
+        color: #666;
+        font-size: 0.78em;
+      }
+
+      /* ── Radar area ───────────────────────────────────── */
+      .radar-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 16px;
+        overflow: hidden;
+      }
+      .radar-title {
+        font-family: Georgia, serif;
+        font-size: 0.9em;
+        color: #888;
+        letter-spacing: 0.5px;
+      }
+      .radar-explain {
+        font-size: 0.78em;
+        color: #555;
+        text-align: center;
+        max-width: 480px;
+      }
+      .empty-hint {
+        color: #444;
+        font-size: 0.9em;
+        font-style: italic;
+        margin-top: 40px;
+      }
+
+      /* ── Legend ───────────────────────────────────────── */
+      .legend {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8em;
+        color: #aaa;
+      }
+      .legend-swatch {
+        width: 20px;
+        height: 3px;
+        border-radius: 2px;
+      }
+      .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h2>ECO Repertoire Radar</h2>
+      <span class="subtitle">Opening family distribution per player</span>
+    </header>
+
+    <div class="workspace">
+      <!-- Player selector (mirrors chord diagram panel) -->
+      <div class="panel">
+        <div class="panel-header">Players</div>
+        <ul class="player-list" id="playerList"></ul>
+      </div>
+
+      <!-- Radar chart -->
+      <div class="radar-area">
+        <div class="radar-title">ECO Family Distribution</div>
+        <div class="radar-explain" id="explain">
+          Select up to 3 players to compare their opening repertoire across ECO
+          families (A–E). Each axis shows the percentage of games in that
+          family.
+        </div>
+        <div id="radarWrap">
+          <div class="empty-hint" id="emptyHint">
+            Select players from the left to display the radar
+          </div>
+        </div>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+
+    <script>
+      // ── Mock data (mirrors player-eco-matrix structure) ──────────────────
+      const PLAYERS = [
+        {
+          key: "carlsen,m",
+          displayName: "Carlsen",
+          peakRating: 2882,
+          eco: { A: 22, B: 28, C: 19, D: 18, E: 13 },
+        },
+        {
+          key: "kasparov,g",
+          displayName: "Kasparov",
+          peakRating: 2851,
+          eco: { A: 8, B: 31, C: 38, D: 12, E: 11 },
+        },
+        {
+          key: "anand,v",
+          displayName: "Anand",
+          peakRating: 2817,
+          eco: { A: 12, B: 24, C: 22, D: 20, E: 22 },
+        },
+        {
+          key: "nakamura,h",
+          displayName: "Nakamura",
+          peakRating: 2816,
+          eco: { A: 25, B: 22, C: 21, D: 15, E: 17 },
+        },
+        {
+          key: "fischer,r",
+          displayName: "Fischer",
+          peakRating: 2785,
+          eco: { A: 5, B: 40, C: 42, D: 8, E: 5 },
+        },
+      ];
+
+      const ECO_LABELS = {
+        A: "Flank/Irr.",
+        B: "Semi-Open",
+        C: "Open",
+        D: "Closed",
+        E: "Indian",
+      };
+      const ECO_KEYS = ["A", "B", "C", "D", "E"];
+      const PALETTE = ["#5b9bd5", "#e87c47", "#67c24a"];
+      const MAX_PLAYERS = 3;
+
+      let selected = []; // player keys
+
+      // ── Build player list ────────────────────────────────────────────────
+      const playerListEl = document.getElementById("playerList");
+      PLAYERS.forEach((p) => {
+        const li = document.createElement("li");
+        li.className = "player-item";
+        li.dataset.key = p.key;
+        li.innerHTML = `
+          <span class="player-dot" style="background:#555;opacity:0.22" data-dot="${p.key}"></span>
+          <span class="player-name">${p.displayName}</span>
+          <span class="player-elo">${p.peakRating}</span>
+        `;
+        li.addEventListener("click", () => togglePlayer(p.key));
+        playerListEl.appendChild(li);
+      });
+
+      function togglePlayer(key) {
+        if (selected.includes(key)) {
+          selected = selected.filter((k) => k !== key);
+        } else if (selected.length < MAX_PLAYERS) {
+          selected.push(key);
+        }
+        render();
+      }
+
+      // ── Render ───────────────────────────────────────────────────────────
+      function render() {
+        // Update player list styling
+        document.querySelectorAll(".player-item").forEach((li) => {
+          const key = li.dataset.key;
+          const idx = selected.indexOf(key);
+          const dot = li.querySelector("[data-dot]");
+          if (idx !== -1) {
+            li.classList.add("selected");
+            dot.style.background = PALETTE[idx];
+            dot.style.opacity = "1";
+          } else {
+            li.classList.remove("selected");
+            dot.style.background = "#555";
+            dot.style.opacity = selected.length >= MAX_PLAYERS ? "0.1" : "0.22";
+          }
+        });
+
+        const wrap = document.getElementById("radarWrap");
+        const emptyHint = document.getElementById("emptyHint");
+        const legendEl = document.getElementById("legend");
+        const explainEl = document.getElementById("explain");
+
+        if (selected.length === 0) {
+          wrap.innerHTML =
+            '<div class="empty-hint">Select players from the left to display the radar</div>';
+          legendEl.innerHTML = "";
+          explainEl.textContent =
+            "Select up to 3 players to compare their opening repertoire across ECO families (A–E). Each axis shows the percentage of games in that family.";
+          return;
+        }
+
+        const names = selected.map(
+          (k) => PLAYERS.find((p) => p.key === k).displayName,
+        );
+        explainEl.textContent = `Each axis is an ECO family (A–E). The polygon area shows ${names.join(" vs ")} — larger area means more games in that family. Hover to see exact percentages.`;
+
+        // Build legend
+        legendEl.innerHTML =
+          selected
+            .map((key, idx) => {
+              const p = PLAYERS.find((p) => p.key === key);
+              return `<div class="legend-item">
+            <span class="legend-dot" style="background:${PALETTE[idx]}"></span>
+            ${p.displayName}
+          </div>`;
+            })
+            .join("") +
+          `
+          <div class="legend-item" style="margin-left:12px;color:#555;font-style:italic">
+            outer ring = peak
+          </div>`;
+
+        // Draw SVG radar
+        wrap.innerHTML = "";
+        wrap.appendChild(drawRadar());
+      }
+
+      function drawRadar() {
+        const SIZE = 420,
+          CX = SIZE / 2,
+          CY = SIZE / 2,
+          R = 160;
+        const N = ECO_KEYS.length;
+        const LEVELS = 4; // ring count
+
+        const svg = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "svg",
+        );
+        svg.setAttribute("width", SIZE);
+        svg.setAttribute("height", SIZE);
+        svg.setAttribute("viewBox", `0 0 ${SIZE} ${SIZE}`);
+
+        function angle(i) {
+          return (Math.PI * 2 * i) / N - Math.PI / 2;
+        }
+        function pt(i, r) {
+          return [CX + r * Math.cos(angle(i)), CY + r * Math.sin(angle(i))];
+        }
+        // Compute scale max from selected players' data, rounded up to nearest 5%
+        const allValues = selected.flatMap((key) =>
+          ECO_KEYS.map((eco) => PLAYERS.find((p) => p.key === key).eco[eco]),
+        );
+        const dataMax = Math.max(...allValues);
+        const SCALE_MAX = Math.ceil(dataMax / 5) * 5; // e.g. 42 → 45
+
+        function pctToR(pct) {
+          return (pct / SCALE_MAX) * R;
+        }
+
+        // ── Grid rings ──
+        for (let lv = 1; lv <= LEVELS; lv++) {
+          const r = (R * lv) / LEVELS;
+          const points = ECO_KEYS.map((_, i) => pt(i, r).join(",")).join(" ");
+          const poly = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "polygon",
+          );
+          poly.setAttribute("points", points);
+          poly.setAttribute("fill", "none");
+          poly.setAttribute("stroke", lv === LEVELS ? "#555" : "#333");
+          poly.setAttribute("stroke-width", lv === LEVELS ? "1.5" : "0.8");
+          svg.appendChild(poly);
+
+          // Ring label (% value)
+          const labelPct = Math.round((lv * SCALE_MAX) / LEVELS);
+          const [lx, ly] = pt(0, r);
+          const txt = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          txt.setAttribute("x", lx + 4);
+          txt.setAttribute("y", ly - 3);
+          txt.setAttribute("fill", "#444");
+          txt.setAttribute("font-size", "9");
+          txt.textContent = `${labelPct}%`;
+          svg.appendChild(txt);
+        }
+
+        // ── Axis spokes ──
+        ECO_KEYS.forEach((eco, i) => {
+          const [x, y] = pt(i, R);
+          const line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line",
+          );
+          line.setAttribute("x1", CX);
+          line.setAttribute("y1", CY);
+          line.setAttribute("x2", x);
+          line.setAttribute("y2", y);
+          line.setAttribute("stroke", "#3a3a3a");
+          line.setAttribute("stroke-width", "1");
+          svg.appendChild(line);
+
+          // Axis label
+          const labelR = R + 22;
+          const [lx, ly] = pt(i, labelR);
+          const txt = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          txt.setAttribute("x", lx);
+          txt.setAttribute("y", ly);
+          txt.setAttribute("text-anchor", "middle");
+          txt.setAttribute("dominant-baseline", "middle");
+          txt.setAttribute("fill", "#888");
+          txt.setAttribute("font-size", "11");
+          txt.setAttribute("font-family", "Georgia, serif");
+
+          // ECO letter large
+          const tspan1 = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "tspan",
+          );
+          tspan1.setAttribute("x", lx);
+          tspan1.setAttribute("dy", "0");
+          tspan1.setAttribute("fill", "#bbb");
+          tspan1.setAttribute("font-size", "13");
+          tspan1.setAttribute("font-weight", "bold");
+          tspan1.textContent = eco;
+
+          const tspan2 = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "tspan",
+          );
+          tspan2.setAttribute("x", lx);
+          tspan2.setAttribute("dy", "13");
+          tspan2.setAttribute("font-size", "9");
+          tspan2.setAttribute("fill", "#666");
+          tspan2.textContent = ECO_LABELS[eco];
+
+          txt.appendChild(tspan1);
+          txt.appendChild(tspan2);
+          svg.appendChild(txt);
+        });
+
+        // ── Player polygons ──
+        const tooltip = document.createElement("div");
+        tooltip.style.cssText =
+          "position:fixed;background:#181818;border:1px solid #494949;border-radius:4px;padding:4px 9px;font-size:0.78em;pointer-events:none;display:none;color:#ccc;z-index:99";
+        document.body.appendChild(tooltip);
+
+        selected.forEach((key, si) => {
+          const player = PLAYERS.find((p) => p.key === key);
+          const color = PALETTE[si];
+
+          const points = ECO_KEYS.map((eco, i) => {
+            const r = pctToR(player.eco[eco]);
+            return pt(i, r).join(",");
+          }).join(" ");
+
+          // Fill polygon
+          const poly = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "polygon",
+          );
+          poly.setAttribute("points", points);
+          poly.setAttribute("fill", color);
+          poly.setAttribute("fill-opacity", "0.12");
+          poly.setAttribute("stroke", color);
+          poly.setAttribute("stroke-width", "2");
+          poly.setAttribute("stroke-opacity", "0.85");
+          svg.appendChild(poly);
+
+          // Vertex dots
+          ECO_KEYS.forEach((eco, i) => {
+            const pct = player.eco[eco];
+            const r = pctToR(pct);
+            const [cx, cy] = pt(i, r);
+            const circle = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "circle",
+            );
+            circle.setAttribute("cx", cx);
+            circle.setAttribute("cy", cy);
+            circle.setAttribute("r", "4");
+            circle.setAttribute("fill", color);
+            circle.setAttribute("stroke", "#222");
+            circle.setAttribute("stroke-width", "1.5");
+            circle.style.cursor = "default";
+
+            circle.addEventListener("mouseenter", (e) => {
+              tooltip.textContent = `${player.displayName} · ECO ${eco} (${ECO_LABELS[eco]}): ${pct}%`;
+              tooltip.style.display = "block";
+              tooltip.style.left = `${e.clientX + 12}px`;
+              tooltip.style.top = `${e.clientY - 28}px`;
+            });
+            circle.addEventListener("mousemove", (e) => {
+              tooltip.style.left = `${e.clientX + 12}px`;
+              tooltip.style.top = `${e.clientY - 28}px`;
+            });
+            circle.addEventListener("mouseleave", () => {
+              tooltip.style.display = "none";
+            });
+
+            svg.appendChild(circle);
+          });
+        });
+
+        return svg;
+      }
+
+      render();
+    </script>
+  </body>
+</html>

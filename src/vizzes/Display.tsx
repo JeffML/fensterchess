@@ -5,6 +5,7 @@ import {
   MOST_ACTIVE,
   PIECE_DESTINATION,
   PLAYER_OPENING_CHORD,
+  PLAYER_ECO_RADAR,
 } from "../Visualizations.jsx";
 import { ColorAndPieces } from "./ColorAndPieces";
 import { EcoCatCode } from "./EcoCatSelector";
@@ -12,6 +13,9 @@ import { EcoCatCode } from "./EcoCatSelector";
 // Lazy load heavy components
 const ChordVizContainer = lazy(() =>
   import("./ChordVizContainer").then((m) => ({ default: m.ChordVizContainer })),
+);
+const RadarVizContainer = lazy(() =>
+  import("./RadarVizContainer").then((m) => ({ default: m.RadarVizContainer })),
 );
 const EcoFlowchart = lazy(() =>
   import("./EcoFlowchart").then((m) => ({ default: m.EcoFlowchart })),
@@ -92,6 +96,13 @@ export const Display = ({ viz }: DisplayProps) => {
     return (
       <Suspense fallback={<Loading />}>
         <ChordVizContainer />
+      </Suspense>
+    );
+
+  if (viz === PLAYER_ECO_RADAR)
+    return (
+      <Suspense fallback={<Loading />}>
+        <RadarVizContainer />
       </Suspense>
     );
 
