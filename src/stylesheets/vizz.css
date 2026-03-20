@@ -703,7 +703,9 @@
   justify-content: center;
   font-size: 0.72em;
   cursor: pointer;
-  transition: filter 0.12s, outline 0.05s;
+  transition:
+    filter 0.12s,
+    outline 0.05s;
   position: relative;
   user-select: none;
 }

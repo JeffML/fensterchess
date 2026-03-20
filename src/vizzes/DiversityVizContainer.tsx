@@ -96,13 +96,14 @@ export function DiversityVizContainer() {
   return (
     <div className="chord-container diversity-container">
       <div className="chord-subtitle">
-        Shannon entropy of ECO family distribution — higher = more varied repertoire
+        Shannon entropy of ECO family distribution — higher = more varied
+        repertoire
       </div>
       <div className="chord-explain">
         Each player's score is the <strong>Shannon entropy</strong> of their
-        games across ECO families A–E. Max ≈ 2.32 bits (perfectly uniform).
-        A score near 0 means nearly all games in one family — a specialist.
-        The thin bar below each score shows the actual A–E breakdown.
+        games across ECO families A–E. Max ≈ 2.32 bits (perfectly uniform). A
+        score near 0 means nearly all games in one family — a specialist. The
+        thin bar below each score shows the actual A–E breakdown.
       </div>
 
       <div className="diversity-chart">
@@ -113,7 +114,11 @@ export function DiversityVizContainer() {
             {TICKS.map((t) => {
               const pct = (t / MAX_ENTROPY) * 100;
               return (
-                <div key={t} className="diversity-tick" style={{ left: `${pct}%` }}>
+                <div
+                  key={t}
+                  className="diversity-tick"
+                  style={{ left: `${pct}%` }}
+                >
                   <span className="diversity-tick-label">
                     {t === MAX_ENTROPY ? `${t.toFixed(2)} (max)` : t.toFixed(1)}
                   </span>
@@ -125,60 +130,61 @@ export function DiversityVizContainer() {
 
         {/* Player rows — scrollable, ~12 visible at a time */}
         <div className="diversity-rows-scroll">
-        {rows.map(({ key, entry, h }, rank) => {
-          const total = entry.totalGames || 1;
-          const barPct = (h / MAX_ENTROPY) * 100;
-          const color = barColor(h);
+          {rows.map(({ key, entry, h }, rank) => {
+            const total = entry.totalGames || 1;
+            const barPct = (h / MAX_ENTROPY) * 100;
+            const color = barColor(h);
 
-          return (
-            <div key={key} className="diversity-row">
-              <div className="diversity-rank">{rank + 1}</div>
-              <div className="diversity-name-col" title={key}>
-                {entry.displayName}
-              </div>
-              <div className="diversity-bar-track">
-                {/* Entropy bar */}
-                <div
-                  className="diversity-entropy-wrap"
-                  onMouseEnter={(e) =>
-                    setTooltip({ x: e.clientX, y: e.clientY, key })
-                  }
-                  onMouseMove={(e) =>
-                    setTooltip({ x: e.clientX, y: e.clientY, key })
-                  }
-                  onMouseLeave={() => setTooltip(null)}
-                >
+            return (
+              <div key={key} className="diversity-row">
+                <div className="diversity-rank">{rank + 1}</div>
+                <div className="diversity-name-col" title={key}>
+                  {entry.displayName}
+                </div>
+                <div className="diversity-bar-track">
+                  {/* Entropy bar */}
                   <div
-                    className="diversity-entropy-bar"
-                    style={{ width: `${barPct}%`, background: color }}
-                  />
-                  <span className="diversity-entropy-label">
-                    <strong>{h.toFixed(3)}</strong> bits
-                  </span>
-                </div>
+                    className="diversity-entropy-wrap"
+                    onMouseEnter={(e) =>
+                      setTooltip({ x: e.clientX, y: e.clientY, key })
+                    }
+                    onMouseMove={(e) =>
+                      setTooltip({ x: e.clientX, y: e.clientY, key })
+                    }
+                    onMouseLeave={() => setTooltip(null)}
+                  >
+                    <div
+                      className="diversity-entropy-bar"
+                      style={{ width: `${barPct}%`, background: color }}
+                    />
+                    <span className="diversity-entropy-label">
+                      <strong>{h.toFixed(3)}</strong> bits
+                    </span>
+                  </div>
 
-                {/* Stacked ECO mini-bar */}
-                <div className="diversity-eco-bar">
-                  {ECO_KEYS.map((eco) => {
-                    const pct = ((entry.eco[eco]?.total ?? 0) / total) * 100;
-                    return (
-                      <div
-                        key={eco}
-                        className="diversity-eco-segment"
-                        style={{
-                          width: `${pct}%`,
-                          background: ECO_COLORS[eco],
-                        }}
-                        title={`ECO ${eco} (${ECO_LABELS[eco]}): ${pct.toFixed(1)}%`}
-                      />
-                    );
-                  })}
+                  {/* Stacked ECO mini-bar */}
+                  <div className="diversity-eco-bar">
+                    {ECO_KEYS.map((eco) => {
+                      const pct = ((entry.eco[eco]?.total ?? 0) / total) * 100;
+                      return (
+                        <div
+                          key={eco}
+                          className="diversity-eco-segment"
+                          style={{
+                            width: `${pct}%`,
+                            background: ECO_COLORS[eco],
+                          }}
+                          title={`ECO ${eco} (${ECO_LABELS[eco]}): ${pct.toFixed(1)}%`}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-        </div>{/* end diversity-rows-scroll */}
+            );
+          })}
+        </div>
+        {/* end diversity-rows-scroll */}
 
         {/* ECO legend */}
         <div className="diversity-legend">

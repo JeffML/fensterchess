@@ -20,10 +20,14 @@ const RadarVizContainer = lazy(() =>
   import("./RadarVizContainer").then((m) => ({ default: m.RadarVizContainer })),
 );
 const DiversityVizContainer = lazy(() =>
-  import("./DiversityVizContainer").then((m) => ({ default: m.DiversityVizContainer })),
+  import("./DiversityVizContainer").then((m) => ({
+    default: m.DiversityVizContainer,
+  })),
 );
 const EcoHeatmapContainer = lazy(() =>
-  import("./EcoHeatmapContainer").then((m) => ({ default: m.EcoHeatmapContainer })),
+  import("./EcoHeatmapContainer").then((m) => ({
+    default: m.EcoHeatmapContainer,
+  })),
 );
 const EcoFlowchart = lazy(() =>
   import("./EcoFlowchart").then((m) => ({ default: m.EcoFlowchart })),

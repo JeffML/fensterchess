@@ -44,16 +44,16 @@ export const VisualizationsSection = () => (
 
     <h3 id="player-chord">Player ↔ Opening Repertoire</h3>
     <p>
-      A chord diagram linking players to the ECO opening families they play
-      most often in the master game database. Bands are sized by game count;
-      click a band to filter the opening list below the diagram.
+      A chord diagram linking players to the ECO opening families they play most
+      often in the master game database. Bands are sized by game count; click a
+      band to filter the opening list below the diagram.
     </p>
 
     <h3 id="player-radar">Player ECO Radar</h3>
     <p>
       A radar (spider) chart showing each player’s ECO family distribution
-      across the five families (A–E). Useful for comparing repertoire breadth
-      at a glance. Select one or more players from the legend to overlay their
+      across the five families (A–E). Useful for comparing repertoire breadth at
+      a glance. Select one or more players from the legend to overlay their
       polygons.
     </p>
 

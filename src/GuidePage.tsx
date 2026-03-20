@@ -80,7 +80,12 @@ function TocSidebar() {
           <li key={section.id} style={{ marginBottom: 8 }}>
             <a
               href={`#${section.id}`}
-              style={{ color: accent, textDecoration: "underline", fontWeight: 600, fontSize: "1.05em" }}
+              style={{
+                color: accent,
+                textDecoration: "underline",
+                fontWeight: 600,
+                fontSize: "1.05em",
+              }}
             >
               {section.label}
             </a>

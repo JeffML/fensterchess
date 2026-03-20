@@ -155,18 +155,16 @@ export function EcoHeatmapContainer() {
       : []
     : [];
 
-  const selectedCount = selected
-    ? counts[selected.letter][selected.decade]
-    : 0;
+  const selectedCount = selected ? counts[selected.letter][selected.decade] : 0;
 
   return (
     <div className="heatmap-outer">
       {/* ── Left: grid ── */}
       <div className="heatmap-left">
         <div className="heatmap-explain">
-          Each cell shows how many named variations exist in that ECO group (e.g.
-          C4x&nbsp;=&nbsp;C40–C49). Brighter&nbsp;=&nbsp;richer theory. Click a cell to
-          explore.
+          Each cell shows how many named variations exist in that ECO group
+          (e.g. C4x&nbsp;=&nbsp;C40–C49). Brighter&nbsp;=&nbsp;richer theory.
+          Click a cell to explore.
         </div>
 
         <div className="heatmap-grid-wrap">
@@ -212,9 +210,7 @@ export function EcoHeatmapContainer() {
                     }
                     onMouseMove={(e) =>
                       setTooltip((prev) =>
-                        prev
-                          ? { ...prev, x: e.clientX, y: e.clientY }
-                          : null,
+                        prev ? { ...prev, x: e.clientX, y: e.clientY } : null,
                       )
                     }
                     onMouseLeave={() => setTooltip(null)}
