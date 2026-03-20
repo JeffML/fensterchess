@@ -506,6 +506,12 @@
 }
 
 /* Player rows */
+.diversity-rows-scroll {
+  max-height: 340px; /* ~10 rows × 34px */
+  overflow-y: auto;
+  padding-right: 70px; /* room for the label that overflows right */
+}
+
 .diversity-row {
   display: flex;
   align-items: center;

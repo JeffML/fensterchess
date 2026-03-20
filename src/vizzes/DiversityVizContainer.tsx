@@ -123,7 +123,8 @@ export function DiversityVizContainer() {
           </div>
         </div>
 
-        {/* Player rows */}
+        {/* Player rows — scrollable, ~12 visible at a time */}
+        <div className="diversity-rows-scroll">
         {rows.map(({ key, entry, h }, rank) => {
           const total = entry.totalGames || 1;
           const barPct = (h / MAX_ENTROPY) * 100;
@@ -177,6 +178,7 @@ export function DiversityVizContainer() {
             </div>
           );
         })}
+        </div>{/* end diversity-rows-scroll */}
 
         {/* ECO legend */}
         <div className="diversity-legend">
