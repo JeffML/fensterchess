@@ -86,7 +86,9 @@ export function RadarVizContainer() {
     .filter((x): x is NonNullable<typeof x> => x !== null);
 
   // Auto-scale: outer ring = highest value across all selected players, rounded up to nearest 5%
-  const allValues = playerData.flatMap((p) => ECO_KEYS.map((eco) => p.pcts[eco]));
+  const allValues = playerData.flatMap((p) =>
+    ECO_KEYS.map((eco) => p.pcts[eco]),
+  );
   const dataMax = allValues.length > 0 ? Math.max(...allValues) : 40;
   const SCALE_MAX = Math.max(5, Math.ceil(dataMax / 5) * 5);
 
@@ -234,11 +236,7 @@ export function RadarVizContainer() {
               Select players from the list on the left to display the radar
             </div>
           ) : (
-            <svg
-              width={SIZE}
-              height={SIZE}
-              viewBox={`0 0 ${SIZE} ${SIZE}`}
-            >
+            <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
               {gridRings}
               {axes}
               {polygons}
