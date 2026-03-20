@@ -452,3 +452,173 @@
   color: #ccc;
   z-index: 99;
 }
+
+/* ── Diversity Score Chart ────────────────────── */
+
+.diversity-container {
+  max-width: 760px;
+}
+
+.diversity-chart {
+  margin-top: 4px;
+}
+
+/* Scale header */
+.diversity-scale-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.diversity-name-col {
+  width: 160px;
+  flex-shrink: 0;
+  text-align: right;
+  padding-right: 12px;
+  font-size: 0.88em;
+  color: #bbb;
+}
+
+.diversity-bar-track {
+  flex: 1;
+  position: relative;
+}
+
+.diversity-scale-track {
+  height: 20px;
+}
+
+.diversity-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #333;
+}
+
+.diversity-tick-label {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: 9px;
+  color: #444;
+  white-space: nowrap;
+}
+
+/* Player rows */
+.diversity-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.diversity-rank {
+  width: 20px;
+  flex-shrink: 0;
+  font-size: 0.72em;
+  color: #555;
+  text-align: center;
+}
+
+/* Entropy bar */
+.diversity-entropy-wrap {
+  position: relative;
+  height: 20px;
+  background: #1a1a1a;
+  border-radius: 3px;
+  overflow: visible;
+  cursor: default;
+  margin-bottom: 4px;
+}
+
+.diversity-entropy-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: filter 0.15s;
+}
+
+.diversity-entropy-wrap:hover .diversity-entropy-bar {
+  filter: brightness(1.25);
+}
+
+.diversity-entropy-label {
+  position: absolute;
+  right: -62px;
+  top: 2px;
+  font-size: 0.8em;
+  color: #aaa;
+  white-space: nowrap;
+}
+
+/* Stacked ECO mini-bar */
+.diversity-eco-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 2px;
+  overflow: hidden;
+  opacity: 0.7;
+}
+
+.diversity-eco-segment {
+  height: 100%;
+  transition: opacity 0.12s;
+}
+.diversity-eco-segment:hover {
+  opacity: 1;
+}
+
+/* Legend */
+.diversity-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-top: 22px;
+  padding-left: 180px;
+  font-size: 0.78em;
+  color: #666;
+}
+
+.diversity-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diversity-legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Tooltip */
+.diversity-tooltip {
+  position: fixed;
+  background: #181818;
+  border: 1px solid #494949;
+  border-radius: 4px;
+  padding: 7px 11px;
+  font-size: 0.78em;
+  pointer-events: none;
+  color: #ccc;
+  z-index: 99;
+  line-height: 1.7;
+  min-width: 190px;
+}
+
+.diversity-tt-name {
+  font-weight: 600;
+  color: #ddd;
+  margin-bottom: 4px;
+}
+
+.diversity-tt-eco {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.diversity-tt-eco-label {
+  color: #888;
+}

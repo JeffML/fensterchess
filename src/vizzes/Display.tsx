@@ -6,6 +6,7 @@ import {
   PIECE_DESTINATION,
   PLAYER_OPENING_CHORD,
   PLAYER_ECO_RADAR,
+  PLAYER_ECO_DIVERSITY,
 } from "../Visualizations.jsx";
 import { ColorAndPieces } from "./ColorAndPieces";
 import { EcoCatCode } from "./EcoCatSelector";
@@ -16,6 +17,9 @@ const ChordVizContainer = lazy(() =>
 );
 const RadarVizContainer = lazy(() =>
   import("./RadarVizContainer").then((m) => ({ default: m.RadarVizContainer })),
+);
+const DiversityVizContainer = lazy(() =>
+  import("./DiversityVizContainer").then((m) => ({ default: m.DiversityVizContainer })),
 );
 const EcoFlowchart = lazy(() =>
   import("./EcoFlowchart").then((m) => ({ default: m.EcoFlowchart })),
@@ -103,6 +107,13 @@ export const Display = ({ viz }: DisplayProps) => {
     return (
       <Suspense fallback={<Loading />}>
         <RadarVizContainer />
+      </Suspense>
+    );
+
+  if (viz === PLAYER_ECO_DIVERSITY)
+    return (
+      <Suspense fallback={<Loading />}>
+        <DiversityVizContainer />
       </Suspense>
     );
 
