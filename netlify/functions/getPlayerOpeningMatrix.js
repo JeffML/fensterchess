@@ -26,6 +26,7 @@ import { authenticateRequest, authFailureResponse } from "./utils/auth.js";
 // Module-level cache (persists across warm invocations)
 let playerEcoMatrix = null;
 let openingByNameIndex = null;
+let gameToPlayersIndex = null;
 let blobStore = null;
 
 function getBlobStore() {
@@ -56,7 +57,13 @@ async function loadIndexes() {
     openingByNameIndex = JSON.parse(data);
   }
 
-  return { playerEcoMatrix, openingByNameIndex };
+  if (!gameToPlayersIndex) {
+    const data = await store.get("indexes/game-to-players.json");
+    if (!data) throw new Error("game-to-players.json not found in blob store");
+    gameToPlayersIndex = JSON.parse(data);
+  }
+
+  return { playerEcoMatrix, openingByNameIndex, gameToPlayersIndex };
 }
 
 /**
@@ -108,32 +115,60 @@ export const handler = async (event) => {
   }
 
   try {
-    const { playerEcoMatrix: matrix, openingByNameIndex: openingByName } =
-      await loadIndexes();
+    const {
+      playerEcoMatrix: matrix,
+      openingByNameIndex: openingByName,
+      gameToPlayersIndex: gameToPlayers,
+    } = await loadIndexes();
 
-    // Optional: filter matrix to specific players to reduce payload
     const playersParam = event.queryStringParameters?.players;
-    let matrixPayload = matrix;
+    const letterParam = event.queryStringParameters?.letter?.toUpperCase();
+    const decadeParam = event.queryStringParameters?.decade;
 
-    if (playersParam) {
+    // Band-scoped request: ?players=...&letter=B&decade=9
+    // Returns only the filtered opening list for that decade, for those players.
+    if (playersParam && letterParam && decadeParam !== undefined) {
+      const decade = parseInt(decadeParam, 10);
       const requested = playersParam
-        .split(",")
+        .split("|")
         .map((s) => s.trim().toLowerCase())
-        .filter(Boolean);
-      const filteredPlayers = Object.fromEntries(
-        requested
-          .filter((key) => matrix.players[key])
-          .map((key) => [key, matrix.players[key]]),
+        .filter((k) => matrix.players[k]);
+
+      const displayNames = new Set(
+        requested.map((k) => matrix.players[k].displayName),
       );
-      matrixPayload = { ...matrix, players: filteredPlayers };
+
+      // Filter opening-by-name to this ECO letter+decade, then count player games
+      // using direct array access on gameToPlayers (matches getGamesByMasterAndOpening pattern)
+      const result = [];
+      for (const [name, entry] of Object.entries(openingByName)) {
+        const eco = entry.eco ?? "";
+        if (!eco.startsWith(letterParam)) continue;
+        const numericVal = parseInt(eco.slice(1), 10);
+        if (isNaN(numericVal) || Math.floor(numericVal / 10) !== decade) continue;
+        const matchCount = (entry.gameIds ?? []).filter((id) => {
+          const players = gameToPlayers[id];
+          return players && (displayNames.has(players[0]) || displayNames.has(players[1]));
+        }).length;
+        if (matchCount === 0) continue;
+        result.push({ name, eco, ecoLetter: letterParam, decade, games: matchCount });
+      }
+      result.sort((a, b) => b.games - a.games || a.name.localeCompare(b.name));
+
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ openings: result }),
+      };
     }
 
+    // Default: full matrix + all opening groups (no player filter used here)
     const openings = buildOpeningGroups(openingByName);
 
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ matrix: matrixPayload, openings }),
+      body: JSON.stringify({ matrix, openings }),
     };
   } catch (err) {
     console.error("getPlayerOpeningMatrix error:", err);

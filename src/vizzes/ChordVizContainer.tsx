@@ -5,7 +5,10 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchPlayerOpeningMatrix } from "../datasource/fetchPlayerOpeningMatrix";
+import {
+  fetchPlayerOpeningMatrix,
+  fetchOpeningsForBand,
+} from "../datasource/fetchPlayerOpeningMatrix";
 import { ChordDiagram, PALETTE } from "./ChordDiagram";
 import type { ActivePlayer, HighlightBand } from "./ChordDiagram";
 import { PlayerSelector } from "./PlayerSelector";
@@ -13,9 +16,7 @@ import { OpeningSelector } from "./OpeningSelector";
 
 export function ChordVizContainer() {
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
-  const [highlightedBands, setHighlightedBands] = useState<Set<string>>(
-    new Set(),
-  );
+  const [selectedBand, setSelectedBand] = useState<string | null>(null);
   const [playersCollapsed, setPlayersCollapsed] = useState(false);
 
   // Initial load — full player list + opening groups
@@ -27,6 +28,20 @@ export function ChordVizContainer() {
   } = useQuery({
     queryKey: ["playerOpeningMatrix"],
     queryFn: fetchPlayerOpeningMatrix,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  // Band-scoped openings query — fires only when a band is clicked with players selected
+  const bandParts = selectedBand ? selectedBand.split(":") : null;
+  const { data: bandData, isFetching: bandLoading } = useQuery({
+    queryKey: ["bandOpenings", selectedBand, selectedPlayers],
+    queryFn: () =>
+      fetchOpeningsForBand(
+        selectedPlayers,
+        bandParts![0],
+        parseInt(bandParts![1], 10),
+      ),
+    enabled: selectedBand !== null && selectedPlayers.length > 0,
     staleTime: 1000 * 60 * 10,
   });
 
@@ -52,15 +67,18 @@ export function ChordVizContainer() {
     })
     .filter((x): x is ActivePlayer => x !== null);
 
-  const highlightBands: HighlightBand[] = Array.from(highlightedBands).map(
-    (k) => {
-      const [letter, d] = k.split(":");
-      return { ecoLetter: letter, decade: parseInt(d, 10) };
-    },
-  );
+  const highlightBands: HighlightBand[] = selectedBand
+    ? [{ ecoLetter: selectedBand.split(":")[0], decade: parseInt(selectedBand.split(":")[1], 10) }]
+    : [];
+
+  const handleBandClick = (letter: string, decade: number) => {
+    const key = `${letter}:${decade}`;
+    setSelectedBand((prev) => (prev === key ? null : key));
+  };
 
   const handlePlayerChange = (newSelected: string[]) => {
     setSelectedPlayers(newSelected);
+    setSelectedBand(null);
   };
 
   let explanation: string;
@@ -72,13 +90,13 @@ export function ChordVizContainer() {
     explanation =
       `The colored arc shows ${name}'s games distributed across ECO families (A–E). ` +
       "Each family arc is split into decade bands (A0x, A1x … A9x) — thicker bands mean more games in that group. " +
-      "Click an opening in the right panel to highlight its decade band.";
+      "Click a decade band to see its named openings.";
   } else {
     const names = activePlayers.map((p) => p.entry.displayName).join(" vs ");
     explanation =
       `Ribbons connect each player arc (${names}) to the ECO family arcs. ` +
       "Ribbon thickness reflects game count — wider means more games in that opening family. " +
-      "Click an opening on the right to highlight its decade band across all players.";
+      "Click a decade band to see its named openings.";
   }
 
   return (
@@ -121,13 +139,15 @@ export function ChordVizContainer() {
             <ChordDiagram
               activePlayers={activePlayers}
               highlightBands={highlightBands}
+              onBandClick={handleBandClick}
             />
           )}
         </div>
         <OpeningSelector
-          openings={fullData.openings}
-          highlightedBands={highlightedBands}
-          onHighlightChange={setHighlightedBands}
+          hasPlayers={selectedPlayers.length > 0}
+          selectedBand={selectedBand}
+          bandOpenings={bandData?.openings ?? []}
+          isLoading={bandLoading}
         />
       </div>
     </div>

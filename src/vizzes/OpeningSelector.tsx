@@ -1,10 +1,8 @@
 /**
- * Opening selector for the chord diagram.
- * ECO-grouped, collapsible. Checking an opening highlights its
- * decade band in the chord diagram.
+ * Opening panel for the chord diagram.
+ * Shows a flat list of named openings for the decade band clicked in the diagram.
  */
 
-import { useState } from "react";
 import type { OpeningEntry } from "../datasource/fetchPlayerOpeningMatrix";
 
 const ECO_LABELS: Record<string, string> = {
@@ -23,97 +21,62 @@ const ECO_HSL: Record<string, [number, number]> = {
   E: [128, 46],
 };
 
-function pipColor(letter: string, decade: number, highlighted: boolean) {
-  const [h, s] = ECO_HSL[letter];
-  if (highlighted) return `hsl(${h},${Math.min(s + 22, 100)}%,74%)`;
-  const l = 28 + decade * 3.8;
-  return `hsl(${h},${s}%,${l}%)`;
-}
-
 interface OpeningSelectorProps {
-  openings: Record<string, OpeningEntry[]>;
-  highlightedBands: Set<string>; // "B:9"
-  onHighlightChange: (bands: Set<string>) => void;
+  hasPlayers: boolean;
+  selectedBand: string | null; // e.g. "B:9"
+  bandOpenings: OpeningEntry[];
+  isLoading: boolean;
 }
 
 export function OpeningSelector({
-  openings,
-  highlightedBands,
-  onHighlightChange,
+  hasPlayers,
+  selectedBand,
+  bandOpenings,
+  isLoading,
 }: OpeningSelectorProps) {
-  const letters = Object.keys(openings).sort();
-  const [expanded, setExpanded] = useState<Set<string>>(new Set(letters));
+  if (!hasPlayers || !selectedBand) {
+    return (
+      <div className="chord-panel chord-openings-panel">
+        <div className="chord-panel-header">Openings</div>
+        <div style={{ fontSize: "0.8em", color: "#666", marginTop: 12 }}>
+          {!hasPlayers
+            ? "Select a player to begin"
+            : "Click a decade band in the diagram to see its openings"}
+        </div>
+      </div>
+    );
+  }
 
-  const toggleLetter = (letter: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      next.has(letter) ? next.delete(letter) : next.add(letter);
-      return next;
-    });
-  };
-
-  const toggleBand = (letter: string, decade: number) => {
-    const key = `${letter}:${decade}`;
-    const next = new Set(highlightedBands);
-    next.has(key) ? next.delete(key) : next.add(key);
-    onHighlightChange(next);
-  };
+  const [letter, decadeStr] = selectedBand.split(":");
+  const decade = parseInt(decadeStr, 10);
+  const [h, s] = ECO_HSL[letter] ?? [0, 0];
+  const decadeLabel = `${letter}${decade}0\u2013${letter}${decade}9`;
+  const headerColor = `hsl(${h},${s}%,68%)`;
 
   return (
     <div className="chord-panel chord-openings-panel">
       <div className="chord-panel-header">Openings</div>
-      <div style={{ fontSize: "0.7em", color: "#888", marginBottom: 6 }}>
-        Highlight a band in the diagram
+      <div style={{ fontSize: "0.78em", color: headerColor, marginBottom: 8, fontWeight: 500 }}>
+        {decadeLabel} &middot; {ECO_LABELS[letter]}
       </div>
-      <div className="chord-openings-list">
-        {letters.map((letter) => {
-          const items = openings[letter];
-          const isOpen = expanded.has(letter);
-          const anyHl = items.some((op) =>
-            highlightedBands.has(`${letter}:${op.decade}`),
-          );
-          const [h, s] = ECO_HSL[letter];
-          const baseClr = `hsl(${h},${s}%,60%)`;
-
-          return (
-            <div key={letter} className="chord-eco-group">
-              <div
-                className={`chord-eco-header${anyHl ? " highlighted" : ""}`}
-                onClick={() => toggleLetter(letter)}
-                style={{ color: anyHl ? `hsl(${h},${s}%,78%)` : baseClr }}
-              >
-                <span className="chord-eco-chevron">{isOpen ? "▾" : "▸"}</span>
-                <span className="chord-eco-letter">{letter}</span>
-                <span className="chord-eco-desc">{ECO_LABELS[letter]}</span>
-              </div>
-              {isOpen && (
-                <ul className="chord-opening-items">
-                  {items.map((op) => {
-                    const bandKey = `${letter}:${op.decade}`;
-                    const isHl = highlightedBands.has(bandKey);
-                    const pip = pipColor(letter, op.decade, isHl);
-
-                    return (
-                      <li
-                        key={`${op.eco}:${op.name}`}
-                        className={`chord-opening-item${isHl ? " highlighted" : ""}`}
-                        onClick={() => toggleBand(letter, op.decade)}
-                      >
-                        <span
-                          className="chord-opening-pip"
-                          style={{ background: pip }}
-                        />
-                        <span className="chord-opening-name">{op.name}</span>
-                        <span className="chord-opening-eco">{op.eco}</span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {isLoading ? (
+        <div style={{ fontSize: "0.8em", color: "#555" }}>Loading…</div>
+      ) : bandOpenings.length === 0 ? (
+        <div style={{ fontSize: "0.8em", color: "#555" }}>No named openings in this band</div>
+      ) : (
+        <ul className="chord-opening-items">
+          {bandOpenings.map((op) => (
+            <li key={`${op.eco}:${op.name}`} className="chord-opening-item">
+              <span
+                className="chord-opening-pip"
+                style={{ background: `hsl(${h},${s}%,${28 + decade * 3.8}%)` }}
+              />
+              <span className="chord-opening-name">{op.name}</span>
+              <span className="chord-opening-eco">{op.eco}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

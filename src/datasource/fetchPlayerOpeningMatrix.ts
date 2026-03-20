@@ -36,6 +36,10 @@ export interface PlayerOpeningMatrixResponse {
   openings: Record<string, OpeningEntry[]>; // keyed by ECO letter A–E
 }
 
+export interface BandOpeningsResponse {
+  openings: OpeningEntry[];
+}
+
 const AUTH_HEADER = {
   Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
 };
@@ -49,15 +53,21 @@ export async function fetchPlayerOpeningMatrix(): Promise<PlayerOpeningMatrixRes
   return res.json();
 }
 
-/** Fetch matrix rows for specific players only (smaller payload for the diagram). */
-export async function fetchPlayerMatrixForPlayers(
+/** Fetch openings for a specific ECO decade band, filtered to the given players. */
+export async function fetchOpeningsForBand(
   players: string[],
-): Promise<PlayerOpeningMatrixResponse> {
-  const qs = new URLSearchParams({ players: players.join(",") });
+  letter: string,
+  decade: number,
+): Promise<BandOpeningsResponse> {
+  const qs = new URLSearchParams({
+    players: players.join("|"),
+    letter,
+    decade: String(decade),
+  });
   const res = await fetch(
     `/.netlify/functions/getPlayerOpeningMatrix?${qs.toString()}`,
     { headers: AUTH_HEADER },
   );
-  if (!res.ok) throw new Error(`getPlayerOpeningMatrix: ${res.status}`);
+  if (!res.ok) throw new Error(`getPlayerOpeningMatrix band: ${res.status}`);
   return res.json();
 }

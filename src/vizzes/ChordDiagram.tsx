@@ -21,6 +21,7 @@ export interface HighlightBand {
 interface ChordDiagramProps {
   activePlayers: ActivePlayer[];
   highlightBands: HighlightBand[]; // empty = no highlight
+  onBandClick?: (letter: string, decade: number) => void;
 }
 
 // Fixed palette — color assigned by slot, not by player name
@@ -86,9 +87,13 @@ function ribbonPath(
 export function ChordDiagram({
   activePlayers,
   highlightBands,
+  onBandClick,
 }: ChordDiagramProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
+  // Stable ref so the effect never needs onBandClick in its deps array
+  const onBandClickRef = useRef(onBandClick);
+  onBandClickRef.current = onBandClick;
 
   useEffect(() => {
     const svg = svgRef.current;
@@ -295,7 +300,9 @@ export function ChordDiagram({
           p.setAttribute("stroke-width", "1.5");
           p.setAttribute("stroke-opacity", "0.9");
         }
-        const label = `ECO ${g.id}${di}0–${g.id}${di}9 · ${count.toLocaleString()} games${bandHl ? "  ◀ selected opening" : ""}`;
+        const label = `ECO ${g.id}${di}0–${g.id}${di}9 · ${count.toLocaleString()} games`;
+        p.style.cursor = "pointer";
+        p.addEventListener("click", () => onBandClickRef.current?.(g.id, di));
         p.addEventListener("mouseenter", (e) =>
           showTip(e as MouseEvent, label),
         );
