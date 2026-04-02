@@ -14,7 +14,7 @@ const squareColors = FILES.map((file, fileNo) =>
   RANKS.map((rank) => {
     const squareInt = 8 * fileNo + rank;
     return { file, rank, color: getColorForValue((squareInt - 8) / 65) };
-  })
+  }),
 ).flat();
 
 const moveCoords = squareColors.map(({ file, rank, color }, i) => {
@@ -40,7 +40,8 @@ const FromToCircleImpl = ({ fromTos }) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const W = 600, H = 600;
+    const W = 600,
+      H = 600;
     ctx.clearRect(0, 0, W, H);
     ctx.save();
     ctx.translate(W / 2, H / 2);
@@ -49,10 +50,10 @@ const FromToCircleImpl = ({ fromTos }) => {
     ctx.lineWidth = 1;
     fromTos.forEach((move) => {
       const fromCoord = moveCoords.find(
-        ({ file, rank }) => move[0][0] === file && move[0][1] == rank
+        ({ file, rank }) => move[0][0] === file && move[0][1] == rank,
       );
       const toCoord = moveCoords.find(
-        ({ file, rank }) => move[1][0] === file && move[1][1] == rank
+        ({ file, rank }) => move[1][0] === file && move[1][1] == rank,
       );
       if (!fromCoord || !toCoord) return;
 
@@ -60,9 +61,12 @@ const FromToCircleImpl = ({ fromTos }) => {
       ctx.beginPath();
       ctx.moveTo(fromCoord.lx, fromCoord.ly);
       ctx.bezierCurveTo(
-        fromCoord.lx / 2, fromCoord.ly / 2,
-        toCoord.lx / 2, toCoord.ly / 2,
-        toCoord.lx, toCoord.ly
+        fromCoord.lx / 2,
+        fromCoord.ly / 2,
+        toCoord.lx / 2,
+        toCoord.ly / 2,
+        toCoord.lx,
+        toCoord.ly,
       );
       ctx.stroke();
     });
