@@ -15,7 +15,7 @@ async function getDownloadUrls(): Promise<GitHubFileMetadata[]> {
     {
       owner: "JeffML",
       repo: "eco.json",
-    }
+    },
   );
 
   // const downloads = data.map((meta) => {
