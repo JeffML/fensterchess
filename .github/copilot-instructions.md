@@ -2,6 +2,9 @@
 
 ## Quick Reference
 
+- If a problem isn't solved within 5 consecutive tool calls, stop, summarize
+  what you've ruled out, and ask the user for more information.
+
 **chessPGN API Patterns:**
 
 - **Single game**: `loadPgn(pgnString)` → `IChessGame` instance (use `.move()`, `.fen()`, etc.)
