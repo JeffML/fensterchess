@@ -1,21 +1,10 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
-import {
-  useContext,
-  useRef,
-  useState,
-  useEffect,
-  MutableRefObject,
-} from "react";
+import { useContext, useRef, useState, useEffect, MutableRefObject } from "react";
 import { FENEX, POSITION_ONLY_FEN_REGEX } from "../common/consts";
 import { OpeningBookContext } from "../contexts/OpeningBookContext";
 import SearchPage from "./SearchPage";
 import { useQuery } from "@tanstack/react-query";
-import {
-  findOpening,
-  findNearestOpening,
-  getFromTosForFen,
-  getScoresForFens,
-} from "../datasource/findOpening";
+import { findOpening, findNearestOpening, getFromTosForFen, getScoresForFens } from "../datasource/findOpening";
 import { BoardState } from "../types";
 
 interface LoadMovesResult {
@@ -23,10 +12,7 @@ interface LoadMovesResult {
   fen: string;
 }
 
-const loadMoves = (
-  moves: string,
-  chess: MutableRefObject<ChessPGN>
-): LoadMovesResult => {
+const loadMoves = (moves: string, chess: MutableRefObject<ChessPGN>): LoadMovesResult => {
   let fen = "";
 
   try {
@@ -40,10 +26,7 @@ const loadMoves = (
   }
 };
 
-function readParams(
-  url: URLSearchParams,
-  chess: MutableRefObject<ChessPGN>
-): BoardState {
+function readParams(url: URLSearchParams, chess: MutableRefObject<ChessPGN>): BoardState {
   const qmoves = url.get("moves");
   url.delete("moves");
 
@@ -105,11 +88,7 @@ const SearchPageContainer = () => {
   const { data: fromTosForFen } = useQuery({
     queryKey: ["fromTosForFen", fen],
     queryFn: async () => getFromTosForFen(fen),
-    enabled:
-      fen != null &&
-      fen !== "start" &&
-      openingBook != null &&
-      openingBook[fen] != null,
+    enabled: fen != null && fen !== "start" && openingBook != null && openingBook[fen] != null,
   });
 
   const { data: scoresForFens } = useQuery({
@@ -128,30 +107,17 @@ const SearchPageContainer = () => {
 
   let opening =
     openingBook && positionBook
-      ? findOpening(
-          openingBook,
-          fen,
-          positionBook,
-          fromTosForFen || null,
-          scoresForFens || null
-        )
+      ? findOpening(openingBook, fen, positionBook, fromTosForFen || null, scoresForFens || null)
       : undefined;
 
   // If no opening found and we have moves, search backward for nearest opening
   if (!opening && moves && moves.trim() !== "" && openingBook) {
-    const { opening: nearestOpening, movesBack } = findNearestOpening(
-      moves,
-      openingBook
-    );
+    const { opening: nearestOpening, movesBack } = findNearestOpening(moves, openingBook, positionBook!);
 
     if (nearestOpening && movesBack > 0) {
       opening = nearestOpening;
       // Store info about how far back we found the opening
-      if (
-        !nearestOpeningInfo ||
-        nearestOpeningInfo.fen !== fen ||
-        nearestOpeningInfo.movesBack !== movesBack
-      ) {
+      if (!nearestOpeningInfo || nearestOpeningInfo.fen !== fen || nearestOpeningInfo.movesBack !== movesBack) {
         setNearestOpeningInfo({ fen, movesBack });
       }
     } else {

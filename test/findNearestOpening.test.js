@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { findNearestOpening } from "../src/datasource/findOpening";
+import { getPositionBook } from "@chess-openings/eco.json";
 
 describe("findNearestOpening", () => {
   const mockOpeningBook = {
@@ -36,12 +37,8 @@ describe("findNearestOpening", () => {
   };
 
   const mockPositionBook = {
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR": [
-      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-    ],
-    "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR": [
-      "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
-    ],
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR": ["rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"],
+    "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR": ["rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"],
     "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR": [
       "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
     ],
@@ -54,13 +51,13 @@ describe("findNearestOpening", () => {
   };
 
   it("should return undefined for empty moves string", () => {
-    const result = findNearestOpening("", mockOpeningBook);
+    const result = findNearestOpening("", mockOpeningBook, mockPositionBook);
     expect(result.opening).toBeUndefined();
     expect(result.movesBack).toBe(0);
   });
 
   it("should return undefined for whitespace-only moves string", () => {
-    const result = findNearestOpening("   ", mockOpeningBook);
+    const result = findNearestOpening("   ", mockOpeningBook, mockPositionBook);
     expect(result.opening).toBeUndefined();
     expect(result.movesBack).toBe(0);
   });
@@ -68,7 +65,7 @@ describe("findNearestOpening", () => {
   it("should find opening 1 move back", () => {
     // Moves: 1. e4 e5 2. Nf3 Nc6 3. Bc4 (last move not in opening book)
     const moves = "1. e4 e5 2. Nf3 Nc6 3. Bc4";
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeDefined();
     expect(result.opening.name).toBe("King's Knight Opening: Normal Variation");
@@ -79,7 +76,7 @@ describe("findNearestOpening", () => {
   it("should find opening 2 moves back", () => {
     // Moves: 1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 (last 2 moves not in opening book)
     const moves = "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5";
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeDefined();
     expect(result.opening.name).toBe("King's Knight Opening: Normal Variation");
@@ -90,7 +87,7 @@ describe("findNearestOpening", () => {
   it("should find opening 3 moves back", () => {
     // Moves: 1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. O-O (last 3 moves not in opening book)
     const moves = "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. O-O";
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeDefined();
     expect(result.opening.name).toBe("King's Knight Opening: Normal Variation");
@@ -100,7 +97,7 @@ describe("findNearestOpening", () => {
 
   it("should return 0 moves back when last position is in opening book", () => {
     const moves = "1. e4 e5 2. Nf3 Nc6";
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeDefined();
     expect(result.opening.name).toBe("King's Knight Opening: Normal Variation");
@@ -111,7 +108,7 @@ describe("findNearestOpening", () => {
   it("should find starting position when all moves are unknown", () => {
     // Completely different opening line not in our mock book
     const moves = "1. a3 a6 2. h3 h6";
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeDefined();
     expect(result.opening.name).toBe("Starting Position");
@@ -120,7 +117,7 @@ describe("findNearestOpening", () => {
 
   it("should handle single move sequences", () => {
     const moves = "1. e4";
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeDefined();
     expect(result.opening.name).toBe("King's Pawn Opening");
@@ -132,7 +129,7 @@ describe("findNearestOpening", () => {
     // 1. e4 e5 2. Nf3 followed by illegal move Nc3 (white can't move knight to c3 after Nf3)
     // Let's use a valid continuation instead
     const moves = "1. e4 e5 2. Nf3 d6"; // valid moves
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeDefined();
     // Should find "King's Knight Opening" (after 2. Nf3)
@@ -143,7 +140,7 @@ describe("findNearestOpening", () => {
   it("should use position book as fallback", () => {
     // Create a scenario where exact FEN match fails but position match succeeds
     const moves = "1. e4";
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeDefined();
     expect(result.opening.name).toBe("King's Pawn Opening");
@@ -152,7 +149,7 @@ describe("findNearestOpening", () => {
 
   it("should return undefined for invalid PGN", () => {
     const moves = "invalid pgn notation xyz";
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeUndefined();
     expect(result.movesBack).toBe(0);
@@ -160,7 +157,7 @@ describe("findNearestOpening", () => {
 
   it("should handle moves with comments", () => {
     const moves = "1. e4 {best move} e5 2. Nf3 Nc6";
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeDefined();
     expect(result.opening.name).toBe("King's Knight Opening: Normal Variation");
@@ -186,9 +183,7 @@ describe("findNearestOpening", () => {
 
     const extendedPositionBook = {
       ...mockPositionBook,
-      "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR": [
-        "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1",
-      ],
+      "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR": ["rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1"],
       "rnbqkbnr/pp1ppppp/8/2p5/3P4/8/PPP1PPPP/RNBQKBNR": [
         "rnbqkbnr/pp1ppppp/8/2p5/3P4/8/PPP1PPPP/RNBQKBNR w KQkq c6 0 2",
       ],
@@ -196,7 +191,7 @@ describe("findNearestOpening", () => {
 
     // Continue Benoni with moves not in book
     const moves = "1. d4 c5 2. d5 e6 3. Nc3";
-    const result = findNearestOpening(moves, extendedOpeningBook);
+    const result = findNearestOpening(moves, extendedOpeningBook, extendedPositionBook);
 
     expect(result.opening).toBeDefined();
     expect(result.opening.name).toBe("Benoni Defense");
@@ -205,9 +200,8 @@ describe("findNearestOpening", () => {
 
   it("should handle deeply nested game continuation", () => {
     // Game continues far beyond opening book
-    const moves =
-      "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. O-O Nf6 5. d3 d6 6. Bg5 h6 7. Bh4 g5 8. Bg3 h5";
-    const result = findNearestOpening(moves, mockOpeningBook);
+    const moves = "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. O-O Nf6 5. d3 d6 6. Bg5 h6 7. Bh4 g5 8. Bg3 h5";
+    const result = findNearestOpening(moves, mockOpeningBook, mockPositionBook);
 
     expect(result.opening).toBeDefined();
     expect(result.opening.name).toBe("King's Knight Opening: Normal Variation");

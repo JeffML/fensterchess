@@ -1,17 +1,6 @@
 import { ChessPGN } from "@chess-pgn/chess-pgn";
-import {
-  findOpening as ecoFindOpening,
-  getPositionBook,
-} from "@chess-openings/eco.json";
-import type {
-  FEN,
-  Opening,
-  OpeningBook,
-  PositionBook,
-  FromTosResponse,
-  ScoresResponse,
-  ScoresRequest,
-} from "../types";
+import { findOpening as ecoFindOpening } from "@chess-openings/eco.json";
+import type { FEN, Opening, OpeningBook, PositionBook, FromTosResponse, ScoresResponse, ScoresRequest } from "../types";
 
 interface NearestOpeningResult {
   opening: Opening | undefined;
@@ -26,11 +15,7 @@ export function findOpening(
   scoresForFens: ScoresResponse | null,
 ): Opening | undefined {
   // Use eco.json's findOpening for base lookup (cast to handle type compatibility)
-  const baseOpening = ecoFindOpening(
-    openingBook as any,
-    fen === "start" ? "start" : fen,
-    positionBook,
-  );
+  const baseOpening = ecoFindOpening(openingBook as any, fen === "start" ? "start" : fen, positionBook);
 
   if (!baseOpening) {
     return undefined;
@@ -85,6 +70,7 @@ export function findOpening(
 export function findNearestOpening(
   moves: string,
   openingBook: OpeningBook,
+  positionBook: PositionBook,
 ): NearestOpeningResult {
   if (!moves || moves.trim() === "") {
     return { opening: undefined, movesBack: 0 };
@@ -100,7 +86,6 @@ export function findNearestOpening(
     return { opening: undefined, movesBack: 0 };
   }
 
-  const posBook = getPositionBook(openingBook as any);
   let movesBack = 0;
 
   // Walk backward through moves until we find an opening
@@ -111,9 +96,9 @@ export function findNearestOpening(
     let opening = openingBook[currentFen];
 
     // Try position-only fallback if no exact match
-    if (!opening && posBook) {
+    if (!opening) {
       const position = currentFen.split(" ")[0];
-      const posEntry = posBook[position];
+      const posEntry = positionBook[position];
       if (posEntry && posEntry.length > 0) {
         opening = openingBook[posEntry[0]];
         if (opening) {
@@ -145,19 +130,14 @@ export function findNearestOpening(
 }
 
 export const getFromTosForFen = async (fen: FEN): Promise<FromTosResponse> => {
-  const response = await fetch(
-    "/.netlify/functions/getFromTosForFen?fen=" + fen,
-    {
-      headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
-      },
+  const response = await fetch("/.netlify/functions/getFromTosForFen?fen=" + fen, {
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_API_SECRET_TOKEN}`,
     },
-  );
+  });
 
   if (!response.ok) {
-    console.error(
-      `Failed to fetch fromTos for FEN: ${response.status} ${response.statusText}`,
-    );
+    console.error(`Failed to fetch fromTos for FEN: ${response.status} ${response.statusText}`);
     // Return empty arrays instead of throwing, so the app continues to work
     return { next: [], from: [] };
   }
@@ -165,9 +145,7 @@ export const getFromTosForFen = async (fen: FEN): Promise<FromTosResponse> => {
   return await response.json();
 };
 
-export const getScoresForFens = async (
-  json: ScoresRequest,
-): Promise<ScoresResponse> => {
+export const getScoresForFens = async (json: ScoresRequest): Promise<ScoresResponse> => {
   const response = await fetch("/.netlify/functions/scoresForFens", {
     method: "POST",
     headers: {
@@ -178,9 +156,7 @@ export const getScoresForFens = async (
   });
 
   if (!response.ok) {
-    console.error(
-      `Failed to fetch scores: ${response.status} ${response.statusText}`,
-    );
+    console.error(`Failed to fetch scores: ${response.status} ${response.statusText}`);
     // Return null scores instead of throwing, so the app continues to work
     return { score: null, nextScores: [], fromScores: [] };
   }
