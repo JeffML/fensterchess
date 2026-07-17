@@ -5,6 +5,7 @@ import { OpeningBookContext } from "../contexts/OpeningBookContext";
 import SearchPage from "./SearchPage";
 import { useQuery } from "@tanstack/react-query";
 import { findOpening, findNearestOpening, getFromTosForFen, getScoresForFens } from "../datasource/findOpening";
+import { extractSanMoves } from "../utils/chessTools";
 import { BoardState } from "../types";
 
 interface LoadMovesResult {
@@ -32,7 +33,8 @@ function readParams(url: URLSearchParams, chess: MutableRefObject<ChessPGN>): Bo
 
   if (qmoves) {
     const { moves, fen } = loadMoves(qmoves, chess);
-    return { moves, fen };
+    const currentPly = moves ? extractSanMoves(moves).length : 0;
+    return { moves, fen, currentPly };
   } else {
     let qfen = url.get("fen");
     url.delete("fen");
@@ -50,7 +52,7 @@ function readParams(url: URLSearchParams, chess: MutableRefObject<ChessPGN>): Bo
       qfen = "start";
     }
 
-    return { moves: "", fen: qfen ?? "start" };
+    return { moves: "", fen: qfen ?? "start", currentPly: 0 };
   }
 }
 
@@ -58,6 +60,7 @@ const SearchPageContainer = () => {
   const [boardState, setBoardState] = useState<BoardState>({
     fen: "start",
     moves: "",
+    currentPly: 0,
   });
   const [nearestOpeningInfo, setNearestOpeningInfo] = useState<{
     fen: string;
@@ -71,10 +74,10 @@ const SearchPageContainer = () => {
   useEffect(() => {
     if (!initializedFromUrl.current) {
       const url = new URLSearchParams(window.location.search);
-      const { fen, moves } = readParams(url, chess);
+      const { fen, moves, currentPly } = readParams(url, chess);
       // Only update if different from initial state
       if (fen !== "start" || moves !== "") {
-        setBoardState({ fen, moves });
+        setBoardState({ fen, moves, currentPly });
       }
       initializedFromUrl.current = true;
     }

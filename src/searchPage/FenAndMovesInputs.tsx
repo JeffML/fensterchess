@@ -8,7 +8,7 @@ import {
 } from "react";
 import { FENEX, POSITION_ONLY_FEN_REGEX } from "../common/consts";
 import "../stylesheets/textarea.css";
-import { pgnMovesOnly } from "../utils/chessTools";
+import { pgnMovesOnly, extractSanMoves } from "../utils/chessTools";
 import { sanitizeInput } from "../utils/sanitizeInput.js";
 import { BoardState, Opening, OpeningBook, PositionBook } from "../types";
 import { ChessPGN } from "@chess-pgn/chess-pgn";
@@ -180,7 +180,8 @@ const FenAndMovesInputs = ({
         chess.current.loadPgn(opening.moves);
         const resultingFen = chess.current.fen();
         const validatedMoves = chess.current.pgn();
-        setBoardState({ fen: resultingFen, moves: validatedMoves });
+        const currentPly = extractSanMoves(validatedMoves).length;
+        setBoardState({ fen: resultingFen, moves: validatedMoves, currentPly });
         setLastKnownOpening(opening);
       } catch (ex) {
         alert(`Error loading opening: ${(ex as Error).message}`);
@@ -192,7 +193,7 @@ const FenAndMovesInputs = ({
     try {
       chess.current.load(input);
       const validatedFen = chess.current.fen();
-      setBoardState({ fen: validatedFen, moves: "" });
+      setBoardState({ fen: validatedFen, moves: "", currentPly: 0 });
       setLastKnownOpening({});
     } catch (ex) {
       alert((ex as Error).toString());
@@ -209,7 +210,8 @@ const FenAndMovesInputs = ({
       chess.current.loadPgn(input);
       const validatedMoves = chess.current.pgn(); // canonical pgn
       const resultingFen = chess.current.fen();
-      setBoardState({ fen: resultingFen, moves: validatedMoves });
+      const currentPly = extractSanMoves(validatedMoves).length;
+      setBoardState({ fen: resultingFen, moves: validatedMoves, currentPly });
       setLastKnownOpening({});
     } catch (ex) {
       alert((ex as Error).toString());
@@ -237,7 +239,8 @@ const FenAndMovesInputs = ({
         chess.current.loadPgn(opening.moves);
         const resultingFen = chess.current.fen();
         const validatedMoves = chess.current.pgn();
-        setBoardState({ fen: resultingFen, moves: validatedMoves });
+        const currentPly = extractSanMoves(validatedMoves).length;
+        setBoardState({ fen: resultingFen, moves: validatedMoves, currentPly });
         setLastKnownOpening(opening);
         setNameSearchTerm(""); // Clear search after selection
         setSearchMode("position"); // Switch to position tab to show FEN and moves
