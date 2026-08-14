@@ -1,11 +1,4 @@
-import {
-  ClipboardEvent,
-  MutableRefObject,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-} from "react";
+import { ClipboardEvent, MutableRefObject, useState, useEffect, useCallback, useMemo } from "react";
 import { FENEX, POSITION_ONLY_FEN_REGEX } from "../common/consts";
 import "../stylesheets/textarea.css";
 import { pgnMovesOnly, extractSanMoves } from "../utils/chessTools";
@@ -18,13 +11,7 @@ type SearchMode = "position" | "name";
 /**
  * Component to display moves with opening variation highlighted in bold
  */
-const MoveDisplay = ({
-  moves,
-  openingPlyCount,
-}: {
-  moves: string;
-  openingPlyCount?: number;
-}) => {
+const MoveDisplay = ({ moves, openingPlyCount }: { moves: string; openingPlyCount?: number }) => {
   if (!moves) {
     return <span style={{ color: "#888" }}>Paste moves or PGN here</span>;
   }
@@ -35,8 +22,7 @@ const MoveDisplay = ({
   }
 
   // Find where opening ends by counting SAN moves
-  const sanMoveRegex =
-    /[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](=[QRBN])?[+#]?|O-O(-O)?[+#]?/g;
+  const sanMoveRegex = /[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](=[QRBN])?[+#]?|O-O(-O)?[+#]?/g;
   let plyCount = 0;
   let splitIndex = moves.length;
 
@@ -70,10 +56,7 @@ const OPENING_ALIASES: Record<string, string[]> = {
   scotch: ["scottish"],
 };
 
-function filterOpenings(
-  searchTerm: string,
-  openingBook: OpeningBook | undefined,
-): Array<[string, Opening]> {
+function filterOpenings(searchTerm: string, openingBook: OpeningBook | undefined): Array<[string, Opening]> {
   if (!searchTerm.trim() || !openingBook) return [];
 
   // Normalize search term
@@ -87,10 +70,7 @@ function filterOpenings(
   if (words.length === 0) return [];
 
   const results = Object.entries(openingBook).filter(([_fen, opening]) => {
-    const name = opening.name
-      .toLowerCase()
-      .replace(/['']/g, "")
-      .replace(/[-,]/g, " ");
+    const name = opening.name.toLowerCase().replace(/['']/g, "").replace(/[-,]/g, " ");
 
     // All original words must appear (or their aliases)
     return words.every((word) => {
@@ -134,9 +114,7 @@ const FenAndMovesInputs = ({
   const [nameSearchTerm, setNameSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
-  const handleFenPaste = (
-    e: ClipboardEvent<HTMLDivElement | HTMLTextAreaElement>,
-  ) => {
+  const handleFenPaste = (e: ClipboardEvent<HTMLDivElement | HTMLTextAreaElement>) => {
     e.preventDefault();
     let input = e.clipboardData.getData("text");
     input = sanitizeInput(input);
@@ -160,9 +138,7 @@ const FenAndMovesInputs = ({
       // Look up the position in the position book
       const posEntry = positionBook[stubFen];
       if (!posEntry || posEntry.length === 0) {
-        alert(
-          "Position not found in opening database. Please enter a full FEN or a position from the opening book.",
-        );
+        alert("Position not found in opening database. Please enter a full FEN or a position from the opening book.");
         return;
       }
 
@@ -251,10 +227,7 @@ const FenAndMovesInputs = ({
     [chess, setBoardState, setLastKnownOpening],
   );
 
-  const fenDisplay =
-    fen === "start"
-      ? "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      : fen;
+  const fenDisplay = fen === "start" ? "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" : fen;
 
   return (
     <div
@@ -279,21 +252,12 @@ const FenAndMovesInputs = ({
           style={{
             padding: "6px 16px",
             border: "none",
-            borderBottom:
-              searchMode === "position"
-                ? "3px solid var(--color-accent-green)"
-                : "3px solid transparent",
-            backgroundColor:
-              searchMode === "position"
-                ? "var(--color-bg-menu-item)"
-                : "transparent",
+            borderBottom: searchMode === "position" ? "3px solid var(--color-accent-green)" : "3px solid transparent",
+            backgroundColor: searchMode === "position" ? "var(--color-bg-menu-item)" : "transparent",
             cursor: "pointer",
             fontSize: "12px",
             fontWeight: "bold",
-            color:
-              searchMode === "position"
-                ? "var(--color-link)"
-                : "var(--color-text-muted)",
+            color: searchMode === "position" ? "var(--color-link)" : "var(--color-text-muted)",
             transition: "all 0.2s ease",
           }}
         >
@@ -304,21 +268,12 @@ const FenAndMovesInputs = ({
           style={{
             padding: "6px 16px",
             border: "none",
-            borderBottom:
-              searchMode === "name"
-                ? "3px solid var(--color-accent-green)"
-                : "3px solid transparent",
-            backgroundColor:
-              searchMode === "name"
-                ? "var(--color-bg-menu-item)"
-                : "transparent",
+            borderBottom: searchMode === "name" ? "3px solid var(--color-accent-green)" : "3px solid transparent",
+            backgroundColor: searchMode === "name" ? "var(--color-bg-menu-item)" : "transparent",
             cursor: "pointer",
             fontSize: "12px",
             fontWeight: "bold",
-            color:
-              searchMode === "name"
-                ? "var(--color-link)"
-                : "var(--color-text-muted)",
+            color: searchMode === "name" ? "var(--color-link)" : "var(--color-text-muted)",
             transition: "all 0.2s ease",
           }}
         >
@@ -375,9 +330,7 @@ const FenAndMovesInputs = ({
             <div
               id="moves-input"
               onPaste={(e: ClipboardEvent<HTMLDivElement>) => {
-                handleMovesPaste(
-                  e as unknown as ClipboardEvent<HTMLTextAreaElement>,
-                );
+                handleMovesPaste(e as unknown as ClipboardEvent<HTMLTextAreaElement>);
               }}
               style={{
                 fontFamily: "monospace",
@@ -395,19 +348,13 @@ const FenAndMovesInputs = ({
                 textAlign: "left",
               }}
             >
-              <MoveDisplay
-                moves={pgnMovesOnly(moves)}
-                openingPlyCount={boardState.openingPlyCount}
-              />
+              <MoveDisplay moves={pgnMovesOnly(moves)} openingPlyCount={boardState.openingPlyCount} />
             </div>
           </div>
         </>
       ) : (
         <div>
-          <label
-            htmlFor="name-input"
-            style={{ display: "block", marginBottom: "2px", fontSize: "11px" }}
-          >
+          <label htmlFor="name-input" style={{ display: "block", marginBottom: "2px", fontSize: "11px" }}>
             Opening Name:
           </label>
           <input
@@ -454,9 +401,7 @@ const FenAndMovesInputs = ({
                     e.currentTarget.style.backgroundColor = "#fff";
                   }}
                 >
-                  <div style={{ fontWeight: "500", color: "#000" }}>
-                    {opening.name}
-                  </div>
+                  <div style={{ fontWeight: "500", color: "#000" }}>{opening.name}</div>
                 </div>
               ))}
             </div>
