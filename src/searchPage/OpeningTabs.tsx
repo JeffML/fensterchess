@@ -94,7 +94,7 @@ const OpeningTabs = ({
   const { move } = toPlay(fen);
 
   const searchable = parseInt(move) > 4;
-  const showTransitions = from && from.length > 1;
+  const showTransitions = from && from.length > 0;
 
   const [html, setHtml] = useState<string | null>(null);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
