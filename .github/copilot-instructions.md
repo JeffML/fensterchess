@@ -1,5 +1,19 @@
 # Copilot Instructions for Fenster Chess
 
+## Git Safety — Agent Operating Rules
+
+**Binding on any agent working in this repo (including Copilot).**
+
+- NEVER run destructive git ops — `reset --hard`, `checkout` to an old tag or
+  branch, force-push, history rewrite, or `clean -fd` — without the repo owner's
+  explicit approval.
+- Before starting work, run `git status -sb` and confirm HEAD matches
+  `origin/main`. Do not assume the working tree is at the expected version.
+- Re-verify `git status -sb` and the current commit after any branch operation.
+- Prefer non-destructive fixes. `git reflog` is the recovery net if history is
+  ever changed by mistake.
+- Default branch: `main`. Do not rename or reset it.
+
 ## Quick Reference
 
 - If a problem isn't solved within 5 consecutive tool calls, stop, summarize

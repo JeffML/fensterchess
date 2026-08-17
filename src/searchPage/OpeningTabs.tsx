@@ -29,13 +29,7 @@ interface MoveLists {
  * - moved to from current move sequence (legal move)
  * - transposed to from a different move sequence (yet same position as current move sequence)
  */
-const moveLists = ({
-  variations,
-  currentMoves,
-}: {
-  variations?: Opening[];
-  currentMoves?: string;
-}): MoveLists => {
+const moveLists = ({ variations, currentMoves }: { variations?: Opening[]; currentMoves?: string }): MoveLists => {
   let legalMoves: Variation[] = [];
   let transpositions: Variation[] = [];
 
@@ -61,9 +55,7 @@ const legalMove = (moves: string, variation: Opening): Variation | null => {
   chess.loadPgn(moves);
   const legalMoves = chess.moves();
 
-  return legalMoves.includes(nextPly)
-    ? { ...variation, theMove, nextPly }
-    : null;
+  return legalMoves.includes(nextPly) ? { ...variation, theMove, nextPly } : null;
 };
 
 interface OpeningTabsProps {
@@ -94,7 +86,7 @@ const OpeningTabs = ({
   const { move } = toPlay(fen);
 
   const searchable = parseInt(move) > 4;
-  const showTransitions = from && from.length > 1;
+  const showTransitions = from && from.length > 0;
 
   const [html, setHtml] = useState<string | null>(null);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
@@ -144,10 +136,7 @@ const OpeningTabs = ({
         )}
         {html && <TabPanel>{hasLastMove && <Theory {...{ html }} />}</TabPanel>}
         <TabPanel>
-          <div
-            className="row"
-            style={{ marginLeft: "1em", marginBottom: "1em" }}
-          >
+          <div className="row" style={{ marginLeft: "1em", marginBottom: "1em" }}>
             <OpeningAdditionalWithBarChartGrid
               {...{
                 eco,
